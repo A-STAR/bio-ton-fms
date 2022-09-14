@@ -1,4 +1,5 @@
 using BioTonFMS.Infrastructure.EF;
+using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMSApp.Startup;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +28,9 @@ builder.Services.AddSwaggerGen();
 
 builder.RegisterInfrastructureComponents();
 builder.RegisterDataAccess();
+
+// configuring Serilog
+builder.ConfigureSerilog();
 
 var app = builder.Build();
 
