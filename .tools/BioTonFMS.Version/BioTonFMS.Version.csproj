@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Configurations>Debug;Release;Production</Configurations>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.8.0" />
+    <!--<Compile Include="$(SolutionDir)GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>-->
+  </ItemGroup>
+
+
+  <ItemGroup>
+        <BuiltTask Include="$(TargetPath)*.dll"/>
+  </ItemGroup>
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Copy
+            SourceFiles="$(TargetPath)"
+            DestinationFolder="..\..\libs\"
+            ContinueOnError="WarnAndContinue"
+    />
+
+    <!--Exec Command="echo d | xcopy $(TargetPath) $..\..\libs\ /r /y /q /c" /-->
+  </Target>
+
+</Project>

@@ -4,10 +4,16 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+	<Compile Include="..\GlobalAssemblyInfo.cs">
+	  <Link>Properties\GlobalAssemblyInfo.cs</Link>
+	</Compile>
+  </ItemGroup>
 </Project>

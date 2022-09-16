@@ -4,6 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +18,12 @@
   <ItemGroup>
     <ProjectReference Include="..\BioTonFMS.Infrastructure.EF\BioTonFMS.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Compile Include="..\GlobalAssemblyInfo.cs">
+	  <Link>Properties\GlobalAssemblyInfo.cs</Link>
+	</Compile>
   </ItemGroup>
 
 </Project>
