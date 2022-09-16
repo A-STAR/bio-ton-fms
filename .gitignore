@@ -11,3 +11,6 @@ StyleCop.Cache
 *.DotSettings.user
 *.user
 #/packages/
+/libs/*.*
+/BioTonFMSApp/logs/*.*
+/GlobalAssemblyInfo.cs

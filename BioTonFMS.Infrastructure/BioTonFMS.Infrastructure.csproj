@@ -17,4 +17,8 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
   </ItemGroup>
 
+  <UsingTask TaskName="GitVersionFile" AssemblyFile="..\libs\BioTonFMS.Version.dll" />
+  <Target Name="BioTonFMS_Infrastructure" AfterTargets="AfterBuild">
+	<GitVersionFile TemplateFile="..\GlobalAssemblyInfo.Template.cs" DestinationFile="..\GlobalAssemblyInfo.cs" />
+  </Target>
 </Project>
