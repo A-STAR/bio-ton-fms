@@ -38,6 +38,7 @@
               "src/assets"
             ],
             "styles": [
+              "src/styles/reset.sass",
               "src/styles.sass"
             ],
             "scripts": []
@@ -100,6 +101,7 @@
               "src/assets"
             ],
             "styles": [
+              "src/styles/reset.sass",
               "src/styles.sass"
             ],
             "scripts": []
