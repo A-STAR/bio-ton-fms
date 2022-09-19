@@ -34,7 +34,7 @@ builder.ConfigureSerilog();
 
 var app = builder.Build();
 
-app.CreateDbIfNotExists();
+app.ApplyMigrations(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

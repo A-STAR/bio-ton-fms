@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BioTonFMS.Infrastructure.EF\BioTonFMS.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
+    <ProjectReference Include="..\BioTonFMS.Migrations\BioTonFMS.Migrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

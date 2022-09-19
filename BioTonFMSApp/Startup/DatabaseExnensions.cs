@@ -1,24 +1,30 @@
 ﻿using BioTonFMS.Infrastructure.EF;
+using BioTonFMS.Migrations;
 
 namespace BioTonFMSApp.Startup
 {
     public static class DatabaseExnensions
     {
-        public static void CreateDbIfNotExists(this IHost host)
+        public static void ApplyMigrations(this IHost host, IConfiguration configuration, Action<DbOptions>? configureOptions = null)
         {
-            using (var scope = host.Services.CreateScope())
+            var dbOptions = new DbOptions();
+            configuration.GetSection("Db").Bind(dbOptions);
+            configureOptions?.Invoke(dbOptions);
+
+            if (!dbOptions.ApplyMigrations) return;
+
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            
+            try
             {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var context = services.GetRequiredService<BioTonDBContext>();
-                    DbInitializer.Initialize(context);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred creating the DB.");
-                }
+                var context = services.GetRequiredService<BioTonDBContext>();
+                DbMigrator.Apply(context);
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred creating the DB");
             }
         }
     }
