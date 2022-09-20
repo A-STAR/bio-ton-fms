@@ -2,6 +2,7 @@
 using BioTonFMS.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMSApp.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    partial class BioTonDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220920095312_AlterForeignKeyInDevices")]
+    partial class AlterForeignKeyInDevices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,26 +49,6 @@ namespace BioTonFMSApp.Migrations
                         .HasDatabaseName("ix_devices_tracker_id");
 
                     b.ToTable("devices", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "D1",
-                            TrackerId = 2
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "D2",
-                            TrackerId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "D3",
-                            TrackerId = 2
-                        });
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Tracker", b =>
@@ -94,20 +76,6 @@ namespace BioTonFMSApp.Migrations
                         .HasName("pk_trackers");
 
                     b.ToTable("trackers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Imei = "12345678",
-                            Name = "tracker 1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Imei = "22345679",
-                            Name = "tracker 2"
-                        });
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Vehicle", b =>
@@ -136,20 +104,6 @@ namespace BioTonFMSApp.Migrations
                         .HasDatabaseName("ix_vehicles_tracker_id");
 
                     b.ToTable("vehicles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "vehicle 1",
-                            TrackerId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "vehicle 2",
-                            TrackerId = 2
-                        });
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Device", b =>

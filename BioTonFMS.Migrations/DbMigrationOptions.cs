@@ -1,6 +1,6 @@
 namespace BioTonFMSApp.Startup;
 
-public class DbOptions
+public class DbMigrationOptions
 {
     public bool ApplyMigrations { get; set; }
 }
