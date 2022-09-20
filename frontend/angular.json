@@ -41,6 +41,11 @@
               "src/styles/reset.sass",
               "src/styles.sass"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles/partials"
+              ]
+            },
             "scripts": []
           },
           "configurations": {
@@ -104,6 +109,11 @@
               "src/styles/reset.sass",
               "src/styles.sass"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles/partials"
+              ]
+            },
             "scripts": []
           }
         },
