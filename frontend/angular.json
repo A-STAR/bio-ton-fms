@@ -39,6 +39,7 @@
             ],
             "styles": [
               "src/styles/reset.sass",
+              "src/styles/fonts/fonts.sass",
               "src/styles.sass"
             ],
             "stylePreprocessorOptions": {
@@ -107,6 +108,7 @@
             ],
             "styles": [
               "src/styles/reset.sass",
+              "src/styles/fonts/fonts.sass",
               "src/styles.sass"
             ],
             "stylePreprocessorOptions": {

@@ -1,0 +1,51 @@
+@use 'variables' as *
+
+$font-assets-path: '' !default
+
+@font-face
+  font-family: 'Material Icons'
+  font-style: normal
+  font-weight: 400
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url('#{$font-assets-path}/material-icons-regular.woff2') format('woff2')
+
+.material-icons
+  display: inline-block
+  font-family: 'Material Icons'
+  font-weight: unset
+  font-style: unset
+  line-height: 1
+  text-transform: unset
+  letter-spacing: unset
+  word-wrap: unset
+  white-space: nowrap
+  direction: unset
+  -webkit-font-feature-settings: 'liga'
+  -webkit-font-smoothing: antialiased
+
+  /* Rules for sizing the icon. */
+  &.md-18
+    font-size: 18px
+
+  &,
+  &.md-24
+    font-size: 24px
+
+  &.md-36
+    font-size: 36px
+
+  &.md-48
+    font-size: 48px
+
+  /* Rules for using icons as black on a light background. */
+  &.md-dark
+    color: rgba($black, 54%)
+
+    &.md-inactive
+      color: rgba($black, 26%)
+
+  /* Rules for using icons as white on a dark background. */
+  &.md-light
+    color: $white
+
+    &.md-inactive
+      color: rgba($white, 30%)
