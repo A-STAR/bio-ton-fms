@@ -26,7 +26,6 @@
             catch (Exception ex)
             {
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                // меняем на русский
                 logger.LogError(ex, "Ошибка при создании базы данных");
             }
         }
