@@ -19,7 +19,8 @@ IConfiguration configuration = new ConfigurationBuilder()
 
 builder.Services.AddDbContext<BioTonDBContext>(
         options => options
-                    .UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+                    .UseNpgsql(configuration.GetConnectionString("DefaultConnection"), 
+                        x => x.MigrationsAssembly("BioTonFMS.Migrations"))
                     .UseSnakeCaseNamingConvention());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -34,7 +35,7 @@ builder.ConfigureSerilog();
 
 var app = builder.Build();
 
-app.CreateDbIfNotExists();
+await app.ApplyMigrationsAsync(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
