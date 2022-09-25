@@ -28,6 +28,7 @@ namespace BioTonFMS.Infrastructure.Models
     public abstract class EntityBase : IEntity
     {
         /// <inheritdoc />
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
         public virtual int Id { get; protected internal set; }
