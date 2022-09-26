@@ -1,9 +1,11 @@
 ﻿using BioTonFMS.Domain;
+using BioTonFMS.Domain.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BioTonFMS.Infrastructure.EF
 {
-    public class BioTonDBContext : DbContext
+    public class BioTonDBContext : IdentityDbContext<AppUser, AppRole, int>
     {
         public BioTonDBContext(DbContextOptions<BioTonDBContext> options)
             : base(options)
@@ -16,6 +18,7 @@ namespace BioTonFMS.Infrastructure.EF
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

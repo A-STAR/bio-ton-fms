@@ -1,6 +1,7 @@
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMSApp.Startup;
+using BioTonFMSApp.Startup.Swagger;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,12 +24,15 @@ builder.Services.AddDbContext<BioTonDBContext>(
                         x => x.MigrationsAssembly("BioTonFMS.Migrations"))
                     .UseSnakeCaseNamingConvention());
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.RegisterInfrastructureComponents();
 builder.RegisterDataAccess();
+
+builder.AddAuth();
+builder.AddValidation();
+builder.AddSwagger();
 
 // configuring Serilog
 builder.ConfigureSerilog();
