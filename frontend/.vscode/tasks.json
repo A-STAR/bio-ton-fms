@@ -18,11 +18,14 @@
             "regexp": "bundle generation complete"
           }
         }
-      }
+      },
+      "label": "npm: start",
+      "detail": "ng serve"
     },
     {
       "type": "npm",
       "script": "test",
+      "group": "test",
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
@@ -36,7 +39,30 @@
             "regexp": "bundle generation complete"
           }
         }
-      }
+      },
+      "label": "npm: test",
+      "detail": "ng test"
+    },
+    {
+      "type": "npm",
+      "script": "deploy",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "(.*?)"
+          },
+          "endsPattern": {
+            "regexp": "bundle generation complete"
+          }
+        }
+      },
+      "label": "npm: deploy",
+      "detail": "npm run lint && npm run build && npm run test:coverage"
     }
   ]
 }
