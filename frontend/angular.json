@@ -40,6 +40,8 @@
             "styles": [
               "src/styles/reset.sass",
               "src/styles/fonts/fonts.sass",
+              "src/styles/material-theme.sass",
+              "src/styles/overrides/overrides.sass",
               "src/styles.sass"
             ],
             "stylePreprocessorOptions": {
@@ -109,6 +111,8 @@
             "styles": [
               "src/styles/reset.sass",
               "src/styles/fonts/fonts.sass",
+              "src/styles/material-theme.sass",
+              "src/styles/overrides/overrides.sass",
               "src/styles.sass"
             ],
             "stylePreprocessorOptions": {
