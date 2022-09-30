@@ -1,7 +1,7 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BioTonFMSApp.Authentication.Models;
+namespace BioTonFMS.Security.Authentication.Models;
 
 public class JwtSettings
 {

@@ -1,12 +1,12 @@
 ﻿using BioTonFMS.Domain.Identity;
-using BioTonFMSApp.Authentication;
-using BioTonFMSApp.Dtos.Auth;
+using BioTonFMS.Security.Authentication;
+using BioTonFMS.Security.Dtos.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace BioTonFMSApp.Controllers;
+namespace BioTonFMS.Security.Controllers;
 
 [ApiController]
 [Route("/api/auth")]
@@ -42,18 +42,7 @@ public class AuthController : AuthorizedControllerBase
         {
             return BadRequest(result.Errors);
         }
-
-        try
-        {
-            var tokens = _jwtGenerator.GenerateTokens(user);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            await _userManager.DeleteAsync(user);
-            throw;
-        }
+        return Ok();
     }
 
     [HttpPost("login")]
@@ -73,13 +62,13 @@ public class AuthController : AuthorizedControllerBase
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex.Message);
+                    _logger.LogError(ex, "Ошибка при логине пользователя {@UserLogin}", userLogin);
                     throw;
                 }
             }
         }
 
-        return Unauthorized("Неверный Email или пароль");
+        return BadRequest("Неверный логин или пароль");
     }
 
     [HttpPost("refresh")]
@@ -99,7 +88,7 @@ public class AuthController : AuthorizedControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Ошибка при обновлении токенов");
             throw;
         }
     }
@@ -107,12 +96,13 @@ public class AuthController : AuthorizedControllerBase
     [HttpGet("user")]
     public async Task<UserShortInfoDto> GetShortUserInfo()
     {
-        var user = await _userManager.FindByIdAsync(GetUserStringId());
+        var userId = GetUserStringId();
+        var user = await _userManager.FindByIdAsync(userId);
         
         if (user is null)
         {
-            _logger.LogError("Пользователь не найден");
-            throw new InvalidOperationException("Пользователь не найден");
+            _logger.LogError("Пользователь c id = {@UserId} не найден", userId);
+            throw new InvalidOperationException($"Пользователь c id={userId} не найден"); ;
         }
 
         return new UserShortInfoDto(user.LastName, user.FirstName, user.MiddleName, user.UserName);

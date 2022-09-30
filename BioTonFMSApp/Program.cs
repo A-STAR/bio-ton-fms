@@ -1,5 +1,6 @@
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.Extensions;
+using BioTonFMS.Security.Controllers;
 using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,8 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 {
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-});
-
-builder.Services.AddMvc().AddApplicationPart(Assembly.Load(new AssemblyName("BioTonFMS.Security")));
+})
+.AddApplicationPart(typeof(AuthController).Assembly);
 
 builder.Services.AddDbContext<BioTonDBContext>(
         options => options

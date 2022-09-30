@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace BioTonFMSApp.Authentication.Models;
+namespace BioTonFMS.Security.Authentication.Models;
 
 public class IdentityException : Exception
 {

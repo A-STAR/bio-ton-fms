@@ -1,7 +1,7 @@
 ﻿using BioTonFMS.Domain.Identity;
 using BioTonFMS.Infrastructure.EF;
-using BioTonFMSApp.Authentication;
-using BioTonFMSApp.Authentication.Models;
+using BioTonFMS.Security.Authentication;
+using BioTonFMS.Security.Authentication.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -40,6 +40,8 @@ public static class AuthenticationExtensions
                     builder.Configuration.GetSection(JwtSettings.SectionName).Bind(config);
                     builder.Configuration.Bind(JwtSettings.SectionName, options);
                     options.TokenValidationParameters.IssuerSigningKey = config.SigningCredentials.Key;
+                    options.TokenValidationParameters.ValidateIssuer = false;
+                    options.TokenValidationParameters.ValidateAudience = false;
                 });
         
         builder.Services.AddAuthorization(options =>

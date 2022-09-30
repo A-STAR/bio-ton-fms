@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace BioTonFMSApp.Controllers;
+namespace BioTonFMS.Security.Controllers;
 
 [Authorize]
 public abstract class AuthorizedControllerBase : ControllerBase

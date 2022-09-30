@@ -1,4 +1,4 @@
-using BioTonFMSApp.Dtos.Auth;
+using BioTonFMS.Security.Dtos.Auth;
 using FluentValidation;
 
 namespace BioTonFMSApp.Validation;

@@ -1,6 +1,7 @@
 ﻿namespace BioTonFMSApp.Startup
 {
     using BioTonFMS.Infrastructure.EF;
+    using BioTonFMSApp.Migrations;
     using Microsoft.EntityFrameworkCore;
 
     public static class DatabaseExtensions

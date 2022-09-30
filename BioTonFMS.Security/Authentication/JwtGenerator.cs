@@ -1,11 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using BioTonFMS.Domain.Identity;
-using BioTonFMSApp.Authentication.Models;
+using BioTonFMS.Security.Authentication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace BioTonFMSApp.Authentication;
+namespace BioTonFMS.Security.Authentication;
 
 public sealed class JwtGenerator
 {
