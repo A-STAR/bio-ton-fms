@@ -1,9 +1,3 @@
-using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure;
-using BioTonFMS.Infrastructure.EF;
-using BioTonFMS.Infrastructure.EF.Repositories;
-using BioTonFMS.Infrastructure.Persistence;
-using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 using System.Text.Json;
@@ -13,13 +7,11 @@ namespace BioTonApp.Controllers
     [ApiController]
     public class SystemInfoController : ControllerBase
     {
-
         private readonly ILogger<TestRepoController> _logger;
 
         public SystemInfoController(
             ILogger<TestRepoController> logger)
         {
-
             _logger = logger;
         }
 

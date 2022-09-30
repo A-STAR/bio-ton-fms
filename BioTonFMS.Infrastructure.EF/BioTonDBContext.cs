@@ -1,9 +1,11 @@
 ﻿using BioTonFMS.Domain;
+using BioTonFMS.Domain.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BioTonFMS.Infrastructure.EF
 {
-    public class BioTonDBContext : DbContext
+    public class BioTonDBContext : IdentityDbContext<AppUser, AppRole, int>
     {
         public BioTonDBContext(DbContextOptions<BioTonDBContext> options)
             : base(options)
@@ -16,6 +18,20 @@ namespace BioTonFMS.Infrastructure.EF
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Vehicle>().HasData(
+             new Vehicle { Id = 1, Name = "vehicle 1", TrackerId = 1 },
+             new Vehicle { Id = 2, Name = "vehicle 2", TrackerId = 2 });
+
+            modelBuilder.Entity<Tracker>().HasData(
+                new Tracker { Id = 1, Name = "tracker 1", Imei = "12345678" },
+                new Tracker { Id = 2, Name = "tracker 2", Imei = "22345679" });
+
+            modelBuilder.Entity<Device>().HasData(
+                new Device { Id = 1, Name = "D1", TrackerId = 2 },
+                new Device { Id = 2, Name = "D2", TrackerId = 2 },
+                new Device { Id = 3, Name = "D3", TrackerId = 2 });
         }
     }
 }

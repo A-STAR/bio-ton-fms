@@ -1,13 +1,14 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure;
-using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.EF.Repositories;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioTonApp.Controllers
 {
+    [Authorize]
     [ApiController]
     public class TestRepoController : ControllerBase
     {
