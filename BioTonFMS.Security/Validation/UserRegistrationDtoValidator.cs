@@ -10,7 +10,7 @@ public class UserRegistrationDtoValidator : AbstractValidator<UserRegistrationDt
         RuleFor(x => x.FirstName).NotEmpty();
         RuleFor(x => x.LastName).NotEmpty();
         RuleFor(x => x.FirstName).NotEmpty();
-        RuleFor(x => x.Email).EmailAddress();
+        RuleFor(x => x.UserName).NotEmpty().Length(3, 16);
         RuleFor(x => x.Password).NotEmpty();
     }
 }

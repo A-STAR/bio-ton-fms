@@ -14,5 +14,9 @@ namespace BioTonFMS.Domain
         [Required]
         [MaxLength(128)]
         public string Name { get; set; }
+
+        public int TrackerId { get; set; }
+
+        public Tracker Tracker { get; set; }
     }
 }

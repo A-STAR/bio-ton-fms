@@ -19,6 +19,6 @@ namespace BioTonFMS.Domain
         [MaxLength(30)]
         public string Imei { get; set; }
 
-        public IEnumerable<Device> Devices { get; set; }
+        public virtual IEnumerable<Device> Devices { get; set; }
     }
 }

@@ -10,53 +10,6 @@ namespace BioTonFMSApp.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "fk_devices_trackers_tracker_id",
-                table: "devices");
-
-            migrationBuilder.DeleteData(
-                table: "devices",
-                keyColumn: "id",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "devices",
-                keyColumn: "id",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
-                table: "devices",
-                keyColumn: "id",
-                keyValue: 3);
-
-            migrationBuilder.DeleteData(
-                table: "vehicles",
-                keyColumn: "id",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "vehicles",
-                keyColumn: "id",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
-                table: "trackers",
-                keyColumn: "id",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "trackers",
-                keyColumn: "id",
-                keyValue: 2);
-
-            migrationBuilder.AlterColumn<int>(
-                name: "tracker_id",
-                table: "devices",
-                type: "integer",
-                nullable: true,
-                oldClrType: typeof(int),
-                oldType: "integer");
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -243,21 +196,10 @@ namespace BioTonFMSApp.Migrations
                 table: "AspNetUsers",
                 column: "normalized_user_name",
                 unique: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "fk_devices_trackers_tracker_id",
-                table: "devices",
-                column: "tracker_id",
-                principalTable: "trackers",
-                principalColumn: "id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "fk_devices_trackers_tracker_id",
-                table: "devices");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -278,52 +220,6 @@ namespace BioTonFMSApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "tracker_id",
-                table: "devices",
-                type: "integer",
-                nullable: false,
-                defaultValue: 0,
-                oldClrType: typeof(int),
-                oldType: "integer",
-                oldNullable: true);
-
-            migrationBuilder.InsertData(
-                table: "trackers",
-                columns: new[] { "id", "imei", "name" },
-                values: new object[,]
-                {
-                    { 1, "12345678", "tracker 1" },
-                    { 2, "22345679", "tracker 2" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "devices",
-                columns: new[] { "id", "name", "tracker_id" },
-                values: new object[,]
-                {
-                    { 1, "D1", 2 },
-                    { 2, "D2", 2 },
-                    { 3, "D3", 2 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "vehicles",
-                columns: new[] { "id", "name", "tracker_id" },
-                values: new object[,]
-                {
-                    { 1, "vehicle 1", 1 },
-                    { 2, "vehicle 2", 2 }
-                });
-
-            migrationBuilder.AddForeignKey(
-                name: "fk_devices_trackers_tracker_id",
-                table: "devices",
-                column: "tracker_id",
-                principalTable: "trackers",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
         }
     }
 }

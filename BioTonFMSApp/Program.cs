@@ -3,29 +3,24 @@ using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllers().AddJsonOptions(x =>
+{
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 
-builder.Services.AddControllers();
-
-IConfiguration configuration = new ConfigurationBuilder()
-#if DEBUG                
-                .AddJsonFile("appsettings.Development.json", true)
-#else
-                .AddJsonFile("appsettings.json")
-#endif
-   .Build();
+builder.Services.AddMvc().AddApplicationPart(Assembly.Load(new AssemblyName("BioTonFMS.Security")));
 
 builder.Services.AddDbContext<BioTonDBContext>(
         options => options
-                    .UseNpgsql(configuration.GetConnectionString("DefaultConnection"), 
+                    .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
                         x => x.MigrationsAssembly("BioTonFMS.Migrations"))
                     .UseSnakeCaseNamingConvention());
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.RegisterInfrastructureComponents();
 builder.RegisterDataAccess();
@@ -34,14 +29,12 @@ builder.AddAuth();
 builder.AddValidation();
 builder.AddSwagger();
 
-// configuring Serilog
 builder.ConfigureSerilog();
 
 var app = builder.Build();
 
 await app.ApplyMigrationsAsync(builder.Configuration);
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

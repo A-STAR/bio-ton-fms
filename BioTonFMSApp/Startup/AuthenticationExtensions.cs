@@ -21,7 +21,7 @@ public static class AuthenticationExtensions
 
         builder.Services.AddIdentityCore<AppUser>(options =>
             {
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMSApp.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    [Migration("20220926033015_CreateIdentitySchema")]
+    [Migration("20220929105655_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,7 @@ namespace BioTonFMSApp.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("name");
 
-                    b.Property<int?>("TrackerId")
+                    b.Property<int>("TrackerId")
                         .HasColumnType("integer")
                         .HasColumnName("tracker_id");
 
@@ -50,6 +50,26 @@ namespace BioTonFMSApp.Migrations
                         .HasDatabaseName("ix_devices_tracker_id");
 
                     b.ToTable("devices", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "D1",
+                            TrackerId = 2
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "D2",
+                            TrackerId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "D3",
+                            TrackerId = 2
+                        });
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Identity.AppRole", b =>
@@ -208,6 +228,20 @@ namespace BioTonFMSApp.Migrations
                         .HasName("pk_trackers");
 
                     b.ToTable("trackers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Imei = "12345678",
+                            Name = "tracker 1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Imei = "22345679",
+                            Name = "tracker 2"
+                        });
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Vehicle", b =>
@@ -236,6 +270,20 @@ namespace BioTonFMSApp.Migrations
                         .HasDatabaseName("ix_vehicles_tracker_id");
 
                     b.ToTable("vehicles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "vehicle 1",
+                            TrackerId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "vehicle 2",
+                            TrackerId = 2
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -370,10 +418,14 @@ namespace BioTonFMSApp.Migrations
 
             modelBuilder.Entity("BioTonFMS.Domain.Device", b =>
                 {
-                    b.HasOne("BioTonFMS.Domain.Tracker", null)
+                    b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
                         .WithMany("Devices")
                         .HasForeignKey("TrackerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_devices_trackers_tracker_id");
+
+                    b.Navigation("Tracker");
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Vehicle", b =>
