@@ -1,8 +1,16 @@
-stages:          
+stages: 
+  - lint         
   - build
   - test
   - deploy
-  
+
+Build-front:
+  stage: lint
+  script:
+    - cd frontend
+    - npm ci
+    - npm run lint
+
 Build-backend:
   stage: build
   script:
