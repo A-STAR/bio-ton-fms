@@ -1,6 +1,4 @@
-variables:
-  GIT_STRATEGY: clone
-  
+
 stages: 
   - lint         
   - build
