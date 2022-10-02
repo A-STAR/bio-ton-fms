@@ -3,6 +3,7 @@ WORKDIR /app
 
 # Copy everything
 COPY . ./
+COPY .git/ ./.git/
 # Restore as distinct layers
 RUN dotnet restore  BioTonFMSApp/
 # Build and publish a release
