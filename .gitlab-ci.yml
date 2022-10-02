@@ -22,6 +22,9 @@ Build-front:
     - npm run build
 
 Build-backend:
+  variables:
+    GIT_FETCH_EXTRA_FLAGS: --tags
+
   before_script:
     - git fetch --tags
   stage: build
