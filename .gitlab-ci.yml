@@ -6,7 +6,8 @@ stages:
 Build-backend:
   stage: build
   script:
-    - docker build -t fms-back:dev-ops2 .
+    - docker system prune -a
+    - docker build -t fms-back:dev-ops .
 
 Deploy-backend:
   stage: deploy
