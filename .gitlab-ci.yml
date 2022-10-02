@@ -1,0 +1,40 @@
+variables:
+  GIT_FETCH_EXTRA_FLAGS: --tags
+     
+stages: 
+  - lint         
+  - build
+  - test
+  - deploy
+
+Lint-front:
+  stage: lint
+  script:
+    - cd frontend
+    - npm ci
+    - npm run lint
+
+Build-front:
+  stage: build
+  script:
+    - cd frontend
+    - npm update    
+    - npm run build
+
+Build-backend:
+  before_script:
+    - git fetch --tags
+  stage: build
+  script:    
+    - docker build -t fms-back:dev-ops .
+
+Test-front:
+  stage: test
+  script:
+    - cd frontend
+    - npm run test:coverage
+
+Deploy-backend:
+  stage: deploy
+  script:
+    - docker run -p 80:80 -d fms-back:dev-ops
