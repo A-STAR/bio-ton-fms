@@ -7,4 +7,8 @@ Build-backend:
   stage: build
   script:
     - docker build -t fms-back:dev-ops .
-    - docker run -p 80:80 -d fms-back:dev-ops    
+
+Deploy-backend:
+  stage: deploy
+  script:
+    - docker run -p 80:80 -d fms-back:dev-ops
