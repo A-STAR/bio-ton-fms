@@ -23,8 +23,7 @@ Build-front:
 
 Build-backend:
   stage: build
-  script:
-    - docker system prune -a
+  script:    
     - docker build -t fms-back:dev-ops .
 
 Test-front:
