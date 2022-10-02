@@ -14,7 +14,8 @@ Lint-front:
 Build-front:
   stage: build
   script:
-    - cd frontend    
+    - cd frontend
+    - npm update    
     - npm run build
 
 Build-backend:
