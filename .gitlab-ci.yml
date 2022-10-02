@@ -24,6 +24,12 @@ Build-backend:
     - docker system prune -a
     - docker build -t fms-back:dev-ops .
 
+Test-front:
+  stage: test
+  script:
+    - cd frontend
+    - npm run test:coverage
+
 Deploy-backend:
   stage: deploy
   script:
