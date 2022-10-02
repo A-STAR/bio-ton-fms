@@ -22,6 +22,8 @@ Build-front:
     - npm run build
 
 Build-backend:
+  before_script:
+    - git fetch --tags
   stage: build
   script:    
     - docker build -t fms-back:dev-ops .
