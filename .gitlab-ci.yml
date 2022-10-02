@@ -12,7 +12,7 @@ Lint-front:
     - npm run lint
 
 Build-front:
-  stage: lint
+  stage: build
   script:
     - cd frontend    
     - npm run build
