@@ -22,10 +22,9 @@ Build-front:
     - npm run build
 
 Build-backend:
-  before_script:
-    - git fetch --tags
   stage: build
   script:    
+    - docker system prune -af
     - docker build -t fms-back:dev-ops .
 
 Test-front:
@@ -39,4 +38,5 @@ Test-front:
 Deploy-backend:
   stage: deploy
   script:
-    - docker run -p 8080:80 -d fms-back:dev-ops
+    - docker stop fms-back
+    - docker run --name fms-back -p 8080:80 -d fms-back:dev-ops
