@@ -33,6 +33,7 @@ Test-front:
   script:
     - cd frontend
     - npm ci
+    - export CHROME_BIN=/usr/bin/chromium-browser
     - npm run test:coverage
 
 Deploy-backend:
