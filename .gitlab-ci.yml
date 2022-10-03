@@ -39,4 +39,4 @@ Test-front:
 Deploy-backend:
   stage: deploy
   script:
-    - docker run -p 80:80 -d fms-back:dev-ops
+    - docker run -p 8080:80 -d fms-back:dev-ops
