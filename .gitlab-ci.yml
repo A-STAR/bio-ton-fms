@@ -32,6 +32,7 @@ Test-front:
   stage: test
   script:
     - cd frontend
+    - npm ci
     - npm run test:coverage
 
 Deploy-backend:
