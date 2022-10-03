@@ -40,4 +40,10 @@ Deploy-backend:
   script:
     - docker rm -f fms-back || true
     - docker run --name fms-back -p 8080:80 -d fms-back:dev-ops
+
+Deploy-frontend:
+  stage: deploy
+  script:
+    - cd frontend
+    - rsync ./dist/bio-ton-field-management-system/ ~/www
     
