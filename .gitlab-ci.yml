@@ -45,5 +45,6 @@ Deploy-frontend:
   stage: deploy
   script:
     - cd frontend
+    - npm run deploy
     - rsync ./dist/bio-ton-field-management-system/ ~/www
     
