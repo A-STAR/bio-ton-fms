@@ -38,5 +38,5 @@ Test-front:
 Deploy-backend:
   stage: deploy
   script:
-    - docker stop fms-back || true
+    - docker rm -f fms-back || true
     - docker run --name fms-back -p 8080:80 -d fms-back:dev-ops
