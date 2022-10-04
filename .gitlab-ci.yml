@@ -13,14 +13,14 @@ Build-backend:
   stage: build
   script:    
     - docker system prune -af
-    - docker build -t fms-back:DOCKER_TAG .
+    - docker build -t fms-back:$DOCKER_TAG .
 
 
 Deploy-backend:
   stage: deploy
   script:
     - docker rm -f fms-back || true
-    - docker run --name fms-back -p 8080:80 -d fms-back:dev-ops  
+    - docker run --name fms-back -p 8080:80 -d fms-back:$DOCKER_TAG  
 
 Deploy-frontend:
   stage: deploy
