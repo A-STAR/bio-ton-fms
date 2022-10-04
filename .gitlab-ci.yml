@@ -47,6 +47,7 @@ Deploy-front:
   stage: deploy
   script:
     - cd frontend
+    - export CHROME_BIN=/usr/bin/chromium-browser
     - npm ci
     - npm update    
     - npm run deploy 
