@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCardHarness } from '@angular/material/card/testing';
 import { MatDividerHarness } from '@angular/material/divider/testing';
+import { MatInputHarness } from '@angular/material/input/testing';
 
 import { SignInComponent } from './sign-in.component';
 
@@ -21,6 +23,7 @@ describe('SignInComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           HttpClientTestingModule,
           RouterTestingModule,
           SignInComponent
@@ -100,5 +103,27 @@ describe('SignInComponent', () => {
       .toBe(`v. ${testVersion}`);
 
     card.getHarness(MatDividerHarness);
+  });
+
+  it('should render Sign in form', async () => {
+    const formDe = fixture.debugElement.query(By.css('form#sign-in-form'));
+
+    expect(formDe)
+      .withContext('render Sign in form element')
+      .toBeDefined();
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#sign-in-form',
+      placeholder: 'Логин'
+    }));
+
+    const passwordInput = await loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#sign-in-form',
+      placeholder: 'Пароль'
+    }));
+
+    await expectAsync(passwordInput.getType())
+      .withContext('render password input type')
+      .toBeResolvedTo('password');
   });
 });
