@@ -1,5 +1,6 @@
 variables:
   GIT_FETCH_EXTRA_FLAGS: --tags
+  DOCKER_TAG: "latest"
      
 stages: 
   - lint         
@@ -7,34 +8,28 @@ stages:
   - test
   - deploy
 
-Lint-front:
-  stage: lint
-  script:
-    - cd frontend
-    - npm ci
-    - npm run lint
-
-Build-front:
-  stage: build
-  script:
-    - cd frontend
-    - npm update    
-    - npm run build
 
 Build-backend:
-  before_script:
-    - git fetch --tags
   stage: build
   script:    
-    - docker build -t fms-back:dev-ops .
+    - docker system prune -af
+    - docker build -t fms-back:$DOCKER_TAG .
 
-Test-front:
-  stage: test
-  script:
-    - cd frontend
-    - npm run test:coverage
 
 Deploy-backend:
   stage: deploy
   script:
-    - docker run -p 80:80 -d fms-back:dev-ops
+    - docker rm -f fms-back || true
+    - docker run --name fms-back -p 8080:80 -d fms-back:$DOCKER_TAG  
+
+Deploy-frontend:
+  stage: deploy
+  script:
+    - cd frontend
+    - export CHROME_BIN=/usr/bin/chromium-browser
+    - npm ci
+    - npm update    
+    - npm run deploy 
+    - sudo rsync -zvh dist/bio-ton-field-management-system/ /var/www/front
+    - sudo chown www-data:www-data /var/www/front/*  
+    
