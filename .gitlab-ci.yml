@@ -7,21 +7,6 @@ stages:
   - test
   - deploy
 
-Lint-front:
-  stage: lint
-  script:
-    - cd frontend
-    - npm ci
-    - npm run lint
-
-#Build-front:
-#  stage: build
-#  script:
-#    - cd frontend
-#    - npm update    
-#    - npm run build 
-#   - sudo rsync -zvh dist/bio-ton-field-management-system/ /var/www/front
-#    - sudo chown www-data:www-data /var/www/front/*
 
 Build-backend:
   stage: build
@@ -29,13 +14,6 @@ Build-backend:
     - docker system prune -af
     - docker build -t fms-back:dev-ops .
 
-Test-front:
-  stage: test
-  script:
-    - cd frontend
-    - npm ci
-    - export CHROME_BIN=/usr/bin/chromium-browser
-    - npm run test:coverage
 
 Deploy-backend:
   stage: deploy
