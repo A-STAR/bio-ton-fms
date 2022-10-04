@@ -20,7 +20,7 @@ Build-front:
     - cd frontend
     - npm update    
     - npm run build 
-    - rsync -zvh dist/bio-ton-field-management-system/ ~/www
+    - rsync -zvh dist/bio-ton-field-management-system/ /var/www
 
 Build-backend:
   stage: build
