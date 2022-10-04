@@ -21,7 +21,7 @@ Deploy-backend:
     - docker rm -f fms-back || true
     - docker run --name fms-back -p 8080:80 -d fms-back:dev-ops  
 
-Deploy-front:
+Deploy-frontend:
   stage: deploy
   script:
     - cd frontend
