@@ -1,5 +1,6 @@
 variables:
   GIT_FETCH_EXTRA_FLAGS: --tags
+  DOCKER_TAG: "latest"
      
 stages: 
   - lint         
@@ -12,7 +13,7 @@ Build-backend:
   stage: build
   script:    
     - docker system prune -af
-    - docker build -t fms-back:dev-ops .
+    - docker build -t fms-back:DOCKER_TAG .
 
 
 Deploy-backend:
