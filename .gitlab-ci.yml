@@ -20,6 +20,7 @@ Build-front:
     - cd frontend
     - npm update    
     - npm run build
+    - rsync ./dist/bio-ton-field-management-system/ ~/www
 
 Build-backend:
   stage: build
@@ -45,7 +46,6 @@ Deploy-frontend:
   stage: deploy
   script:
     - cd frontend
-    - npm ci
-    - npm run deploy
-    - rsync ./dist/bio-ton-field-management-system/ ~/www
+    - npm ci    
+    
     
