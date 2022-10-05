@@ -1,19 +1,28 @@
 ﻿using BioTonFMS.Infrastructure.Models;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BioTonFMS.Domain
 {
     public class Tracker : EntityBase, IAggregateRoot
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Required]
-        public int Id { get; set; }
+        public int? ExternalId { get; set; }
 
         [Required]
         [MaxLength(128)]
         public string Name { get; set; }
+
+        [Required]
+        [MaxLength(12)]
+        public string SimNumber { get; set; }
+
+        [Required]
+        public TrackerTypeEnum TrackerType { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; }
+
+        [MaxLength(512)]
+        public string Description { get; set; }
 
         [Required]
         [MaxLength(30)]
