@@ -21,8 +21,8 @@ namespace BioTonFMS.Infrastructure.EF
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Vehicle>().HasData(
-             new Vehicle { Id = 1, Name = "vehicle 1", TrackerId = 1 },
-             new Vehicle { Id = 2, Name = "vehicle 2", TrackerId = 2 });
+             new Vehicle { Name = "vehicle 1", TrackerId = 1 },
+             new Vehicle { Name = "vehicle 2", TrackerId = 2 });
 
             modelBuilder.Entity<Tracker>().HasData(
                 new Tracker { Id = 1, Name = "tracker 1", Imei = "12345678" },
