@@ -24,6 +24,10 @@ namespace BioTonFMS.Infrastructure.EF
              new Vehicle { Id = 1, Name = "vehicle 1", TrackerId = 1 },
              new Vehicle { Id = 2, Name = "vehicle 2", TrackerId = 2 });
 
+            modelBuilder.Entity<Tracker>()
+                .HasIndex(u => u.ExternalId)
+                .IsUnique();
+
             modelBuilder.Entity<Tracker>().HasData(
              new Tracker
              {
