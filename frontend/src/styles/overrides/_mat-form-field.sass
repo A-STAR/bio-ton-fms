@@ -48,6 +48,31 @@
     padding-top: coerce-px-to-em(12.13px, $mat-form-field-font-size)
     padding-bottom: coerce-px-to-em(12.13px, $mat-form-field-font-size)
 
+  div.mat-form-field-prefix,
+  div.mat-form-field-suffix
+    top: unset
+
+.mat-form-field-prefix,
+.mat-form-field-suffix
+  color: $gray
+
+.mat-icon-button
+
+  &[aria-pressed="false"],
+  &:hover,
+  &:active
+    color: $light-green
+
+.mat-form-field:not(.mat-form-field-appearance-legacy)
+
+  & .mat-form-field-prefix,
+  & .mat-form-field-suffix
+
+    button.mat-icon-button
+      width: 24px
+      height: 24px
+      vertical-align: middle
+
 .mat-form-field-infix
   border-top: unset
 

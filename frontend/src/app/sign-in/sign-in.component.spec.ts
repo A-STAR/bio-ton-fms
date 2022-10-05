@@ -8,6 +8,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCardHarness } from '@angular/material/card/testing';
 import { MatDividerHarness } from '@angular/material/divider/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { SignInComponent } from './sign-in.component';
 
@@ -124,6 +125,30 @@ describe('SignInComponent', () => {
 
     await expectAsync(passwordInput.getType())
       .withContext('render password input type')
+      .toBeResolvedTo('password');
+  });
+
+  it('should toggle a password visibility', async () => {
+    const passwordVisibilityButton = await loader.getHarness(MatButtonHarness.with({
+      ancestor: 'form#sign-in-form label[for="password"] + mat-form-field',
+      selector: '[matSuffix]'
+    }));
+
+    await passwordVisibilityButton.click();
+
+    const passwordInput = await loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#sign-in-form',
+      placeholder: 'Пароль'
+    }));
+
+    await expectAsync(passwordInput.getType())
+      .withContext('render password input type as text')
+      .toBeResolvedTo('text');
+
+    await passwordVisibilityButton.click();
+
+    await expectAsync(passwordInput.getType())
+      .withContext('render password input type as password')
       .toBeResolvedTo('password');
   });
 });

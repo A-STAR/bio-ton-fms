@@ -6,6 +6,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 import { Observable } from 'rxjs';
 
@@ -21,7 +23,9 @@ import { SystemService } from '../system.service';
     MatCardModule,
     MatDividerModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule
   ],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.sass'],
@@ -30,6 +34,18 @@ import { SystemService } from '../system.service';
 export class SignInComponent implements OnInit {
   protected systemVersion$!: Observable<string>;
   protected signInForm!: FormGroup;
+  protected hidePassword = true;
+
+  /**
+   * Toggle password field visibility in Sign in form.
+   *
+   * @param event Click event going from a toggle password visibility button.
+   */
+  protected togglePasswordVisibility(event: MouseEvent) {
+    event.stopPropagation();
+
+    this.hidePassword = !this.hidePassword;
+  }
 
   /**
    * Initialize Sign in form.
