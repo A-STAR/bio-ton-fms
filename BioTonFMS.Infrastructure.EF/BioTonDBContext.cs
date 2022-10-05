@@ -37,7 +37,9 @@ namespace BioTonFMS.Infrastructure.EF
                  Imei = "12345678",
                  SimNumber = "123456789121",
                  StartDate = DateTime.UtcNow,
-                 TrackerType = TrackerTypeEnum.Retranslator
+                 TrackerType = TrackerTypeEnum.Retranslator,
+                 ExternalId = 1
+                 
              },
              new Tracker
              {
@@ -47,7 +49,8 @@ namespace BioTonFMS.Infrastructure.EF
                  Imei = "22345679",
                  SimNumber = "12345678912",
                  StartDate = DateTime.UtcNow,
-                 TrackerType = TrackerTypeEnum.Retranslator
+                 TrackerType = TrackerTypeEnum.Retranslator,
+                 ExternalId = 2
              });
 
             modelBuilder.Entity<Device>().HasData(

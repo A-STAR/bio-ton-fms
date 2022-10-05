@@ -9,11 +9,19 @@ namespace BioTonFMSApp.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterColumn<string>(
+                name: "name",
+                table: "trackers",
+                type: "character varying(100)",
+                maxLength: 100,
+                nullable: false,
+                defaultValue: "");
+
             migrationBuilder.AddColumn<string>(
                 name: "description",
                 table: "trackers",
-                type: "character varying(512)",
-                maxLength: 512,
+                type: "character varying(500)",
+                maxLength: 500,
                 nullable: false,
                 defaultValue: "");
 
@@ -21,7 +29,8 @@ namespace BioTonFMSApp.Migrations
                 name: "external_id",
                 table: "trackers",
                 type: "integer",
-                nullable: true);
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.AddColumn<string>(
                 name: "sim_number",
@@ -45,25 +54,25 @@ namespace BioTonFMSApp.Migrations
                 nullable: false,
                 defaultValue: 0);
 
-            migrationBuilder.CreateIndex(
-                name: "ix_trackers_external_id",
-                table: "trackers",
-                column: "external_id",
-                unique: true);
-
             migrationBuilder.UpdateData(
               table: "trackers",
               keyColumn: "id",
               keyValue: 1,
-              columns: new[] { "description", "sim_number", "start_date", "tracker_type" },
-              values: new object[] { "tracker_description 1", "123456789121", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5208), 3 });
+              columns: new[] { "description", "sim_number", "start_date", "tracker_type", "external_id" },
+              values: new object[] { "tracker_description 1", "123456789121", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5208), 3, "1" });
 
             migrationBuilder.UpdateData(
                 table: "trackers",
                 keyColumn: "id",
                 keyValue: 2,
-                columns: new[] { "description", "sim_number", "start_date", "tracker_type" },
-                values: new object[] { "tracker_description 2", "12345678912", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5211), 3 });
+                columns: new[] { "description", "sim_number", "start_date", "tracker_type", "external_id" },
+                values: new object[] { "tracker_description 2", "12345678912", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5211), 3, "2" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_trackers_external_id",
+                table: "trackers",
+                column: "external_id",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

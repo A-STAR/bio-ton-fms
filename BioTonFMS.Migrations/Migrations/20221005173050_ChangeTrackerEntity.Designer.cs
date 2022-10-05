@@ -214,24 +214,25 @@ namespace BioTonFMSApp.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
                         .HasColumnName("description");
 
                     b.Property<int?>("ExternalId")
+                        .IsRequired()
                         .HasColumnType("integer")
                         .HasColumnName("external_id");
 
                     b.Property<string>("Imei")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
                         .HasColumnName("imei");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
                     b.Property<string>("SimNumber")
@@ -266,7 +267,8 @@ namespace BioTonFMSApp.Migrations
                             Name = "tracker 1",
                             SimNumber = "123456789121",
                             StartDate = new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5208),
-                            TrackerType = 3
+                            TrackerType = 3,
+                            ExternalId = 1
                         },
                         new
                         {
@@ -276,7 +278,8 @@ namespace BioTonFMSApp.Migrations
                             Name = "tracker 2",
                             SimNumber = "12345678912",
                             StartDate = new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5211),
-                            TrackerType = 3
+                            TrackerType = 3,
+                            ExternalId = 2
                         });
                 });
 

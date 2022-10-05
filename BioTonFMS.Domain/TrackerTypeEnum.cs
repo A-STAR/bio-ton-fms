@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BioTonFMS.Domain
+﻿namespace BioTonFMS.Domain
 {
+    /// <summary>
+    /// Тип протокола, поддерживаемый трекером
+    /// </summary>
     public enum TrackerTypeEnum
     {
         GalileoSkyV50,
