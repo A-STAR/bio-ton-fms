@@ -20,7 +20,7 @@ Deploy-backend:
   stage: deploy
   script:
     - docker rm -f fms-back || true
-    - docker run --name fms-back -p 8080:80 -d fms-back:$DOCKER_TAG  
+    - docker run --name fms-back -p 8080:80  --restart always -d fms-back:$DOCKER_TAG  
 
 Deploy-frontend:
   stage: deploy
