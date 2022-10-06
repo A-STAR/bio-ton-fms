@@ -8,6 +8,16 @@ stages:
   - build
   - deploy
 
+
+Test-frontend:
+  stage: lint
+  script:
+    - cd frontend 
+    - export CHROME_BIN=/usr/bin/chromium-browser   
+    - npm ci
+    - npm update    
+    - npm run lint 
+
 Test-frontend:
   stage: test
   script:
