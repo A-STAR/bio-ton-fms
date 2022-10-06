@@ -13,8 +13,8 @@ variables:
      
 stages: 
   - lint 
-  - test        
   - build  
+  - test   
   - deploy
 
 Lint-frontend:
@@ -22,13 +22,6 @@ Lint-frontend:
   extends: .node-job
   script:             
     - npm run lint 
-
-Test-frontend:
-  stage: test
-  extends: .node-job
-  script:    
-    - export CHROME_BIN=/usr/bin/chromium-browser                 
-    - npm run test:coverage
 
 Build-frontend:
   stage: build
@@ -39,6 +32,13 @@ Build-frontend:
     expire_in: 1 hour
     paths:
       - frontend/dist/     
+
+Test-frontend:
+  stage: test
+  extends: .node-job
+  script:    
+    - export CHROME_BIN=/usr/bin/chromium-browser                 
+    - npm run test:coverage
 
 Deploy-frontend:
   stage: deploy  
