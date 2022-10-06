@@ -25,7 +25,7 @@ Test-frontend:
     - export CHROME_BIN=/usr/bin/chromium-browser   
     - npm ci
     - npm update    
-    - npm run test 
+    - npm run test:coverage
 
 Deploy-frontend:
   stage: deploy
