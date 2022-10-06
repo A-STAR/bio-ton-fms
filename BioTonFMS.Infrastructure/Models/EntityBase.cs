@@ -31,7 +31,7 @@ namespace BioTonFMS.Infrastructure.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
-        public virtual int Id { get; protected internal set; }
+        public virtual int Id { get; set; }
 
         /// <summary>
         /// Оператор равенства двух сущностей.

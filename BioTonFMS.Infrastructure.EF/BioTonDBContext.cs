@@ -24,9 +24,34 @@ namespace BioTonFMS.Infrastructure.EF
              new Vehicle { Name = "vehicle 1", TrackerId = 1 },
              new Vehicle { Name = "vehicle 2", TrackerId = 2 });
 
+            modelBuilder.Entity<Tracker>()
+                .HasIndex(u => u.ExternalId)
+                .IsUnique();
+
             modelBuilder.Entity<Tracker>().HasData(
-                new Tracker { Id = 1, Name = "tracker 1", Imei = "12345678" },
-                new Tracker { Id = 2, Name = "tracker 2", Imei = "22345679" });
+             new Tracker
+             {
+                 Id = 1,
+                 Name = "tracker 2",
+                 Description = "tracker_description 1",
+                 Imei = "12345678",
+                 SimNumber = "123456789121",
+                 StartDate = DateTime.UtcNow,
+                 TrackerType = TrackerTypeEnum.Retranslator,
+                 ExternalId = 1
+                 
+             },
+             new Tracker
+             {
+                 Id = 2,
+                 Name = "tracker 2",
+                 Description = "tracker_description 2",
+                 Imei = "22345679",
+                 SimNumber = "12345678912",
+                 StartDate = DateTime.UtcNow,
+                 TrackerType = TrackerTypeEnum.Retranslator,
+                 ExternalId = 2
+             });
 
             modelBuilder.Entity<Device>().HasData(
                 new Device { Id = 1, Name = "D1", TrackerId = 2 },
