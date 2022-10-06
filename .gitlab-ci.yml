@@ -1,43 +1,56 @@
 variables:
   GIT_FETCH_EXTRA_FLAGS: --tags
   DOCKER_TAG: "latest"
+
+.node-job:
+  before_script:
+  - cd frontend 
+  - npm ci --cache .npm --prefer-offline
+  cache:
+    key: npm
+    paths:
+     - .npm/
      
 stages: 
   - lint 
   - test        
-  - build
+  - build  
   - deploy
 
-
-Test-frontend:
+Lint-frontend:
   stage: lint
-  script:
-    - cd frontend 
-    - export CHROME_BIN=/usr/bin/chromium-browser   
-    - npm ci
-    - npm update    
+  extends: .node-job
+  script:             
     - npm run lint 
 
 Test-frontend:
   stage: test
-  script:
-    - cd frontend 
-    - export CHROME_BIN=/usr/bin/chromium-browser   
-    - npm ci
-    - npm update    
+  extends: .node-job
+  script:    
+    - export CHROME_BIN=/usr/bin/chromium-browser                 
     - npm run test:coverage
 
-Deploy-frontend:
-  stage: deploy
-  script:
-    - cd frontend  
-    - npm ci
-    - npm update    
+Build-frontend:
+  stage: build
+  extends: .node-job
+  script:           
     - npm run build 
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - frontend/dist/     
+
+Deploy-frontend:
+  stage: deploy  
+  script:
+    - cd frontend 
     - sudo rsync -zvh dist/bio-ton-field-management-system/ /var/www/front
-    - sudo chown www-data:www-data /var/www/front/*  
+    - sudo chown www-data:www-data /var/www/front/* 
+
 
 Build-backend:
+  variables:
+    GIT_DEPTH: 100
   stage: build
   script:    
     - docker system prune -af
@@ -48,7 +61,5 @@ Deploy-backend:
   stage: deploy
   script:
     - docker rm -f fms-back || true
-    - docker run --name fms-back -p 8080:80  --restart always -d fms-back:$DOCKER_TAG  
-
-
+    - docker run --name fms-back -p 8080:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
     
