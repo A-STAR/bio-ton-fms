@@ -3,11 +3,29 @@ variables:
   DOCKER_TAG: "latest"
      
 stages: 
-  - lint         
+  - lint 
+  - test        
   - build
-  - test
   - deploy
 
+Test-frontend:
+  stage: test
+  script:
+    - cd frontend 
+    - export CHROME_BIN=/usr/bin/chromium-browser   
+    - npm ci
+    - npm update    
+    - npm run test 
+
+Deploy-frontend:
+  stage: deploy
+  script:
+    - cd frontend  
+    - npm ci
+    - npm update    
+    - npm run build 
+    - sudo rsync -zvh dist/bio-ton-field-management-system/ /var/www/front
+    - sudo chown www-data:www-data /var/www/front/*  
 
 Build-backend:
   stage: build
@@ -22,14 +40,5 @@ Deploy-backend:
     - docker rm -f fms-back || true
     - docker run --name fms-back -p 8080:80  --restart always -d fms-back:$DOCKER_TAG  
 
-Deploy-frontend:
-  stage: deploy
-  script:
-    - cd frontend
-    - export CHROME_BIN=/usr/bin/chromium-browser
-    - npm ci
-    - npm update    
-    - npm run deploy 
-    - sudo rsync -zvh dist/bio-ton-field-management-system/ /var/www/front
-    - sudo chown www-data:www-data /var/www/front/*  
+
     
