@@ -58,15 +58,15 @@ namespace BioTonFMSApp.Migrations
               table: "trackers",
               keyColumn: "id",
               keyValue: 1,
-              columns: new[] { "description", "sim_number", "start_date", "tracker_type", "external_id" },
-              values: new object[] { "tracker_description 1", "123456789121", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5208), 3, "1" });
+              columns: new[] { "description", "sim_number", "start_date", "tracker_type", "external_id", "imei" },
+              values: new object[] { "tracker_description 1", "123456789121", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5208), 3, "1", "imei1" });
 
             migrationBuilder.UpdateData(
                 table: "trackers",
                 keyColumn: "id",
                 keyValue: 2,
-                columns: new[] { "description", "sim_number", "start_date", "tracker_type", "external_id" },
-                values: new object[] { "tracker_description 2", "12345678912", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5211), 3, "2" });
+                columns: new[] { "description", "sim_number", "start_date", "tracker_type", "external_id", "imei" },
+                values: new object[] { "tracker_description 2", "12345678912", new DateTime(2022, 10, 5, 17, 30, 50, 206, DateTimeKind.Utc).AddTicks(5211), 3, "2", "imei2" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_trackers_external_id",

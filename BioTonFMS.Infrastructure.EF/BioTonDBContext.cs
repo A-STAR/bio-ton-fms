@@ -19,7 +19,7 @@ namespace BioTonFMS.Infrastructure.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+/*
             modelBuilder.Entity<Vehicle>().HasData(
              new Vehicle { Name = "vehicle 1", TrackerId = 1 },
              new Vehicle { Name = "vehicle 2", TrackerId = 2 });
@@ -56,7 +56,7 @@ namespace BioTonFMS.Infrastructure.EF
             modelBuilder.Entity<Device>().HasData(
                 new Device { Id = 1, Name = "D1", TrackerId = 2 },
                 new Device { Id = 2, Name = "D2", TrackerId = 2 },
-                new Device { Id = 3, Name = "D3", TrackerId = 2 });
+                new Device { Id = 3, Name = "D3", TrackerId = 2 });*/
         }
     }
 }
