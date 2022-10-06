@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -52,8 +52,8 @@ export class SignInComponent implements OnInit {
    */
   #initSignInForm() {
     this.signInForm = this.fb.group({
-      username: '',
-      password: ''
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     });
   }
 

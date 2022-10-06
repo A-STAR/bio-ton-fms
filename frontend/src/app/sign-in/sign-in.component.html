@@ -22,6 +22,8 @@
 
       <mat-form-field>
         <input matInput id="username" placeholder="Логин" formControlName="username">
+
+        <mat-error><strong>Логин</strong> обязательное поле</mat-error>
       </mat-form-field>
 
       <label for="password">Пароль</label>
@@ -34,6 +36,8 @@
           (click)="togglePasswordVisibility($event)">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
+
+        <mat-error><strong>Пароль</strong> обязательное поле</mat-error>
       </mat-form-field>
     </form>
   </mat-card-content>
