@@ -32,6 +32,17 @@ import { SystemService } from '../system.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SignInComponent implements OnInit {
+  /**
+   * Submit Sign in form, checking validation state.
+   */
+  submitSignInForm() {
+    const { invalid } = this.signInForm;
+
+    if (invalid) {
+      return;
+    }
+  }
+
   protected systemVersion$!: Observable<string>;
   protected signInForm!: FormGroup;
   protected hidePassword = true;

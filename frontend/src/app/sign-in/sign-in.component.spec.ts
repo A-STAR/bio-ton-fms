@@ -151,4 +151,18 @@ describe('SignInComponent', () => {
       .withContext('render password input type as password')
       .toBeResolvedTo('password');
   });
+
+  it('should submit Sign in form', async () => {
+    spyOn(component, 'submitSignInForm').and.callThrough();
+
+    const card = await loader.getHarness(MatCardHarness.with({
+      title: 'Вход в личный кабинет'
+    }));
+
+    const signInButton = await card.getHarness(MatButtonHarness);
+
+    await signInButton.click();
+
+    expect(component.submitSignInForm).toHaveBeenCalled();
+  });
 });
