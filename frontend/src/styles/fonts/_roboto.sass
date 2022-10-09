@@ -40,3 +40,15 @@ $font-path: '#{$font-assets-path}/#{$font-path-name}/#{$font-path-name}'
   font-style: italic
   font-weight: 500
   src: local('#{local-family} MediumItalic'), local('#{local-family-alternative}-MediumItalic'), url('#{$font-path}-medium-italic.woff2') format('woff2')
+
+@font-face
+  font-family: $font-family
+  font-style: normal
+  font-weight: 700
+  src: local('#{local-family} Bold'), local('#{local-family-alternative}-Bold'), url('#{$font-path}-bold.woff2') format('woff2')
+
+@font-face
+  font-family: $font-family
+  font-style: italic
+  font-weight: 700
+  src: local('#{local-family} BoldItalic'), local('#{local-family-alternative}-BoldItalic'), url('#{$font-path}-bold-italic.woff2') format('woff2')
