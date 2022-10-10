@@ -2,9 +2,17 @@
   <mat-card-title-group>
     <mat-card-title>Вход в личный кабинет</mat-card-title>
 
-    <a routerLink="/">
-      <img src="assets/images/bio-ton-field-management-system-logo-green.svg" alt="Bio-Ton Field Management System"
-        width="147" height="44">
-    </a>
+    <div class="logo">
+      <a routerLink="/">
+        <img src="assets/images/bio-ton-field-management-system-logo-green.svg" alt="Bio-Ton Field Management System"
+          width="147" height="44">
+      </a>
+
+      <ng-container *ngIf="systemVersion$ | async as version">
+        <span class="version">v. {{ version }}</span>
+      </ng-container>
+    </div>
   </mat-card-title-group>
+
+  <mat-divider inset></mat-divider>
 </mat-card>

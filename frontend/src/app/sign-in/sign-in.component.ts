@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+
+import { Observable } from 'rxjs';
+
+import { SystemService } from '../system.service';
 
 @Component({
   selector: 'bio-sign-in',
@@ -9,10 +14,19 @@ import { MatCardModule } from '@angular/material/card';
   imports: [
     CommonModule,
     RouterModule,
-    MatCardModule
+    MatCardModule,
+    MatDividerModule
   ],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SignInComponent { }
+export class SignInComponent implements OnInit {
+  protected systemVersion$!: Observable<string>;
+
+  constructor(private systemService: SystemService) { }
+
+  ngOnInit() {
+    this.systemVersion$ = this.systemService.getVersion$;
+  }
+}
