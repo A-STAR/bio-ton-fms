@@ -1,0 +1,106 @@
+@use 'variables' as *
+@use 'functions' as *
+
+$subscript-wrapper-line-height: 20px
+
+.mat-form-field-appearance-outline
+  $mat-form-field-font-size: 14px
+  $subscript-wrapper-margin: 5px
+
+  .mat-form-field-wrapper
+    padding-bottom: coerce-px-to-em($subscript-wrapper-margin + 2 * $subscript-wrapper-line-height, $mat-form-field-font-size)
+
+  div.mat-form-field-wrapper
+    margin-top: unset
+    margin-bottom: coerce-px-to-em($subscript-wrapper-margin, $mat-form-field-font-size)
+
+  div.mat-form-field-flex
+    margin-top: unset
+    padding-left: coerce-px-to-em(12px, $mat-form-field-font-size)
+    padding-right: coerce-px-to-em(12px, $mat-form-field-font-size)
+
+  .mat-form-field-outline
+    color: $light-gray
+
+  .mat-form-field-outline-thick
+    color: $gray
+
+  div.mat-form-field-outline
+    top: 0
+
+  div
+    $border-radius: 3px
+
+    &.mat-form-field-outline-start,
+    &.mat-form-field-outline-end
+      min-width: $border-radius
+
+    &.mat-form-field-outline-start
+      border-top-left-radius: $border-radius
+      border-bottom-left-radius: $border-radius
+
+    &.mat-form-field-outline-end
+      border-top-right-radius: $border-radius
+      border-bottom-right-radius: $border-radius
+
+  .mat-form-field-outline-thick div
+
+    &.mat-form-field-outline-start,
+    &.mat-form-field-outline-gap,
+    &.mat-form-field-outline-end
+      border-width: 1px
+
+  .mat-form-field-infix
+    padding-top: coerce-px-to-em(12.13px, $mat-form-field-font-size)
+    padding-bottom: coerce-px-to-em(12.13px, $mat-form-field-font-size)
+
+  div.mat-form-field-prefix,
+  div.mat-form-field-suffix
+    top: unset
+
+  div.mat-form-field-subscript-wrapper
+    top: unset
+    margin-top: coerce-px-to-em($subscript-wrapper-margin, $mat-form-field-font-size)
+    padding-left: coerce-px-to-em(70px, $mat-form-field-font-size)
+    padding-right: coerce-px-to-em(70px, $mat-form-field-font-size)
+
+.mat-form-field-prefix,
+.mat-form-field-suffix
+  color: $gray
+
+.mat-icon-button
+
+  &[aria-pressed="false"],
+  &:hover,
+  &:active
+    color: $light-green
+
+.mat-form-field:not(.mat-form-field-appearance-legacy)
+
+  & .mat-form-field-prefix,
+  & .mat-form-field-suffix
+
+    button.mat-icon-button
+      width: 24px
+      height: 24px
+      vertical-align: middle
+
+.mat-form-field-infix
+  border-top: unset
+
+.mat-form-field-label-wrapper
+  display: none
+
+.mat-form-field-subscript-wrapper
+  font-size: unset
+
+mat-hint,
+mat-error
+  line-height: $subscript-wrapper-line-height
+  text-align: center
+
+.mat-hint
+  color: unset
+
+div.mat-form-field-hint-spacer
+  flex: unset

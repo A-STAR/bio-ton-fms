@@ -1,0 +1,47 @@
+@use 'variables' as *
+
+.authentication
+  display: flex
+  justify-content: center
+  align-items: flex-start
+  padding-top: 150px
+  padding-bottom: 40px
+
+  mat-card
+    $mat-card-padding: 60px
+
+    width: 520px
+    min-height: 480px
+    padding: 12px $mat-card-padding $mat-card-padding
+
+    mat-card-title-group
+      align-items: center
+      height: 67px
+
+      mat-card-title
+        margin-bottom: unset
+
+      .logo
+        align-self: flex-start
+
+        a
+        .version
+          display: block
+
+        .version
+          margin-top: 2px
+          color: $green
+          font-size: 10px
+          text-align: right
+          
+    mat-divider[inset]
+      width: calc(100% + 2 * $mat-card-padding)
+      margin-bottom: 35px
+      margin-left: -$mat-card-padding
+
+    mat-card-content
+      margin-bottom: 30px - $mat-card-actions-spacing-vertical
+
+    mat-card-content mat-form-field,
+    mat-card-actions button
+      width: 100%

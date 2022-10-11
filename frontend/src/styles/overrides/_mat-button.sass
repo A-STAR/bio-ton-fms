@@ -1,0 +1,25 @@
+@use 'variables' as *
+
+button.mat-stroked-button
+  font-size: unset
+  line-height: 38px
+
+.mat-stroked-button,
+.mat-icon-button
+  transition-property: background-color, color
+  transition-duration: 200ms
+  transition-timing-function: cubic-bezier(0.35, 0, 0.25, 1)
+
+.mat-stroked-button
+
+  &:hover
+    background-color: $green
+    color: $white
+    border: unset
+    line-height: 40px
+
+  &:not(.mat-button-disabled)
+    border-color: unset
+
+    &:hover span.mat-button-focus-overlay
+      opacity: 0

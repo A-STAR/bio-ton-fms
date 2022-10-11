@@ -1,0 +1,21 @@
+@use 'variables' as *
+
+.mat-card
+  color: unset
+  font-size: unset
+
+  &:not([class*=mat-elevation-z])
+    box-shadow: 0px 2px 9px rgba($shady, 18%)
+
+.mat-card-title
+  font-size: 20px
+  font-weight: 700
+
+mat-card-actions.mat-card-actions
+  margin-left: unset
+  margin-right: unset
+  padding-top: $mat-card-actions-spacing-vertical
+  padding-bottom: $mat-card-actions-spacing-vertical
+
+  .mat-card > &:last-child
+    margin-bottom: -$mat-card-actions-spacing-vertical

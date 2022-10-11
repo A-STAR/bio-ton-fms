@@ -1,0 +1,48 @@
+<mat-card>
+  <mat-card-title-group>
+    <mat-card-title>Вход в личный кабинет</mat-card-title>
+
+    <div class="logo">
+      <a routerLink="/">
+        <img src="assets/images/bio-ton-field-management-system-logo-green.svg" alt="Bio-Ton Field Management System"
+          width="147" height="44">
+      </a>
+
+      <ng-container *ngIf="systemVersion$ | async as version">
+        <span class="version">v. {{ version }}</span>
+      </ng-container>
+    </div>
+  </mat-card-title-group>
+
+  <mat-divider inset></mat-divider>
+
+  <mat-card-content>
+    <form id="sign-in-form" [formGroup]="signInForm" (ngSubmit)="submitSignInForm()">
+      <label for="username">Логин</label>
+
+      <mat-form-field>
+        <input matInput id="username" placeholder="Логин" formControlName="username">
+
+        <mat-error><strong>Логин</strong> обязательное поле</mat-error>
+      </mat-form-field>
+
+      <label for="password">Пароль</label>
+
+      <mat-form-field>
+        <input matInput id="password" placeholder="Пароль" formControlName="password"
+          [type]="hidePassword ? 'password' : 'text'">
+
+        <button mat-icon-button matSuffix aria-label="Скрыть пароль" [attr.aria-pressed]="hidePassword"
+          (click)="togglePasswordVisibility($event)">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+
+        <mat-error><strong>Пароль</strong> обязательное поле</mat-error>
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-stroked-button form="sign-in-form" color="accent">Войти</button>
+  </mat-card-actions>
+</mat-card>
