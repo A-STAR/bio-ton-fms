@@ -23,6 +23,7 @@ Lint-frontend:
   script:             
     - npm run lint 
 
+
 Build-frontend:
   stage: build
   extends: .node-job
@@ -31,14 +32,15 @@ Build-frontend:
   artifacts:
     expire_in: 1 hour
     paths:
-      - frontend/dist/     
+      - frontend/dist/       
 
 Test-frontend:
   stage: test
   extends: .node-job
   script:    
     - export CHROME_BIN=/usr/bin/chromium-browser                 
-    - npm run test:coverage
+    - npm run test:coverage  
+  
 
 Deploy-frontend:
   stage: deploy  
@@ -46,6 +48,9 @@ Deploy-frontend:
     - cd frontend 
     - sudo rsync -zvh dist/bio-ton-field-management-system/ /var/www/front
     - sudo chown www-data:www-data /var/www/front/* 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - when: manual
 
 
 Build-backend:
@@ -54,7 +59,7 @@ Build-backend:
   stage: build
   script:    
     - docker system prune -af
-    - docker build -t fms-back:$DOCKER_TAG .
+    - docker build -t fms-back:$DOCKER_TAG .  
 
 
 Deploy-backend:
@@ -62,4 +67,6 @@ Deploy-backend:
   script:
     - docker rm -f fms-back || true
     - docker run --name fms-back -p 8080:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
-    
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - when: manual
