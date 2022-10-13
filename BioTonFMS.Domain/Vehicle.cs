@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BioTonFMS.Domain
 {
+    /// <summary>
+    /// Машина
+    /// </summary>
     public class Vehicle : EntityBase, IAggregateRoot
     {
         /// <summary>

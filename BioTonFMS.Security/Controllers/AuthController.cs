@@ -2,14 +2,20 @@
 using BioTonFMS.Security.Authentication;
 using BioTonFMS.Security.Dtos.Auth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace BioTonFMS.Security.Controllers;
 
+/// <summary>
+/// API аутентификации пользователя
+/// </summary>
 [ApiController]
 [Route("/api/auth")]
+[Consumes("application/json")]
+[Produces("application/json")]
 public class AuthController : AuthorizedControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
@@ -23,9 +29,16 @@ public class AuthController : AuthorizedControllerBase
         _userManager = userManager;
         _jwtGenerator = jwtGenerator;
     }
-    
+    /// <summary>
+    /// Регистрация нового пользователя
+    /// </summary>
+    /// <param name="userRegistration">Информация о новом пользователе</param>
+    /// <response code="200">Новый пользователь успешно создан</response>
+    /// <response code="400">Невозможно зарегестрировать пользователя</response>
     [HttpPost("register")]
     [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(UserRegistrationDto userRegistration)
     {
         var user = new AppUser
@@ -45,8 +58,17 @@ public class AuthController : AuthorizedControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Вход пользователя в систему
+    /// </summary>
+    /// <param name="userLogin">Данные для входа пользователя в систему</param>
+    /// <returns></returns>
+    /// <response code="200">Пользователь успешно вошёл в систему</response>
+    /// <response code="400">Неверный логин или пароль</response>
     [HttpPost("login")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(TokenDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login(UserLoginDto userLogin)
     {
         var user = await _userManager.FindByNameAsync(userLogin.UserName);
@@ -71,8 +93,14 @@ public class AuthController : AuthorizedControllerBase
         return BadRequest("Неверный логин или пароль");
     }
 
+    /// <summary>
+    /// Обновления токена аутентификации
+    /// </summary>
+    /// <returns></returns>
+    /// <response code="200">Токен аутентификации успешно обновлён</response>
     [HttpPost("refresh")]
     [Authorize(Policy = JwtGenerator.RefreshTokenClaimType)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RefreshToken()
     {
         var user = await _userManager.FindByIdAsync(GetUserStringId());
@@ -93,8 +121,17 @@ public class AuthController : AuthorizedControllerBase
         }
     }
 
+    /// <summary>
+    /// Получение информации по текущему пользователю
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <response code="200">Возвращена информация о текущем пользователе</response>
+    /// <response code="404">Текущий пользователь не найден</response>
     [HttpGet("user")]
-    public async Task<UserShortInfoDto> GetShortUserInfo()
+    [ProducesResponseType(typeof(UserShortInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UserShortInfoDto>> GetShortUserInfo()
     {
         var userId = GetUserStringId();
         var user = await _userManager.FindByIdAsync(userId);
@@ -102,9 +139,9 @@ public class AuthController : AuthorizedControllerBase
         if (user is null)
         {
             _logger.LogError("Пользователь c id = {@UserId} не найден", userId);
-            throw new InvalidOperationException($"Пользователь c id={userId} не найден"); ;
+            return NotFound($"Пользователь c id={userId} не найден");
+            //throw new InvalidOperationException($"Пользователь c id={userId} не найден"); ;
         }
-
         return new UserShortInfoDto(user.LastName, user.FirstName, user.MiddleName, user.UserName);
     }
 }
