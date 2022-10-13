@@ -1,2 +1,19 @@
+@use 'variables' as *
+
 \:host
+  z-index: 1
+  position: fixed
+  top: 0
+  left: 0
+  overflow-x: hidden
   display: block
+  width: $sidebar-width
+  height: 100vh
+  background-color: $light-green
+  box-shadow: $box-shadow
+  transition-property: width
+  transition-duration: 200ms
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1)
+
+  &:hover
+    width: 255px
