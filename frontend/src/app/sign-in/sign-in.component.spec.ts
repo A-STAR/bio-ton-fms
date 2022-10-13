@@ -89,13 +89,13 @@ describe('SignInComponent', () => {
       .withContext('render logo image alternate text')
       .toBe('Bio-Ton Field Management System');
 
-    expect(logoImageDe.nativeElement.width)
+    expect(logoImageDe.nativeElement.getAttribute('width'))
       .withContext('render logo image width')
-      .toBe(147);
+      .toBe('147');
 
-    expect(logoImageDe.nativeElement.height)
+    expect(logoImageDe.nativeElement.getAttribute('height'))
       .withContext('render logo image height')
-      .toBe(44);
+      .toBe('44');
 
     const versionSpanDe = logoDivDe.query(By.css('.version'));
 
