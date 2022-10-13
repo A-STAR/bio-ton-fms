@@ -27,7 +27,9 @@ namespace BioTonFMS.Infrastructure.Models
     /// </summary>
     public abstract class EntityBase : IEntity
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Идентификатор сущности
+        /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]

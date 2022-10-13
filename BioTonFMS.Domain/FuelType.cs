@@ -5,10 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BioTonFMS.Domain
 {
     /// <summary>
-    /// Группа машин
+    /// Тип топлива
     /// </summary>
     public class FuelType : EntityBase, IAggregateRoot
     {
+        /// <summary>
+        /// Название типа топлива
+        /// </summary>
         [Required]
         [MaxLength(50)]
         public string Name { get; set; } = "";

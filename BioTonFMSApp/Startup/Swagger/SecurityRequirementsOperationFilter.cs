@@ -28,8 +28,8 @@ public class SecurityRequirementsOperationFilter : IOperationFilter
 
         if (requiredScopes.Any())
         {
-            operation.Responses.Add("401", new OpenApiResponse {Description = "Unauthorized"});
-            operation.Responses.Add("403", new OpenApiResponse {Description = "Forbidden"});
+            operation.Responses.Add("401", new OpenApiResponse {Description = "Пользователь не авторизован в системе"});
+            operation.Responses.Add("403", new OpenApiResponse {Description = "Доступ запрещён"});
 
             operation.Security = new List<OpenApiSecurityRequirement>
             {

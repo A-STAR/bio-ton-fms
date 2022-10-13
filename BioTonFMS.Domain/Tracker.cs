@@ -3,10 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BioTonFMS.Domain
 {
+    /// <summary>
+    /// Трекер
+    /// </summary>
     public class Tracker : EntityBase, IAggregateRoot
     {
         /// <summary>
-        /// идентификатор трекера во внешней системе
+        /// Идентификатор трекера во внешней системе
         /// </summary>
         [Required]
         public int ExternalId { get; set; }
@@ -50,6 +53,6 @@ namespace BioTonFMS.Domain
         [MaxLength(15)]
         public string Imei { get; set; } = "";
 
-        public virtual IEnumerable<Device> Devices { get; set; }
+        public virtual IEnumerable<Device> Devices { get; set; } = default!;
     }
 }

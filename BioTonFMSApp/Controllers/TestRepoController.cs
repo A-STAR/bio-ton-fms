@@ -1,4 +1,4 @@
-using BioTonFMS.Domain;
+﻿using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF.Repositories;
 using BioTonFMS.Infrastructure.Persistence;
@@ -6,10 +6,11 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BioTonApp.Controllers
+namespace BioTonFMSApp.Controllers
 {
     [Authorize]
     [ApiController]
+    [Produces("application/json")]
     public class TestRepoController : ControllerBase
     {
 
@@ -61,7 +62,7 @@ namespace BioTonApp.Controllers
         [HttpGet("testRepo/VehicleDevices/{id}")]
         public IEnumerable<Device> GetVehicleDevices(int id)
         {
-            var devices = _vehicleRepo.GetAllDevices(id); 
+            var devices = _vehicleRepo.GetAllDevices(id);
             return devices;
         }
 

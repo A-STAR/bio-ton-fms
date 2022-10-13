@@ -1,10 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+п»їusing Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 using System.Text.Json;
 
-namespace BioTonApp.Controllers
+namespace BioTonFMSApp.Controllers
 {
+    /// <summary>
+    /// РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРёСЃС‚РµРјРµ
+    /// </summary>
     [ApiController]
+    [Produces("application/json")]
     public class SystemInfoController : ControllerBase
     {
         private readonly ILogger<TestRepoController> _logger;
@@ -16,21 +20,21 @@ namespace BioTonApp.Controllers
         }
 
         /// <summary>
-        /// Получить версию системы.
+        /// РџРѕР»СѓС‡РёС‚СЊ РІРµСЂСЃРёСЋ СЃРёСЃС‚РµРјС‹.
         /// </summary>
-        /// <returns>Строка с номером версии</returns>
+        /// <returns>РЎС‚СЂРѕРєР° СЃ РЅРѕРјРµСЂРѕРј РІРµСЂСЃРёРё</returns>
         [HttpGet]
         [Route("system/get-version")]
         public string GetVersion()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            return JsonSerializer.Serialize(version != null? $"{version.Major}.{version.Minor}.{version.Build}": "");
+            return JsonSerializer.Serialize(version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "");
         }
 
         /// <summary>
-        /// Получить полную информацию о текущей сборке.
+        /// РџРѕР»СѓС‡РёС‚СЊ РїРѕР»РЅСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ С‚РµРєСѓС‰РµР№ СЃР±РѕСЂРєРµ.
         /// </summary>
-        /// <returns>Строка с информацией о сборке</returns>
+        /// <returns>РЎС‚СЂРѕРєР° СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ Рѕ СЃР±РѕСЂРєРµ</returns>
         [HttpGet]
         [Route("system/get-build-info")]
         public string GetBuildInfo()

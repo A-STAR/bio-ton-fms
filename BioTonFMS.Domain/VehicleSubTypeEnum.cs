@@ -1,5 +1,8 @@
 ﻿namespace BioTonFMS.Domain
 {
+    /// <summary>
+    /// Перечисление подтипов машин
+    /// </summary>
     public enum VehicleSubTypeEnum
     {
         /// <summary>

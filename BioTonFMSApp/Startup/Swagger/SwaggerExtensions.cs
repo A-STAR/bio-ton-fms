@@ -1,4 +1,8 @@
+using BioTonFMS.Domain;
+using BioTonFMS.Security.Controllers;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 namespace BioTonFMSApp.Startup.Swagger;
 
@@ -7,20 +11,36 @@ public static class SwaggerExtensions
     public static WebApplicationBuilder AddSwagger(this WebApplicationBuilder builder)
     {
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c =>
+        builder.Services.AddSwaggerGen(options =>
         {
-            c.SwaggerGeneratorOptions.IgnoreObsoleteActions = true;
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            options.SwaggerGeneratorOptions.IgnoreObsoleteActions = true;
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "BioTon FMS API", Version = "v1" });
+
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "Заголовок авторизации JWT с использованием схемы Bearer. Например: \"Bearer {token}\"",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description =
+                    "JWT Authorization заголовок использующий схему Bearer. \r\n\r\n Введите 'Bearer' [пробел] и затем ваш токен авторизации в поле ввода внизу.\r\n\r\nПример: \"Bearer 12345abcdef\""
             });
-            c.OperationFilter<SecurityRequirementsOperationFilter>();
+            options.OperationFilter<SecurityRequirementsOperationFilter>();
+
+            AddXmlCommentsForAssembly(options, Assembly.GetExecutingAssembly());
+            AddXmlCommentsForAssembly(options, typeof(AuthController).Assembly);
+            AddXmlCommentsForAssembly(options, typeof(Vehicle).Assembly);
         });
 
         return builder;
+    }
+
+    private static void AddXmlCommentsForAssembly(SwaggerGenOptions options, Assembly assembly)
+    {
+        var xmlFilename = $"{assembly.GetName().Name}.xml";
+        var xmlFileWithPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+        options.IncludeXmlComments(xmlFileWithPath, includeControllerXmlComments: true);
+        options.SchemaFilter<EnumTypesSchemaFilter>(xmlFileWithPath);
     }
 }

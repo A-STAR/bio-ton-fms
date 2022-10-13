@@ -9,6 +9,9 @@ namespace BioTonFMS.Domain
     /// </summary>
     public class VehicleGroup : EntityBase, IAggregateRoot
     {
+        /// <summary>
+        /// Название группы
+        /// </summary>
         [Required]
         [MaxLength(50)]
         public string Name { get; set; } = "";

@@ -1,5 +1,8 @@
 ﻿namespace BioTonFMS.Domain
 {
+    /// <summary>
+    /// Перечисление типов машин
+    /// </summary>
     public enum VehicleTypeEnum
     {
         /// <summary>
