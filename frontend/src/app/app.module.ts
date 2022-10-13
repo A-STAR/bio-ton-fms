@@ -8,6 +8,8 @@ import { APIInterceptor } from './api.interceptor';
 
 import { AppRoutingModule } from './app-routing.module';
 
+import { SidebarComponent } from './sidebar/sidebar.component';
+
 import { AppComponent } from './app.component';
 
 @NgModule({
@@ -16,7 +18,8 @@ import { AppComponent } from './app.component';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    SidebarComponent
   ],
   providers: [
     {

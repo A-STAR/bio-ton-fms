@@ -1,4 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+
+import { Observable } from 'rxjs';
+
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'bio-root',
@@ -6,4 +10,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   styleUrls: ['./app.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent { }
+export class AppComponent implements OnInit {
+  authenticated$!: Observable<boolean>;
+
+  constructor(private authService: AuthService) { }
+
+  ngOnInit() {
+    this.authenticated$ = this.authService.authenticated$;
+  }
+}
