@@ -1,0 +1,18 @@
+<div class="logo">
+  <a title="Bio-Ton Field Management System" routerLinkActive routerLink="/" #link="routerLinkActive"
+    [routerLinkActiveOptions]="{
+      exact: true
+    }" [hidden]="link.isActive">
+    <ng-container *ngTemplateOutlet="logo"></ng-container>
+  </a>
+
+  <ng-container *ngIf="link.isActive" [ngTemplateOutlet]="logo"></ng-container>
+
+  <ng-template #logo>
+    <img src="assets/images/bio-ton-field-management-system-logo-sunflower.svg" alt="Bio-Ton Field Management System"
+      width="42" height="44">
+
+    <img src="assets/images/bio-ton-field-management-system-logo-white.svg" alt="Bio-Ton Field Management System"
+      width="149" height="44">
+  </ng-template>
+</div>

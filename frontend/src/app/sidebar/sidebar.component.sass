@@ -9,11 +9,60 @@
   display: block
   width: $sidebar-width
   height: 100vh
+  padding-top: 20px
   background-color: $light-green
   box-shadow: $box-shadow
   transition-property: width
-  transition-duration: 200ms
-  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1)
+
+  &,
+  .logo,
+  .logo img
+    transition-duration: 200ms
+    transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1)
+
+  .logo
+    $sunflower-logo-width: 42px
+
+    margin-left: 0.5 * ($sidebar-width - $sunflower-logo-width)
+    transition-property: margin-left
+
+    img
+      transition-property: opacity
+
+      &[src*="logo-white"]
+        opacity: 0
 
   &:hover
     width: 255px
+
+    .logo
+      margin-left: 20px
+
+      a
+        width: 147px
+
+      img
+
+        &[src*="logo-sunflower"]
+          opacity: 0
+
+        &[src*="logo-white"]
+          opacity: 1
+
+.logo
+  position: relative
+  height: 44px
+  margin-bottom: 30px
+
+  a
+    height: 100%
+
+    &:not([hidden])
+      display: block
+
+  img
+    position: absolute
+    max-width: unset
+
+    &[src*="logo-white"]
+      opacity: 0
