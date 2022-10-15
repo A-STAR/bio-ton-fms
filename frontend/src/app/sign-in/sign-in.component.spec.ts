@@ -48,7 +48,8 @@ describe('SignInComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 
   it('should render card', async () => {
@@ -64,22 +65,26 @@ describe('SignInComponent', () => {
       title: 'Вход в личный кабинет'
     }));
 
-    const logoDivDe = fixture.debugElement.query(By.css('.logo'));
-    const logoAnchorDe = logoDivDe.query(By.css('a'));
+    const logoDivisionDe = fixture.debugElement.query(By.css('div.logo'));
+    const logoAnchorDe = logoDivisionDe.query(By.css('a'));
 
     expect(logoAnchorDe)
       .withContext('render logo anchor element')
-      .toBeDefined();
+      .not.toBeNull();
 
     expect(logoAnchorDe.nativeElement.getAttribute('routerlink'))
       .withContext('render logo anchor router link')
       .toBe('/');
 
+    expect(logoAnchorDe.nativeElement.getAttribute('title'))
+      .withContext('render logo anchor title')
+      .toBe('Bio-Ton Field Management System');
+
     const logoImageDe = logoAnchorDe.query(By.css('img'));
 
     expect(logoImageDe)
       .withContext('render logo image element')
-      .toBeDefined();
+      .not.toBeNull();
 
     expect(logoImageDe.nativeElement.src)
       .withContext('render logo image source')
@@ -91,27 +96,35 @@ describe('SignInComponent', () => {
 
     expect(logoImageDe.nativeElement.getAttribute('width'))
       .withContext('render logo image width')
-      .toBe('147');
+      .toBe('149');
 
     expect(logoImageDe.nativeElement.getAttribute('height'))
       .withContext('render logo image height')
       .toBe('44');
 
-    const versionSpanDe = logoDivDe.query(By.css('.version'));
+    const versionSpanDe = logoDivisionDe.query(By.css('.version'));
 
     expect(versionSpanDe.nativeElement.textContent)
       .withContext('render an app version')
       .toBe(`v. ${testVersion}`);
 
-    card.getHarness(MatDividerHarness);
+    const divider = await card.getHarness(MatDividerHarness);
+
+    await expectAsync(divider.getOrientation())
+      .withContext('render horizontal divider orientation')
+      .toBeResolvedTo('horizontal');
+
+    await expectAsync(divider.isInset())
+      .withContext('render divider inset')
+      .toBeResolvedTo(true);
   });
 
   it('should render Sign in form', async () => {
-    const formDe = fixture.debugElement.query(By.css('form#sign-in-form'));
+    const signInFormDe = fixture.debugElement.query(By.css('form#sign-in-form'));
 
-    expect(formDe)
+    expect(signInFormDe)
       .withContext('render Sign in form element')
-      .toBeDefined();
+      .not.toBeNull();
 
     loader.getHarness(MatInputHarness.with({
       ancestor: 'form#sign-in-form',
