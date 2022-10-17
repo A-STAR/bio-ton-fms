@@ -25,10 +25,11 @@ namespace BioTonFMSApp.Controllers
         /// <returns>Строка с номером версии</returns>
         [HttpGet]
         [Route("system/get-version")]
-        public string GetVersion()
+        public object GetVersion()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            return JsonSerializer.Serialize(version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "");
+            var versionString = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "";
+            return Ok(versionString);
         }
 
         /// <summary>
