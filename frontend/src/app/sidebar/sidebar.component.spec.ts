@@ -1,12 +1,16 @@
 import { By } from '@angular/platform-browser';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HarnessLoader, parallel } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatNavListHarness } from '@angular/material/list/testing';
 
-import { SidebarComponent } from './sidebar.component';
+import { NAVIGATION, SidebarComponent } from './sidebar.component';
 
 describe('SidebarComponent', () => {
   let component: SidebarComponent;
   let fixture: ComponentFixture<SidebarComponent>;
+  let loader: HarnessLoader;
 
   beforeEach(async () => {
     await TestBed
@@ -19,6 +23,7 @@ describe('SidebarComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(SidebarComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
 
@@ -88,5 +93,47 @@ describe('SidebarComponent', () => {
     expect(logoImageDe.nativeElement.getAttribute('height'))
       .withContext('render logo image height')
       .toBe('44');
+  });
+
+  it('should render navigation', async () => {
+    const navigationLists = await loader.getAllHarnesses(MatNavListHarness);
+
+    const [appNavigationGroups, userNavigationGroups] = await parallel(() => navigationLists.map(
+      list => list.getItemsGroupedByDividers()
+    ));
+
+    expect(appNavigationGroups.length)
+      .withContext(`render ${NAVIGATION[0].length} app navigation groups`)
+      .toBe(NAVIGATION[0].length);
+
+    expect(userNavigationGroups.length)
+      .withContext(`render ${NAVIGATION[1].length} user navigation groups`)
+      .toBe(NAVIGATION[1].length);
+
+    const navigationItems = await parallel(() => [appNavigationGroups, userNavigationGroups].map(
+      list => parallel(() => list.map(
+        group => parallel(() => group.map(
+          item => parallel(() => [
+            item.getText(),
+            item.getHref(),
+            item.hasIcon()
+          ]))
+        ))
+      ))
+    );
+
+    expect(navigationItems)
+      .withContext('render navigation items icon, title and link')
+      .toEqual(
+        NAVIGATION.map(
+          list => list.map(
+            group => group.map(({ title, link }) => [
+              title,
+              link ?? null,
+              true
+            ])
+          )
+        )
+      );
   });
 });

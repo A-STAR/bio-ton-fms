@@ -1,24 +1,36 @@
 @use 'variables' as *
 
+$mat-list-item-spacing-vertical: 10px
+$mat-list-icon-size: 24px
+
 \:host
   z-index: 1
   position: fixed
   top: 0
   left: 0
   overflow-x: hidden
-  display: block
+  display: flex
+  flex-direction: column
   width: $sidebar-width
   height: 100vh
   padding-top: 20px
+  padding-bottom: 15px
   background-color: $light-green
   box-shadow: $box-shadow
   transition-property: width
 
   &,
   .logo,
-  .logo img
+  .logo img,
+  .mat-list-icon,
+  .mat-line,
+  mat-divider
     transition-duration: 200ms
     transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1)
+
+  .logo img,
+  .mat-line
+    transition-property: opacity
 
   .logo
     $sunflower-logo-width: 42px
@@ -32,7 +44,26 @@
       &[src*="logo-white"]
         opacity: 0
 
+  .mat-list-icon,
+  mat-divider
+    transition-property: margin-left, margin-right
+
+  .mat-list-icon
+    $mat-list-icon-margin-horizontal: 0.5 * ($sidebar-width - 2 * $mat-list-item-content-padding-horizontal - $mat-list-icon-size)
+
+    margin-left: $mat-list-icon-margin-horizontal
+    margin-right: $mat-list-icon-margin-horizontal
+
+  .mat-line
+    opacity: 0
+
+  mat-divider
+    margin-left: 10px
+    margin-right: 10px
+
   &:hover
+    $mat-list-icon-spacing-horizontal: 30px
+
     width: 255px
 
     .logo
@@ -49,10 +80,22 @@
         &[src*="logo-white"]
           opacity: 1
 
+    .mat-list-icon
+      margin-left: $mat-list-icon-spacing-horizontal - $mat-list-item-content-padding-horizontal
+      margin-right: unset
+
+    .mat-line
+      opacity: 1
+
+    mat-divider
+      margin-left: $mat-list-icon-spacing-horizontal
+      margin-right: $mat-list-icon-spacing-horizontal
+
 .logo
   position: relative
+  flex-shrink: 0
   height: 44px
-  margin-bottom: 30px
+  margin-bottom: 30px - $mat-list-item-spacing-vertical
 
   a
     height: 100%
@@ -64,5 +107,31 @@
     position: absolute
     max-width: unset
 
-    &[src*="logo-white"]
-      opacity: 0
+mat-nav-list
+
+  &:first-of-type
+    margin-bottom: auto
+
+  &:last-of-type
+    margin-top: 2 * $mat-list-item-spacing-vertical
+
+.mat-list-base
+
+  .mat-list-item
+    height: $mat-list-icon-size + 2 * $mat-list-item-spacing-vertical
+    color: $green
+
+    &.active
+      color: $white
+
+    .mat-list-icon
+      padding: unset
+
+    .mat-line
+      font-weight: 500
+
+mat-divider
+  margin-top: $mat-list-item-spacing-vertical
+  margin-bottom: $mat-list-item-spacing-vertical
+  border-top-color: $lighter-green
+  border-top-style: dashed
