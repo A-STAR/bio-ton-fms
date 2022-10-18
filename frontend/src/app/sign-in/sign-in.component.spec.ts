@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -10,13 +11,17 @@ import { MatDividerHarness } from '@angular/material/divider/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 
+import { AuthService } from '../auth.service';
+
 import { SignInComponent } from './sign-in.component';
 
 describe('SignInComponent', () => {
   let component: SignInComponent;
   let fixture: ComponentFixture<SignInComponent>;
   let httpTestingController: HttpTestingController;
+  let router: Router;
   let loader: HarnessLoader;
+  let authService: AuthService;
 
   const testVersion = '1.0.0';
 
@@ -34,7 +39,9 @@ describe('SignInComponent', () => {
 
     fixture = TestBed.createComponent(SignInComponent);
     httpTestingController = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    authService = TestBed.inject(AuthService);
 
     component = fixture.componentInstance;
 
@@ -165,17 +172,65 @@ describe('SignInComponent', () => {
       .toBeResolvedTo('password');
   });
 
-  it('should submit Sign in form', async () => {
-    spyOn(component, 'submitSignInForm').and.callThrough();
-
+  it('should submit invalid Sign in form', async () => {
     const card = await loader.getHarness(MatCardHarness.with({
       title: 'Вход в личный кабинет'
     }));
 
-    const signInButton = await card.getHarness(MatButtonHarness);
+    spyOn(component, 'submitSignInForm')
+      .and.callThrough();
+
+    const signInSpy = spyOnProperty(authService, 'signIn$')
+      .and.callThrough();
+
+    const signInButton = await card.getHarness(MatButtonHarness.with({
+      selector: '[form="sign-in-form"]'
+    }));
 
     await signInButton.click();
 
-    expect(component.submitSignInForm).toHaveBeenCalled();
+    expect(component.submitSignInForm)
+      .toHaveBeenCalled();
+
+    expect(signInSpy)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should submit Sign in form', async () => {
+    const card = await loader.getHarness(MatCardHarness.with({
+      title: 'Вход в личный кабинет'
+    }));
+
+    const [usernameInput, passwordInput] = await card.getAllHarnesses(MatInputHarness.with({
+      ancestor: 'form#sign-in-form'
+    }));
+
+    await usernameInput.setValue('admin');
+    await passwordInput.setValue('root');
+
+    spyOn(component, 'submitSignInForm')
+      .and.callThrough();
+
+    const signInSpy = spyOnProperty(authService, 'signIn$')
+      .and.callThrough();
+
+    spyOn(router, 'navigate');
+
+    const signInButton = await card.getHarness(MatButtonHarness.with({
+      selector: '[form="sign-in-form"]'
+    }));
+
+    await signInButton.click();
+
+    expect(component.submitSignInForm)
+      .toHaveBeenCalled();
+
+    expect(signInSpy)
+      .toHaveBeenCalled();
+
+    expect(router.navigate)
+      .toHaveBeenCalledWith(['/'], {
+        replaceUrl: true
+      });
   });
 });
