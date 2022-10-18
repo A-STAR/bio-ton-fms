@@ -16,18 +16,23 @@ describe('AuthService', () => {
       .toBeTruthy();
   });
 
-  it('should set authenticated state', async () => {
+  it('should initialize authenticated state', async () => {
     await expectAsync(firstValueFrom(service.authenticated$))
       .withContext('initialize `autnenticated$`')
       .toBeResolvedTo(false);
+  });
 
-    service.setAuthenticated(true);
+  it('should sign in', async () => {
+    await firstValueFrom(service.signIn$);
 
     await expectAsync(firstValueFrom(service.authenticated$))
       .withContext('set `autnenticated$` to `true`')
       .toBeResolvedTo(true);
+  });
 
-    service.setAuthenticated(false);
+  it('should sign out', async () => {
+    await firstValueFrom(service.signIn$);
+    await firstValueFrom(service.signOut$);
 
     await expectAsync(firstValueFrom(service.authenticated$))
       .withContext('set `autnenticated$` to `false`')

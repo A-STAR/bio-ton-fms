@@ -44,21 +44,27 @@ describe('AppComponent', () => {
       .withContext('initialize `autnenticated$`')
       .toBeResolvedTo(false);
 
-    authService.setAuthenticated(true);
+    await firstValueFrom(authService.signIn$);
 
     await expectAsync(firstValueFrom(app.authenticated$))
-      .withContext('set `autnenticated$`')
+      .withContext('set `autnenticated$` to `true`')
       .toBeResolvedTo(true);
+
+    await firstValueFrom(authService.signOut$);
+
+    await expectAsync(firstValueFrom(app.authenticated$))
+      .withContext('set `autnenticated$` to `false`')
+      .toBeResolvedTo(false);
   });
 
-  it('should render sidebar', () => {
+  it('should render sidebar', async () => {
     let sidebar = fixture.debugElement.query(By.css('bio-sidebar'));
 
     expect(sidebar)
       .withContext('hide sidebar in unauthenticated state')
       .toBeNull();
 
-    authService.setAuthenticated(true);
+    await firstValueFrom(authService.signIn$);
     fixture.detectChanges();
 
     sidebar = fixture.debugElement.query(By.css('bio-sidebar'));
@@ -66,5 +72,25 @@ describe('AppComponent', () => {
     expect(sidebar)
       .withContext('render sidebar in authenticated state')
       .not.toBeNull();
+  });
+
+  it('should hide sidebar', async () => {
+    await firstValueFrom(authService.signIn$);
+    fixture.detectChanges();
+
+    let sidebar = fixture.debugElement.query(By.css('bio-sidebar'));
+
+    expect(sidebar)
+      .withContext('render sidebar in authenticated state')
+      .not.toBeNull();
+
+    await firstValueFrom(authService.signOut$);
+    fixture.detectChanges();
+
+    sidebar = fixture.debugElement.query(By.css('bio-sidebar'));
+
+    expect(sidebar)
+      .withContext('hide sidebar in unauthenticated state')
+      .toBeNull();
   });
 });
