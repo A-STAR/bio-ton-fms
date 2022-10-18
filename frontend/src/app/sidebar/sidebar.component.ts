@@ -1,7 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
+
+import { firstValueFrom } from 'rxjs';
+
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'bio-sidebar',
@@ -19,6 +23,30 @@ export class SidebarComponent {
   protected get NAVIGATION(): NavigationItem[][][] {
     return NAVIGATION;
   }
+
+  /**
+   * Handle navigation button action.
+   *
+   * @param type A type of button action.
+   */
+  async onNavigationButtonClick(type: NavigationButtonType) {
+    switch (type) {
+      case NavigationButtonType.SignOut:
+        await firstValueFrom(this.authService.signOut$);
+
+        await this.router.navigate(['/sign-in'], {
+          replaceUrl: true
+        });
+
+        break;
+    }
+  }
+
+  constructor(private router: Router, private authService: AuthService) { }
+}
+
+export enum NavigationButtonType {
+  SignOut
 }
 
 type NavigationItem = {
@@ -26,6 +54,7 @@ type NavigationItem = {
   link?: string;
   icon: string;
   alt: string;
+  type?: NavigationButtonType.SignOut;
 };
 
 export const NAVIGATION: NavigationItem[][][] = [
@@ -110,7 +139,8 @@ export const NAVIGATION: NavigationItem[][][] = [
       {
         title: 'Выход',
         icon: 'exit',
-        alt: 'Выход'
+        alt: 'Выход',
+        type: NavigationButtonType.SignOut
       }
     ]
   ]

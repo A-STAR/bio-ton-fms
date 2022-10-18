@@ -29,7 +29,7 @@
       </a>
 
       <ng-template #button>
-        <button mat-list-item>
+        <button mat-list-item (click)="onNavigationButtonClick(item.type!)">
           <img mat-list-icon width="24" height="24" [src]="'assets/images/' + item.icon + '-green.svg'"
             [alt]="item.alt">
 

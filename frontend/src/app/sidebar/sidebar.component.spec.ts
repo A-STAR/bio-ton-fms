@@ -1,11 +1,14 @@
 import { By } from '@angular/platform-browser';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatNavListHarness } from '@angular/material/list/testing';
 
-import { NAVIGATION, SidebarComponent } from './sidebar.component';
+import { AuthService } from '../auth.service';
+
+import { NAVIGATION, NavigationButtonType, SidebarComponent } from './sidebar.component';
 
 describe('SidebarComponent', () => {
   let component: SidebarComponent;
@@ -135,5 +138,38 @@ describe('SidebarComponent', () => {
           )
         )
       );
+  });
+
+  it('should handle sign out button action', async () => {
+    const [, userNavigationList] = await loader.getAllHarnesses(MatNavListHarness);
+
+    const [signOutNavigationItem] = await userNavigationList.getItems({
+      selector: 'button',
+      text: 'Выход'
+    });
+
+    const router = TestBed.inject(Router);
+    const authService = TestBed.inject(AuthService);
+
+    spyOn(component, 'onNavigationButtonClick')
+      .and.callThrough();
+
+    const signOutSpy = spyOnProperty(authService, 'signOut$')
+      .and.callThrough();
+
+    spyOn(router, 'navigate');
+
+    await signOutNavigationItem.click();
+
+    expect(component.onNavigationButtonClick)
+      .toHaveBeenCalledWith(NavigationButtonType.SignOut);
+
+    expect(signOutSpy)
+      .toHaveBeenCalled();
+
+    expect(router.navigate)
+      .toHaveBeenCalledWith(['/sign-in'], {
+        replaceUrl: true
+      });
   });
 });
