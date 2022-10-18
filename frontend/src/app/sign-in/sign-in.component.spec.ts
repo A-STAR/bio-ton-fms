@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -10,13 +11,17 @@ import { MatDividerHarness } from '@angular/material/divider/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 
+import { AuthService } from '../auth.service';
+
 import { SignInComponent } from './sign-in.component';
 
 describe('SignInComponent', () => {
   let component: SignInComponent;
   let fixture: ComponentFixture<SignInComponent>;
   let httpTestingController: HttpTestingController;
+  let router: Router;
   let loader: HarnessLoader;
+  let authService: AuthService;
 
   const testVersion = '1.0.0';
 
@@ -34,7 +39,9 @@ describe('SignInComponent', () => {
 
     fixture = TestBed.createComponent(SignInComponent);
     httpTestingController = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    authService = TestBed.inject(AuthService);
 
     component = fixture.componentInstance;
 
@@ -48,7 +55,8 @@ describe('SignInComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 
   it('should render card', async () => {
@@ -64,22 +72,26 @@ describe('SignInComponent', () => {
       title: 'Вход в личный кабинет'
     }));
 
-    const logoDivDe = fixture.debugElement.query(By.css('.logo'));
-    const logoAnchorDe = logoDivDe.query(By.css('a'));
+    const logoDivisionDe = fixture.debugElement.query(By.css('div.logo'));
+    const logoAnchorDe = logoDivisionDe.query(By.css('a'));
 
     expect(logoAnchorDe)
       .withContext('render logo anchor element')
-      .toBeDefined();
+      .not.toBeNull();
 
     expect(logoAnchorDe.nativeElement.getAttribute('routerlink'))
       .withContext('render logo anchor router link')
       .toBe('/');
 
+    expect(logoAnchorDe.nativeElement.getAttribute('title'))
+      .withContext('render logo anchor title')
+      .toBe('Bio-Ton Field Management System');
+
     const logoImageDe = logoAnchorDe.query(By.css('img'));
 
     expect(logoImageDe)
       .withContext('render logo image element')
-      .toBeDefined();
+      .not.toBeNull();
 
     expect(logoImageDe.nativeElement.src)
       .withContext('render logo image source')
@@ -91,27 +103,35 @@ describe('SignInComponent', () => {
 
     expect(logoImageDe.nativeElement.getAttribute('width'))
       .withContext('render logo image width')
-      .toBe('147');
+      .toBe('149');
 
     expect(logoImageDe.nativeElement.getAttribute('height'))
       .withContext('render logo image height')
       .toBe('44');
 
-    const versionSpanDe = logoDivDe.query(By.css('.version'));
+    const versionSpanDe = logoDivisionDe.query(By.css('.version'));
 
     expect(versionSpanDe.nativeElement.textContent)
       .withContext('render an app version')
       .toBe(`v. ${testVersion}`);
 
-    card.getHarness(MatDividerHarness);
+    const divider = await card.getHarness(MatDividerHarness);
+
+    await expectAsync(divider.getOrientation())
+      .withContext('render horizontal divider orientation')
+      .toBeResolvedTo('horizontal');
+
+    await expectAsync(divider.isInset())
+      .withContext('render divider inset')
+      .toBeResolvedTo(true);
   });
 
   it('should render Sign in form', async () => {
-    const formDe = fixture.debugElement.query(By.css('form#sign-in-form'));
+    const signInFormDe = fixture.debugElement.query(By.css('form#sign-in-form'));
 
-    expect(formDe)
+    expect(signInFormDe)
       .withContext('render Sign in form element')
-      .toBeDefined();
+      .not.toBeNull();
 
     loader.getHarness(MatInputHarness.with({
       ancestor: 'form#sign-in-form',
@@ -152,17 +172,65 @@ describe('SignInComponent', () => {
       .toBeResolvedTo('password');
   });
 
-  it('should submit Sign in form', async () => {
-    spyOn(component, 'submitSignInForm').and.callThrough();
-
+  it('should submit invalid Sign in form', async () => {
     const card = await loader.getHarness(MatCardHarness.with({
       title: 'Вход в личный кабинет'
     }));
 
-    const signInButton = await card.getHarness(MatButtonHarness);
+    spyOn(component, 'submitSignInForm')
+      .and.callThrough();
+
+    const signInSpy = spyOnProperty(authService, 'signIn$')
+      .and.callThrough();
+
+    const signInButton = await card.getHarness(MatButtonHarness.with({
+      selector: '[form="sign-in-form"]'
+    }));
 
     await signInButton.click();
 
-    expect(component.submitSignInForm).toHaveBeenCalled();
+    expect(component.submitSignInForm)
+      .toHaveBeenCalled();
+
+    expect(signInSpy)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should submit Sign in form', async () => {
+    const card = await loader.getHarness(MatCardHarness.with({
+      title: 'Вход в личный кабинет'
+    }));
+
+    const [usernameInput, passwordInput] = await card.getAllHarnesses(MatInputHarness.with({
+      ancestor: 'form#sign-in-form'
+    }));
+
+    await usernameInput.setValue('admin');
+    await passwordInput.setValue('root');
+
+    spyOn(component, 'submitSignInForm')
+      .and.callThrough();
+
+    const signInSpy = spyOnProperty(authService, 'signIn$')
+      .and.callThrough();
+
+    spyOn(router, 'navigate');
+
+    const signInButton = await card.getHarness(MatButtonHarness.with({
+      selector: '[form="sign-in-form"]'
+    }));
+
+    await signInButton.click();
+
+    expect(component.submitSignInForm)
+      .toHaveBeenCalled();
+
+    expect(signInSpy)
+      .toHaveBeenCalled();
+
+    expect(router.navigate)
+      .toHaveBeenCalledWith(['/'], {
+        replaceUrl: true
+      });
   });
 });

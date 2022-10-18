@@ -3,9 +3,9 @@
     <mat-card-title>Вход в личный кабинет</mat-card-title>
 
     <div class="logo">
-      <a routerLink="/">
+      <a title="Bio-Ton Field Management System" routerLink="/">
         <img src="assets/images/bio-ton-field-management-system-logo-green.svg" alt="Bio-Ton Field Management System"
-          width="147" height="44">
+          width="149" height="44">
       </a>
 
       <ng-container *ngIf="systemVersion$ | async as version">
@@ -32,7 +32,7 @@
         <input matInput id="password" placeholder="Пароль" formControlName="password"
           [type]="hidePassword ? 'password' : 'text'">
 
-        <button mat-icon-button matSuffix aria-label="Скрыть пароль" [attr.aria-pressed]="hidePassword"
+        <button mat-icon-button matSuffix type="button" aria-label="Скрыть пароль" [attr.aria-pressed]="hidePassword"
           (click)="togglePasswordVisibility($event)">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>

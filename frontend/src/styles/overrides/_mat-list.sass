@@ -1,0 +1,31 @@
+@use 'variables' as *
+
+.mat-list-base
+  padding-top: unset
+
+  .mat-list-item
+
+    &[hidden]
+      display: none
+
+    &.mat-list-item-with-avatar .mat-list-item-content span.mat-list-text
+      padding-left: 10px
+
+    span.mat-list-item-content
+      padding-left: $mat-list-item-content-padding-horizontal
+      padding-right: $mat-list-item-content-padding-horizontal
+
+    .mat-list-item-content .mat-list-icon
+      border-radius: unset
+
+    .mat-line:nth-child(n+2)
+      font-size: unset
+
+.mat-nav-list .mat-list-item
+
+  &:hover,
+  &:focus
+    background-color: unset
+
+  .mat-ripple-element
+    background-color: rgba($green, 10%)

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -9,9 +9,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 import { SystemService } from '../system.service';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'bio-sign-in',
@@ -35,12 +36,18 @@ export class SignInComponent implements OnInit {
   /**
    * Submit Sign in form, checking validation state.
    */
-  submitSignInForm() {
+  async submitSignInForm() {
     const { invalid } = this.signInForm;
 
     if (invalid) {
       return;
     }
+
+    await firstValueFrom(this.authService.signIn$);
+
+    await this.router.navigate(['/'], {
+      replaceUrl: true
+    });
   }
 
   protected systemVersion$!: Observable<string>;
@@ -68,7 +75,7 @@ export class SignInComponent implements OnInit {
     });
   }
 
-  constructor(private fb: FormBuilder, private systemService: SystemService) { }
+  constructor(private fb: FormBuilder, private router: Router, private systemService: SystemService, private authService: AuthService) { }
 
   ngOnInit() {
     this.systemVersion$ = this.systemService.getVersion$;
