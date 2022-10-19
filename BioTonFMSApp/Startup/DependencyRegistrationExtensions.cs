@@ -7,6 +7,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Telematica.Mapping;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
+using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 
 namespace BioTonFMSApp.Startup
 {
@@ -22,9 +23,11 @@ namespace BioTonFMSApp.Startup
 
             builder.Services.AddAutoMapper(typeof(TrackerMappingProfile).Assembly);
 
+            builder.Services.AddAutoMapper(typeof(VehicleMappingProfile).Assembly);
+
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
-            builder.Services.AddTransient<UnitOfWorkFactory>(sp =>
+            builder.Services.AddTransient(sp =>
             {
                 Console.WriteLine("UnitOfWorkFactory invoked");
                 return new UnitOfWorkFactory(sp);

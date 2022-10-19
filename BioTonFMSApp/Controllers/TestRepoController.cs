@@ -1,6 +1,6 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure;
-using BioTonFMS.Infrastructure.EF.Repositories;
+using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.AspNetCore.Authorization;

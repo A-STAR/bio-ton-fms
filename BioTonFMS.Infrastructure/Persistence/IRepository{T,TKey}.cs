@@ -45,6 +45,12 @@ namespace BioTonFMS.Infrastructure.Persistence
         void Put(T entity);
 
         /// <summary>
+        /// Обновляет сущность в репозитории.
+        /// </summary>
+        /// <param name="entity">Обновляемая сущность.</param>
+        void Update(T entity);
+
+        /// <summary>
         /// Начинает синтаксис запроса по спецификации.
         /// </summary>
         /// <param name="specification">Спецификация запроса.</param>
