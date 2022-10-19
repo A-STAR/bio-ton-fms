@@ -23,7 +23,7 @@ public sealed class JwtGenerator
 
     public (string AccessToken, string RefreshToken) GenerateTokens(AppUser user)
     {
-        var now = DateTime.UtcNow; //TODO: наверное лучше использовать DateTimeProvider позже 
+        var now = DateTime.UtcNow; //TODO: Наверное лучше использовать DateTimeProvider позже 
 
         var options = _claimsOptions.Value;
         

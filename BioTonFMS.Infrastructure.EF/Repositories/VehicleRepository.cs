@@ -1,12 +1,6 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
-using LinqSpecs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories
 {
@@ -25,6 +19,19 @@ namespace BioTonFMS.Infrastructure.EF.Repositories
             var tracker = vehicle.Tracker;
             var devices = tracker.Devices;
             return devices;
+        }
+
+        // TODO: Убрать, если каскадное удаление. Если удаляем связи в ручную, добавить try/catch + проверки
+        public void RemoveConstraintVehicleByTrackerId(int trackerId)
+        {
+            var vehicle = this.QueryableProvider
+                .Linq().Where(v => v.TrackerId == trackerId).FirstOrDefault();
+
+            if (vehicle is not null)
+            {
+                vehicle.TrackerId = null;
+                Update(vehicle);
+            }
         }
     }
 }

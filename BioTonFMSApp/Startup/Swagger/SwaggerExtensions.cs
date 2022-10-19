@@ -1,5 +1,6 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Security.Controllers;
+using BioTonFMS.Telematica.Controllers;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
@@ -30,6 +31,7 @@ public static class SwaggerExtensions
 
             AddXmlCommentsForAssembly(options, Assembly.GetExecutingAssembly());
             AddXmlCommentsForAssembly(options, typeof(AuthController).Assembly);
+            AddXmlCommentsForAssembly(options, typeof(TrackerController).Assembly);
             AddXmlCommentsForAssembly(options, typeof(Vehicle).Assembly);
         });
 
