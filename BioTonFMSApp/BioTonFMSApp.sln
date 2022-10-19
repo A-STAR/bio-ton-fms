@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.Version", "..\.to
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.Migrations", "..\BioTonFMS.Migrations\BioTonFMS.Migrations.csproj", "{9EEDBEB3-C47E-4821-AA34-85382E5B525F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BioTonFMS.Security", "..\BioTonFMS.Security\BioTonFMS.Security.csproj", "{D797822A-D679-4168-8D71-EE2AEE54F13E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.Security", "..\BioTonFMS.Security\BioTonFMS.Security.csproj", "{D797822A-D679-4168-8D71-EE2AEE54F13E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BioTonFMS.Telematica", "..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj", "{75314F5E-13E5-426E-A0B3-02D507ECC49E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,12 @@ Global
 		{D797822A-D679-4168-8D71-EE2AEE54F13E}.Production|Any CPU.Build.0 = Debug|Any CPU
 		{D797822A-D679-4168-8D71-EE2AEE54F13E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D797822A-D679-4168-8D71-EE2AEE54F13E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75314F5E-13E5-426E-A0B3-02D507ECC49E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75314F5E-13E5-426E-A0B3-02D507ECC49E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75314F5E-13E5-426E-A0B3-02D507ECC49E}.Production|Any CPU.ActiveCfg = Debug|Any CPU
+		{75314F5E-13E5-426E-A0B3-02D507ECC49E}.Production|Any CPU.Build.0 = Debug|Any CPU
+		{75314F5E-13E5-426E-A0B3-02D507ECC49E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75314F5E-13E5-426E-A0B3-02D507ECC49E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

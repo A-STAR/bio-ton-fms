@@ -3,7 +3,8 @@ using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.EF.Providers;
 using BioTonFMS.Infrastructure.EF.Repositories;
-using BioTonFMS.Infrastructure.Persistence;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
+using BioTonFMS.Telematica.Mapping;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,8 @@ namespace BioTonFMSApp.Startup
                 return () => instance;
             });
 
+            builder.Services.AddAutoMapper(typeof(TrackerMappingProfile).Assembly);
+
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddTransient<UnitOfWorkFactory>(sp =>
@@ -33,7 +36,7 @@ namespace BioTonFMSApp.Startup
         {
             builder.Services.AddTransient<IKeyValueProvider<Tracker, int>, KeyValueProvider<Tracker, int>>();
             builder.Services.AddTransient<IQueryableProvider<Tracker>, QueryableProvider<Tracker>>();
-            builder.Services.AddTransient<IRepository<Tracker>, Repository<Tracker>>();
+            builder.Services.AddTransient<ITrackerRepository, TrackerRepository>();
 
             builder.Services.AddTransient<IKeyValueProvider<Vehicle, int>, KeyValueProvider<Vehicle, int>>();
             builder.Services.AddTransient<IQueryableProvider<Vehicle>, QueryableProvider<Vehicle>>();

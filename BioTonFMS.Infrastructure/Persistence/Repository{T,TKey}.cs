@@ -69,6 +69,15 @@ namespace BioTonFMS.Infrastructure.Persistence
         }
 
         /// <inheritdoc />
+        public void Update(T entity)
+        {
+            using (_unitOfWorkFactory.GetUnitOfWork())
+            {
+                _keyValueProvider.Update(entity);
+            }
+        }
+
+        /// <inheritdoc />
         public IBeginSpecification<T> BeginSpecification(Specification<T> specification)
         {
             return new BeginSpecification<T>(_queryableProvider, specification);

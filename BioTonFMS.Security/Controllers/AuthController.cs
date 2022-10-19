@@ -29,6 +29,7 @@ public class AuthController : AuthorizedControllerBase
         _userManager = userManager;
         _jwtGenerator = jwtGenerator;
     }
+
     /// <summary>
     /// Регистрация нового пользователя
     /// </summary>

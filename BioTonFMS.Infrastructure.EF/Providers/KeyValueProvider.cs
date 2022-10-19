@@ -1,13 +1,8 @@
-﻿namespace BioTonFMS.Infrastructure.EF.Providers
+﻿using BioTonFMS.Infrastructure.Persistence.Providers;
+using Microsoft.EntityFrameworkCore;
+
+namespace BioTonFMS.Infrastructure.EF.Providers
 {
-    using System;
-
-
-    using BioTonFMS.Infrastructure;
-    using BioTonFMS.Infrastructure.Persistence;
-    using BioTonFMS.Infrastructure.Persistence.Providers;
-    using Microsoft.EntityFrameworkCore;
-
     /// <summary>
     /// Реализация для NHibernate провайдера коллекции, способной выполнять выборку сущностей по их идентификаторам.
     /// </summary>
@@ -64,7 +59,17 @@
                 throw new ArgumentNullException(nameof(entity));
             }
             DbContext.Set<T>().Add(entity);
-            //DbContext.SaveChanges();
+        }
+
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException">Переданный аргумент имеет значение <see langword="null"/>.</exception>
+        public void Update(T entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+            DbContext.Set<T>().Update(entity);
         }
     }
 }

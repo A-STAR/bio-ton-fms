@@ -13,7 +13,6 @@ namespace BioTonFMSApp.Controllers
     [Produces("application/json")]
     public class TestRepoController : ControllerBase
     {
-
         private readonly ILogger<TestRepoController> _logger;
         private readonly IQueryableProvider<Tracker> _trackerProvider;
         private readonly IRepository<Tracker> _trackerRepo;
