@@ -7,9 +7,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories
 {
     public interface ITrackerRepository : IRepository<Tracker>
     {
-        public PagedResult<Tracker> GetTrackers(TrackersFilter filter);
-        public void AddTracker(Tracker tracker);
-        public void UpdateTracker(Tracker tracker);
-        public void DeleteTracker(Tracker tracker);
+        PagedResult<Tracker> GetTrackers(TrackersFilter filter);
+        void AddTracker(Tracker tracker);
+        void UpdateTracker(Tracker tracker);
+        void DeleteTracker(Tracker tracker);
     }
 }

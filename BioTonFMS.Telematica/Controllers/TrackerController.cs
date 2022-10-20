@@ -42,7 +42,7 @@ public class TrackerController : ControllerBase
     /// <response code="200">Список трекеров успещно возвращен</response>
     /// <response code="400">Невозможно вернуть список трекеров</response>
     [HttpGet("trackers")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TrackersResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTrackers([FromQuery] TrackersRequest trackersRequest)
     {
         var filter = _mapper.Map<TrackersFilter>(trackersRequest);

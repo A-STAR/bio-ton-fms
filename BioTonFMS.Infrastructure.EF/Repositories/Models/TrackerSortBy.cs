@@ -1,7 +1,7 @@
 ﻿namespace BioTonFMS.Infrastructure.EF.Repositories.Models
 {
     /// <summary>
-    /// Перечисление сортировки по полю
+    /// Перечисление сортировки трекеров по полю
     /// </summary>
     public enum TrackerSortBy
     {
