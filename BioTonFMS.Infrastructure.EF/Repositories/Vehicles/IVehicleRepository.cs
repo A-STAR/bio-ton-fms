@@ -7,7 +7,6 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 {
     public interface IVehicleRepository : IRepository<Vehicle>
     {
-        IEnumerable<Device> GetAllDevices(int id);
         PagedResult<Vehicle> GetVehicles(VehiclesFilter filter);
     }
 }

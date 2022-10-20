@@ -20,15 +20,6 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
         {
         }
 
-        IEnumerable<Device> IVehicleRepository.GetAllDevices(int id)
-        {
-            var vehicle = QueryableProvider
-                .Fetch(v => v.Tracker).ThenFetch(t => t.Devices).Linq().Where(v => v.Id == id).Single();
-            var tracker = vehicle.Tracker;
-            var devices = tracker.Devices;
-            return devices;
-        }
-
         public PagedResult<Vehicle> GetVehicles(VehiclesFilter filter)
         {
             var linqProvider = QueryableProvider
