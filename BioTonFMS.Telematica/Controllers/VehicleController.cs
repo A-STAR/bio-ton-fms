@@ -42,7 +42,7 @@ public class VehicleController : ControllerBase
     /// <response code="200">Список машин успешно возвращен</response>
     /// <response code="400">Невозможно вернуть список машин</response>
     [HttpGet("vehicles")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(VehicleResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetVehicles([FromQuery] VehiclesRequest vehiclesRequest)
     {
         var filter = _mapper.Map<VehiclesFilter>(vehiclesRequest);
@@ -103,7 +103,7 @@ public class VehicleController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при добавлении машины", newVehicle);
+            _logger.LogError(ex, "Ошибка при добавлении машины {@newVehicle}", newVehicle);
             throw;
         }
 

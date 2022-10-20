@@ -1,12 +1,12 @@
 ﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Models;
+using BioTonFMS.Infrastructure.EF.Models.Filters;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Models.Filters
 {
     /// <summary>
     /// Параметры выборки списка машин
     /// </summary>
-    public class VehiclesFilter
+    public class VehiclesFilter : SortableFilterWithPaging<VehicleSortBy?>
     {
         /// <summary>
         /// Наименование машины
@@ -37,26 +37,6 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Models.Filters
         /// Регистрационный номер
         /// </summary>
         public string? RegNum { get; set; }
-
-        /// <summary>
-        /// Сортировка по полю
-        /// </summary>
-        public VehicleSortBy? SortBy { get; set; }
-
-        /// <summary>
-        /// Направление сортировки
-        /// </summary>
-        public SortDirection? SortDirection { get; set; }
-
-        /// <summary>
-        /// Номер страницы для постраничного вывода
-        /// </summary>
-        public int PageNum { get; set; }
-
-        /// <summary>
-        /// Размер страницы для постраничного вывода
-        /// </summary>s
-        public int PageSize { get; set; }
     }
 
 }
