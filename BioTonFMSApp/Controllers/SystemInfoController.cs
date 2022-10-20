@@ -11,10 +11,10 @@ namespace BioTonFMSApp.Controllers
     [Produces("application/json")]
     public class SystemInfoController : ControllerBase
     {
-        private readonly ILogger<TestRepoController> _logger;
+        private readonly ILogger<SystemInfoController> _logger;
 
         public SystemInfoController(
-            ILogger<TestRepoController> logger)
+            ILogger<SystemInfoController> logger)
         {
             _logger = logger;
         }
