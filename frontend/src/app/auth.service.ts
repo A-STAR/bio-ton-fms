@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 
@@ -16,18 +17,6 @@ export class AuthService {
   }
 
   /**
-   * Sign in user.
-   *
-   * @returns An `Observable' of signing in stream.
-   */
-  get signIn$() {
-    return of(undefined)
-      .pipe(
-        tap(this.#setAuthenticated.bind(this, true))
-      );
-  }
-
-  /**
    * Sign out user.
    *
    * @returns An `Observable' of signing out stream.
@@ -36,6 +25,24 @@ export class AuthService {
     return of(undefined)
       .pipe(
         tap(this.#setAuthenticated.bind(this, false))
+      );
+  }
+
+  /**
+   * Sign in user.
+   *
+   * @returns An `Observable' of signing in stream.
+   */
+  signIn({ username, password }: Credentials) {
+    const body = {
+      userName: username,
+      password
+    };
+
+    return this.httpClient
+      .post<CredentialsResponse>('/api/auth/login', body)
+      .pipe(
+        tap(this.#setAuthenticated.bind(this, true))
       );
   }
 
@@ -49,4 +56,16 @@ export class AuthService {
   #setAuthenticated(authenticated: boolean) {
     this.#authenticated$.next(authenticated);
   }
+
+  constructor(private httpClient: HttpClient) { }
 }
+
+export type Credentials = {
+  username: string;
+  password: string;
+}
+
+export type CredentialsResponse = {
+  accessToken: string;
+  refreshToken: string;
+};

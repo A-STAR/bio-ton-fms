@@ -9,10 +9,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { firstValueFrom, Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { SystemService } from '../system.service';
-import { AuthService } from '../auth.service';
+import { AuthService, Credentials } from '../auth.service';
 
 @Component({
   selector: 'bio-sign-in',
@@ -32,22 +32,26 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./sign-in.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SignInComponent implements OnInit {
+export class SignInComponent implements OnInit, OnDestroy {
   /**
    * Submit Sign in form, checking validation state.
    */
   async submitSignInForm() {
-    const { invalid } = this.signInForm;
+    this.#subscription?.unsubscribe();
+
+    const { invalid, value } = this.signInForm;
 
     if (invalid) {
       return;
     }
 
-    await firstValueFrom(this.authService.signIn$);
-
-    await this.router.navigate(['/'], {
-      replaceUrl: true
-    });
+    this.#subscription = this.authService
+      .signIn(value as Credentials)
+      .subscribe(async () => {
+        await this.router.navigate(['/'], {
+          replaceUrl: true
+        });
+      });
   }
 
   protected systemVersion$!: Observable<string>;
@@ -65,6 +69,8 @@ export class SignInComponent implements OnInit {
     this.hidePassword = !this.hidePassword;
   }
 
+  #subscription: Subscription | undefined;
+
   /**
    * Initialize Sign in form.
    */
@@ -81,5 +87,9 @@ export class SignInComponent implements OnInit {
     this.systemVersion$ = this.systemService.getVersion$;
 
     this.#initSignInForm();
+  }
+
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
   }
 }

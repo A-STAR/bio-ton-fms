@@ -15,6 +15,8 @@ import { AuthService } from '../auth.service';
 
 import { SignInComponent } from './sign-in.component';
 
+import { testCredentials, testCredentialsResponse } from '../auth.service.spec';
+
 describe('SignInComponent', () => {
   let component: SignInComponent;
   let fixture: ComponentFixture<SignInComponent>;
@@ -180,38 +182,7 @@ describe('SignInComponent', () => {
     spyOn(component, 'submitSignInForm')
       .and.callThrough();
 
-    const signInSpy = spyOnProperty(authService, 'signIn$')
-      .and.callThrough();
-
-    const signInButton = await card.getHarness(MatButtonHarness.with({
-      selector: '[form="sign-in-form"]'
-    }));
-
-    await signInButton.click();
-
-    expect(component.submitSignInForm)
-      .toHaveBeenCalled();
-
-    expect(signInSpy)
-      .not.toHaveBeenCalled();
-  });
-
-  it('should submit Sign in form', async () => {
-    const card = await loader.getHarness(MatCardHarness.with({
-      title: 'Вход в личный кабинет'
-    }));
-
-    const [usernameInput, passwordInput] = await card.getAllHarnesses(MatInputHarness.with({
-      ancestor: 'form#sign-in-form'
-    }));
-
-    await usernameInput.setValue('admin');
-    await passwordInput.setValue('root');
-
-    spyOn(component, 'submitSignInForm')
-      .and.callThrough();
-
-    const signInSpy = spyOnProperty(authService, 'signIn$')
+    spyOn(authService, 'signIn')
       .and.callThrough();
 
     spyOn(router, 'navigate');
@@ -225,12 +196,57 @@ describe('SignInComponent', () => {
     expect(component.submitSignInForm)
       .toHaveBeenCalled();
 
-    expect(signInSpy)
+    expect(authService.signIn)
+      .not.toHaveBeenCalled();
+
+    expect(router.navigate)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should submit Sign in form', async () => {
+    const card = await loader.getHarness(MatCardHarness.with({
+      title: 'Вход в личный кабинет'
+    }));
+
+    const [usernameInput, passwordInput] = await card.getAllHarnesses(MatInputHarness.with({
+      ancestor: 'form#sign-in-form'
+    }));
+
+    await usernameInput.setValue(testCredentials.username);
+    await passwordInput.setValue(testCredentials.password);
+
+    spyOn(component, 'submitSignInForm')
+      .and.callThrough();
+
+    spyOn(authService, 'signIn')
+      .and.callThrough();
+
+    spyOn(router, 'navigate');
+
+    const signInButton = await card.getHarness(MatButtonHarness.with({
+      selector: '[form="sign-in-form"]'
+    }));
+
+    await signInButton.click();
+
+    expect(component.submitSignInForm)
       .toHaveBeenCalled();
+
+    expect(authService.signIn)
+      .toHaveBeenCalledWith(testCredentials);
+
+    const loginRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: '/api/auth/login'
+    }, 'login request');
+
+    loginRequest.flush(testCredentialsResponse);
 
     expect(router.navigate)
       .toHaveBeenCalledWith(['/'], {
         replaceUrl: true
       });
+
+    httpTestingController.verify();
   });
 });
