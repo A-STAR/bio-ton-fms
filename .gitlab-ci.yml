@@ -32,26 +32,7 @@ Build-frontend:
   artifacts:
     expire_in: 1 hour
     paths:
-      - frontend/dist/       
-
-Test-frontend:
-  stage: test
-  extends: .node-job
-  script:    
-    - export CHROME_BIN=/usr/bin/chromium-browser                 
-    - npm run test:coverage  
-  
-
-Deploy-frontend:
-  stage: deploy  
-  script:
-    - cd frontend 
-    - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/front
-    - sudo chown www-data:www-data /var/www/front/* 
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
-    - when: manual
-
+      - frontend/dist/  
 
 Build-backend:
   variables:
@@ -61,12 +42,48 @@ Build-backend:
     - docker system prune -af
     - docker build -t fms-back:$DOCKER_TAG .   
 
+Test-frontend:
+  stage: test
+  extends: .node-job
+  script:    
+    - export CHROME_BIN=/usr/bin/chromium-browser                 
+    - npm run test:coverage  
 
-Deploy-backend:
+Deploy-test.lan.bioton-fms-ru:
   stage: deploy
   script:
-    - docker rm -f fms-back || true
-    - docker run --name fms-back -p 8080:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
+    - docker rm -f fms-backend || true
+    - docker run --name fms-backend -p 8080:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
+    - cd frontend 
+    - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test.lan.bioton-fms-ru
+    - sudo chown www-data:www-data /var/www/test.lan.bioton-fms-ru/* 
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
+  
+
+
+Deploy-test2.lan.bioton-fms-ru:
+  stage: deploy
+  script:
+    - docker rm -f fms-backend-test2 || true
+    - docker run --name fms-backend-test2 -p 8081:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
+    - cd frontend 
+    - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
+    - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/* 
+  rules:
+    - when: manual
+  allow_failure: true
+    
+
+Deploy-test3.lan.bioton-fms-ru:
+  stage: deploy
+  script:
+    - docker rm -f fms-backend-test3 || true
+    - docker run --name fms-backend-test3 -p 8082:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
+    - cd frontend 
+    - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test3.lan.bioton-fms-ru
+    - sudo chown www-data:www-data /var/www/test3.lan.bioton-fms-ru/* 
+  rules:    
+    - when: manual    
+  allow_failure: true
