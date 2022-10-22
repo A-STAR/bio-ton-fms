@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpHeaders } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -201,6 +202,76 @@ describe('SignInComponent', () => {
 
     expect(router.navigate)
       .not.toHaveBeenCalled();
+  });
+
+  it('should submit Sign in form with error response', async () => {
+    const card = await loader.getHarness(MatCardHarness.with({
+      title: 'Вход в личный кабинет'
+    }));
+
+    const [usernameInput, passwordInput] = await card.getAllHarnesses(MatInputHarness.with({
+      ancestor: 'form#sign-in-form'
+    }));
+
+    const testMalformedCredentials = {
+      ...testCredentials,
+      username: testCredentials.username.slice(0, -1)
+    };
+
+    await usernameInput.setValue(testMalformedCredentials.username);
+    await passwordInput.setValue(testMalformedCredentials.password);
+
+    spyOn(component, 'submitSignInForm')
+      .and.callThrough();
+
+    spyOn(authService, 'signIn')
+      .and.callThrough();
+
+    spyOn(router, 'navigate');
+
+    const signInButton = await card.getHarness(MatButtonHarness.with({
+      selector: '[form="sign-in-form"]'
+    }));
+
+    await signInButton.click();
+
+    expect(component.submitSignInForm)
+      .toHaveBeenCalled();
+
+    expect(authService.signIn)
+      .toHaveBeenCalledWith(testMalformedCredentials);
+
+    let loginRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: '/api/auth/login'
+    }, 'error login request');
+
+    const testErrorResponse = 'Неверный логин или пароль';
+
+    const testRequestErrorOptions: {
+      headers?: HttpHeaders | {
+        [name: string]: string | string[];
+      };
+      status?: number;
+      statusText?: string;
+    } = {
+      status: 400,
+      statusText: 'Bad Request'
+    };
+
+    loginRequest.flush(testErrorResponse, testRequestErrorOptions);
+    fixture.detectChanges();
+
+    expect(router.navigate)
+      .not.toHaveBeenCalled();
+
+    const errorDe = fixture.debugElement.query(By.css('form#sign-in-form > mat-error'));
+
+    expect(errorDe.nativeElement.textContent.trim())
+      .withContext('render form error message')
+      .toBe(testErrorResponse);
+
+    httpTestingController.verify();
   });
 
   it('should submit Sign in form', async () => {

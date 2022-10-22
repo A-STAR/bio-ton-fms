@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -47,10 +48,21 @@ export class SignInComponent implements OnInit, OnDestroy {
 
     this.#subscription = this.authService
       .signIn(value as Credentials)
-      .subscribe(async () => {
-        await this.router.navigate(['/'], {
-          replaceUrl: true
-        });
+      .subscribe({
+        next: async () => {
+          await this.router.navigate(['/'], {
+            replaceUrl: true
+          });
+        },
+        error: ({ error }: HttpErrorResponse) => {
+          const errors: ValidationErrors = {
+            serverError: {
+              message: error.message ?? error
+            }
+          };
+
+          this.signInForm.setErrors(errors);
+        }
       });
   }
 
@@ -75,8 +87,15 @@ export class SignInComponent implements OnInit, OnDestroy {
    * Initialize Sign in form.
    */
   #initSignInForm() {
-    this.signInForm = this.fb.group({
-      username: ['', Validators.required],
+    this.signInForm = this.fb.nonNullable.group({
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(16)
+        ]
+      ],
       password: ['', Validators.required]
     });
   }
