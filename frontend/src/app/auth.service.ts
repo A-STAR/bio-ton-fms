@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 
+import { TokenService } from './token.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +44,12 @@ export class AuthService {
     return this.httpClient
       .post<CredentialsResponse>('/api/auth/login', body)
       .pipe(
-        tap(this.#setAuthenticated.bind(this, true))
+        tap(({ accessToken, refreshToken }) => {
+          this.tokenService.saveToken(accessToken);
+          this.tokenService.saveRefreshToken(refreshToken);
+
+          this.#setAuthenticated(true);
+        })
       );
   }
 
@@ -57,7 +64,7 @@ export class AuthService {
     this.#authenticated$.next(authenticated);
   }
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient, private tokenService: TokenService) { }
 }
 
 export type Credentials = {

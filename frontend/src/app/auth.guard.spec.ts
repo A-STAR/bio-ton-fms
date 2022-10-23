@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 
 import { AuthGuard } from './auth.guard';
 
+import { TokenKey } from './token.service';
 import { testSignIn } from './auth.service.spec';
 
 describe('AuthGuard', () => {
@@ -57,6 +58,11 @@ describe('AuthGuard', () => {
     authService = TestBed.inject(AuthService);
 
     spyOn(router, 'navigate');
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(TokenKey.Token);
+    localStorage.removeItem(TokenKey.RefreshToken);
   });
 
   it('should be created', () => {

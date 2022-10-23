@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 
 import { AppComponent } from './app.component';
 
+import { TokenKey } from './token.service';
 import { testSignIn } from './auth.service.spec';
 
 describe('AppComponent', () => {
@@ -38,6 +39,11 @@ describe('AppComponent', () => {
     app = fixture.componentInstance;
 
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(TokenKey.Token);
+    localStorage.removeItem(TokenKey.RefreshToken);
   });
 
   it('should create the app', () => {

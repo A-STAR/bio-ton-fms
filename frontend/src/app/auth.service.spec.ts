@@ -5,6 +5,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService, Credentials, CredentialsResponse } from './auth.service';
 
+import { TokenKey } from './token.service';
+
 describe('AuthService', () => {
   let httpTestingController: HttpTestingController;
   let service: AuthService;
@@ -16,6 +18,12 @@ describe('AuthService', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(AuthService);
+
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(TokenKey.Token);
+    localStorage.removeItem(TokenKey.RefreshToken);
   });
 
   it('should be created', () => {
