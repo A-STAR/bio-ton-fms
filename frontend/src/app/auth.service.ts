@@ -31,6 +31,20 @@ export class AuthService {
   }
 
   /**
+   * Authenticate user in `AuthGuard` if there's a token.
+   *
+   * @returns An `Observable' of authenticate stream.
+   */
+  authenticate() {
+    if (this.tokenService.token) {
+      // TODO: refresh access token.
+      this.#setAuthenticated(true);
+    }
+
+    return of(undefined);
+  }
+
+  /**
    * Sign in user.
    *
    * @returns An `Observable' of signing in stream.

@@ -37,6 +37,21 @@ describe('AuthService', () => {
       .toBeResolvedTo(false);
   });
 
+  it('should authenticate', async () => {
+    const tokenService = TestBed.inject(TokenService);
+
+    spyOnProperty(tokenService, 'token')
+      .and.returnValue(testCredentialsResponse.accessToken);
+
+    const authenticate$ = service.authenticate();
+
+    firstValueFrom(authenticate$);
+
+    await expectAsync(firstValueFrom(service.authenticated$))
+      .withContext('set `autnenticated$` to `true` if there\'s token')
+      .toBeResolvedTo(true);
+  });
+
   it('should sign in', async () => {
     testSignIn(httpTestingController, service);
 
