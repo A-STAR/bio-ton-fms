@@ -31,6 +31,14 @@ describe('TokenService', () => {
       .toHaveBeenCalledOnceWith(TokenKey.Token, testCredentialsResponse.accessToken);
   });
 
+  it('should get token', () => {
+    service.saveToken(testCredentialsResponse.accessToken);
+
+    expect(service.token)
+      .withContext('save token')
+      .toBe(testCredentialsResponse.accessToken);
+  });
+
   it('should save refresh token', () => {
     spyOn(localStorage, 'setItem').and.callThrough();
 

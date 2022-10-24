@@ -5,6 +5,13 @@ import { Injectable } from '@angular/core';
 })
 export class TokenService {
   /**
+   * Access token.
+   */
+  get token() {
+    return localStorage.getItem(TokenKey.Token);
+  }
+
+  /**
    * Save access token.
    *
    * @param token Access token.
