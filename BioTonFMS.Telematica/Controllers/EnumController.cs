@@ -1,11 +1,9 @@
 ﻿using BioTonFMS.Domain;
-using BioTonFMS.Domain.Extensions;
-
-using Microsoft.AspNetCore.Authorization;
+using BioTonFMS.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
+using KeyValuePair = BioTonFMS.Infrastructure.Extensions.KeyValuePair;
 
 namespace BioTonFMS.Telematica.Controllers
 {
@@ -32,35 +30,22 @@ namespace BioTonFMS.Telematica.Controllers
         /// <response code="200">Список успешно возвращён</response>
         [HttpGet("VehicleTypeEnum")]
         [ProducesResponseType(typeof(KeyValuePair[]), StatusCodes.Status200OK)]
-        public IActionResult GetVehicleTypeEnum()
-        {
-            var pairsList = new List<KeyValuePair>();
-
-            foreach (var key in (VehicleTypeEnum[])Enum.GetValues(typeof(VehicleTypeEnum)))
-            {
-                var pair = new KeyValuePair
-                {
-                    Key = key.ToString(),
-                    Value = key.GetDescription() ?? ""
-                };
-                pairsList.Add(pair);
-            }
-            return Ok(pairsList.OrderBy(p => p.Value).ToArray());
-        }
+        public IActionResult GetVehicleTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<VehicleTypeEnum>());
 
         /// <summary>
-        /// Пара ключ-значение
+        /// Возвращает строковые представления для перечисления TrackerTypeEnum
         /// </summary>
-        public class KeyValuePair
-        {
-            /// <summary>
-            /// Ключ
-            /// </summary>
-            public string Key { get; set; } = "";
-            /// <summary>
-            /// Значение
-            /// </summary>
-            public string Value { get; set; } = "";
-        }
+        /// <response code="200">Список успешно возвращён</response>
+        [HttpGet("TrackerTypeEnum")]
+        [ProducesResponseType(typeof(KeyValuePair[]), StatusCodes.Status200OK)]
+        public IActionResult GetTrackerTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<TrackerTypeEnum>());
+
+        /// <summary>
+        /// Возвращает строковые представления для перечисления VehicleSubTypeEnum
+        /// </summary>
+        /// <response code="200">Список успешно возвращён</response>
+        [HttpGet("VehicleSubTypeEnum")]
+        [ProducesResponseType(typeof(KeyValuePair[]), StatusCodes.Status200OK)]
+        public IActionResult GetVehicleSubTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<VehicleSubTypeEnum>());
     }
 }

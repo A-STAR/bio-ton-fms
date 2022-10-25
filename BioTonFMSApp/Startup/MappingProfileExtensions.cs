@@ -8,7 +8,7 @@ namespace BioTonFMSApp.Startup
         {
             builder.Services.AddAutoMapper(typeof(TrackerMappingProfile).Assembly);
             builder.Services.AddAutoMapper(typeof(VehicleMappingProfile).Assembly);
-            builder.Services.AddAutoMapper(typeof(VehicleMappingProfile).Assembly);
+            builder.Services.AddAutoMapper(typeof(VehicleGroupProfile).Assembly);
             builder.Services.AddAutoMapper(typeof(FuelTypeMappingProfile).Assembly);
             return builder;
         }
