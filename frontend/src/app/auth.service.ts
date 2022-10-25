@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,18 +19,6 @@ export class AuthService {
   }
 
   /**
-   * Sign in user.
-   *
-   * @returns An `Observable' of signing in stream.
-   */
-  get signIn$() {
-    return of(undefined)
-      .pipe(
-        tap(this.#setAuthenticated.bind(this, true))
-      );
-  }
-
-  /**
    * Sign out user.
    *
    * @returns An `Observable' of signing out stream.
@@ -35,7 +26,48 @@ export class AuthService {
   get signOut$() {
     return of(undefined)
       .pipe(
-        tap(this.#setAuthenticated.bind(this, false))
+        tap(() => {
+          this.#setAuthenticated(false);
+
+          this.tokenService.clear();
+        })
+      );
+  }
+
+  /**
+   * Authenticate user in `AuthGuard` if there's a token.
+   *
+   * @returns An `Observable' of authenticate stream.
+   */
+  authenticate() {
+    if (this.tokenService.token) {
+      // TODO: refresh access token.
+      this.#setAuthenticated(true);
+    }
+
+    return of(undefined);
+  }
+
+  /**
+   * Sign in user.
+   *
+   * @returns An `Observable' of signing in stream.
+   */
+  signIn({ username, password }: Credentials) {
+    const body = {
+      userName: username,
+      password
+    };
+
+    return this.httpClient
+      .post<CredentialsResponse>('/api/auth/login', body)
+      .pipe(
+        tap(({ accessToken, refreshToken }) => {
+          this.tokenService.saveToken(accessToken);
+          this.tokenService.saveRefreshToken(refreshToken);
+
+          this.#setAuthenticated(true);
+        })
       );
   }
 
@@ -49,4 +81,16 @@ export class AuthService {
   #setAuthenticated(authenticated: boolean) {
     this.#authenticated$.next(authenticated);
   }
+
+  constructor(private httpClient: HttpClient, private tokenService: TokenService) { }
 }
+
+export type Credentials = {
+  username: string;
+  password: string;
+}
+
+export type CredentialsResponse = {
+  accessToken: string;
+  refreshToken: string;
+};

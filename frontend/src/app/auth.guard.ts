@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
 
-import { map, Observable, tap } from 'rxjs';
+import { map, mergeMap, Observable, of, tap } from 'rxjs';
 
 import { AuthService } from './auth.service';
 
@@ -21,10 +21,19 @@ export class AuthGuard implements CanActivate, CanLoad {
   }
 
   #canActivate(url: string | undefined): Observable<boolean> {
+    const authenticated$ = this.authService.authenticated$.pipe(
+      mergeMap(
+        authenticated => authenticated
+          ? of(undefined)
+          : this.authService.authenticate()
+      ),
+      mergeMap(() => this.authService.authenticated$)
+    );
+
     const signInPath = '/sign-in';
     const isSignInPage = url === signInPath;
 
-    return this.authService.authenticated$.pipe(
+    return authenticated$.pipe(
       tap(authenticated => {
         if (authenticated && isSignInPage) {
           this.router.navigate(['/']);

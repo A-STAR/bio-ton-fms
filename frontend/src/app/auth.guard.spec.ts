@@ -1,13 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Route, Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
 
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import { AuthService } from './auth.service';
 
 import { AuthGuard } from './auth.guard';
 
+import { TokenKey } from './token.service';
+import { testSignIn } from './auth.service.spec';
+
 describe('AuthGuard', () => {
+  let httpTestingController: HttpTestingController;
   let router: Router;
   let guard: AuthGuard;
   let authService: AuthService;
@@ -43,11 +48,24 @@ describe('AuthGuard', () => {
   ] as UrlSegment[];
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    httpTestingController = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
     guard = TestBed.inject(AuthGuard);
     authService = TestBed.inject(AuthService);
 
     spyOn(router, 'navigate');
+
+    localStorage.removeItem(TokenKey.Token);
+    localStorage.removeItem(TokenKey.RefreshToken);
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(TokenKey.Token);
+    localStorage.removeItem(TokenKey.RefreshToken);
   });
 
   it('should be created', () => {
@@ -56,6 +74,9 @@ describe('AuthGuard', () => {
   });
 
   it('should allow navigation to Sign in page', async () => {
+    spyOn(authService, 'authenticate')
+      .and.callFake(() => of(undefined));
+
     const canActivate = await firstValueFrom(
       guard.canActivate(testRouteSnapshot, testSignInState)
     );
@@ -80,7 +101,7 @@ describe('AuthGuard', () => {
   });
 
   it('should allow navigation to authenticated area', async () => {
-    await firstValueFrom(authService.signIn$);
+    testSignIn(httpTestingController, authService);
 
     const canActivate = await firstValueFrom(
       guard.canActivate(testRouteSnapshot, testState)
@@ -106,6 +127,9 @@ describe('AuthGuard', () => {
   });
 
   it('should redirect to Sign in page', async () => {
+    spyOn(authService, 'authenticate')
+      .and.callFake(() => of(undefined));
+
     const canActivate = await firstValueFrom(
       guard.canActivate(testRouteSnapshot, testState)
     );
@@ -132,7 +156,7 @@ describe('AuthGuard', () => {
   });
 
   it('should redirect to authenticated area', async () => {
-    await firstValueFrom(authService.signIn$);
+    testSignIn(httpTestingController, authService);
 
     const canActivate = await firstValueFrom(
       guard.canActivate(testRouteSnapshot, testSignInState)

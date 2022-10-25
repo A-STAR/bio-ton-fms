@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { firstValueFrom } from 'rxjs';
@@ -10,9 +11,13 @@ import { AuthService } from './auth.service';
 
 import { AppComponent } from './app.component';
 
+import { TokenKey } from './token.service';
+import { testSignIn } from './auth.service.spec';
+
 describe('AppComponent', () => {
   let app: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
+  let httpTestingController: HttpTestingController;
   let authService: AuthService;
 
   beforeEach(async () => {
@@ -20,6 +25,7 @@ describe('AppComponent', () => {
       .configureTestingModule({
         declarations: [AppComponent],
         imports: [
+          HttpClientTestingModule,
           RouterTestingModule,
           SidebarComponent
         ]
@@ -27,11 +33,17 @@ describe('AppComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
+    httpTestingController = TestBed.inject(HttpTestingController);
     authService = TestBed.inject(AuthService);
 
     app = fixture.componentInstance;
 
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(TokenKey.Token);
+    localStorage.removeItem(TokenKey.RefreshToken);
   });
 
   it('should create the app', () => {
@@ -44,7 +56,7 @@ describe('AppComponent', () => {
       .withContext('initialize `autnenticated$`')
       .toBeResolvedTo(false);
 
-    await firstValueFrom(authService.signIn$);
+    testSignIn(httpTestingController, authService);
 
     await expectAsync(firstValueFrom(app.authenticated$))
       .withContext('set `autnenticated$` to `true`')
@@ -64,7 +76,7 @@ describe('AppComponent', () => {
       .withContext('hide sidebar in unauthenticated state')
       .toBeNull();
 
-    await firstValueFrom(authService.signIn$);
+    testSignIn(httpTestingController, authService);
     fixture.detectChanges();
 
     sidebar = fixture.debugElement.query(By.css('bio-sidebar'));
@@ -75,7 +87,7 @@ describe('AppComponent', () => {
   });
 
   it('should hide sidebar', async () => {
-    await firstValueFrom(authService.signIn$);
+    testSignIn(httpTestingController, authService);
     fixture.detectChanges();
 
     let sidebar = fixture.debugElement.query(By.css('bio-sidebar'));
