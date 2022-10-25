@@ -26,7 +26,11 @@ export class AuthService {
   get signOut$() {
     return of(undefined)
       .pipe(
-        tap(this.#setAuthenticated.bind(this, false))
+        tap(() => {
+          this.#setAuthenticated(false);
+
+          this.tokenService.clear();
+        })
       );
   }
 

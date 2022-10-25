@@ -28,6 +28,14 @@ export class TokenService {
   saveRefreshToken(token: string) {
     localStorage.setItem(TokenKey.RefreshToken, token);
   }
+
+  /**
+   * Clear access and refresh
+   */
+  clear() {
+    localStorage.removeItem(TokenKey.Token);
+    localStorage.removeItem(TokenKey.RefreshToken);
+  }
 }
 
 export enum TokenKey {

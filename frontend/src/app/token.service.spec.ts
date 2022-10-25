@@ -10,13 +10,11 @@ describe('TokenService', () => {
   beforeEach(() => {
     service = TestBed.inject(TokenService);
 
-    localStorage.removeItem(TokenKey.Token);
-    localStorage.removeItem(TokenKey.RefreshToken);
+    service.clear();
   });
 
   afterEach(() => {
-    localStorage.removeItem(TokenKey.Token);
-    localStorage.removeItem(TokenKey.RefreshToken);
+    service.clear();
   });
   it('should be created', () => {
     expect(service).toBeTruthy();
@@ -46,5 +44,24 @@ describe('TokenService', () => {
 
     expect(localStorage.setItem)
       .toHaveBeenCalledOnceWith(TokenKey.RefreshToken, testCredentialsResponse.refreshToken);
+  });
+
+  it('should clear tokens', () => {
+    service.saveToken(testCredentialsResponse.accessToken);
+    service.saveToken(testCredentialsResponse.refreshToken);
+
+    spyOn(localStorage, 'removeItem').and.callThrough();
+
+    service.clear();
+
+    expect(localStorage.removeItem)
+      .toHaveBeenCalledWith(TokenKey.Token);
+
+    expect(localStorage.removeItem)
+      .toHaveBeenCalledWith(TokenKey.RefreshToken);
+
+    expect(service.token)
+      .withContext('clear token')
+      .toBeNull();
   });
 });

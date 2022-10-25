@@ -4,12 +4,12 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { firstValueFrom } from 'rxjs';
 
 import { AuthService, Credentials, CredentialsResponse } from './auth.service';
-
-import { TokenKey } from './token.service';
+import { TokenService } from './token.service';
 
 describe('AuthService', () => {
   let httpTestingController: HttpTestingController;
   let service: AuthService;
+  let tokenService: TokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -18,12 +18,13 @@ describe('AuthService', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(AuthService);
+    tokenService = TestBed.inject(TokenService);
 
+    tokenService.clear();
   });
 
   afterEach(() => {
-    localStorage.removeItem(TokenKey.Token);
-    localStorage.removeItem(TokenKey.RefreshToken);
+    tokenService.clear();
   });
 
   it('should be created', () => {
@@ -62,6 +63,9 @@ describe('AuthService', () => {
 
   it('should sign out', async () => {
     testSignIn(httpTestingController, service);
+
+    spyOn(tokenService, 'clear')
+      .and.callThrough();
 
     await firstValueFrom(service.signOut$);
 
