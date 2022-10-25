@@ -43,7 +43,7 @@ public class TrackerController : ControllerBase
     /// <response code="400">Невозможно вернуть список трекеров</response>
     [HttpGet("trackers")]
     [ProducesResponseType(typeof(TrackersResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTrackers([FromQuery] TrackersRequest trackersRequest)
+    public IActionResult GetTrackers([FromQuery] TrackersRequest trackersRequest)
     {
         var filter = _mapper.Map<TrackersFilter>(trackersRequest);
 
@@ -71,7 +71,7 @@ public class TrackerController : ControllerBase
     [HttpGet("tracker/{id}")]
     [ProducesResponseType(typeof(TrackerDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTracker(int id)
+    public IActionResult GetTracker(int id)
     {
         var tracker = _trackerRepo[id];
 
@@ -94,7 +94,7 @@ public class TrackerController : ControllerBase
     /// <response code="409">Конфликт при обновлении трекера</response>
     [HttpPost("tracker")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddTracker(CreateTrackerDto createTrackerDto)
+    public IActionResult AddTracker(CreateTrackerDto createTrackerDto)
     {
         var newTracker = _mapper.Map<Tracker>(createTrackerDto);
 
@@ -122,7 +122,7 @@ public class TrackerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> UpdateTracker(int id, UpdateTrackerDto updateTrackerDto)
+    public IActionResult UpdateTracker(int id, UpdateTrackerDto updateTrackerDto)
     {
         var tracker = _trackerRepo[id];
 
@@ -158,7 +158,7 @@ public class TrackerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> DeleteTracker(int id)
+    public IActionResult DeleteTracker(int id)
     {
         var tracker = _trackerRepo[id];
 

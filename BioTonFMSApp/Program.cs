@@ -24,6 +24,7 @@ builder.Services.AddDbContext<BioTonDBContext>(
                         x => x.MigrationsAssembly("BioTonFMS.Migrations"))
                     .UseSnakeCaseNamingConvention());
 
+builder.AddMappingProfiles();
 builder.RegisterInfrastructureComponents();
 builder.RegisterDataAccess();
 

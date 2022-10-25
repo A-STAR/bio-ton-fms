@@ -43,7 +43,7 @@ public class VehicleController : ControllerBase
     /// <response code="400">Невозможно вернуть список машин</response>
     [HttpGet("vehicles")]
     [ProducesResponseType(typeof(VehicleResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetVehicles([FromQuery] VehiclesRequest vehiclesRequest)
+    public IActionResult GetVehicles([FromQuery] VehiclesRequest vehiclesRequest)
     {
         var filter = _mapper.Map<VehiclesFilter>(vehiclesRequest);
 
@@ -71,7 +71,7 @@ public class VehicleController : ControllerBase
     [HttpGet("vehicle/{id}")]
     [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetVehicle(int id)
+    public IActionResult GetVehicle(int id)
     {
         var vehicle = _vehicleRepository[id];
 
@@ -93,7 +93,7 @@ public class VehicleController : ControllerBase
     /// <response code="200">Новая машина успешно создана</response>
     [HttpPost("vehicle")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddVehicle(CreateVehicleDto createVehicleDto)
+    public IActionResult AddVehicle(CreateVehicleDto createVehicleDto)
     {
         var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
 
@@ -120,7 +120,7 @@ public class VehicleController : ControllerBase
     [HttpPut("vehicle/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateVehicle(int id, UpdateVehicleDto updateVehicleDto)
+    public IActionResult UpdateVehicle(int id, UpdateVehicleDto updateVehicleDto)
     {
         var vehicle = _vehicleRepository[id];
 
@@ -155,7 +155,7 @@ public class VehicleController : ControllerBase
     [HttpDelete("vehicle/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteVehicle(int id)
+    public IActionResult DeleteVehicle(int id)
     {
         var vehicle = _vehicleRepository[id];
 
