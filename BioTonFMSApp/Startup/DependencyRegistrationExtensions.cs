@@ -4,7 +4,6 @@ using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.EF.Providers;
 using BioTonFMS.Infrastructure.EF.Repositories;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
-using BioTonFMS.Telematica.Mapping;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
