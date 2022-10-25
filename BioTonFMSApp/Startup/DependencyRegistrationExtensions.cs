@@ -8,6 +8,7 @@ using BioTonFMS.Telematica.Mapping;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
+using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 
 namespace BioTonFMSApp.Startup
@@ -45,6 +46,10 @@ namespace BioTonFMSApp.Startup
             builder.Services.AddTransient<IKeyValueProvider<VehicleGroup, int>, KeyValueProvider<VehicleGroup, int>>();
             builder.Services.AddTransient<IQueryableProvider<VehicleGroup>, QueryableProvider<VehicleGroup>>();
             builder.Services.AddTransient<IVehicleGroupRepository, VehicleGroupRepository>();
+
+            builder.Services.AddTransient<IKeyValueProvider<FuelType, int>, KeyValueProvider<FuelType, int>>();
+            builder.Services.AddTransient<IQueryableProvider<FuelType>, QueryableProvider<FuelType>>();
+            builder.Services.AddTransient<IFuelTypeRepository, FuelTypeRepository>();
 
             return builder;
         }
