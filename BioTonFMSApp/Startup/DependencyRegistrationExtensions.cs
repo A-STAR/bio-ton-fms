@@ -21,10 +21,6 @@ namespace BioTonFMSApp.Startup
                 return () => instance;
             });
 
-            builder.Services.AddAutoMapper(typeof(TrackerMappingProfile).Assembly);
-
-            builder.Services.AddAutoMapper(typeof(VehicleMappingProfile).Assembly);
-
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddTransient(sp =>

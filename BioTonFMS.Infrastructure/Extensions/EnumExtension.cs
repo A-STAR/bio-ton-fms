@@ -24,7 +24,7 @@ namespace BioTonFMS.Infrastructure.Extensions
             return null;
         }
 
-        public static IList<KeyValuePair?> GetKeyValuePairs<T>() where T : Enum
+        public static KeyValuePair[] GetKeyValuePairs<T>() where T : Enum
         {
             var pairsList = new List<KeyValuePair>();
 

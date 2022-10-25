@@ -30,7 +30,7 @@ namespace BioTonFMS.Telematica.Controllers
         /// <response code="200">Список успешно возвращён</response>
         [HttpGet("VehicleTypeEnum")]
         [ProducesResponseType(typeof(KeyValuePair[]), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetVehicleTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<VehicleTypeEnum>());
+        public IActionResult GetVehicleTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<VehicleTypeEnum>());
 
         /// <summary>
         /// Возвращает строковые представления для перечисления TrackerTypeEnum
@@ -38,7 +38,7 @@ namespace BioTonFMS.Telematica.Controllers
         /// <response code="200">Список успешно возвращён</response>
         [HttpGet("TrackerTypeEnum")]
         [ProducesResponseType(typeof(KeyValuePair[]), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetTrackerTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<TrackerTypeEnum>());
+        public IActionResult GetTrackerTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<TrackerTypeEnum>());
 
         /// <summary>
         /// Возвращает строковые представления для перечисления VehicleSubTypeEnum
@@ -46,6 +46,6 @@ namespace BioTonFMS.Telematica.Controllers
         /// <response code="200">Список успешно возвращён</response>
         [HttpGet("VehicleSubTypeEnum")]
         [ProducesResponseType(typeof(KeyValuePair[]), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetVehicleSubTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<VehicleSubTypeEnum>());
+        public IActionResult GetVehicleSubTypeEnum() => Ok(EnumExtension.GetKeyValuePairs<VehicleSubTypeEnum>());
     }
 }
