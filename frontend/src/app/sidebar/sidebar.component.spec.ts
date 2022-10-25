@@ -1,5 +1,6 @@
 import { By } from '@angular/platform-browser';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
@@ -19,6 +20,7 @@ describe('SidebarComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          HttpClientTestingModule,
           RouterTestingModule,
           SidebarComponent
         ]

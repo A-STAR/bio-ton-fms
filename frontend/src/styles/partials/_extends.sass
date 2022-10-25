@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'variables' as *
 
 .authentication
@@ -51,3 +52,24 @@
     mat-card-content mat-form-field,
     mat-card-actions button
       width: 100%
+
+    form
+      position: relative
+
+      > mat-error
+        position: absolute
+        bottom: 0
+        width: 100%
+        height: map.get($mat-form-field-subscript-wrapper, 'margin-vertical') + 2 * map.get($mat-form-field-subscript-wrapper, 'line-height')
+        padding-left: map.get($mat-form-field-subscript-wrapper, 'padding-horizontal')
+        padding-right: map.get($mat-form-field-subscript-wrapper, 'padding-horizontal')
+        animation: transitionmessages 300ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
+
+        @keyframes transitionmessages
+          from
+            opacity: 0
+            transform: translateY(-5px)
+
+          to
+            opacity: 1
+            transform: translateY(0)
