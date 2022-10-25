@@ -8,7 +8,7 @@ namespace BioTonFMS.Telematica.Dtos
     /// <summary>
     /// Параметры выборки списка машин
     /// </summary>
-    public class VehiclesRequest
+    public class VehiclesRequest : RequestWithPaging
     {
         /// <summary>
         /// Наименование машины
@@ -49,17 +49,5 @@ namespace BioTonFMS.Telematica.Dtos
         /// Направление сортировки
         /// </summary>
         public SortDirection? SortDirection { get; set; }
-
-        /// <summary>
-        /// Номер страницы для постраничного вывода
-        /// </summary>
-        [Required]
-        public int PageNum { get; set; }
-
-        /// <summary>
-        /// Размер страницы для постраничного вывода
-        /// </summary>
-        [Required]
-        public int PageSize { get; set; }
     }
 }
