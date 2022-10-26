@@ -23,15 +23,15 @@
       <mat-form-field>
         <input matInput id="username" placeholder="Логин" formControlName="username">
 
-        <mat-error *ngIf="signInForm.controls['username'].errors?.['required']">
+        <mat-error *ngIf="signInForm.controls.username.errors?.['required']">
           <strong>Логин</strong> обязательное поле
         </mat-error>
 
-        <mat-error *ngIf="signInForm.controls['username'].errors?.['minlength'] as error">
+        <mat-error *ngIf="signInForm.controls.username.errors?.['minlength'] as error">
           <strong>Логин</strong> должен быть более {{ error.requiredLength - 1 }} символов
         </mat-error>
 
-        <mat-error *ngIf="signInForm.controls['username'].errors?.['maxlength'] as error">
+        <mat-error *ngIf="signInForm.controls.username.errors?.['maxlength'] as error">
           <strong>Логин</strong> должен быть менее {{ error.requiredLength + 1 }} символов
         </mat-error>
       </mat-form-field>
