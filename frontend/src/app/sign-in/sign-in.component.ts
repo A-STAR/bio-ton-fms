@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -67,7 +67,7 @@ export class SignInComponent implements OnInit, OnDestroy {
   }
 
   protected systemVersion$!: Observable<string>;
-  protected signInForm!: FormGroup;
+  protected signInForm!: FormGroup<SignInForm>;
   protected hidePassword = true;
 
   /**
@@ -87,16 +87,13 @@ export class SignInComponent implements OnInit, OnDestroy {
    * Initialize Sign in form.
    */
   #initSignInForm() {
-    this.signInForm = this.fb.nonNullable.group({
-      username: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(16)
-        ]
-      ],
-      password: ['', Validators.required]
+    this.signInForm = this.fb.group({
+      username: this.fb.control<string | null>(null, [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(16)
+      ]),
+      password: this.fb.control<string | null>(null, Validators.required)
     });
   }
 
@@ -111,4 +108,9 @@ export class SignInComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.#subscription?.unsubscribe();
   }
+}
+
+type SignInForm = {
+  username: FormControl<string | null>;
+  password: FormControl<string | null>;
 }
