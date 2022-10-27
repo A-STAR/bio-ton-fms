@@ -32,7 +32,7 @@ describe('APIInterceptor', () => {
     const testRequestURL = '/';
 
     httpClient
-      .get<string>(testRequestURL)
+      .get(testRequestURL)
       .subscribe(() => {
         done();
       });
@@ -43,7 +43,7 @@ describe('APIInterceptor', () => {
 
     expect(testRequest.request.url)
       .withContext('prepend API to HTTP request URL')
-      .toBe(apiRequestURL)
+      .toBe(apiRequestURL);
 
     testRequest.flush(null);
 
