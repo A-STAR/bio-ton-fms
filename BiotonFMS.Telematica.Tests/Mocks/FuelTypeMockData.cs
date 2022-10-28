@@ -2,7 +2,7 @@
 
 namespace BiotonFMS.Telematica.Tests.Mocks
 {
-    public class FuelTypeMockData
+    public class FuelTypeFakeData
     {
         public static IEnumerable<FuelType> GetFuelTypes()
         {

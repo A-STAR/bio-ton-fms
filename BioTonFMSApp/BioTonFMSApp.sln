@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.Security", "..\Bi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.Telematica", "..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj", "{75314F5E-13E5-426E-A0B3-02D507ECC49E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiotonFMS.Telematica.Tests", "..\BiotonFMS.Telematica.Tests\BiotonFMS.Telematica.Tests.csproj", "{736634F1-6FB5-45B0-8EA8-5AECE08EAB2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiotonFMS.Telematica.Tests", "..\BiotonFMS.Telematica.Tests\BiotonFMS.Telematica.Tests.csproj", "{736634F1-6FB5-45B0-8EA8-5AECE08EAB2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".UnitTests", ".UnitTests", "{C3EA5DCC-93BB-463C-A998-6DFF70637FCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,6 +92,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{773FEA5B-9910-438D-9264-5C203E26C0D5} = {DCC281AE-C83B-4E61-B639-A1C351C8040E}
+		{736634F1-6FB5-45B0-8EA8-5AECE08EAB2B} = {C3EA5DCC-93BB-463C-A998-6DFF70637FCC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29D0711B-D631-44B8-89C7-9A737949225A}
