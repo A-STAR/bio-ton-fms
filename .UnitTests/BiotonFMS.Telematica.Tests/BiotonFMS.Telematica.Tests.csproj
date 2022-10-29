@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj" />
+    <ProjectReference Include="..\..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj" />
   </ItemGroup>
 
 </Project>
