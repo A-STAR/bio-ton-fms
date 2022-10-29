@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { Fuel, pageNum, pageSize, VehicleGroup, Vehicles, VehicleService, VehiclesOptions } from './vehicle.service';
@@ -92,6 +93,37 @@ describe('VehicleService', () => {
 
     fuelsRequest.flush(testFuels);
   });
+
+  it('should get vehicle type enum', (done: DoneFn) => {
+    service.vehicleType$.subscribe(vehicleType => {
+      expect(vehicleType)
+        .withContext('emit vehicle type enum')
+        .toEqual(testVehicleTypeEnum);
+
+      done();
+    });
+
+    const vehicleTypeEnumRequest = httpTestingController.expectOne('/api/telematica/enums/VehicleTypeEnum', 'vehicle type enum request');
+
+    vehicleTypeEnumRequest.flush(testVehicleTypeEnum);
+  });
+
+  it('should get vehicle sub type enum', (done: DoneFn) => {
+    service.vehicleSubType$.subscribe(vehicleSubType => {
+      expect(vehicleSubType)
+        .withContext('emit vehicle sub type enum')
+        .toEqual(testVehicleSubTypeEnum);
+
+      done();
+    });
+
+    const vehicleSubTypeEnumRequest = httpTestingController.expectOne(
+      '/api/telematica/enums/VehicleSubTypeEnum',
+      'vehicle sub type enum request'
+    );
+
+    vehicleSubTypeEnumRequest.flush(testVehicleSubTypeEnum);
+  });
 });
 
 export const testVehicles: Vehicles = {
@@ -179,5 +211,51 @@ export const testFuels: Fuel[] = [
   {
     id: 1,
     name: 'Дизельное топливо'
+  }
+];
+
+export const testVehicleTypeEnum: KeyValue<string, string>[] = [
+  {
+    key: 'Transport',
+    value: 'Для перевозок'
+  },
+  {
+    key: 'Agro',
+    value: 'Для работы на полях'
+  }
+];
+
+export const testVehicleSubTypeEnum: KeyValue<string, string>[] = [
+  {
+    key: 'Telehandler',
+    value: 'Tелескопический погрузчик'
+  },
+  {
+    key: 'Tanker',
+    value: 'Бензовоз'
+  },
+  {
+    key: 'Truck',
+    value: 'Грузовой автомобиль'
+  },
+  {
+    key: 'Other',
+    value: 'Другой транспорт'
+  },
+  {
+    key: 'Harvester',
+    value: 'Комбайн'
+  },
+  {
+    key: 'Car',
+    value: 'Легковой автомобиль'
+  },
+  {
+    key: 'Sprayer',
+    value: 'Опрыскиватель'
+  },
+  {
+    key: 'Tractor',
+    value: 'Трактор'
   }
 ];

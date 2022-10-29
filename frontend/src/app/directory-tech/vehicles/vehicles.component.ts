@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 
 import { BehaviorSubject, forkJoin, mergeMap, Observable } from 'rxjs';
 
@@ -14,18 +14,20 @@ import { Fuel, VehicleGroup, Vehicles, VehicleService } from '../vehicle.service
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VehiclesComponent implements OnInit {
-  protected vehiclesData$!: Observable<[Vehicles, VehicleGroup[], Fuel[]]>;
+  protected vehiclesData$!: Observable<[Vehicles, VehicleGroup[], Fuel[], KeyValue<string, string>[], KeyValue<string, string>[]]>;
   #vehicles$ = new BehaviorSubject(undefined);
 
   /**
-   * Get vehicles, groups, fuels. Set vehicles data.
+   * Get vehicles, groups, fuels, type, subtype. Set vehicles data.
    */
   #setVehiclesData() {
     this.vehiclesData$ = this.#vehicles$.pipe(
       mergeMap(() => forkJoin([
         this.vehiclesService.getVehicles(),
         this.vehiclesService.vehicleGroups$,
-        this.vehiclesService.fuels$
+        this.vehiclesService.fuels$,
+        this.vehiclesService.vehicleType$,
+        this.vehiclesService.vehicleSubType$
       ]))
     );
   }

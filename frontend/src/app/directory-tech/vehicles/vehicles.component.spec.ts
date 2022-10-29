@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { Observable, of } from 'rxjs';
@@ -9,6 +10,8 @@ import { VehiclesComponent } from './vehicles.component';
 
 import { testFuels, testVehicleGroups, testVehicles } from '../vehicle.service.spec';
 
+import { testVehicleSubTypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
+
 describe('VehiclesComponent', () => {
   let component: VehiclesComponent;
   let fixture: ComponentFixture<VehiclesComponent>;
@@ -16,6 +19,8 @@ describe('VehiclesComponent', () => {
   let vehiclesSpy: jasmine.Spy<() => Observable<Vehicles>>;
   let vehicleGroupsSpy: jasmine.Spy<(this: VehicleService) => Observable<VehicleGroup[]>>;
   let fuelsSpy: jasmine.Spy<(this: VehicleService) => Observable<Fuel[]>>;
+  let vehicleTypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<string, string>[]>>;
+  let vehicleSubTypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<string, string>[]>>;
 
   beforeEach(async () => {
     await TestBed
@@ -36,6 +41,8 @@ describe('VehiclesComponent', () => {
     const vehicles$ = of(testVehicles);
     const vehicleGroups$ = of(testVehicleGroups);
     const fuels$ = of(testFuels);
+    const vehicleType$ = of(testVehicleTypeEnum);
+    const vehicleSubType$ = of(testVehicleSubTypeEnum);
 
     vehiclesSpy = spyOn(vehicleService, 'getVehicles')
       .and.returnValue(vehicles$);
@@ -45,6 +52,12 @@ describe('VehiclesComponent', () => {
 
     fuelsSpy = spyOnProperty(vehicleService, 'fuels$')
       .and.returnValue(fuels$);
+
+    vehicleTypeSpy = spyOnProperty(vehicleService, 'vehicleType$')
+      .and.returnValue(vehicleType$);
+
+    vehicleSubTypeSpy = spyOnProperty(vehicleService, 'vehicleSubType$')
+      .and.returnValue(vehicleSubType$);
 
     fixture.detectChanges();
   });
@@ -64,6 +77,14 @@ describe('VehiclesComponent', () => {
       .toHaveBeenCalled();
 
     expect(fuelsSpy)
+      .toHaveBeenCalled();
+  });
+
+  it('should get vehicle type, subtype enums', () => {
+    expect(vehicleTypeSpy)
+      .toHaveBeenCalled();
+
+    expect(vehicleSubTypeSpy)
       .toHaveBeenCalled();
   });
 });

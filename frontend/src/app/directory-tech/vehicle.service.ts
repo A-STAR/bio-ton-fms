@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
+import { KeyValue } from '@angular/common';
 
 export const pageNum = 1;
 export const pageSize = 50;
@@ -24,6 +25,24 @@ export class VehicleService {
    */
   get fuels$() {
     return this.httpClient.get<Fuel[]>('/api/telematica/fueltypes');
+  }
+
+  /**
+   * Get vehicle type enum.
+   *
+   * @returns An `Observable' of vehicle type enum stream.
+   */
+  get vehicleType$() {
+    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleTypeEnum');
+  }
+
+  /**
+   * Get vehicle sub type enum.
+   *
+   * @returns An `Observable' of vehicle sub type enum stream.
+   */
+  get vehicleSubType$() {
+    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleSubTypeEnum');
   }
 
   /**
