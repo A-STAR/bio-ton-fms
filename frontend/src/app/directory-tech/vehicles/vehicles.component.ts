@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { BehaviorSubject, mergeMap, Observable } from 'rxjs';
+import { BehaviorSubject, forkJoin, mergeMap, Observable } from 'rxjs';
 
-import { Vehicles, VehicleService } from '../vehicle.service';
+import { Fuel, VehicleGroup, Vehicles, VehicleService } from '../vehicle.service';
 
 @Component({
   selector: 'bio-vehicles',
@@ -14,21 +14,25 @@ import { Vehicles, VehicleService } from '../vehicle.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VehiclesComponent implements OnInit {
-  protected vehicles$!: Observable<Vehicles>;
+  protected vehiclesData$!: Observable<[Vehicles, VehicleGroup[], Fuel[]]>;
   #vehicles$ = new BehaviorSubject(undefined);
 
   /**
-   * Get and set vehicles.
+   * Get vehicles, groups, fuels. Set vehicles data.
    */
-  #setVehicles() {
-    this.vehicles$ = this.#vehicles$.pipe(
-      mergeMap(() => this.vehiclesService.getVehicles())
+  #setVehiclesData() {
+    this.vehiclesData$ = this.#vehicles$.pipe(
+      mergeMap(() => forkJoin([
+        this.vehiclesService.getVehicles(),
+        this.vehiclesService.vehicleGroups$,
+        this.vehiclesService.fuels$
+      ]))
     );
   }
 
   constructor(private vehiclesService: VehicleService) { }
 
   ngOnInit() {
-    this.#setVehicles();
+    this.#setVehiclesData();
   }
 }

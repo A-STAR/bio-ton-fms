@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { pageNum, pageSize, Vehicles, VehicleService, VehiclesOptions } from './vehicle.service';
+import { Fuel, pageNum, pageSize, VehicleGroup, Vehicles, VehicleService, VehiclesOptions } from './vehicle.service';
 
 describe('VehicleService', () => {
+  let httpTestingController: HttpTestingController;
   let service: VehicleService;
 
   beforeEach(() => {
@@ -11,7 +12,12 @@ describe('VehicleService', () => {
       imports: [HttpClientTestingModule]
     });
 
+    httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(VehicleService);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should be created', () => {
@@ -20,8 +26,6 @@ describe('VehicleService', () => {
   });
 
   it('should get vehicles', (done: DoneFn) => {
-    const httpTestingController = TestBed.inject(HttpTestingController);
-
     let vehiclesOptions: VehiclesOptions | undefined;
 
     const subscription = service
@@ -59,8 +63,34 @@ describe('VehicleService', () => {
     );
 
     vehiclesRequest.flush(testVehicles);
+  });
 
-    httpTestingController.verify();
+  it('should get vehicle groups', (done: DoneFn) => {
+    service.vehicleGroups$.subscribe(groups => {
+      expect(groups)
+        .withContext('emit vehicle groups')
+        .toEqual(testVehicleGroups);
+
+      done();
+    });
+
+    const vehicleGroupsRequest = httpTestingController.expectOne('/api/telematica/vehiclegroups', 'vehicle groups request');
+
+    vehicleGroupsRequest.flush(testVehicleGroups);
+  });
+
+  it('should get fuel types', (done: DoneFn) => {
+    service.fuels$.subscribe(fuels => {
+      expect(fuels)
+        .withContext('emit fuels')
+        .toEqual(testFuels);
+
+      done();
+    });
+
+    const fuelsRequest = httpTestingController.expectOne('/api/telematica/fueltypes', 'fuels request');
+
+    fuelsRequest.flush(testFuels);
   });
 });
 
@@ -125,3 +155,29 @@ export const testVehicles: Vehicles = {
     total: 1
   }
 };
+
+export const testVehicleGroups: VehicleGroup[] = [
+  {
+    id: 0,
+    name: 'Комбайны CLAAS'
+  },
+  {
+    id: 1,
+    name: 'Тракторы Кировцы'
+  },
+  {
+    id: 2,
+    name: 'Легковые автомобили'
+  }
+];
+
+export const testFuels: Fuel[] = [
+  {
+    id: 0,
+    name: 'Бензин'
+  },
+  {
+    id: 1,
+    name: 'Дизельное топливо'
+  }
+];
