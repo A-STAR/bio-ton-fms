@@ -87,7 +87,7 @@ export type Fuel = {
   name: string;
 }
 
-type Vehicle = {
+export type Vehicle = {
   id: number;
   name?: string;
   type: string;
