@@ -5,6 +5,7 @@ using BioTonFMS.Telematica.Controllers;
 using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 })
 .AddApplicationPart(typeof(AuthController).Assembly)
 .AddApplicationPart(typeof(TrackerController).Assembly);
