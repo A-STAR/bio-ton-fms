@@ -21,6 +21,8 @@ namespace BioTonFMS.Telematica.Mapping
                 .ForMember(dest => dest.VehicleGroupId, opt => opt.MapFrom(src => src.VehicleGroup.Id))
                 .ForMember(dest => dest.SubType, opt => opt.MapFrom(src => src.VehicleSubType))
                 .ForMember(dest => dest.FuelTypeId, opt => opt.MapFrom(src => src.FuelType.Id));
+
+            CreateMap<Tracker, VehicleTrackerDto>();
         }
     }
 }
