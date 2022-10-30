@@ -1,5 +1,6 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models;
+using BioTonFMS.Infrastructure.EF.Providers;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.Paging;
@@ -20,11 +21,26 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
         {
         }
 
+        public new Vehicle this[int key]
+        {
+            get
+            {
+                var vehicle = QueryableProvider
+                    .Fetch(v => v.VehicleGroup)
+                    .Fetch(v => v.FuelType)
+                    .Fetch(v => v.Tracker)
+                    .Linq()
+                    .Where(v => v.Id == key).SingleOrDefault();
+                return vehicle;
+            }
+        }
+
         public PagedResult<Vehicle> GetVehicles(VehiclesFilter filter)
         {
             var linqProvider = QueryableProvider
                 .Fetch(v => v.VehicleGroup)
-                .Fetch(v => v.FuelType).Linq();
+                .Fetch(v => v.FuelType)
+                .Fetch(v => v.Tracker).Linq();
 
             Expression<Func<Vehicle, bool>>? vehiclePredicate = null;
 

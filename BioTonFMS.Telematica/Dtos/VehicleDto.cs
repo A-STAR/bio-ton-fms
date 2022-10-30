@@ -1,4 +1,5 @@
 ﻿using BioTonFMS.Domain;
+using System.ComponentModel.DataAnnotations;
 
 namespace BioTonFMS.Telematica.Dtos
 {
@@ -15,7 +16,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Наименование машины
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Тип машины
@@ -71,5 +72,28 @@ namespace BioTonFMS.Telematica.Dtos
         /// Описание
         /// </summary>
         public string Description { get; set; } = "";
+
+        /// <summary>
+        /// Трекер
+        /// </summary>
+        public VehicleTrackerDto? Tracker { get; set; }
     }
+
+    /// <summary>
+    /// Трекер
+    /// </summary>
+    public class VehicleTrackerDto
+    {
+        /// <summary>
+        /// Id трекера
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Наименование трекера
+        /// </summary>
+        [Required]
+        public string Name { get; set; } = "";
+    }
+
 }
