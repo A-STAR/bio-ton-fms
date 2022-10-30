@@ -19,7 +19,7 @@
         /// Идентификатор бизнес-сущности.
         /// </param>
         /// <returns>Искомая сущность.</returns>
-        T this[TKey key] { get; }
+        T? this[TKey key] { get; }
 
         /// <summary>
         /// Удаляет сущность.

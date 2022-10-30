@@ -30,7 +30,7 @@ namespace BioTonFMS.Infrastructure.Persistence
         /// </summary>
         /// <param name="key">Ключ сущности.</param>
         /// <returns>Запрашиваемая сущность.</returns>
-        T this[TKey key] { get; }
+        T? this[TKey key] { get; }
 
         /// <summary>
         /// Удаляет сущность из репозитория.

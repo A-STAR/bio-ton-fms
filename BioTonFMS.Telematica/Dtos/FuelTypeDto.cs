@@ -16,6 +16,6 @@ namespace BioTonFMS.Telematica.Dtos
         /// Название типа топлива
         /// </summary>
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
     }
 }

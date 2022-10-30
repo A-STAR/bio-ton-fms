@@ -21,7 +21,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
         {
         }
 
-        public new Vehicle this[int key]
+        public new Vehicle? this[int key]
         {
             get
             {

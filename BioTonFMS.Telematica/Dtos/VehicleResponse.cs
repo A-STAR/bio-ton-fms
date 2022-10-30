@@ -8,11 +8,11 @@
         /// <summary>
         /// Массив машин
         /// </summary>
-        public VehicleDto[] Vehicles { get; set; }
+        public VehicleDto[] Vehicles { get; set; } = null!;
 
         /// <summary>
         /// Параметр постраничного вывода
         /// </summary>
-        public Pagination Pagination { get; set; }
+        public Pagination Pagination { get; set; } = null!;
     }
 }

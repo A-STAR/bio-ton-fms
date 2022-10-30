@@ -35,13 +35,13 @@ namespace BioTonFMS.Infrastructure.Persistence.Specifications
         }
 
         /// <inheritdoc />
-        public T One()
+        public T? One()
         {
             return _queryableProvider.FirstOrDefault();
         }
 
         /// <inheritdoc />
-        public T Single()
+        public T? Single()
         {
             return _queryableProvider.SingleOrDefault();
         }

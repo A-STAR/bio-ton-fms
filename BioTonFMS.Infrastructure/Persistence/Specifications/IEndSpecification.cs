@@ -30,13 +30,13 @@ namespace BioTonFMS.Infrastructure.Persistence.Specifications
         /// Возвращает первый элемент. Вернет <see langword="null"/>, если найти не удалось.
         /// </summary>
         /// <returns>Первая сущность или null.</returns>
-        T One();
+        T? One();
 
         /// <summary>
         /// Возвращает первый элемент. Вызовет исключение, если набор содержит более одной сущности.
         /// </summary>
         /// <returns>Единственная сущность.</returns>
-        T Single();
+        T? Single();
 
         /// <summary>
         /// Сортирует элементы по возрастанию.

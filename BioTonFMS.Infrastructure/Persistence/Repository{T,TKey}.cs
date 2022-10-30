@@ -42,7 +42,7 @@ namespace BioTonFMS.Infrastructure.Persistence
         protected IQueryableProvider<T> QueryableProvider => _queryableProvider;
 
         /// <inheritdoc />
-        public T this[TKey key]
+        public T? this[TKey key]
         {
             get
             {

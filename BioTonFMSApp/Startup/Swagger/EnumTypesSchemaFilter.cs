@@ -7,7 +7,7 @@ namespace BioTonFMSApp.Startup.Swagger
 {
     public class EnumTypesSchemaFilter : ISchemaFilter
     {
-        private readonly XDocument _xmlComments;
+        private readonly XDocument? _xmlComments;
 
         public EnumTypesSchemaFilter(string xmlPath)
         {
@@ -34,7 +34,7 @@ namespace BioTonFMSApp.Startup.Swagger
                     var fullEnumMemberName = $"F:{fullTypeName}.{enumMemberName}";
 
                     var enumMemberComments = _xmlComments.Descendants("member")
-                        .FirstOrDefault(m => m.Attribute("name").Value.Equals
+                        .FirstOrDefault(m => m.Attribute("name")!.Value.Equals
                         (fullEnumMemberName, StringComparison.OrdinalIgnoreCase));
 
                     if (enumMemberComments == null) continue;

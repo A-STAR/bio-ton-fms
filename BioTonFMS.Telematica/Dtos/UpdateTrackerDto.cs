@@ -17,12 +17,12 @@ namespace BioTonFMS.Telematica.Dtos
         /// Название трекера
         /// </summary>
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
 
         /// <summary>
         /// Номер sim – карты
         /// </summary>
-        public string SimNumber { get; set; }
+        public string SimNumber { get; set; } = String.Empty;
 
         /// <summary>
         /// Тип устройства
@@ -37,6 +37,6 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Описание
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = String.Empty;
     }
 }

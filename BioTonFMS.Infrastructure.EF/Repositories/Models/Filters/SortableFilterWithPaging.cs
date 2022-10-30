@@ -5,7 +5,7 @@
         /// <summary>
         /// Сортировка по полю
         /// </summary>
-        public SortByEnum SortBy { get; set; }
+        public SortByEnum? SortBy { get; set; }
 
         /// <summary>
         /// Направление сортировки

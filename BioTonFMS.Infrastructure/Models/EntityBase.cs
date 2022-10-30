@@ -68,9 +68,9 @@ namespace BioTonFMS.Infrastructure.Models
         /// Использование виртуальных методов приводит к воплощению объекта ключа, что в свою
         /// очередь генерирует не нужные SQL запросы.
         /// </remarks>
-        public static bool Equals(IEntity<int> entityA, IEntity<int> entityB)
+        public static bool Equals(IEntity<int>? entityA, IEntity<int>? entityB)
         {
-            if (entityA == null ^ entityB == null)
+            if (entityA == null || entityB == null)
             {
                 return false;
             }
@@ -119,8 +119,12 @@ namespace BioTonFMS.Infrastructure.Models
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                throw new ArgumentException("Argument is null");
+            }
             return Equals(this, obj as EntityBase);
         }
 

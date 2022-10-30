@@ -16,6 +16,6 @@ namespace BioTonFMS.Telematica.Dtos
         /// Название группы машин
         /// </summary>
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

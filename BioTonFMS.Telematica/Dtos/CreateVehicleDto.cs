@@ -11,7 +11,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Наименование машины
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
 
         /// <summary>
         /// Тип машины
@@ -26,12 +26,12 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Бренд производителя машины
         /// </summary>
-        public string Make { get; set; }
+        public string Make { get; set; } = String.Empty;
 
         /// <summary>
         /// Модель машины
         /// </summary>
-        public string Model { get; set; }
+        public string Model { get; set; } = String.Empty;
 
         /// <summary>
         /// Подтип машины
@@ -51,21 +51,21 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Регистрационный номер
         /// </summary>
-        public string RegistrationNumber { get; set; }
+        public string RegistrationNumber { get; set; } = String.Empty;
 
         /// <summary>
         /// Инвентарный номер
         /// </summary>
-        public string InventoryNumber { get; set; }
+        public string InventoryNumber { get; set; } = String.Empty;
 
         /// <summary>
         /// Серийный номер
         /// </summary>
-        public string SerialNumber { get; set; }
+        public string SerialNumber { get; set; } = String.Empty;
 
         /// <summary>
         /// Описание
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = String.Empty;
     }
 }

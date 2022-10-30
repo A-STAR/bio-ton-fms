@@ -12,9 +12,9 @@ namespace BioTonFMS.Infrastructure.EF
         {
         }
 
-        public DbSet<Tracker> Trackers { get; set; }
-        public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<Device> Devices { get; set; }
+        public DbSet<Tracker> Trackers => Set<Tracker>();
+        public DbSet<Vehicle> Vehicles => Set<Vehicle>();
+        public DbSet<Device> Devices => Set<Device>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

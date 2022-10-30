@@ -12,6 +12,10 @@ namespace BioTonFMS.Infrastructure.Utils.Builders
             Expression<Func<T, bool>> expr2)
         {
             var secondBody = expr2.Body.Replace(expr2.Parameters[0], expr1.Parameters[0]);
+            if (secondBody == null)
+            {
+                throw new ArgumentException("Second body is null");
+            }
             return Expression.Lambda<Func<T, bool>>
                   (Expression.OrElse(expr1.Body, secondBody), expr1.Parameters);
         }
@@ -21,11 +25,15 @@ namespace BioTonFMS.Infrastructure.Utils.Builders
             Expression<Func<T, bool>> expr2)
         {
             var secondBody = expr2.Body.Replace(expr2.Parameters[0], expr1.Parameters[0]);
+            if (secondBody == null)
+            {
+                throw new ArgumentException("Second body is null");
+            }
             return Expression.Lambda<Func<T, bool>>
                   (Expression.AndAlso(expr1.Body, secondBody), expr1.Parameters);
         }
 
-        public static Expression Replace(this Expression expression,
+        public static Expression? Replace(this Expression expression,
                     Expression searchEx, Expression replaceEx)
         {
             return new ReplaceVisitor(searchEx, replaceEx).Visit(expression);
@@ -39,7 +47,7 @@ namespace BioTonFMS.Infrastructure.Utils.Builders
                 this.from = from;
                 this.to = to;
             }
-            public override Expression Visit(Expression node)
+            public override Expression? Visit(Expression? node)
             {
                 return node == from ? to : base.Visit(node);
             }

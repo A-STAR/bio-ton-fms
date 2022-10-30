@@ -77,15 +77,18 @@ namespace BioTonFMS.Infrastructure.EF.Providers
             {
                 if (_transaction == null)
                 {
+#pragma warning disable CS0618 // Тип или член устарел
                     if (Marshal.GetExceptionCode() == 0)
+#pragma warning restore CS0618 // Тип или член устарел
                     {
                         _dbContext.SaveChanges();
                         _disposed = true;
                     }
                     return;
                 }
-
+#pragma warning disable CS0618 // Тип или член устарел
                 if (Marshal.GetExceptionCode() == 0)
+#pragma warning restore CS0618 // Тип или член устарел
                 {
                     try
                     {
@@ -103,7 +106,6 @@ namespace BioTonFMS.Infrastructure.EF.Providers
                 {
                     _transaction.Rollback();
                 }
-
                 _transaction.Dispose();
                 _transaction = null;
             }

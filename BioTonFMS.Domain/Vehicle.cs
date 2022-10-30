@@ -30,7 +30,7 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Группа машин
         /// </summary>
-        public VehicleGroup VehicleGroup { get; set; }
+        public VehicleGroup VehicleGroup { get; set; } = null!;
 
         /// <summary>
         /// Бренд производителя машины
@@ -63,7 +63,7 @@ namespace BioTonFMS.Domain
         /// Тип топлива
         /// </summary>
         [Required]
-        public FuelType FuelType { get; set; }
+        public FuelType FuelType { get; set; } = null!;
 
         /// <summary>
         /// Год выпуска

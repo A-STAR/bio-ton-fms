@@ -8,11 +8,11 @@
         /// <summary>
         /// Массив трекеров
         /// </summary>
-        public TrackerDto[] Trackers { get; set; }
+        public TrackerDto[] Trackers { get; set; } = null!;
 
         /// <summary>
         /// Параметр постраничного вывода
         /// </summary>
-        public Pagination Pagination { get; set; }
+        public Pagination Pagination { get; set; } = null!;
     }
 }

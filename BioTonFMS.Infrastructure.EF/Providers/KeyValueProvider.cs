@@ -30,11 +30,11 @@ namespace BioTonFMS.Infrastructure.EF.Providers
         private DbContext DbContext => _dbContextFactory.Invoke();
 
         /// <inheritdoc />
-        public T this[TKey key] => Get(key);
+        public T? this[TKey key] => Get(key);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Аргумент <c><paramref name="load"/></c> имеет значние вне допустимого диапазона.</exception>
-        public T Get(TKey key)
+        public T? Get(TKey key)
         {
             return DbContext.Set<T>().Find(key);
         }
