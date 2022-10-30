@@ -18,6 +18,8 @@ import { TableDataSource } from '../table.data-source';
 export class VehiclesComponent implements OnInit {
   protected vehiclesData$!: Observable<[Vehicles, VehicleGroup[], Fuel[], KeyValue<string, string>[], KeyValue<string, string>[]]>;
   protected vehiclesDataSource!: TableDataSource<VehicleDataSource>;
+  protected columns = columns;
+  protected columnsKeys!: string[];
   #vehicles$ = new BehaviorSubject(undefined);
 
   /**
@@ -90,11 +92,36 @@ export class VehiclesComponent implements OnInit {
     );
   }
 
+  /**
+   * Set column keys.
+   */
+  #setColumnKeys() {
+    this.columnsKeys = this.columns.map(({ key }) => key);
+  }
+
   constructor(private vehiclesService: VehicleService) { }
 
   ngOnInit() {
     this.#setVehiclesData();
+    this.#setColumnKeys();
   }
+}
+
+enum VehicleColumn {
+  Action = 'action',
+  Name = 'name',
+  Make = 'make',
+  Model = 'model',
+  Type = 'type',
+  Subtype = 'subtype',
+  Group = 'group',
+  Year = 'year',
+  Fuel = 'fuel',
+  Registration = 'registration',
+  Inventory = 'inventory',
+  Serial = 'serial',
+  Description = 'description',
+  Tracker = 'tracker'
 }
 
 export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' | 'model' | 'description'> {
@@ -108,3 +135,54 @@ export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' 
   serial?: string;
   tracker?: string;
 }
+
+const columns: KeyValue<VehicleColumn, string | undefined>[] = [
+  {
+    key: VehicleColumn.Action,
+    value: undefined
+  },
+  {
+    key: VehicleColumn.Name,
+    value: 'Наименование машины'
+  },
+  {
+    key: VehicleColumn.Make,
+    value: 'Производитель'
+  },
+  {
+    key: VehicleColumn.Model,
+    value: 'Модель'
+  },
+  {
+    key: VehicleColumn.Type,
+    value: 'Тип машин'
+  },
+  {
+    key: VehicleColumn.Subtype,
+    value: 'Подтип машины'
+  },
+  {
+    key: VehicleColumn.Group,
+    value: 'Группа машин'
+  },
+  {
+    key: VehicleColumn.Year,
+    value: 'Год производства'
+  },
+  {
+    key: VehicleColumn.Fuel,
+    value: 'Тип топлива'
+  },
+  {
+    key: VehicleColumn.Registration,
+    value: 'Регистрационный номер'
+  },
+  {
+    key: VehicleColumn.Tracker,
+    value: 'GPS трекер'
+  },
+  {
+    key: VehicleColumn.Description,
+    value: 'Описание'
+  }
+];
