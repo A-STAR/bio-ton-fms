@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
 
 import { BehaviorSubject, forkJoin, mergeMap, Observable, tap } from 'rxjs';
 
@@ -10,7 +11,10 @@ import { TableDataSource } from '../table.data-source';
 @Component({
   selector: 'bio-vehicles',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatTableModule
+  ],
   templateUrl: './vehicles.component.html',
   styleUrls: ['./vehicles.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,6 +24,7 @@ export class VehiclesComponent implements OnInit {
   protected vehiclesDataSource!: TableDataSource<VehicleDataSource>;
   protected columns = columns;
   protected columnsKeys!: string[];
+  protected VehicleColumn = VehicleColumn;
   #vehicles$ = new BehaviorSubject(undefined);
 
   /**
@@ -107,7 +112,7 @@ export class VehiclesComponent implements OnInit {
   }
 }
 
-enum VehicleColumn {
+export enum VehicleColumn {
   Action = 'action',
   Name = 'name',
   Make = 'make',
@@ -136,7 +141,7 @@ export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' 
   tracker?: string;
 }
 
-const columns: KeyValue<VehicleColumn, string | undefined>[] = [
+export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
   {
     key: VehicleColumn.Action,
     value: undefined

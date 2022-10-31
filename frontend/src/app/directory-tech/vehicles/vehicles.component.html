@@ -1,1 +1,33 @@
-<ng-container *ngIf="vehiclesData$ | async"></ng-container>
+<mat-table [dataSource]="vehiclesDataSource" *ngIf="vehiclesData$ | async">
+  <ng-container [matColumnDef]="column.key" *ngFor="let column of columns">
+    <ng-container [ngSwitch]="column.key">
+      <ng-container *ngSwitchCase="VehicleColumn.Action">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        <mat-header-cell [innerHTML]="column.value" *matHeaderCellDef></mat-header-cell>
+      </ng-container>
+    </ng-container>
+
+    <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+      <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Type"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Subtype"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="name" *ngSwitchCase="VehicleColumn.Group"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="name" *ngSwitchCase="VehicleColumn.Fuel"></ng-container>
+
+      <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+
+      <ng-template #value>{{ element[column.key]?.value }}</ng-template>
+
+      <ng-template #name>{{ element[column.key]?.name }}</ng-template>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columnsKeys"></mat-header-row>
+
+  <mat-row *matRowDef="let row; columns: columnsKeys"></mat-row>
+</mat-table>
