@@ -1,4 +1,5 @@
 ﻿using BioTonFMS.Domain;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace BioTonFMS.Telematica.Dtos
@@ -16,6 +17,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Тип машины
         /// </summary>
+        [EnumDataType(typeof(VehicleTypeEnum))]
         public VehicleTypeEnum Type { get; set; }
 
         /// <summary>
@@ -36,6 +38,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Подтип машины
         /// </summary>
+        [EnumDataType(typeof(VehicleSubTypeEnum))]
         public VehicleSubTypeEnum SubType { get; set; }
 
         /// <summary>

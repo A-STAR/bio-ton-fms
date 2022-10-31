@@ -27,6 +27,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Тип устройства
         /// </summary>
+        [EnumDataType(typeof(TrackerTypeEnum))]
         public TrackerTypeEnum TrackerType { get; set; }
 
         /// <summary>

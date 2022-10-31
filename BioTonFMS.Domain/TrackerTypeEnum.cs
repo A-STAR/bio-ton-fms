@@ -11,21 +11,21 @@ namespace BioTonFMS.Domain
         /// Протокол GalileoSkyV50
         /// </summary>
         [Description("Протокол GalileoSkyV50")]
-        GalileoSkyV50,
+        GalileoSkyV50 = 1,
         /// <summary>
         /// Протокол WialonIPS
         /// </summary>
         [Description("Протокол WialonIPS")]
-        WialonIPS,
+        WialonIPS = 2,
         /// <summary>
         /// Протокол Wialon
         /// </summary>
         [Description("Протокол Wialon")]
-        Wialon,
+        Wialon = 3,
         /// <summary>
         /// Протокол Retranslator
         /// </summary>
         [Description("Протокол Retranslator")]
-        Retranslator
+        Retranslator = 4
     }
 }
