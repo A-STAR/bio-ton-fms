@@ -1,4 +1,4 @@
-using System.Net;
+п»їusing System.Net;
 using BioTonFMS.Telematica.Validation;
 using BioTonFMSApp.Validation;
 using FluentValidation;
@@ -13,7 +13,7 @@ public static class ValidationExtensions
     public static WebApplicationBuilder AddValidation(this WebApplicationBuilder builder)
     {
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-        // TODO: Поменять на автоматический сбор валидации
+        // TODO: РџРѕРјРµРЅСЏС‚СЊ РЅР° Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№ СЃР±РѕСЂ РІР°Р»РёРґР°С†РёРё
         builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UserRegistrationDtoValidator>());
         builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UserLoginDtoValidator>());
         builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateTrackerDtoValidator>());
@@ -26,8 +26,8 @@ public static class ValidationExtensions
                 {
                     Status = (int)HttpStatusCode.BadRequest,
                     Type = "/bad-request",
-                    Title = "Запрос не соответствует требованиям API",
-                    Detail = "Произошла ошибка"
+                    Title = "Р—Р°РїСЂРѕСЃ РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С‚СЂРµР±РѕРІР°РЅРёСЏРј API",
+                    Detail = "РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР°"
                 };
 
                 return new BadRequestObjectResult(problemDetails)

@@ -5,6 +5,7 @@ using BioTonFMS.Telematica.Controllers;
 using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
