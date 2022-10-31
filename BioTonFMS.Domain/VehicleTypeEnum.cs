@@ -11,11 +11,11 @@ namespace BioTonFMS.Domain
         /// Техника, которая принимает участие в работе на полях
         /// </summary>
         [Description("Для работы на полях")]
-        Agro,
+        Agro = 1,
         /// <summary>
         /// Техника, которая используется для перевозок
         /// </summary>
         [Description("Для перевозок")]
-        Transport
+        Transport = 2
     }
 }

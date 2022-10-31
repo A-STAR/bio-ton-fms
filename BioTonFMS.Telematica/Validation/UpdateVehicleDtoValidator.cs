@@ -11,7 +11,6 @@ namespace BioTonFMS.Telematica.Validation
             RuleFor(x => x.VehicleGroupId).NotEmpty();
             RuleFor(x => x.Make).NotEmpty().Length(1, 30);
             RuleFor(x => x.Model).NotEmpty().Length(1, 30);
-            RuleFor(x => x.SubType).NotNull();
             RuleFor(x => x.FuelTypeId).NotEmpty();
             RuleFor(x => x.InventoryNumber).Length(1, 30);
             RuleFor(x => x.RegistrationNumber).Length(1, 15);

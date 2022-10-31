@@ -8,11 +8,9 @@ namespace BioTonFMS.Telematica.Validation
         public CreateVehicleDtoValidator()
         {
             RuleFor(x => x.Name).NotEmpty().Length(1, 100);
-            RuleFor(x => x.Type).NotEmpty();
             RuleFor(x => x.VehicleGroupId).NotEmpty();
             RuleFor(x => x.Make).NotEmpty().Length(1, 30);
             RuleFor(x => x.Model).NotEmpty().Length(1, 30);
-            RuleFor(x => x.SubType).NotEmpty();
             RuleFor(x => x.FuelTypeId).NotEmpty();
             RuleFor(x => x.InventoryNumber).Length(1, 30);
             RuleFor(x => x.RegistrationNumber).Length(1, 15);

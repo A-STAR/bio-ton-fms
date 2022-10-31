@@ -1,4 +1,4 @@
-using BioTonFMS.Domain;
+п»їusing BioTonFMS.Domain;
 using BioTonFMS.Security.Controllers;
 using BioTonFMS.Telematica.Controllers;
 using Microsoft.OpenApi.Models;
@@ -25,7 +25,7 @@ public static class SwaggerExtensions
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 Description =
-                    "JWT Authorization заголовок использующий схему Bearer. \r\n\r\n Введите 'Bearer' [пробел] и затем ваш токен авторизации в поле ввода внизу.\r\n\r\nПример: \"Bearer 12345abcdef\""
+                    "JWT Authorization Р·Р°РіРѕР»РѕРІРѕРє РёСЃРїРѕР»СЊР·СѓСЋС‰РёР№ СЃС…РµРјСѓ Bearer. \r\n\r\n Р’РІРµРґРёС‚Рµ 'Bearer' [РїСЂРѕР±РµР»] Рё Р·Р°С‚РµРј РІР°С€ С‚РѕРєРµРЅ Р°РІС‚РѕСЂРёР·Р°С†РёРё РІ РїРѕР»Рµ РІРІРѕРґР° РІРЅРёР·Сѓ.\r\n\r\nРџСЂРёРјРµСЂ: \"Bearer 12345abcdef\""
             });
             options.OperationFilter<SecurityRequirementsOperationFilter>();
 
