@@ -19,6 +19,10 @@
 
       <ng-container [ngTemplateOutlet]="name" *ngSwitchCase="VehicleColumn.Fuel"></ng-container>
 
+      <ng-container *ngSwitchCase="VehicleColumn.Registration">
+        <span *ngFor="let node of element[column.key].split(' ')">{{ node }}</span>
+      </ng-container>
+
       <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
 
       <ng-template #value>{{ element[column.key]?.value }}</ng-template>

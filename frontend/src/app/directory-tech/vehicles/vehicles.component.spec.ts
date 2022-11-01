@@ -135,7 +135,11 @@ describe('VehiclesComponent', () => {
 
     const columnLabels = columns
       .filter((column): column is KeyValue<VehicleColumn, string> => column.value !== undefined)
-      .map(({ value }) => value);
+      .map(
+        ({ value }) => value
+          .replace('&#10;', '\n')
+          .replace('&shy;', '­')
+      );
 
     expect(headerCellTexts)
       .withContext('render column labels')
@@ -175,7 +179,7 @@ describe('VehiclesComponent', () => {
         subType: subtypeKey,
         fuelTypeId,
         manufacturingYear: year,
-        registrationNumber: registration,
+        registrationNumber,
         description,
         tracker
       } = testVehicles.vehicles[index];
@@ -184,6 +188,10 @@ describe('VehiclesComponent', () => {
       const subtype = testVehicleSubTypeEnum.find(({ key }) => key === subtypeKey);
       const group = testVehicleGroups.find(({ id }) => id === vehicleGroupId);
       const fuel = testFuels.find(({ id }) => id === fuelTypeId);
+
+      const registration = registrationNumber
+        ?.split(' ')
+        .join('');
 
       const vehicleTexts = [
         name,

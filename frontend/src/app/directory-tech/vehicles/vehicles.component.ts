@@ -148,7 +148,7 @@ export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
   },
   {
     key: VehicleColumn.Name,
-    value: 'Наименование машины'
+    value: 'Наименование&#10;машины'
   },
   {
     key: VehicleColumn.Make,
@@ -160,31 +160,31 @@ export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
   },
   {
     key: VehicleColumn.Type,
-    value: 'Тип машин'
+    value: 'Тип&#10;машин'
   },
   {
     key: VehicleColumn.Subtype,
-    value: 'Подтип машины'
+    value: 'Подтип&#10;машины'
   },
   {
     key: VehicleColumn.Group,
-    value: 'Группа машин'
+    value: 'Группа&#10;машин'
   },
   {
     key: VehicleColumn.Year,
-    value: 'Год производства'
+    value: 'Год произ&shy;водства'
   },
   {
     key: VehicleColumn.Fuel,
-    value: 'Тип топлива'
+    value: 'Тип&#10;топлива'
   },
   {
     key: VehicleColumn.Registration,
-    value: 'Регистрационный номер'
+    value: 'Регистра&shy;ционный&#10;номер'
   },
   {
     key: VehicleColumn.Tracker,
-    value: 'GPS трекер'
+    value: 'GPS&#10;трекер'
   },
   {
     key: VehicleColumn.Description,

@@ -1,0 +1,67 @@
+@use 'variables' as *
+
+$border-width: 1px
+
+mat-table
+  box-shadow: $box-shadow
+  animation: fadein 280ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
+
+  @keyframes fadein
+    from
+      opacity: 0
+
+    to
+      opacity: 1
+
+mat-row,
+mat-header-cell,
+mat-cell
+  border-color: $light-gray
+
+mat-header-cell,
+mat-cell
+  justify-content: center
+  text-align: center
+  border-left-width: $border-width
+  border-right-width: $border-width
+  border-left-style: solid
+  border-right-style: solid
+
+.mat-header-cell,
+.mat-cell
+
+  &:first-of-type
+    padding-left: unset
+
+  &:last-of-type
+    padding-right: unset
+
+.mat-header-row
+  min-height: 45px - $border-width
+
+mat-header-row
+  white-space: pre-line
+
+.mat-row
+  min-height: 40px - $border-width
+
+mat-row
+
+  &:nth-child(odd)
+    background-color: $light
+
+  &:hover
+    background-color: $light-gray
+
+mat-header-cell
+  font-size: 10px
+  font-weight: 500
+
+.mat-header-cell
+  color: $darker-gray
+
+mat-cell
+  line-height: 16px
+
+.mat-cell
+  color: $light-dark
