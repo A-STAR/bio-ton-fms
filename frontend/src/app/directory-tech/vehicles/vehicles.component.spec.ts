@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatTableHarness } from '@angular/material/table/testing';
+import { MatSortHarness } from '@angular/material/sort/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -30,6 +32,7 @@ describe('VehiclesComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           HttpClientTestingModule,
           VehiclesComponent
         ]
@@ -146,6 +149,40 @@ describe('VehiclesComponent', () => {
       .toEqual(columnLabels);
   });
 
+  it('should render vehicle table sort headers', async () => {
+    const sorts = await loader.getAllHarnesses(MatSortHarness);
+
+    expect(sorts.length)
+      .withContext('render a sort')
+      .toBe(1);
+
+    const [sort] = sorts;
+
+    let sortHeaders = await sort.getSortHeaders({
+      sortDirection: ''
+    });
+
+    expect(sortHeaders.length)
+      .withContext('render sort headers')
+      .toBe(5);
+
+    const sortHeaderLabels = await parallel(() => sortHeaders.map(
+      header => header.getLabel()
+    ));
+
+    const columnLabels = [columns[1].value, columns[4].value, columns[5].value, columns[6].value, columns[8].value]
+      .filter((value): value is string => value !== undefined)
+      .map(
+        value => value
+          .replace('&#10;', '\n')
+          .replace('&shy;', '­')
+      );
+
+    expect(sortHeaderLabels)
+      .withContext('render sort header labels')
+      .toEqual(columnLabels);
+  });
+
   it('should render vehicle table cells', async () => {
     const table = await loader.getHarness(MatTableHarness);
     const rows = await table.getRows();
@@ -211,5 +248,67 @@ describe('VehiclesComponent', () => {
         .withContext('render cells text')
         .toEqual(vehicleTexts);
     });
+  });
+
+  it('should sort vehicle table', async () => {
+    const sort = await loader.getHarness(MatSortHarness);
+
+    const [nameSortHeader, typeSortHeader, subtypeSortHeader, groupSortHeader, fuelSortHeader] = await sort.getSortHeaders();
+
+    await nameSortHeader.click();
+
+    let sortDirection = await nameSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render name sort header sorted')
+      .toBe('asc');
+
+    await typeSortHeader.click();
+
+    sortDirection = await typeSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render type sort header sorted')
+      .toBe('asc');
+
+    await subtypeSortHeader.click();
+
+    sortDirection = await subtypeSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render subtype sort header sorted')
+      .toBe('asc');
+
+    await groupSortHeader.click();
+
+    sortDirection = await groupSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render group sort header sorted')
+      .toBe('asc');
+
+    await fuelSortHeader.click();
+
+    sortDirection = await fuelSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render fuel sort header sorted')
+      .toBe('asc');
+
+    await fuelSortHeader.click();
+
+    sortDirection = await fuelSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render fuel sort header sorted in descending direction')
+      .toBe('desc');
+
+    await fuelSortHeader.click();
+
+    sortDirection = await fuelSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render fuel sort header unsorted')
+      .toBe('');
   });
 });

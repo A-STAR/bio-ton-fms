@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { Fuel, pageNum, pageSize, VehicleGroup, Vehicles, VehicleService, VehiclesOptions } from './vehicle.service';
+import { Fuel, pageNum, pageSize, SortBy, SortDirection, VehicleGroup, Vehicles, VehicleService, VehiclesOptions } from './vehicle.service';
 
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
@@ -61,6 +61,67 @@ describe('VehicleService', () => {
     vehiclesRequest = httpTestingController.expectOne(
       `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}`,
       'vehicles request'
+    );
+
+    vehiclesRequest.flush(testVehicles);
+  });
+
+  it('should get sorted vehicles', (done: DoneFn) => {
+    let subscription = service
+      .getVehicles({
+        sortBy: SortBy.Name,
+        sortDirection: SortDirection.Acending
+      })
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get vehicles sorted by name')
+          .toEqual(testVehicles);
+      });
+
+    let vehiclesRequest = httpTestingController.expectOne(
+      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}&sortBy=${SortBy.Name}&sortDirection=${SortDirection.Acending}`,
+      'sorted by name vehicles request'
+    );
+
+    vehiclesRequest.flush(testVehicles);
+
+    subscription.unsubscribe();
+
+    subscription = service
+      .getVehicles({
+        sortBy: SortBy.Fuel,
+        sortDirection: SortDirection.Descending
+      })
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get vehicles sorted by fuel in descending direction')
+          .toEqual(testVehicles);
+      });
+
+    vehiclesRequest = httpTestingController.expectOne(
+      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}&sortBy=${SortBy.Fuel}&sortDirection=${SortDirection.Descending}`,
+      'descendingly sorted by fuel vehicles request'
+    );
+
+    vehiclesRequest.flush(testVehicles);
+
+    subscription.unsubscribe();
+
+    service
+      .getVehicles({
+        sortBy: SortBy.Name
+      })
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get unsorted vehicles with missing sort direction')
+          .toEqual(testVehicles);
+
+        done();
+      });
+
+    vehiclesRequest = httpTestingController.expectOne(
+      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}`,
+      'unsorted vehicles request'
     );
 
     vehiclesRequest.flush(testVehicles);

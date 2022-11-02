@@ -54,7 +54,12 @@ export class VehicleService {
    */
   getVehicles(fromObject: VehiclesOptions = { pageNum, pageSize }) {
     if (!fromObject.pageNum || !fromObject.pageSize) {
-      fromObject = { pageNum, pageSize };
+      fromObject = { pageNum, pageSize, ...fromObject };
+    }
+
+    if (!fromObject.sortBy || !fromObject.sortDirection) {
+      delete fromObject.sortBy;
+      delete fromObject.sortDirection;
     }
 
     const paramsOptions: HttpParamsOptions = { fromObject };
@@ -67,9 +72,24 @@ export class VehicleService {
   constructor(private httpClient: HttpClient) { }
 }
 
+export enum SortBy {
+  Name = 'name',
+  Type = 'type',
+  Subtype = 'subtype',
+  Group = 'group',
+  Fuel = 'fuelType'
+}
+
+export enum SortDirection {
+  Acending = 'ascending',
+  Descending = 'descending'
+}
+
 export type VehiclesOptions = Partial<{
   pageNum: number;
   pageSize: number;
+  sortBy: SortBy;
+  sortDirection: SortDirection;
 }>
 
 type Tracker = {

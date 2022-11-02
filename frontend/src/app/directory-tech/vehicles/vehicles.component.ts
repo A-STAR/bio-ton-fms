@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatRippleModule } from '@angular/material/core';
 
 import { BehaviorSubject, forkJoin, mergeMap, Observable, tap } from 'rxjs';
 
-import { Fuel, Vehicle, VehicleGroup, Vehicles, VehicleService } from '../vehicle.service';
+import { Fuel, SortBy, SortDirection, Vehicle, VehicleGroup, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import { TableDataSource } from '../table.data-source';
 
@@ -13,7 +15,9 @@ import { TableDataSource } from '../table.data-source';
   standalone: true,
   imports: [
     CommonModule,
-    MatTableModule
+    MatTableModule,
+    MatSortModule,
+    MatRippleModule
   ],
   templateUrl: './vehicles.component.html',
   styleUrls: ['./vehicles.component.sass'],
@@ -25,7 +29,56 @@ export class VehiclesComponent implements OnInit {
   protected columns = columns;
   protected columnsKeys!: string[];
   protected VehicleColumn = VehicleColumn;
-  #vehicles$ = new BehaviorSubject(undefined);
+
+  /**
+   * `sortChange` handler sorting vehicles.
+   *
+   * @param sort Sort state.
+   */
+  protected onSortChange({ active, direction }: Sort) {
+    const vehiclesOptions: VehiclesOptions = {};
+
+    if (active && direction) {
+      switch (active) {
+        case VehicleColumn.Name:
+          vehiclesOptions.sortBy = SortBy.Name;
+
+          break;
+
+        case VehicleColumn.Type:
+          vehiclesOptions.sortBy = SortBy.Type;
+
+          break;
+
+        case VehicleColumn.Subtype:
+          vehiclesOptions.sortBy = SortBy.Subtype;
+
+          break;
+
+        case VehicleColumn.Group:
+          vehiclesOptions.sortBy = SortBy.Group;
+
+          break;
+
+        case VehicleColumn.Fuel:
+          vehiclesOptions.sortBy = SortBy.Fuel;
+      }
+
+      switch (direction) {
+        case 'asc':
+          vehiclesOptions.sortDirection = SortDirection.Acending;
+
+          break;
+
+        case 'desc':
+          vehiclesOptions.sortDirection = SortDirection.Descending;
+      }
+    }
+
+    this.#vehicles$.next(vehiclesOptions);
+  }
+
+  #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
 
   /**
    * Map vehicles data source.
@@ -76,7 +129,11 @@ export class VehiclesComponent implements OnInit {
   #setVehiclesDataSource(vehiclesData: [Vehicles, VehicleGroup[], Fuel[], KeyValue<string, string>[], KeyValue<string, string>[]]) {
     const vehiclesDataSource = this.#mapVehiclesDataSource(...vehiclesData);
 
-    this.vehiclesDataSource = new TableDataSource<VehicleDataSource>(vehiclesDataSource);
+    if (this.vehiclesDataSource) {
+      this.vehiclesDataSource.setDataSource(vehiclesDataSource);
+    } else {
+      this.vehiclesDataSource = new TableDataSource<VehicleDataSource>(vehiclesDataSource);
+    }
   }
 
   /**
@@ -84,8 +141,8 @@ export class VehiclesComponent implements OnInit {
    */
   #setVehiclesData() {
     this.vehiclesData$ = this.#vehicles$.pipe(
-      mergeMap(() => forkJoin([
-        this.vehiclesService.getVehicles(),
+      mergeMap(vehiclesOptions => forkJoin([
+        this.vehiclesService.getVehicles(vehiclesOptions),
         this.vehiclesService.vehicleGroups$,
         this.vehiclesService.fuels$,
         this.vehiclesService.vehicleType$,
