@@ -21,6 +21,11 @@ namespace BioTonFMS.Telematica.Dtos
         public VehicleTypeEnum Type { get; set; }
 
         /// <summary>
+        /// Id трекера, закреплённый за машиной
+        /// </summary>
+        public int? TrackerId { get; set; }
+
+        /// <summary>
         /// Id группы машин
         /// </summary>
         public int VehicleGroupId { get; set; }
