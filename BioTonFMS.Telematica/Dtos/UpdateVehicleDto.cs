@@ -14,6 +14,11 @@ namespace BioTonFMS.Telematica.Dtos
         public string Name { get; set; } = String.Empty;
 
         /// <summary>
+        /// Id трекера, закреплённый за машиной
+        /// </summary>
+        public int? TrackerId { get; set; }
+
+        /// <summary>
         /// Тип машины
         /// </summary>
         [EnumDataType(typeof(VehicleTypeEnum))]

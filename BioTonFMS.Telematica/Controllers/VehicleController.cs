@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
+using BioTonFMS.Infrastructure.EF.Repositories;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Services;
@@ -23,13 +24,16 @@ public class VehicleController : ControllerBase
 {
     private readonly ILogger<VehicleController> _logger;
     private readonly IVehicleRepository _vehicleRepository;
+    private readonly ITrackerRepository _trackerRepo;
     private readonly IMapper _mapper;
 
     public VehicleController(
         IVehicleRepository vehicleRepository,
+        ITrackerRepository trackerRepo,
         IMapper mapper,
         ILogger<VehicleController> logger)
     {
+        _trackerRepo = trackerRepo;
         _vehicleRepository = vehicleRepository;
         _mapper = mapper;
         _logger = logger;
@@ -94,8 +98,20 @@ public class VehicleController : ControllerBase
     [HttpPost("vehicle")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult AddVehicle(CreateVehicleDto createVehicleDto)
-    {
+    {       
         var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
+
+        if (createVehicleDto.TrackerId.HasValue)
+        {
+            var trackerId = createVehicleDto.TrackerId.Value;
+            var tracker = _trackerRepo[trackerId];
+
+            if (tracker is null)
+            {
+                return NotFound(
+                    new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
+            }
+        }
 
         try
         {
@@ -126,6 +142,17 @@ public class VehicleController : ControllerBase
 
         if (vehicle is not null)
         {
+            if (updateVehicleDto.TrackerId.HasValue)
+            {
+                var trackerId = updateVehicleDto.TrackerId.Value;
+                var tracker = _trackerRepo[trackerId];
+
+                if (tracker is null)
+                {
+                    return NotFound(
+                        new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
+                }
+            }
             _mapper.Map(updateVehicleDto, vehicle);
 
             try
