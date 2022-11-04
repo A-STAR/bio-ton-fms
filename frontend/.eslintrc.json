@@ -40,6 +40,10 @@
           {
             "code": 140
           }
+        ],
+        "semi": [
+          "error",
+          "always"
         ]
       }
     },
