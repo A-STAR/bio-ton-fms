@@ -10,9 +10,19 @@ const routes: Routes = [
     canLoad: [AuthGuard],
     children: [
       {
+        path: '',
+        redirectTo: 'directory',
+        pathMatch: 'full'
+      },
+      {
         path: 'sign-in',
         loadComponent: () => import('./sign-in/sign-in.component')
           .then(({ SignInComponent }) => SignInComponent)
+      },
+      {
+        path: 'directory',
+        loadChildren: () => import('./directory.routes')
+          .then(({ directory }) => directory)
       }
     ]
   }
