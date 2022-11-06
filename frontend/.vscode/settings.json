@@ -1,0 +1,21 @@
+{
+  "gitlens.remotes": [
+    {
+      "domain": "git.bioton-fms.ru",
+      "type": "GitLab",
+      "name": "Bio-Ton",
+      "protocol": "https",
+      "urls": {
+        "repository": "https://git.bioton-fms.ru/${repo}",
+        "branches": "https://git.bioton-fms.ru/${repo}/branches",
+        "branch": "https://git.bioton-fms.ru/${repo}/commits/${branch}",
+        "commit": "https://git.bioton-fms.ru/${repo}/commit/${id}",
+        "file": "https://git.bioton-fms.ru/${repo}?path=${file}${line}",
+        "fileInBranch": "https://git.bioton-fms.ru/${repo}/blob/${branch}/${file}${line}",
+        "fileInCommit": "https://git.bioton-fms.ru/${repo}/blob/${id}/${file}${line}",
+        "fileLine": "#L${line}",
+        "fileRange": "#L${start}-L${end}"
+      }
+    }
+  ]
+}
