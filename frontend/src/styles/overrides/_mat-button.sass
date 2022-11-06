@@ -1,9 +1,5 @@
 @use 'variables' as *
 
-button.mat-stroked-button
-  font-size: unset
-  line-height: 38px
-
 .mat-stroked-button,
 .mat-icon-button
   transition-property: background-color, color
@@ -11,15 +7,28 @@ button.mat-stroked-button
   transition-timing-function: cubic-bezier(0.35, 0, 0.25, 1)
 
 .mat-stroked-button
+  font-size: unset
 
-  &:hover
-    background-color: $green
-    color: $white
-    border: unset
-    line-height: 40px
+  &:not([class*=mat-elevation-z])
+    box-shadow: unset
 
   &:not(.mat-button-disabled)
     border-color: unset
 
-    &:hover span.mat-button-focus-overlay
+  &:hover:not(.mat-button-disabled)
+    background-color: $green
+    color: $white
+    border-color: $green
+
+    span.mat-button-focus-overlay
       opacity: 0
+
+  mat-card-actions &
+    $mat-stroked-button-border-width: 1px
+    $mat-stroked-button-line-height: 40px
+
+    font-weight: 500
+    line-height: $mat-stroked-button-line-height - 2 * $mat-stroked-button-border-width
+
+    &[form]:hover:not(.mat-button-disabled)
+      box-shadow: 0px 4px 8px rgba($dark-shady, 13%)
