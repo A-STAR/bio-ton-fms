@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatRippleModule } from '@angular/material/core';
@@ -15,6 +16,7 @@ import { TableDataSource } from '../table.data-source';
   standalone: true,
   imports: [
     CommonModule,
+    MatButtonModule,
     MatTableModule,
     MatSortModule,
     MatRippleModule

@@ -4,6 +4,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 
@@ -56,6 +57,17 @@ describe('VehiclesComponent', () => {
   it('should get vehicles', () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
+  });
+
+  it('should render add vehicle button', async () => {
+    const buttons = await loader.getAllHarnesses(MatButtonHarness.with({
+      selector: '[mat-stroked-button]',
+      text: 'Добавить технику'
+    }));
+
+    expect(buttons.length)
+      .withContext('render an add vehicle button')
+      .toBe(1);
   });
 
   it('should render vehicle table', async () => {

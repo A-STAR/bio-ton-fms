@@ -23,6 +23,14 @@
     span.mat-button-focus-overlay
       opacity: 0
 
+  $mat-stroked-button-border-width: 1px
+  $mat-button-line-height: 30px
+  $mat-button-line-height: $mat-button-line-height - 2 * $mat-stroked-button-border-width
+
+  @at-root button#{&}
+    font-weight: unset
+    line-height: $mat-button-line-height
+
   mat-card-actions &
     $mat-stroked-button-border-width: 1px
     $mat-stroked-button-line-height: 40px
