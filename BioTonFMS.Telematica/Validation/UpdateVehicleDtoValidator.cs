@@ -12,10 +12,10 @@ namespace BioTonFMS.Telematica.Validation
             RuleFor(x => x.Make).NotEmpty().Length(1, 30);
             RuleFor(x => x.Model).NotEmpty().Length(1, 30);
             RuleFor(x => x.FuelTypeId).NotEmpty();
-            RuleFor(x => x.InventoryNumber).Length(1, 30);
-            RuleFor(x => x.RegistrationNumber).Length(1, 15);
-            RuleFor(x => x.SerialNumber).Length(1, 40);
-            RuleFor(x => x.Description).Length(1, 500);
+            When(x => x.InventoryNumber != string.Empty, () => RuleFor(x => x.InventoryNumber).Length(1, 30));
+            When(x => x.SerialNumber != string.Empty, () => RuleFor(x => x.RegistrationNumber).Length(1, 40));
+            When(x => x.RegistrationNumber != string.Empty, () => RuleFor(x => x.RegistrationNumber).Length(1, 15));
+            When(x => x.Description != string.Empty, () => RuleFor(x => x.Description).Length(1, 500));
         }
     }
 }

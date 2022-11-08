@@ -1,11 +1,15 @@
 ﻿using BioTonFMS.Domain.Identity;
 using BioTonFMS.Security.Authentication;
 using BioTonFMS.Security.Dtos.Auth;
+using BioTonFMS.Telematica.Validation.Extensions;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace BioTonFMS.Security.Controllers;
 
@@ -20,14 +24,20 @@ public class AuthController : AuthorizedControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly JwtGenerator _jwtGenerator;
+    private readonly IValidator<UserRegistrationDto> _registratioValidator;
+    private readonly IValidator<UserLoginDto> _loginValidator;
 
     public AuthController(
         ILogger<AuthController> logger,
-        UserManager<AppUser> userManager, 
-        JwtGenerator jwtGenerator): base(logger)
+        UserManager<AppUser> userManager,
+        JwtGenerator jwtGenerator,
+        IValidator<UserRegistrationDto> registratioValidator,
+        IValidator<UserLoginDto> loginValidator) : base(logger)
     {
         _userManager = userManager;
         _jwtGenerator = jwtGenerator;
+        _registratioValidator = registratioValidator;
+        _loginValidator = loginValidator;
     }
 
     /// <summary>
@@ -42,6 +52,12 @@ public class AuthController : AuthorizedControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(UserRegistrationDto userRegistration)
     {
+        ValidationResult validationResult = _registratioValidator.Validate(userRegistration);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
+
         var user = new AppUser
         {
             FirstName = userRegistration.FirstName,
@@ -51,7 +67,6 @@ public class AuthController : AuthorizedControllerBase
         };
 
         var result = await _userManager.CreateAsync(user, userRegistration.Password);
-
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
@@ -72,6 +87,12 @@ public class AuthController : AuthorizedControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login(UserLoginDto userLogin)
     {
+        ValidationResult validationResult = _loginValidator.Validate(userLogin);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
+
         var user = await _userManager.FindByNameAsync(userLogin.UserName);
         if (user is not null)
         {
@@ -141,7 +162,6 @@ public class AuthController : AuthorizedControllerBase
         {
             _logger.LogError("Пользователь c id = {@UserId} не найден", userId);
             return NotFound($"Пользователь c id={userId} не найден");
-            //throw new InvalidOperationException($"Пользователь c id={userId} не найден"); ;
         }
         return new UserShortInfoDto(user.LastName, user.FirstName, user.MiddleName, user.UserName);
     }

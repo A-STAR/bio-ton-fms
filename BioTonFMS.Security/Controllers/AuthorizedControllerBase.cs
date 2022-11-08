@@ -1,12 +1,12 @@
 using System.Security.Claims;
+using BioTonFMS.Infrastructure.Controllers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace BioTonFMS.Security.Controllers;
 
 [Authorize]
-public abstract class AuthorizedControllerBase : ControllerBase
+public abstract class AuthorizedControllerBase : ValidationControllerBase
 {
     public readonly ILogger<AuthController> _logger;
 

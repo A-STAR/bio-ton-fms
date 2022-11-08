@@ -11,7 +11,7 @@ namespace BioTonFMS.Telematica.Validation
             RuleFor(x => x.Name).NotEmpty().Length(1, 100);
             RuleFor(x => x.StartDate).NotEmpty();
             RuleFor(x => x.SimNumber).NotEmpty().Length(1, 12);
-            RuleFor(x => x.Description).Length(1, 500);
+            When(x => x.Description != string.Empty, () => RuleFor(x => x.Description).Length(1, 500));
         }
     }
 }

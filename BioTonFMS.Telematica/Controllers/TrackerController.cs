@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
+using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
+using BioTonFMS.Telematica.Validation.Extensions;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace BioTonFMS.Telematica.Controllers;
 
@@ -19,20 +24,29 @@ namespace BioTonFMS.Telematica.Controllers;
 [Route("/api/telematica")]
 [Consumes("application/json")]
 [Produces("application/json")]
-public class TrackerController : ControllerBase
+public class TrackerController : ValidationControllerBase
 {
     private readonly ILogger<TrackerController> _logger;
     private readonly ITrackerRepository _trackerRepo;
+    private readonly IValidator<UpdateTrackerDto> _updateValidator;
+    private readonly IValidator<TrackersRequest> _trackersRequestValidator;
+    private readonly IValidator<CreateTrackerDto> _createValidator;
     private readonly IMapper _mapper;
 
     public TrackerController(
         ITrackerRepository trackerRepo,
         IMapper mapper,
-        ILogger<TrackerController> logger)
+        ILogger<TrackerController> logger,
+        IValidator<UpdateTrackerDto> updateValidator,
+        IValidator<CreateTrackerDto> createValidator,
+        IValidator<TrackersRequest> trackersRequestValidator)
     {
         _trackerRepo = trackerRepo;
         _mapper = mapper;
         _logger = logger;
+        _updateValidator = updateValidator;
+        _createValidator = createValidator;
+        _trackersRequestValidator = trackersRequestValidator;
     }
 
     /// <summary>
@@ -45,6 +59,13 @@ public class TrackerController : ControllerBase
     [ProducesResponseType(typeof(TrackersResponse), StatusCodes.Status200OK)]
     public IActionResult GetTrackers([FromQuery] TrackersRequest trackersRequest)
     {
+        ValidationResult validationResult = _trackersRequestValidator
+            .Validate(trackersRequest);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
+
         var filter = _mapper.Map<TrackersFilter>(trackersRequest);
 
         var trackersPaging = _trackerRepo.GetTrackers(filter);
@@ -74,7 +95,6 @@ public class TrackerController : ControllerBase
     public IActionResult GetTracker(int id)
     {
         var tracker = _trackerRepo[id];
-
         if (tracker is not null)
         {
             var trackerDto = _mapper.Map<TrackerDto>(tracker);
@@ -96,8 +116,13 @@ public class TrackerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult AddTracker(CreateTrackerDto createTrackerDto)
     {
-        var newTracker = _mapper.Map<Tracker>(createTrackerDto);
+        ValidationResult validationResult = _createValidator.Validate(createTrackerDto);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
 
+        var newTracker = _mapper.Map<Tracker>(createTrackerDto);
         try
         {
             _trackerRepo.AddTracker(newTracker);
@@ -124,8 +149,13 @@ public class TrackerController : ControllerBase
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status409Conflict)]
     public IActionResult UpdateTracker(int id, UpdateTrackerDto updateTrackerDto)
     {
-        var tracker = _trackerRepo[id];
+        ValidationResult validationResult = _updateValidator.Validate(updateTrackerDto);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
 
+        var tracker = _trackerRepo[id];
         if (tracker is not null)
         {
             _mapper.Map(updateTrackerDto, tracker);
@@ -138,7 +168,6 @@ public class TrackerController : ControllerBase
             {
                 return Conflict(new ServiceErrorResult(ex.Message));
             }
-
             return Ok();
         }
         else
@@ -161,7 +190,6 @@ public class TrackerController : ControllerBase
     public IActionResult DeleteTracker(int id)
     {
         var tracker = _trackerRepo[id];
-
         if (tracker is not null)
         {
             try
