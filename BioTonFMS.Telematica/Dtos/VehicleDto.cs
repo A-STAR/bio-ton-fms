@@ -1,5 +1,6 @@
 ﻿using BioTonFMS.Domain;
 using System.ComponentModel.DataAnnotations;
+using KeyValuePair = BioTonFMS.Infrastructure.Extensions.KeyValuePair;
 
 namespace BioTonFMS.Telematica.Dtos
 {
@@ -19,14 +20,14 @@ namespace BioTonFMS.Telematica.Dtos
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// Тип машины
+        /// Тип машины (ключ-значение)
         /// </summary>
-        public VehicleTypeEnum Type { get; set; }
+        public KeyValuePair Type { get; set; }
 
         /// <summary>
-        /// Id группы машины
+        /// Группа машины (ключ-значение)
         /// </summary>
-        public int VehicleGroupId { get; set; }
+        public KeyValuePair VehicleGroup { get; set; }
 
         /// <summary>
         /// Бренд производителя машины
@@ -39,14 +40,14 @@ namespace BioTonFMS.Telematica.Dtos
         public string Model { get; set; } = "";
 
         /// <summary>
-        /// Подтип машины
+        /// Подтип машины (ключ-значение)
         /// </summary>
-        public VehicleSubTypeEnum SubType { get; set; }
+        public KeyValuePair SubType { get; set; }
 
         /// <summary>
-        /// Id типа топлива
+        /// Типа топлива (ключ-значение)
         /// </summary>
-        public int FuelTypeId { get; set; }
+        public KeyValuePair FuelType { get; set; }
 
         /// <summary>
         /// Год выпуска
@@ -74,9 +75,9 @@ namespace BioTonFMS.Telematica.Dtos
         public string Description { get; set; } = "";
 
         /// <summary>
-        /// Трекер
+        /// Трекер (ключ-значение)
         /// </summary>
-        public VehicleTrackerDto? Tracker { get; set; }
+        public KeyValuePair? Tracker { get; set; }
     }
 
     /// <summary>

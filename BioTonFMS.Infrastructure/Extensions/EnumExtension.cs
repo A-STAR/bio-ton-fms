@@ -40,8 +40,19 @@ namespace BioTonFMS.Infrastructure.Extensions
             }
 
             KeyValuePair[]? list = pairsList.OrderBy(p => p.Value).ToArray();
-
             return list;
+        }
+
+        public static KeyValuePair GetKeyValuePair<T>(T value) where T : Enum
+        {
+            var name = Enum.GetName(typeof(T), value);
+            var description = value.GetDescription();
+
+            if (name != null && description != null)
+            {
+                return new KeyValuePair(name, description);
+            }
+            throw new ArgumentException($"Неправильное значение {value} для перечисления {nameof(T)}");
         }
     }
 }

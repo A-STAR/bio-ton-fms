@@ -3,8 +3,19 @@
     /// <summary>
     /// Пара ключ-значение
     /// </summary>
-    public class KeyValuePair
+    public struct KeyValuePair
     {
+        /// <summary>
+        /// Установка пары ключ-значение
+        /// </summary>
+        /// <param name="key">ключ</param>
+        /// <param name="value">значение</param>
+        public KeyValuePair(string key, string value)
+        {
+            Key = key;
+            Value = value;
+        }
+
         /// <summary>
         /// Ключ
         /// </summary>
