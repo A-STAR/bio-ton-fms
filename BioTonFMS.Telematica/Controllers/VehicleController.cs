@@ -1,14 +1,19 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
+using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
+using BioTonFMS.Telematica.Validation.Extensions;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace BioTonFMS.Telematica.Controllers;
 
@@ -20,10 +25,13 @@ namespace BioTonFMS.Telematica.Controllers;
 [Route("/api/telematica")]
 [Consumes("application/json")]
 [Produces("application/json")]
-public class VehicleController : ControllerBase
+public class VehicleController : ValidationControllerBase
 {
     private readonly ILogger<VehicleController> _logger;
     private readonly IVehicleRepository _vehicleRepository;
+    private readonly IValidator<UpdateVehicleDto> _updateValidator;
+    private readonly IValidator<VehiclesRequest> _vehiclesRequestValidator;
+    private readonly IValidator<CreateVehicleDto> _createValidator;
     private readonly ITrackerRepository _trackerRepo;
     private readonly IMapper _mapper;
 
@@ -31,8 +39,14 @@ public class VehicleController : ControllerBase
         IVehicleRepository vehicleRepository,
         ITrackerRepository trackerRepo,
         IMapper mapper,
-        ILogger<VehicleController> logger)
+        IValidator<CreateVehicleDto> createValidator,
+        IValidator<UpdateVehicleDto> updateValidator,
+        ILogger<VehicleController> logger,
+        IValidator<VehiclesRequest> vehiclesRequestValidator)
     {
+        _updateValidator = updateValidator;
+        _createValidator = createValidator;
+        _vehiclesRequestValidator = vehiclesRequestValidator;
         _trackerRepo = trackerRepo;
         _vehicleRepository = vehicleRepository;
         _mapper = mapper;
@@ -49,10 +63,15 @@ public class VehicleController : ControllerBase
     [ProducesResponseType(typeof(VehicleResponse), StatusCodes.Status200OK)]
     public IActionResult GetVehicles([FromQuery] VehiclesRequest vehiclesRequest)
     {
+        ValidationResult validationResult = _vehiclesRequestValidator
+            .Validate(vehiclesRequest);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
+
         var filter = _mapper.Map<VehiclesFilter>(vehiclesRequest);
-
         var vehiclesPaging = _vehicleRepository.GetVehicles(filter);
-
         var result = new VehicleResponse
         {
             Vehicles = vehiclesPaging.Results.Select(res => _mapper.Map<VehicleDto>(res)).ToArray(),
@@ -98,9 +117,14 @@ public class VehicleController : ControllerBase
     [HttpPost("vehicle")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult AddVehicle(CreateVehicleDto createVehicleDto)
-    {       
-        var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
+    {
+        ValidationResult validationResult = _createValidator.Validate(createVehicleDto);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
 
+        var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
         if (createVehicleDto.TrackerId.HasValue)
         {
             var trackerId = createVehicleDto.TrackerId.Value;
@@ -138,8 +162,13 @@ public class VehicleController : ControllerBase
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult UpdateVehicle(int id, UpdateVehicleDto updateVehicleDto)
     {
-        var vehicle = _vehicleRepository[id];
+        ValidationResult validationResult = _updateValidator.Validate(updateVehicleDto);
+        if (!validationResult.IsValid)
+        {
+            return ReturnValidationErrors(validationResult);
+        }
 
+        var vehicle = _vehicleRepository[id];
         if (vehicle is not null)
         {
             if (updateVehicleDto.TrackerId.HasValue)
@@ -154,7 +183,6 @@ public class VehicleController : ControllerBase
                 }
             }
             _mapper.Map(updateVehicleDto, vehicle);
-
             try
             {
                 _vehicleRepository.Update(vehicle);
@@ -164,7 +192,6 @@ public class VehicleController : ControllerBase
                 _logger.LogError(ex, "Ошибка при обновлении машины {@id}", vehicle.Id);
                 throw;
             }
-
             return Ok();
         }
         else
@@ -185,7 +212,6 @@ public class VehicleController : ControllerBase
     public IActionResult DeleteVehicle(int id)
     {
         var vehicle = _vehicleRepository[id];
-
         if (vehicle is not null)
         {
             try
@@ -197,7 +223,6 @@ public class VehicleController : ControllerBase
                 _logger.LogError(ex, "Ошибка при машины {@id}", vehicle.Id);
                 throw;
             }
-
             return Ok();
         }
         else
