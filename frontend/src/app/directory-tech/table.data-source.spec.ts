@@ -43,26 +43,15 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Марьевка',
     make: 'CLAAS',
     model: 'Tucano 460',
-    type: {
-      key: 'Transport',
-      value: 'Для перевозок'
-    },
-    subtype: {
-      key: 'Harvester',
-      value: 'Комбайн'
-    },
-    group: {
-      id: 1,
-      name: 'Группа 1'
-    },
+    type: 'Для работы на полях',
+    subtype: 'Комбайн',
+    group: 'Комбайны CLAAS',
     year: 2022,
-    fuel: {
-      id: 1,
-      name: 'Бензин'
-    },
+    fuel: 'Дизельное топливо',
     registration: '1200 AM 63',
     inventory: 'С293823729',
     serial: '202039293834',
+    tracker: '18-07-2539',
     description: 'Марьевское'
   },
   {
@@ -70,23 +59,11 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Легковая машина',
     make: 'Ford',
     model: 'Focus',
-    type: {
-      key: 'Transport',
-      value: 'Для перевозок'
-    },
-    subtype: {
-      key: 'Car',
-      value: 'Легковой автомобиль'
-    },
-    group: {
-      id: 2,
-      name: 'Группа 2'
-    },
+    type: 'Для перевозок',
+    subtype: 'Легковой автомобиль',
+    group: 'Легковые автомобили',
     year: 2019,
-    fuel: {
-      id: 2,
-      name: 'Дизельное топливо'
-    },
+    fuel: 'Бензин',
     registration: '1290 AM 63',
     inventory: 'FF800110350',
     serial: '800110350305',
@@ -97,26 +74,15 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Кировец',
     make: 'Кировец',
     model: 'K-744',
-    type: {
-      key: 'Transport',
-      value: 'Для перевозок'
-    },
-    subtype: {
-      key: 'Tractor',
-      value: 'Трактор'
-    },
-    group: {
-      id: 1,
-      name: 'Группа 1'
-    },
+    type: 'Для работы на полях',
+    subtype: 'Трактор',
+    group: 'Тракторы Кировцы',
     year: 2017,
-    fuel: {
-      id: 1,
-      name: 'Бензин'
-    },
+    fuel: 'Бензин',
     registration: '1202 AК 63',
     inventory: 'М465890560',
     serial: '678896767968',
+    tracker: '18-07-2557',
     description: 'Кировское'
   }
 ];

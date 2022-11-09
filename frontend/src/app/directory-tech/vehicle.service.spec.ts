@@ -126,65 +126,6 @@ describe('VehicleService', () => {
 
     vehiclesRequest.flush(testVehicles);
   });
-
-  it('should get vehicle groups', (done: DoneFn) => {
-    service.vehicleGroups$.subscribe(groups => {
-      expect(groups)
-        .withContext('emit vehicle groups')
-        .toEqual(testVehicleGroups);
-
-      done();
-    });
-
-    const vehicleGroupsRequest = httpTestingController.expectOne('/api/telematica/vehiclegroups', 'vehicle groups request');
-
-    vehicleGroupsRequest.flush(testVehicleGroups);
-  });
-
-  it('should get fuel types', (done: DoneFn) => {
-    service.fuels$.subscribe(fuels => {
-      expect(fuels)
-        .withContext('emit fuels')
-        .toEqual(testFuels);
-
-      done();
-    });
-
-    const fuelsRequest = httpTestingController.expectOne('/api/telematica/fueltypes', 'fuels request');
-
-    fuelsRequest.flush(testFuels);
-  });
-
-  it('should get vehicle type enum', (done: DoneFn) => {
-    service.vehicleType$.subscribe(vehicleType => {
-      expect(vehicleType)
-        .withContext('emit vehicle type enum')
-        .toEqual(testVehicleTypeEnum);
-
-      done();
-    });
-
-    const vehicleTypeEnumRequest = httpTestingController.expectOne('/api/telematica/enums/VehicleTypeEnum', 'vehicle type enum request');
-
-    vehicleTypeEnumRequest.flush(testVehicleTypeEnum);
-  });
-
-  it('should get vehicle sub type enum', (done: DoneFn) => {
-    service.vehicleSubType$.subscribe(vehicleSubType => {
-      expect(vehicleSubType)
-        .withContext('emit vehicle sub type enum')
-        .toEqual(testVehicleSubTypeEnum);
-
-      done();
-    });
-
-    const vehicleSubTypeEnumRequest = httpTestingController.expectOne(
-      '/api/telematica/enums/VehicleSubTypeEnum',
-      'vehicle sub type enum request'
-    );
-
-    vehicleSubTypeEnumRequest.flush(testVehicleSubTypeEnum);
-  });
 });
 
 export const testVehicles: Vehicles = {
@@ -192,31 +133,55 @@ export const testVehicles: Vehicles = {
     {
       id: 1,
       name: 'Марьевка',
-      type: 'Agro',
-      vehicleGroupId: 1,
+      type: {
+        key: 'Agro',
+        value: 'Для работы на полях'
+      },
+      vehicleGroup: {
+        key: '0',
+        value: 'Комбайны CLAAS'
+      },
       make: 'CLAAS',
       model: 'Tucano 460',
-      subType: 'Harvester',
-      fuelTypeId: 0,
+      subType: {
+        key: 'Harvester',
+        value: 'Комбайн'
+      },
+      fuelType: {
+        key: '1',
+        value: 'Дизельное топливо'
+      },
       manufacturingYear: 2022,
       registrationNumber: '1200 AM 63',
       inventoryNumber: 'С293823729',
       serialNumber: '202039293834',
       description: 'Марьевское',
       tracker: {
-        id: 1,
-        name: '18-07-2539'
+        key: '1',
+        value: '18-07-2539'
       }
     },
     {
       id: 2,
       name: 'Легковая машина',
-      type: 'Transport',
-      vehicleGroupId: 2,
+      type: {
+        key: 'Transport',
+        value: 'Для перевозок'
+      },
+      vehicleGroup: {
+        key: '2',
+        value: 'Легковые автомобили'
+      },
       make: 'Ford',
       model: 'Focus',
-      subType: 'Car',
-      fuelTypeId: 2,
+      subType: {
+        key: 'Car',
+        value: 'Легковой автомобиль'
+      },
+      fuelType: {
+        key: '0',
+        value: 'Бензин'
+      },
       manufacturingYear: 2019,
       registrationNumber: '1290 AM 63',
       inventoryNumber: 'FF800110350',
@@ -226,20 +191,32 @@ export const testVehicles: Vehicles = {
     {
       id: 3,
       name: 'Кировец',
-      type: 'Agro',
-      vehicleGroupId: 1,
+      type: {
+        key: 'Agro',
+        value: 'Для работы на полях'
+      },
+      vehicleGroup: {
+        key: '1',
+        value: 'Тракторы Кировцы'
+      },
       make: 'Кировец',
       model: 'K-744',
-      subType: 'Tractor',
-      fuelTypeId: 1,
+      subType: {
+        key: 'Tractor',
+        value: 'Трактор'
+      },
+      fuelType: {
+        key: '0',
+        value: 'Бензин'
+      },
       manufacturingYear: 2017,
       registrationNumber: '1202 AК 63',
       inventoryNumber: 'М465890560',
       serialNumber: '678896767968',
       description: 'Кировское',
       tracker: {
-        id: 1,
-        name: '18-07-2557'
+        key: '2',
+        value: '18-07-2557'
       }
     }
   ],
@@ -248,75 +225,3 @@ export const testVehicles: Vehicles = {
     total: 1
   }
 };
-
-export const testVehicleGroups: VehicleGroup[] = [
-  {
-    id: 0,
-    name: 'Комбайны CLAAS'
-  },
-  {
-    id: 1,
-    name: 'Тракторы Кировцы'
-  },
-  {
-    id: 2,
-    name: 'Легковые автомобили'
-  }
-];
-
-export const testFuels: Fuel[] = [
-  {
-    id: 0,
-    name: 'Бензин'
-  },
-  {
-    id: 1,
-    name: 'Дизельное топливо'
-  }
-];
-
-export const testVehicleTypeEnum: KeyValue<string, string>[] = [
-  {
-    key: 'Transport',
-    value: 'Для перевозок'
-  },
-  {
-    key: 'Agro',
-    value: 'Для работы на полях'
-  }
-];
-
-export const testVehicleSubTypeEnum: KeyValue<string, string>[] = [
-  {
-    key: 'Telehandler',
-    value: 'Tелескопический погрузчик'
-  },
-  {
-    key: 'Tanker',
-    value: 'Бензовоз'
-  },
-  {
-    key: 'Truck',
-    value: 'Грузовой автомобиль'
-  },
-  {
-    key: 'Other',
-    value: 'Другой транспорт'
-  },
-  {
-    key: 'Harvester',
-    value: 'Комбайн'
-  },
-  {
-    key: 'Car',
-    value: 'Легковой автомобиль'
-  },
-  {
-    key: 'Sprayer',
-    value: 'Опрыскиватель'
-  },
-  {
-    key: 'Tractor',
-    value: 'Трактор'
-  }
-];

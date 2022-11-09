@@ -10,42 +10,6 @@ export const pageSize = 50;
 })
 export class VehicleService {
   /**
-   * Get vehicle groups.
-   *
-   * @returns An `Observable' of vehicle groups stream.
-   */
-  get vehicleGroups$() {
-    return this.httpClient.get<VehicleGroup[]>('/api/telematica/vehiclegroups');
-  }
-
-  /**
-   * Get fuel types.
-   *
-   * @returns An `Observable' of fuels stream.
-   */
-  get fuels$() {
-    return this.httpClient.get<Fuel[]>('/api/telematica/fueltypes');
-  }
-
-  /**
-   * Get vehicle type enum.
-   *
-   * @returns An `Observable' of vehicle type enum stream.
-   */
-  get vehicleType$() {
-    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleTypeEnum');
-  }
-
-  /**
-   * Get vehicle sub type enum.
-   *
-   * @returns An `Observable' of vehicle sub type enum stream.
-   */
-  get vehicleSubType$() {
-    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleSubTypeEnum');
-  }
-
-  /**
    * Get vehicles.
    *
    * @param fromObject Vehicles params options.
@@ -92,11 +56,6 @@ export type VehiclesOptions = Partial<{
   sortDirection: SortDirection;
 }>
 
-type Tracker = {
-  id: number;
-  name: string;
-}
-
 export type VehicleGroup = {
   id: number;
   name: string;
@@ -110,18 +69,18 @@ export type Fuel = {
 export type Vehicle = {
   id: number;
   name?: string;
-  type: string;
-  vehicleGroupId: number;
+  type: KeyValue<string, string>;
+  vehicleGroup: KeyValue<string, string>;
   make?: string;
   model?: string;
-  subType: string;
-  fuelTypeId: number;
+  subType: KeyValue<string, string>;
+  fuelType: KeyValue<string, string>;
   manufacturingYear: number;
   registrationNumber?: string;
   inventoryNumber?: string;
   serialNumber?: string;
   description?: string;
-  tracker?: Tracker
+  tracker?: KeyValue<string, string>
 }
 
 type Pagination = {

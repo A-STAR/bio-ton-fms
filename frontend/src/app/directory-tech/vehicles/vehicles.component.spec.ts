@@ -9,13 +9,11 @@ import { MatSortHarness } from '@angular/material/sort/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { Fuel, VehicleGroup, Vehicles, VehicleService } from '../vehicle.service';
+import { Vehicles, VehicleService } from '../vehicle.service';
 
 import { columns, VehicleColumn, VehiclesComponent } from './vehicles.component';
 
-import { testFuels, testVehicleGroups, testVehicles } from '../vehicle.service.spec';
-
-import { testVehicleSubTypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
+import { testVehicles } from '../vehicle.service.spec';
 
 describe('VehiclesComponent', () => {
   let component: VehiclesComponent;
@@ -23,10 +21,6 @@ describe('VehiclesComponent', () => {
   let loader: HarnessLoader;
 
   let vehiclesSpy: jasmine.Spy<() => Observable<Vehicles>>;
-  let vehicleGroupsSpy: jasmine.Spy<(this: VehicleService) => Observable<VehicleGroup[]>>;
-  let fuelsSpy: jasmine.Spy<(this: VehicleService) => Observable<Fuel[]>>;
-  let vehicleTypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<string, string>[]>>;
-  let vehicleSubTypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<string, string>[]>>;
 
   beforeEach(async () => {
     await TestBed
@@ -47,25 +41,9 @@ describe('VehiclesComponent', () => {
     component = fixture.componentInstance;
 
     const vehicles$ = of(testVehicles);
-    const vehicleGroups$ = of(testVehicleGroups);
-    const fuels$ = of(testFuels);
-    const vehicleType$ = of(testVehicleTypeEnum);
-    const vehicleSubType$ = of(testVehicleSubTypeEnum);
 
     vehiclesSpy = spyOn(vehicleService, 'getVehicles')
       .and.returnValue(vehicles$);
-
-    vehicleGroupsSpy = spyOnProperty(vehicleService, 'vehicleGroups$')
-      .and.returnValue(vehicleGroups$);
-
-    fuelsSpy = spyOnProperty(vehicleService, 'fuels$')
-      .and.returnValue(fuels$);
-
-    vehicleTypeSpy = spyOnProperty(vehicleService, 'vehicleType$')
-      .and.returnValue(vehicleType$);
-
-    vehicleSubTypeSpy = spyOnProperty(vehicleService, 'vehicleSubType$')
-      .and.returnValue(vehicleSubType$);
 
     fixture.detectChanges();
   });
@@ -77,22 +55,6 @@ describe('VehiclesComponent', () => {
 
   it('should get vehicles', () => {
     expect(vehiclesSpy)
-      .toHaveBeenCalled();
-  });
-
-  it('should get vehicle groups, fuels', () => {
-    expect(vehicleGroupsSpy)
-      .toHaveBeenCalled();
-
-    expect(fuelsSpy)
-      .toHaveBeenCalled();
-  });
-
-  it('should get vehicle type, subtype enums', () => {
-    expect(vehicleTypeSpy)
-      .toHaveBeenCalled();
-
-    expect(vehicleSubTypeSpy)
       .toHaveBeenCalled();
   });
 
@@ -209,22 +171,29 @@ describe('VehiclesComponent', () => {
     cellTexts.forEach((rowCellTexts, index) => {
       const {
         name,
-        type: typeKey,
-        vehicleGroupId,
+        type: {
+          value: type
+        },
+        vehicleGroup: {
+          value: group
+        },
         make,
         model,
-        subType: subtypeKey,
-        fuelTypeId,
+        subType: {
+          value: subtype
+        },
+        fuelType: {
+          value: fuel
+        },
         manufacturingYear: year,
         registrationNumber,
         description,
-        tracker
+        tracker: {
+          value: tracker
+        } = {
+          value: undefined
+        }
       } = testVehicles.vehicles[index];
-
-      const type = testVehicleTypeEnum.find(({ key }) => key === typeKey);
-      const subtype = testVehicleSubTypeEnum.find(({ key }) => key === subtypeKey);
-      const group = testVehicleGroups.find(({ id }) => id === vehicleGroupId);
-      const fuel = testFuels.find(({ id }) => id === fuelTypeId);
 
       const registration = registrationNumber
         ?.split(' ')
@@ -234,13 +203,13 @@ describe('VehiclesComponent', () => {
         name,
         make,
         model,
-        type?.value,
-        subtype?.value,
-        group?.name,
+        type,
+        subtype,
+        group,
         year,
-        fuel?.name,
+        fuel,
         registration,
-        tracker?.name,
+        tracker,
         description
       ].map(value => value?.toString() ?? '');
 
