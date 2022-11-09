@@ -2,11 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -19,6 +21,8 @@ import { testVehicles } from '../vehicle.service.spec';
 describe('VehiclesComponent', () => {
   let component: VehiclesComponent;
   let fixture: ComponentFixture<VehiclesComponent>;
+  let overlayContainer: OverlayContainer;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
 
   let vehiclesSpy: jasmine.Spy<() => Observable<Vehicles>>;
@@ -35,7 +39,9 @@ describe('VehiclesComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(VehiclesComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    overlayContainer = TestBed.inject(OverlayContainer);
 
     const vehicleService = TestBed.inject(VehicleService);
 
@@ -291,5 +297,27 @@ describe('VehiclesComponent', () => {
     expect(sortDirection)
       .withContext('render fuel sort header unsorted')
       .toBe('');
+  });
+
+  it('should add vehicle', async () => {
+    const addVehicleButton = await loader.getHarness(MatButtonHarness.with({
+      selector: '[mat-stroked-button]',
+      text: 'Добавить технику'
+    }));
+
+    await addVehicleButton.click();
+
+    const {
+      0: vehicleDialog,
+      length
+    } = await documentRootLoader.getAllHarnesses(MatDialogHarness);
+
+    expect(length)
+      .withContext('render a vehicle dialog')
+      .toBe(1);
+
+    await vehicleDialog.close();
+
+    overlayContainer.ngOnDestroy();
   });
 });

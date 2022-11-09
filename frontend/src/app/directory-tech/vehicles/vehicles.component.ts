@@ -3,11 +3,13 @@ import { CommonModule, KeyValue } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
-import { MatRippleModule } from '@angular/material/core';
+import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
 import { SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
+
+import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { TableDataSource } from '../table.data-source';
 
@@ -19,7 +21,7 @@ import { TableDataSource } from '../table.data-source';
     MatButtonModule,
     MatTableModule,
     MatSortModule,
-    MatRippleModule
+    MatDialogModule
   ],
   templateUrl: './vehicles.component.html',
   styleUrls: ['./vehicles.component.sass'],
@@ -80,13 +82,25 @@ export class VehiclesComponent implements OnInit {
     this.#vehicles$.next(vehiclesOptions);
   }
 
+  /**
+   * Add a new vehicle to table.
+   */
+  onAddVehicle() {
+    const dialogConfig: MatDialogConfig = {
+      width: '70vw',
+      height: '85vh'
+    };
+
+    this.dialog.open(VehicleDialogComponent, dialogConfig);
+  }
+
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
 
   /**
    * Map vehicles data source.
    *
    * @param vehicles Vehicles with pagination.
-   * 
+   *
    * @returns Mapped vehicles data source.
    */
   #mapVehiclesDataSource({ vehicles }: Vehicles) {
@@ -158,7 +172,7 @@ export class VehiclesComponent implements OnInit {
     this.columnsKeys = this.columns.map(({ key }) => key);
   }
 
-  constructor(private vehiclesService: VehicleService) { }
+  constructor(private dialog: MatDialog, private vehiclesService: VehicleService) { }
 
   ngOnInit() {
     this.#setVehiclesData();

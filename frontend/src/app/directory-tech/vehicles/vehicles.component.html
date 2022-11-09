@@ -1,4 +1,4 @@
-<button mat-stroked-button color="accent">Добавить технику</button>
+<button mat-stroked-button color="accent" (click)="onAddVehicle()">Добавить технику</button>
 
 <mat-table matSort [dataSource]="vehiclesDataSource" *ngIf="vehiclesData$ | async"
   (matSortChange)="onSortChange($event)">
