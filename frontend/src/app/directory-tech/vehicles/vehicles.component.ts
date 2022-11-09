@@ -4,9 +4,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatRippleModule } from '@angular/material/core';
 
-import { BehaviorSubject, forkJoin, mergeMap, Observable, tap } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
-import { Fuel, SortBy, SortDirection, Vehicle, VehicleGroup, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
+import { SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import { TableDataSource } from '../table.data-source';
 
@@ -24,7 +24,7 @@ import { TableDataSource } from '../table.data-source';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VehiclesComponent implements OnInit {
-  protected vehiclesData$!: Observable<[Vehicles, VehicleGroup[], Fuel[], KeyValue<string, string>[], KeyValue<string, string>[]]>;
+  protected vehiclesData$!: Observable<Vehicles>;
   protected vehiclesDataSource!: TableDataSource<VehicleDataSource>;
   protected columns = columns;
   protected columnsKeys!: string[];
@@ -82,41 +82,42 @@ export class VehiclesComponent implements OnInit {
 
   /**
    * Map vehicles data source.
+   *
+   * @param vehicles Vehicles with pagination.
+   * 
+   * @returns Mapped vehicles data source.
    */
-  #mapVehiclesDataSource(
-    { vehicles }: Vehicles,
-    groups: VehicleGroup[],
-    fuels: Fuel[],
-    types: KeyValue<string, string>[],
-    subtypes: KeyValue<string, string>[]
-  ) {
+  #mapVehiclesDataSource({ vehicles }: Vehicles) {
     return Object
       .freeze(vehicles)
       .map(({
         id,
         name,
-        type: typeKey,
-        vehicleGroupId,
+        type: {
+          value: type
+        },
+        vehicleGroup: {
+          value: group
+        },
         make,
         model,
-        subType: subtypeKey,
-        fuelTypeId,
+        subType: {
+          value: subtype
+        },
+        fuelType: {
+          value: fuel
+        },
         manufacturingYear: year,
         registrationNumber: registration,
         inventoryNumber: inventory,
         serialNumber: serial,
         description,
         tracker: {
-          name: tracker
+          value: tracker
         } = {
-          name: undefined
+          value: undefined
         }
       }): VehicleDataSource => {
-        const type = types.find(({ key }) => key === typeKey);
-        const subtype = subtypes.find(({ key }) => key === subtypeKey);
-        const group = groups.find(({ id }) => id === vehicleGroupId);
-        const fuel = fuels.find(({ id }) => id === fuelTypeId);
-
         return { id, name, make, model, type, subtype, group, year, fuel, registration, inventory, serial, tracker, description };
       });
   }
@@ -124,10 +125,10 @@ export class VehiclesComponent implements OnInit {
   /**
    * Initialize `TableDataSource` and set vehicles data source.
    *
-   * @param vehiclesData Vehicles data.
+   * @param vehicles Vehicles.
    */
-  #setVehiclesDataSource(vehiclesData: [Vehicles, VehicleGroup[], Fuel[], KeyValue<string, string>[], KeyValue<string, string>[]]) {
-    const vehiclesDataSource = this.#mapVehiclesDataSource(...vehiclesData);
+  #setVehiclesDataSource(vehicles: Vehicles) {
+    const vehiclesDataSource = this.#mapVehiclesDataSource(vehicles);
 
     if (this.vehiclesDataSource) {
       this.vehiclesDataSource.setDataSource(vehiclesDataSource);
@@ -141,13 +142,7 @@ export class VehiclesComponent implements OnInit {
    */
   #setVehiclesData() {
     this.vehiclesData$ = this.#vehicles$.pipe(
-      mergeMap(vehiclesOptions => forkJoin([
-        this.vehiclesService.getVehicles(vehiclesOptions),
-        this.vehiclesService.vehicleGroups$,
-        this.vehiclesService.fuels$,
-        this.vehiclesService.vehicleType$,
-        this.vehiclesService.vehicleSubType$
-      ])),
+      switchMap(vehiclesOptions => this.vehiclesService.getVehicles(vehiclesOptions)),
       tap(vehiclesData => {
         this.#setVehiclesDataSource(vehiclesData);
       })
@@ -187,11 +182,11 @@ export enum VehicleColumn {
 }
 
 export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' | 'model' | 'description'> {
-  type?: KeyValue<string, string>;
-  subtype?: KeyValue<string, string>;
-  group?: VehicleGroup;
+  type: string;
+  subtype: string;
+  group: string;
   year: number;
-  fuel?: Fuel;
+  fuel: string;
   registration?: string;
   inventory?: string;
   serial?: string;

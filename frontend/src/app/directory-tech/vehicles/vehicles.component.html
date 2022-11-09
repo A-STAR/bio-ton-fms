@@ -28,23 +28,11 @@
     </ng-container>
 
     <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
-      <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Type"></ng-container>
-
-      <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Subtype"></ng-container>
-
-      <ng-container [ngTemplateOutlet]="name" *ngSwitchCase="VehicleColumn.Group"></ng-container>
-
-      <ng-container [ngTemplateOutlet]="name" *ngSwitchCase="VehicleColumn.Fuel"></ng-container>
-
       <ng-container *ngSwitchCase="VehicleColumn.Registration">
         <span *ngFor="let node of element[column.key].split(' ')">{{ node }}</span>
       </ng-container>
 
       <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
-
-      <ng-template #value>{{ element[column.key]?.value }}</ng-template>
-
-      <ng-template #name>{{ element[column.key]?.name }}</ng-template>
     </mat-cell>
   </ng-container>
 
