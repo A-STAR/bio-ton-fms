@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 
 import { forkJoin, map, Observable } from 'rxjs';
 
@@ -15,18 +15,25 @@ import { Fuel, VehicleGroup, VehicleService } from '../vehicle.service';
 })
 export class VehicleDialogComponent implements OnInit {
   /**
-   * Get groups, fuels. Set vehicle data.
+   * Get groups, fuels, type, subtype. Set vehicle data.
    */
   #setVehicleData() {
-    this.vehicleData$ = forkJoin([this.vehicleService.vehicleGroups$, this.vehicleService.fuels$])
+    this.vehicleData$ = forkJoin([
+      this.vehicleService.vehicleGroups$,
+      this.vehicleService.fuels$,
+      this.vehicleService.vehicleType$,
+      this.vehicleService.vehicleSubtype$
+    ])
       .pipe(
-        map(([groups, fuels]) => ({ groups, fuels }))
+        map(([groups, fuels, type, subtype]) => ({ groups, fuels, type, subtype }))
       );
   }
 
   protected vehicleData$!: Observable<{
     groups: VehicleGroup[];
     fuels: Fuel[];
+    type: KeyValue<string, string>[];
+    subtype: KeyValue<string, string>[];
   }>;
 
   constructor(private vehicleService: VehicleService) { }

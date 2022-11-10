@@ -28,6 +28,24 @@ export class VehicleService {
   }
 
   /**
+   * Get vehicle type enum.
+   *
+   * @returns An `Observable' of vehicle type enum stream.
+   */
+  get vehicleType$() {
+    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleTypeEnum');
+  }
+
+  /**
+   * Get vehicle subtype enum.
+   *
+   * @returns An `Observable' of vehicle sub type enum stream.
+   */
+  get vehicleSubtype$() {
+    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleSubTypeEnum');
+  }
+
+  /**
    * Get vehicles.
    *
    * @param fromObject Vehicles params options.

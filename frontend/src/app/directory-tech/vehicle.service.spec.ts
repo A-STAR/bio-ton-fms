@@ -154,6 +154,37 @@ describe('VehicleService', () => {
 
     fuelsRequest.flush(testFuels);
   });
+
+  it('should get vehicle type enum', (done: DoneFn) => {
+    service.vehicleType$.subscribe(vehicleType => {
+      expect(vehicleType)
+        .withContext('emit vehicle type enum')
+        .toEqual(testVehicleTypeEnum);
+
+      done();
+    });
+
+    const vehicleTypeEnumRequest = httpTestingController.expectOne('/api/telematica/enums/VehicleTypeEnum', 'vehicle type enum request');
+
+    vehicleTypeEnumRequest.flush(testVehicleTypeEnum);
+  });
+
+  it('should get vehicle subtype enum', (done: DoneFn) => {
+    service.vehicleSubtype$.subscribe(vehicleSubType => {
+      expect(vehicleSubType)
+        .withContext('emit vehicle sub type enum')
+        .toEqual(testVehicleSubtypeEnum);
+
+      done();
+    });
+
+    const vehicleSubTypeEnumRequest = httpTestingController.expectOne(
+      '/api/telematica/enums/VehicleSubTypeEnum',
+      'vehicle sub type enum request'
+    );
+
+    vehicleSubTypeEnumRequest.flush(testVehicleSubtypeEnum);
+  });
 });
 
 export const testVehicleGroups: VehicleGroup[] = [
@@ -182,25 +213,65 @@ export const testFuels: Fuel[] = [
   }
 ];
 
+export const testVehicleTypeEnum: KeyValue<string, string>[] = [
+  {
+    key: 'Transport',
+    value: 'Для перевозок'
+  },
+  {
+    key: 'Agro',
+    value: 'Для работы на полях'
+  }
+];
+
+export const testVehicleSubtypeEnum: KeyValue<string, string>[] = [
+  {
+    key: 'Telehandler',
+    value: 'Tелескопический погрузчик'
+  },
+  {
+    key: 'Tanker',
+    value: 'Бензовоз'
+  },
+  {
+    key: 'Truck',
+    value: 'Грузовой автомобиль'
+  },
+  {
+    key: 'Other',
+    value: 'Другой транспорт'
+  },
+  {
+    key: 'Harvester',
+    value: 'Комбайн'
+  },
+  {
+    key: 'Car',
+    value: 'Легковой автомобиль'
+  },
+  {
+    key: 'Sprayer',
+    value: 'Опрыскиватель'
+  },
+  {
+    key: 'Tractor',
+    value: 'Трактор'
+  }
+];
+
 export const testVehicles: Vehicles = {
   vehicles: [
     {
       id: 1,
       name: 'Марьевка',
-      type: {
-        key: 'Agro',
-        value: 'Для работы на полях'
-      },
+      type: testVehicleTypeEnum[1],
       vehicleGroup: {
         key: testVehicleGroups[0].id.toString(),
         value: testVehicleGroups[0].name
       },
       make: 'CLAAS',
       model: 'Tucano 460',
-      subType: {
-        key: 'Harvester',
-        value: 'Комбайн'
-      },
+      subType: testVehicleSubtypeEnum[4],
       fuelType: {
         key: testFuels[1].id.toString(),
         value: testFuels[1].name
@@ -218,20 +289,14 @@ export const testVehicles: Vehicles = {
     {
       id: 2,
       name: 'Легковая машина',
-      type: {
-        key: 'Transport',
-        value: 'Для перевозок'
-      },
+      type: testVehicleTypeEnum[0],
       vehicleGroup: {
         key: testVehicleGroups[2].id.toString(),
         value: testVehicleGroups[2].name
       },
       make: 'Ford',
       model: 'Focus',
-      subType: {
-        key: 'Car',
-        value: 'Легковой автомобиль'
-      },
+      subType: testVehicleSubtypeEnum[5],
       fuelType: {
         key: testFuels[0].id.toString(),
         value: testFuels[0].name
@@ -245,20 +310,14 @@ export const testVehicles: Vehicles = {
     {
       id: 3,
       name: 'Кировец',
-      type: {
-        key: 'Agro',
-        value: 'Для работы на полях'
-      },
+      type: testVehicleTypeEnum[1],
       vehicleGroup: {
         key: testVehicleGroups[1].id.toString(),
         value: testVehicleGroups[1].name
       },
       make: 'Кировец',
       model: 'K-744',
-      subType: {
-        key: 'Tractor',
-        value: 'Трактор'
-      },
+      subType: testVehicleSubtypeEnum[7],
       fuelType: {
         key: testFuels[1].id.toString(),
         value: testFuels[1].name
