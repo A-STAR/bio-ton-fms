@@ -126,7 +126,61 @@ describe('VehicleService', () => {
 
     vehiclesRequest.flush(testVehicles);
   });
+
+  it('should get vehicle groups', (done: DoneFn) => {
+    service.vehicleGroups$.subscribe(groups => {
+      expect(groups)
+        .withContext('emit vehicle groups')
+        .toEqual(testVehicleGroups);
+
+      done();
+    });
+
+    const vehicleGroupsRequest = httpTestingController.expectOne('/api/telematica/vehiclegroups', 'vehicle groups request');
+
+    vehicleGroupsRequest.flush(testVehicleGroups);
+  });
+
+  it('should get fuel types', (done: DoneFn) => {
+    service.fuels$.subscribe(fuels => {
+      expect(fuels)
+        .withContext('emit fuels')
+        .toEqual(testFuels);
+
+      done();
+    });
+
+    const fuelsRequest = httpTestingController.expectOne('/api/telematica/fueltypes', 'fuels request');
+
+    fuelsRequest.flush(testFuels);
+  });
 });
+
+export const testVehicleGroups: VehicleGroup[] = [
+  {
+    id: 0,
+    name: 'Комбайны CLAAS'
+  },
+  {
+    id: 1,
+    name: 'Тракторы Кировцы'
+  },
+  {
+    id: 2,
+    name: 'Легковые автомобили'
+  }
+];
+
+export const testFuels: Fuel[] = [
+  {
+    id: 0,
+    name: 'Бензин'
+  },
+  {
+    id: 1,
+    name: 'Дизельное топливо'
+  }
+];
 
 export const testVehicles: Vehicles = {
   vehicles: [
@@ -138,8 +192,8 @@ export const testVehicles: Vehicles = {
         value: 'Для работы на полях'
       },
       vehicleGroup: {
-        key: '0',
-        value: 'Комбайны CLAAS'
+        key: testVehicleGroups[0].id.toString(),
+        value: testVehicleGroups[0].name
       },
       make: 'CLAAS',
       model: 'Tucano 460',
@@ -148,8 +202,8 @@ export const testVehicles: Vehicles = {
         value: 'Комбайн'
       },
       fuelType: {
-        key: '1',
-        value: 'Дизельное топливо'
+        key: testFuels[1].id.toString(),
+        value: testFuels[1].name
       },
       manufacturingYear: 2022,
       registrationNumber: '1200 AM 63',
@@ -169,8 +223,8 @@ export const testVehicles: Vehicles = {
         value: 'Для перевозок'
       },
       vehicleGroup: {
-        key: '2',
-        value: 'Легковые автомобили'
+        key: testVehicleGroups[2].id.toString(),
+        value: testVehicleGroups[2].name
       },
       make: 'Ford',
       model: 'Focus',
@@ -179,8 +233,8 @@ export const testVehicles: Vehicles = {
         value: 'Легковой автомобиль'
       },
       fuelType: {
-        key: '0',
-        value: 'Бензин'
+        key: testFuels[0].id.toString(),
+        value: testFuels[0].name
       },
       manufacturingYear: 2019,
       registrationNumber: '1290 AM 63',
@@ -196,8 +250,8 @@ export const testVehicles: Vehicles = {
         value: 'Для работы на полях'
       },
       vehicleGroup: {
-        key: '1',
-        value: 'Тракторы Кировцы'
+        key: testVehicleGroups[1].id.toString(),
+        value: testVehicleGroups[1].name
       },
       make: 'Кировец',
       model: 'K-744',
@@ -206,8 +260,8 @@ export const testVehicles: Vehicles = {
         value: 'Трактор'
       },
       fuelType: {
-        key: '0',
-        value: 'Бензин'
+        key: testFuels[1].id.toString(),
+        value: testFuels[1].name
       },
       manufacturingYear: 2017,
       registrationNumber: '1202 AК 63',

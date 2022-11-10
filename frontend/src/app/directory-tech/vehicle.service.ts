@@ -10,6 +10,24 @@ export const pageSize = 50;
 })
 export class VehicleService {
   /**
+   * Get vehicle groups.
+   *
+   * @returns An `Observable' of vehicle groups stream.
+   */
+  get vehicleGroups$() {
+    return this.httpClient.get<VehicleGroup[]>('/api/telematica/vehiclegroups');
+  }
+
+  /**
+   * Get fuel types.
+   *
+   * @returns An `Observable' of fuels stream.
+   */
+  get fuels$() {
+    return this.httpClient.get<Fuel[]>('/api/telematica/fueltypes');
+  }
+
+  /**
    * Get vehicles.
    *
    * @param fromObject Vehicles params options.

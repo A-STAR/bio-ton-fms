@@ -4,6 +4,8 @@ import { TableDataSource } from './table.data-source';
 
 import { VehicleDataSource } from './vehicles/vehicles.component';
 
+import { testFuels, testVehicleGroups } from './vehicle.service.spec';
+
 describe('TableDataSource', () => {
   let tableDataSource: TableDataSource<VehicleDataSource>;
 
@@ -45,9 +47,9 @@ const testDataSource: VehicleDataSource[] = [
     model: 'Tucano 460',
     type: 'Для работы на полях',
     subtype: 'Комбайн',
-    group: 'Комбайны CLAAS',
+    group: testVehicleGroups[0].name,
     year: 2022,
-    fuel: 'Дизельное топливо',
+    fuel: testFuels[1].name,
     registration: '1200 AM 63',
     inventory: 'С293823729',
     serial: '202039293834',
@@ -61,9 +63,9 @@ const testDataSource: VehicleDataSource[] = [
     model: 'Focus',
     type: 'Для перевозок',
     subtype: 'Легковой автомобиль',
-    group: 'Легковые автомобили',
+    group: testVehicleGroups[2].name,
     year: 2019,
-    fuel: 'Бензин',
+    fuel: testFuels[0].name,
     registration: '1290 AM 63',
     inventory: 'FF800110350',
     serial: '800110350305',
@@ -76,9 +78,9 @@ const testDataSource: VehicleDataSource[] = [
     model: 'K-744',
     type: 'Для работы на полях',
     subtype: 'Трактор',
-    group: 'Тракторы Кировцы',
+    group: testVehicleGroups[1].name,
     year: 2017,
-    fuel: 'Бензин',
+    fuel: testFuels[1].name,
     registration: '1202 AК 63',
     inventory: 'М465890560',
     serial: '678896767968',

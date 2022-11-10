@@ -154,11 +154,11 @@ export class VehiclesComponent implements OnInit {
   }
 
   /**
-   * Get vehicles, groups, fuels, type, subtype. Set vehicles data.
+   * Get and set vehicles data.
    */
   #setVehiclesData() {
     this.vehiclesData$ = this.#vehicles$.pipe(
-      switchMap(vehiclesOptions => this.vehiclesService.getVehicles(vehiclesOptions)),
+      switchMap(vehiclesOptions => this.vehicleService.getVehicles(vehiclesOptions)),
       tap(vehiclesData => {
         this.#setVehiclesDataSource(vehiclesData);
       })
@@ -172,7 +172,7 @@ export class VehiclesComponent implements OnInit {
     this.columnsKeys = this.columns.map(({ key }) => key);
   }
 
-  constructor(private dialog: MatDialog, private vehiclesService: VehicleService) { }
+  constructor(private dialog: MatDialog, private vehicleService: VehicleService) { }
 
   ngOnInit() {
     this.#setVehiclesData();
