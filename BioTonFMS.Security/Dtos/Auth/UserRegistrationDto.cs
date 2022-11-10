@@ -9,17 +9,15 @@ namespace BioTonFMS.Security.Dtos.Auth;
 /// <param name="MiddleName"></param>
 /// <param name="UserName"></param>
 /// <param name="Password"></param>
-public record UserRegistrationDto(string LastName, string FirstName, string? MiddleName, string UserName, string Password)
+public record UserRegistrationDto([Required] string LastName, [Required] string FirstName, string? MiddleName, [Required] string UserName, [Required] string Password)
 {
     /// <summary>
     /// Фамилия
     /// </summary>
-    [Required]
     public string LastName { get; init; } = LastName;
     /// <summary>
     /// Имя
     /// </summary>
-    [Required]
     public string FirstName { get; init; } = FirstName;
     /// <summary>
     /// Отчество
@@ -28,12 +26,10 @@ public record UserRegistrationDto(string LastName, string FirstName, string? Mid
     /// <summary>
     /// Имя пользователя
     /// </summary>
-    [Required]
     public string UserName { get; init; } = UserName;
     /// <summary>
     /// Пароль
     /// </summary>
-    [Required]
     public string Password { get; init; } = Password;
 
 }
