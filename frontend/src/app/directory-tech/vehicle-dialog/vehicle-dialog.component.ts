@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { forkJoin, map, Observable } from 'rxjs';
 
@@ -8,7 +9,10 @@ import { Fuel, VehicleGroup, VehicleService } from '../vehicle.service';
 @Component({
   selector: 'bio-vehicle-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatDialogModule
+  ],
   templateUrl: './vehicle-dialog.component.html',
   styleUrls: ['./vehicle-dialog.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush

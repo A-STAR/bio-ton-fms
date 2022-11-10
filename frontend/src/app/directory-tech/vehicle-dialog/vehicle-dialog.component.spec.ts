@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -74,5 +75,17 @@ describe('VehicleDialogComponent', () => {
 
     expect(vehicleSubtypeSpy)
       .toHaveBeenCalled();
+  });
+
+  it('should render dialog title', async () => {
+    const titleTextDe = fixture.debugElement.query(By.css('[mat-dialog-title]'));
+
+    expect(titleTextDe)
+      .withContext('render dialog title element')
+      .not.toBeNull();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog title text')
+      .toBe('Сводная информация о техническом средстве');
   });
 });
