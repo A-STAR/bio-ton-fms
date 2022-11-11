@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -47,23 +47,26 @@ export class VehicleDialogComponent implements OnInit {
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
-        name: this.fb.nonNullable.control<string | undefined>(undefined),
-        make: this.fb.nonNullable.control<string | undefined>(undefined),
-        model: this.fb.nonNullable.control<string | undefined>(undefined),
-        year: this.fb.nonNullable.control<number | undefined>(undefined),
-        group: this.fb.nonNullable.control<number | undefined>(undefined),
-        type: this.fb.nonNullable.control<string | undefined>(undefined),
-        subtype: this.fb.nonNullable.control<string | undefined>(undefined),
-        fuel: this.fb.nonNullable.control<number | undefined>(undefined)
+        name: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        make: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        model: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        year: this.fb.nonNullable.control<number | undefined>(undefined, [
+          Validators.required,
+          Validators.pattern(YEAR_PATTERN)
+        ]),
+        group: this.fb.nonNullable.control<number | undefined>(undefined, Validators.required),
+        type: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        subtype: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        fuel: this.fb.nonNullable.control<number | undefined>(undefined, Validators.required)
       }),
       registration: this.fb.group({
-        registration: this.fb.nonNullable.control<string | undefined>(undefined),
-        inventory: this.fb.nonNullable.control<string | undefined>(undefined),
-        serial: this.fb.nonNullable.control<string | undefined>(undefined),
+        registration: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        inventory: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        serial: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
         tracker: this.fb.nonNullable.control<number | undefined>(undefined)
       }),
       additional: this.fb.group({
-        description: this.fb.nonNullable.control<string | undefined>(undefined)
+        description: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required)
       })
     });
   }
@@ -106,3 +109,5 @@ type VehicleForm = {
     description: FormControl<string | undefined>;
   }>;
 }
+
+const YEAR_PATTERN = /\d{4}/;

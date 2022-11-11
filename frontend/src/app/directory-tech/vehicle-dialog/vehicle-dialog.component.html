@@ -10,6 +10,8 @@
 
         <mat-form-field>
           <input matInput id="name" placeholder="Наименование машины" formControlName="name">
+
+          <mat-error><strong>Наименование машины</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -18,6 +20,8 @@
 
         <mat-form-field>
           <input matInput id="make" placeholder="Производитель" formControlName="make">
+
+          <mat-error><strong>Производитель</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -26,6 +30,8 @@
 
         <mat-form-field>
           <input matInput id="model" placeholder="Модель" formControlName="model">
+
+          <mat-error><strong>Модель</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -34,6 +40,14 @@
 
         <mat-form-field>
           <input matInput id="year" type="number" placeholder="Год производства" formControlName="year">
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['required']">
+            <strong>Год производства</strong> обязательное поле
+          </mat-error>
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['pattern']">
+            <strong>Год производства</strong> введён некорректно
+          </mat-error>
         </mat-form-field>
       </div>
 
@@ -106,6 +120,8 @@
 
         <mat-form-field>
           <input matInput id="registration" placeholder="Регистрационный номер" formControlName="registration">
+
+          <mat-error><strong>Регистрационный номер</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -114,6 +130,8 @@
 
         <mat-form-field>
           <input matInput id="inventory" placeholder="Инвентарный номер" formControlName="inventory">
+
+          <mat-error><strong>Инвентарный номер</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -122,6 +140,8 @@
 
         <mat-form-field>
           <input matInput id="serial" placeholder="Серийный номер кузова" formControlName="serial">
+
+          <mat-error><strong>Серийный номер кузова</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -142,6 +162,8 @@
 
         <mat-form-field>
           <input matInput id="description" placeholder="Описание" formControlName="description">
+
+          <mat-error><strong>Дополнительные сведения</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
     </fieldset>
