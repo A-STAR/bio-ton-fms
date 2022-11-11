@@ -1,3 +1,149 @@
 <h1 mat-dialog-title>Сводная информация о техническом средстве</h1>
 
-<ng-container *ngIf="vehicleData$ | async"></ng-container>
+<mat-dialog-content>
+  <form id="vehicle-form" [formGroup]="vehicleForm">
+    <fieldset formGroupName="basic">
+      <legend>Основные сведения</legend>
+
+      <div class="full">
+        <label for="name">Наименование машины</label>
+
+        <mat-form-field>
+          <input matInput id="name" placeholder="Наименование машины" formControlName="name">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="make">Производитель</label>
+
+        <mat-form-field>
+          <input matInput id="make" placeholder="Производитель" formControlName="make">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="model">Модель</label>
+
+        <mat-form-field>
+          <input matInput id="model" placeholder="Модель" formControlName="model">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="year">Год производства</label>
+
+        <mat-form-field>
+          <input matInput id="year" type="number" placeholder="Год производства" formControlName="year">
+        </mat-form-field>
+      </div>
+
+      <ng-container *ngIf="vehicleData$ | async as vehicleData">
+        <div>
+          <label>Группа машин</label>
+
+          <mat-form-field>
+            <mat-select placeholder="Группа машин" formControlName="group">
+              <mat-option>Группа машин</mat-option>
+
+              <mat-option [value]="group.id" *ngFor="let group of vehicleData.groups">{{ group.name }}</mat-option>
+            </mat-select>
+
+            <mat-error><strong>Группа машин</strong> обязательное поле</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <label>Тип машины</label>
+
+          <mat-form-field>
+            <mat-select placeholder="Тип машины" formControlName="type">
+              <mat-option>Тип машины</mat-option>
+
+              <mat-option [value]="type.key" *ngFor="let type of vehicleData.type">{{ type.value }}</mat-option>
+            </mat-select>
+
+            <mat-error><strong>Тип машины</strong> обязательное поле</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <label>Подтип машины</label>
+
+          <mat-form-field>
+            <mat-select placeholder="Подтип машины" formControlName="subtype">
+              <mat-option>Подтип машины</mat-option>
+
+              <mat-option [value]="subtype.key" *ngFor="let subtype of vehicleData.subtype">
+                {{ subtype.value }}
+              </mat-option>
+            </mat-select>
+
+            <mat-error><strong>Подтип машины</strong> обязательное поле</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <label>Тип топлива</label>
+
+          <mat-form-field>
+            <mat-select placeholder="Тип топлива" formControlName="fuel">
+              <mat-option>Тип топлива</mat-option>
+
+              <mat-option [value]="fuel.id" *ngFor="let fuel of vehicleData.fuels">{{ fuel.name }}</mat-option>
+            </mat-select>
+
+            <mat-error><strong>Тип топлива</strong> обязательное поле</mat-error>
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </fieldset>
+
+    <fieldset formGroupName="registration">
+      <legend>Регистрационные данные</legend>
+
+      <div>
+        <label for="registration">Регистрационный номер</label>
+
+        <mat-form-field>
+          <input matInput id="registration" placeholder="Регистрационный номер" formControlName="registration">
+        </mat-form-field>
+      </div>
+
+      <div class="two-thirds">
+        <label for="inventory">Инвентарный номер</label>
+
+        <mat-form-field>
+          <input matInput id="inventory" placeholder="Инвентарный номер" formControlName="inventory">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="serial">Серийный номер кузова</label>
+
+        <mat-form-field>
+          <input matInput id="serial" placeholder="Серийный номер кузова" formControlName="serial">
+        </mat-form-field>
+      </div>
+
+      <div class="two-thirds">
+        <label for="tracker">GPS трекер</label>
+
+        <mat-form-field>
+          <input matInput id="tracker" type="number" placeholder="GPS трекер" min="1" formControlName="tracker">
+        </mat-form-field>
+      </div>
+    </fieldset>
+
+    <fieldset formGroupName="additional">
+      <legend>Дополнительные сведения</legend>
+
+      <div class="full">
+        <label for="description">Описание</label>
+
+        <mat-form-field>
+          <input matInput id="description" placeholder="Описание" formControlName="description">
+        </mat-form-field>
+      </div>
+    </fieldset>
+  </form>
+</mat-dialog-content>

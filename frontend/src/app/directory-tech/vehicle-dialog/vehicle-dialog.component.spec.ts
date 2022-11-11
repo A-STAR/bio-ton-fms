@@ -1,7 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatInputHarness } from '@angular/material/input/testing';
+import { MatSelectHarness } from '@angular/material/select/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -14,6 +19,7 @@ import { testFuels, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEn
 describe('VehicleDialogComponent', () => {
   let component: VehicleDialogComponent;
   let fixture: ComponentFixture<VehicleDialogComponent>;
+  let loader: HarnessLoader;
 
   let vehicleGroupsSpy: jasmine.Spy<(this: VehicleService) => Observable<VehicleGroup[]>>;
   let fuelsSpy: jasmine.Spy<(this: VehicleService) => Observable<Fuel[]>>;
@@ -24,6 +30,7 @@ describe('VehicleDialogComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           HttpClientTestingModule,
           VehicleDialogComponent
         ]
@@ -31,6 +38,7 @@ describe('VehicleDialogComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(VehicleDialogComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     const vehicleService = TestBed.inject(VehicleService);
 
@@ -87,5 +95,84 @@ describe('VehicleDialogComponent', () => {
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog title text')
       .toBe('Сводная информация о техническом средстве');
+  });
+
+  it('should render vehicle form', async () => {
+    const vehicleFormDe = fixture.debugElement.query(By.css('form#vehicle-form'));
+
+    expect(vehicleFormDe)
+      .withContext('render Vehicle form element')
+      .not.toBeNull();
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Наименование машины'
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Производитель'
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Модель'
+    }));
+
+    const yearInput = await loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Год производства'
+    }));
+
+    await expectAsync(
+      yearInput.getType()
+    )
+      .withContext('render year input type')
+      .toBeResolvedTo('number');
+
+    loader.getHarness(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form',
+      selector: '[placeholder="Группа машин"]'
+    }));
+
+    loader.getHarness(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form',
+      selector: '[placeholder="Тип машины"]'
+    }));
+
+    loader.getHarness(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form',
+      selector: '[placeholder="Подтип машины'
+    }));
+
+    loader.getHarness(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form',
+      selector: '[placeholder="Тип топлива"]'
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Регистрационный номер'
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Инвентарный номер'
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Серийный номер кузова'
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'GPS трекер'
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Описание'
+    }));
   });
 });
