@@ -1,4 +1,5 @@
 @use 'variables' as *
+@use 'extends' as *
 
 body
   background-color: $light
@@ -24,3 +25,9 @@ bio-root
 
 bio-sidebar ~ router-outlet + *
   margin-left: $sidebar-width
+
+legend
+  @extend %heading-with-border
+  width: 100%
+  font-size: 15px
+  font-weight: 500

@@ -1,4 +1,5 @@
 @use 'variables' as *
+@use 'extends' as *
 
 mat-dialog-container.mat-dialog-container
   padding-top: 20px
@@ -7,11 +8,8 @@ mat-dialog-container.mat-dialog-container
   padding-bottom: 15px
 
 [mat-dialog-title]
-  padding-bottom: 10px
-  color: $darker-gray
   font-size: 18px
-  border-bottom: 1px solid $ligher-gray
   line-height: unset
 
   &.mat-dialog-title
-    margin-bottom: 30px
+    @extend %heading-with-border
