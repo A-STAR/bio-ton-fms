@@ -1,16 +1,31 @@
 @use 'variables' as *
 
+$mat-stroked-button-border-width: 1px !default
+$mat-button-line-height: 30px !default
+
+.mat-flat-button,
+.mat-stroked-button
+  font-size: unset
+
+  &:not([class*=mat-elevation-z])
+    box-shadow: unset
+
+  mat-card-actions &,
+  mat-dialog-actions &
+
+    &[form]:hover:not(.mat-button-disabled)
+      box-shadow: 0px 4px 8px rgba($dark-shady, 13%)
+
 .mat-stroked-button,
 .mat-icon-button
   transition-property: background-color, color
   transition-duration: 200ms
   transition-timing-function: cubic-bezier(0.35, 0, 0.25, 1)
 
-.mat-stroked-button
-  font-size: unset
+.mat-flat-button
+  line-height: $mat-button-line-height
 
-  &:not([class*=mat-elevation-z])
-    box-shadow: unset
+.mat-stroked-button
 
   &:not(.mat-button-disabled)
     border-color: unset
@@ -23,20 +38,24 @@
     span.mat-button-focus-overlay
       opacity: 0
 
-  $mat-stroked-button-border-width: 1px
-  $mat-button-line-height: 30px
-  $mat-button-line-height: $mat-button-line-height - 2 * $mat-stroked-button-border-width
-
   @at-root button#{&}
+    $mat-button-line-height: $mat-button-line-height - 2 * $mat-stroked-button-border-width
+
     font-weight: unset
     line-height: $mat-button-line-height
 
-  mat-card-actions &
-    $mat-stroked-button-border-width: 1px
-    $mat-stroked-button-line-height: 40px
+mat-card-actions,
+mat-dialog-actions
+  $mat-button-line-height: 40px
+
+  .mat-flat-button
+    line-height: $mat-button-line-height
+
+  .mat-stroked-button
+    $mat-button-line-height: $mat-button-line-height - 2 * $mat-stroked-button-border-width
 
     font-weight: 500
-    line-height: $mat-stroked-button-line-height - 2 * $mat-stroked-button-border-width
+    line-height: $mat-button-line-height
 
-    &[form]:hover:not(.mat-button-disabled)
-      box-shadow: 0px 4px 8px rgba($dark-shady, 13%)
+    &:hover:not(.mat-button-disabled)
+      box-shadow: $box-shadow
