@@ -2,7 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { Fuel, pageNum, pageSize, SortBy, SortDirection, VehicleGroup, Vehicles, VehicleService, VehiclesOptions } from './vehicle.service';
+import {
+  Fuel,
+  NewVehicle,
+  pageNum,
+  pageSize,
+  SortBy,
+  SortDirection,
+  VehicleGroup,
+  Vehicles,
+  VehicleService,
+  VehiclesOptions
+} from './vehicle.service';
 
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
@@ -185,6 +196,25 @@ describe('VehicleService', () => {
 
     vehicleSubTypeEnumRequest.flush(testVehicleSubtypeEnum);
   });
+
+  it('should create vehicle', (done: DoneFn) => {
+    service
+      .createVehicle(testNewVehicle)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const addVehicleRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: '/api/telematica/vehicle'
+    }, 'create vehicle request');
+
+    addVehicleRequest.flush(null);
+  });
 });
 
 export const testVehicleGroups: VehicleGroup[] = [
@@ -258,6 +288,25 @@ export const testVehicleSubtypeEnum: KeyValue<string, string>[] = [
     value: 'Трактор'
   }
 ];
+
+const groupId = testVehicleGroups[2].id.toString();
+const fuelId = testFuels[0].id.toString();
+
+export const testNewVehicle: NewVehicle = {
+  name: 'Toyota Tundra',
+  make: 'Toyota',
+  model: 'Tundra',
+  manufacturingYear: 2015,
+  vehicleGroupId: Number(groupId),
+  type: testVehicleGroups[0].id.toString(),
+  subType: testVehicleSubtypeEnum[2].key.toString(),
+  fuelTypeId: Number(fuelId),
+  registrationNumber: '7777 TT 77',
+  inventoryNumber: 'TT77',
+  serialNumber: 'TT7777',
+  trackerId: 1,
+  description: 'Пикап с краном'
+};
 
 export const testVehicles: Vehicles = {
   vehicles: [

@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>Сводная информация о техническом средстве</h1>
 
 <mat-dialog-content>
-  <form id="vehicle-form" [formGroup]="vehicleForm">
+  <form id="vehicle-form" [formGroup]="vehicleForm" (ngSubmit)="submitVehicleForm()">
     <fieldset formGroupName="basic">
       <legend>Основные сведения</legend>
 
@@ -169,3 +169,9 @@
     </fieldset>
   </form>
 </mat-dialog-content>
+
+<mat-dialog-actions fxLayoutAlign="space-between">
+  <button mat-stroked-button color="accent" mat-dialog-close>Отмена</button>
+
+  <button mat-flat-button type="submit" form="vehicle-form" color="accent">Сохранить</button>
+</mat-dialog-actions>

@@ -7,6 +7,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -14,12 +15,13 @@ import { Fuel, VehicleGroup, VehicleService } from '../vehicle.service';
 
 import { VehicleDialogComponent } from './vehicle-dialog.component';
 
-import { testFuels, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
+import { testFuels, testNewVehicle, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
 
 describe('VehicleDialogComponent', () => {
   let component: VehicleDialogComponent;
   let fixture: ComponentFixture<VehicleDialogComponent>;
   let loader: HarnessLoader;
+  let vehicleService: VehicleService;
 
   let vehicleGroupsSpy: jasmine.Spy<(this: VehicleService) => Observable<VehicleGroup[]>>;
   let fuelsSpy: jasmine.Spy<(this: VehicleService) => Observable<Fuel[]>>;
@@ -39,8 +41,7 @@ describe('VehicleDialogComponent', () => {
 
     fixture = TestBed.createComponent(VehicleDialogComponent);
     loader = TestbedHarnessEnvironment.loader(fixture);
-
-    const vehicleService = TestBed.inject(VehicleService);
+    vehicleService = TestBed.inject(VehicleService);
 
     component = fixture.componentInstance;
 
@@ -174,5 +175,112 @@ describe('VehicleDialogComponent', () => {
       ancestor: 'form#vehicle-form',
       placeholder: 'Описание'
     }));
+  });
+
+  it('should submit invalid vehicle form', async () => {
+    spyOn(component, 'submitVehicleForm')
+      .and.callThrough();
+
+    spyOn(vehicleService, 'createVehicle')
+      .and.callThrough();
+
+    const saveButton = await loader.getHarness(MatButtonHarness.with({
+      selector: '[form="vehicle-form"]',
+      text: 'Сохранить'
+    }));
+
+    await saveButton.click();
+
+    expect(component.submitVehicleForm)
+      .toHaveBeenCalled();
+
+    expect(vehicleService.createVehicle)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should submit vehicle form', async () => {
+    spyOn(component, 'submitVehicleForm')
+      .and.callThrough();
+
+    spyOn(vehicleService, 'createVehicle')
+      .and.callThrough();
+
+    const saveButton = await loader.getHarness(MatButtonHarness.with({
+      selector: '[form="vehicle-form"]'
+    }));
+
+    await saveButton.click();
+
+    expect(component.submitVehicleForm)
+      .toHaveBeenCalled();
+
+    expect(vehicleService.createVehicle)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should submit vehicle form', async () => {
+    const [
+      nameInput,
+      makeInput,
+      modelInput,
+      yearInput,
+      registrationInput,
+      inventoryInput,
+      serialInput,
+      ,
+      descriptionInput
+    ] = await loader.getAllHarnesses(MatInputHarness.with({
+      ancestor: 'form#vehicle-form'
+    }));
+
+    const [groupSelect, typeSelect, subtypeSelect, fuelSelect] = await loader.getAllHarnesses(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form'
+    }));
+
+    const { name, make, model, manufacturingYear, registrationNumber, inventoryNumber, serialNumber, description } = testNewVehicle;
+
+    const year = manufacturingYear.toString();
+
+    await groupSelect.clickOptions({
+      text: testVehicleGroups[2].name
+    });
+
+    await typeSelect.clickOptions({
+      text: testVehicleTypeEnum[0].value
+    });
+    await subtypeSelect.clickOptions({
+      text: testVehicleSubtypeEnum[2].value
+    });
+
+    await fuelSelect.clickOptions({
+      text: testFuels[0].name
+    });
+
+    await nameInput.setValue(name);
+    await makeInput.setValue(make);
+    await modelInput.setValue(model);
+    await yearInput.setValue(year);
+    await registrationInput.setValue(registrationNumber);
+    await inventoryInput.setValue(inventoryNumber);
+    await serialInput.setValue(serialNumber);
+    await descriptionInput.setValue(description);
+
+    spyOn(component, 'submitVehicleForm')
+      .and.callThrough();
+
+    spyOn(vehicleService, 'createVehicle')
+      .and.callFake(() => of({}));
+
+    const saveButton = await loader.getHarness(MatButtonHarness.with({
+      selector: '[form="vehicle-form"]'
+    }));
+
+    await saveButton.click();
+
+    expect(component.submitVehicleForm)
+      .toHaveBeenCalled();
+
+    expect(vehicleService.createVehicle)
+      .toHaveBeenCalled();
   });
 });

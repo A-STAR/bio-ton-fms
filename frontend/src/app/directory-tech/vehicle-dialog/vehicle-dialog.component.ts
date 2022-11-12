@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
 
-import { forkJoin, map, Observable } from 'rxjs';
+import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
 
-import { Fuel, VehicleGroup, VehicleService } from '../vehicle.service';
+import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
 
 @Component({
   selector: 'bio-vehicle-dialog',
@@ -19,13 +20,59 @@ import { Fuel, VehicleGroup, VehicleService } from '../vehicle.service';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    MatButtonModule
   ],
   templateUrl: './vehicle-dialog.component.html',
   styleUrls: ['./vehicle-dialog.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class VehicleDialogComponent implements OnInit {
+export class VehicleDialogComponent implements OnInit, OnDestroy {
+  /**
+   * Submit Vehicle form, checking validation state.
+   */
+  async submitVehicleForm() {
+    this.#subscription?.unsubscribe();
+
+    const { invalid, value } = this.vehicleForm;
+
+    if (invalid) {
+      return;
+    }
+
+    const {
+      basic,
+      registration: registrationGroup,
+      additional
+    } = value;
+
+    const { name, make, model, year, type, subtype, group, fuel } = basic!;
+    const { registration, inventory, serial, tracker } = registrationGroup!;
+    const { description } = additional!;
+
+    const vehicle: NewVehicle = {
+      name: name!,
+      type: type!,
+      trackerId: tracker,
+      vehicleGroupId: group!,
+      make: make!,
+      model: model!,
+      subType: subtype!,
+      fuelTypeId: fuel!,
+      manufacturingYear: year!,
+      registrationNumber: registration!,
+      inventoryNumber: inventory!,
+      serialNumber: serial!,
+      description: description!
+    };
+
+    const addVehicle$ = this.vehicleService.createVehicle(vehicle);
+
+    await firstValueFrom(addVehicle$);
+  }
+
+  #subscription: Subscription | undefined;
+
   /**
    * Get groups, fuels, type, subtype. Set vehicle data.
    */
@@ -85,6 +132,10 @@ export class VehicleDialogComponent implements OnInit {
   ngOnInit() {
     this.#setVehicleData();
     this.#initVehicleForm();
+  }
+
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
   }
 }
 
