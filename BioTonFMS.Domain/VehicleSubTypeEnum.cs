@@ -8,44 +8,44 @@ namespace BioTonFMS.Domain
     public enum VehicleSubTypeEnum
     {
         /// <summary>
-        /// Легковой автомобиль
+        /// Бензовоз
         /// </summary>
-        [Description("Легковой автомобиль")]
-        Car = 1,
+        [Description("Бензовоз")]
+        Tanker = 1,
         /// <summary>
         /// Грузовой автомобиль
         /// </summary>
         [Description("Грузовой автомобиль")]
         Truck = 2,
         /// <summary>
+        /// Другой транспорт
+        /// </summary>
+        [Description("Другой транспорт")]
+        Other = 3,
+        /// <summary>
         /// Комбайн
         /// </summary>
         [Description("Комбайн")]
-        Harvester = 3,
+        Harvester = 4,
+        /// <summary>
+        /// Легковой автомобиль
+        /// </summary>
+        [Description("Легковой автомобиль")]
+        Car = 5,
         /// <summary>
         /// Опрыскиватель
         /// </summary>
         [Description("Опрыскиватель")]
-        Sprayer = 4,
-        /// <summary>
-        /// Трактор
-        /// </summary>
-        [Description("Трактор")]
-        Tractor = 5,
-        /// <summary>
-        /// Бензовоз
-        /// </summary>
-        [Description("Бензовоз")]
-        Tanker = 6,
+        Sprayer = 6,
         /// <summary>
         /// Tелескопический погрузчик
         /// </summary>
         [Description("Tелескопический погрузчик")]
         Telehandler = 7,
         /// <summary>
-        /// Другой транспорт
+        /// Трактор
         /// </summary>
-        [Description("Другой транспорт")]
-        Other = 8
+        [Description("Трактор")]
+        Tractor = 8
     }
 }
