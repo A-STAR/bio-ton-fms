@@ -15,7 +15,7 @@ stages:
   - lint 
   - build  
   - test   
-  - deploy
+  - deploy  
 
 Lint-frontend:
   stage: lint
@@ -41,6 +41,9 @@ Build-backend:
   script:    
     - docker system prune -af
     - docker build -t fms-back:$DOCKER_TAG .   
+    - docker image tag fms-back:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
+    - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
+    - docker image push git.bioton-fms.ru:5050/bioton/fms/backend:latest
 
 Test-frontend:
   stage: test
@@ -51,39 +54,72 @@ Test-frontend:
 
 Deploy-test.lan.bioton-fms-ru:
   stage: deploy
+  extends: .node-job
   script:
     - docker rm -f fms-backend || true
-    - docker run --name fms-backend -p 8080:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
-    - cd frontend 
+    - docker run --name fms-backend -p 8080:80 -v /var/log/fms/test:/app/logs -v /etc/fms/test:/app/config --restart always  -d fms-back:$DOCKER_TAG      
+    - npm run build:test    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test.lan.bioton-fms-ru/* 
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - frontend/dist/  
   
 
 
 Deploy-test2.lan.bioton-fms-ru:
   stage: deploy
+  extends: .node-job
   script:
     - docker rm -f fms-backend-test2 || true
-    - docker run --name fms-backend-test2 -p 8081:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
-    - cd frontend 
+    - docker run --name fms-backend-test2 -p 8081:80 -v /var/log/fms/test2:/app/logs -v /etc/fms/test2:/app/config --restart always  -d fms-back:$DOCKER_TAG      
+    - npm run build:test2    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/* 
   rules:
     - when: manual
   allow_failure: true
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - frontend/dist/  
     
 
 Deploy-test3.lan.bioton-fms-ru:
   stage: deploy
+  extends: .node-job
   script:
     - docker rm -f fms-backend-test3 || true
-    - docker run --name fms-backend-test3 -p 8082:80 -v /var/log/fms:/app/logs --restart always  -d fms-back:$DOCKER_TAG  
-    - cd frontend 
+    - docker run --name fms-backend-test3 -p 8082:80 -v /var/log/fms/test3:/app/logs -v /etc/fms/test3:/app/config --restart always  -d fms-back:$DOCKER_TAG   
+    - npm run build:test3        
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test3.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test3.lan.bioton-fms-ru/* 
   rules:    
     - when: manual    
   allow_failure: true
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - frontend/dist/  
+
+Deploy-stage.bioton-fms.ru:
+  stage: deploy
+  extends: .node-job
+  script:
+    - ssh user@stage.bioton-fms.ru \
+      && docker rm -f fms-backend || true \
+      "docker pull git.bioton-fms.ru:5050/bioton/fms/backend:latest \      
+      && docker run --name fms-backend -p 8080:80 -v /etc/fms/stage:/app/config -v /var/log/fms/stage:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:latest"
+    - npm run build:stage
+    - rsync -avu dist/bio-ton-field-management-system/ user@stage.bioton-fms.ru:/var/www/stage   
+  rules:    
+    - when: manual    
+  allow_failure: true
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - frontend/dist/  
