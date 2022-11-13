@@ -10,6 +10,42 @@ export const pageSize = 50;
 })
 export class VehicleService {
   /**
+   * Get vehicle groups.
+   *
+   * @returns An `Observable' of vehicle groups stream.
+   */
+  get vehicleGroups$() {
+    return this.httpClient.get<VehicleGroup[]>('/api/telematica/vehiclegroups');
+  }
+
+  /**
+   * Get fuel types.
+   *
+   * @returns An `Observable' of fuels stream.
+   */
+  get fuels$() {
+    return this.httpClient.get<Fuel[]>('/api/telematica/fueltypes');
+  }
+
+  /**
+   * Get vehicle type enum.
+   *
+   * @returns An `Observable' of vehicle type enum stream.
+   */
+  get vehicleType$() {
+    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleTypeEnum');
+  }
+
+  /**
+   * Get vehicle subtype enum.
+   *
+   * @returns An `Observable' of vehicle sub type enum stream.
+   */
+  get vehicleSubtype$() {
+    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleSubTypeEnum');
+  }
+
+  /**
    * Get vehicles.
    *
    * @param fromObject Vehicles params options.
@@ -31,6 +67,15 @@ export class VehicleService {
     const params = new HttpParams(paramsOptions);
 
     return this.httpClient.get<Vehicles>('/api/telematica/vehicles', { params });
+  }
+
+  /**
+   * Create a new vehicle.
+   *
+   * @returns An `Observable' of adding vehicle.
+   */
+  createVehicle(vehicle: NewVehicle) {
+    return this.httpClient.post('/api/telematica/vehicle', vehicle);
   }
 
   constructor(private httpClient: HttpClient) { }
@@ -68,19 +113,30 @@ export type Fuel = {
 
 export type Vehicle = {
   id: number;
-  name?: string;
+  name: string;
   type: KeyValue<string, string>;
   vehicleGroup: KeyValue<string, string>;
-  make?: string;
-  model?: string;
+  make: string;
+  model: string;
   subType: KeyValue<string, string>;
   fuelType: KeyValue<string, string>;
   manufacturingYear: number;
-  registrationNumber?: string;
-  inventoryNumber?: string;
-  serialNumber?: string;
-  description?: string;
+  registrationNumber: string;
+  inventoryNumber: string;
+  serialNumber: string;
+  description: string;
   tracker?: KeyValue<string, string>
+}
+
+export interface NewVehicle extends Pick<
+  Vehicle,
+  'name' | 'make' | 'model' | 'manufacturingYear' | 'registrationNumber' | 'inventoryNumber' | 'serialNumber' | 'description'
+> {
+  type: string;
+  vehicleGroupId: number;
+  subType: string;
+  fuelTypeId: number;
+  trackerId?: number;
 }
 
 type Pagination = {

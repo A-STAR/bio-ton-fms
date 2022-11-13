@@ -1,0 +1,44 @@
+@use 'sass:math'
+
+\:host
+  display: block
+
+fieldset
+  $column-gap: 40px
+
+  display: flex
+  flex-wrap: wrap
+  column-gap: $column-gap
+
+  > div
+    $field-width: math.div(100%, 3)
+    $field-gap: 2 * math.div($column-gap, 3)
+
+    &,
+    &::before,
+    &::after
+      flex: 0 calc($field-width - $field-gap)
+
+    &::before,
+    &::after
+      content: ""
+      order: 1
+      height: 0
+
+    &.full
+      flex-basis: 100%
+
+      mat-form-field
+        width: calc(2 * ($field-width - $field-gap) + $column-gap)
+
+    &.two-thirds
+      flex-basis: calc(2 * ($field-width - $field-gap) + $column-gap)
+
+      mat-form-field
+        $field-width: math.div(100%, 2)
+        $field-gap: math.div($column-gap, 2)
+
+        width: calc($field-width - $field-gap)
+
+mat-form-field
+  display: block

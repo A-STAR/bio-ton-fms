@@ -4,6 +4,8 @@ import { TableDataSource } from './table.data-source';
 
 import { VehicleDataSource } from './vehicles/vehicles.component';
 
+import { testFuels, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from './vehicle.service.spec';
+
 describe('TableDataSource', () => {
   let tableDataSource: TableDataSource<VehicleDataSource>;
 
@@ -43,11 +45,11 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Марьевка',
     make: 'CLAAS',
     model: 'Tucano 460',
-    type: 'Для работы на полях',
-    subtype: 'Комбайн',
-    group: 'Комбайны CLAAS',
+    type: testVehicleTypeEnum[1].value,
+    subtype: testVehicleSubtypeEnum[4].value,
+    group: testVehicleGroups[0].name,
     year: 2022,
-    fuel: 'Дизельное топливо',
+    fuel: testFuels[1].name,
     registration: '1200 AM 63',
     inventory: 'С293823729',
     serial: '202039293834',
@@ -59,11 +61,11 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Легковая машина',
     make: 'Ford',
     model: 'Focus',
-    type: 'Для перевозок',
-    subtype: 'Легковой автомобиль',
-    group: 'Легковые автомобили',
+    type: testVehicleTypeEnum[0].value,
+    subtype: testVehicleSubtypeEnum[5].value,
+    group: testVehicleGroups[2].name,
     year: 2019,
-    fuel: 'Бензин',
+    fuel: testFuels[0].name,
     registration: '1290 AM 63',
     inventory: 'FF800110350',
     serial: '800110350305',
@@ -74,11 +76,11 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Кировец',
     make: 'Кировец',
     model: 'K-744',
-    type: 'Для работы на полях',
-    subtype: 'Трактор',
-    group: 'Тракторы Кировцы',
+    type: testVehicleTypeEnum[0].value,
+    subtype: testVehicleSubtypeEnum[7].value,
+    group: testVehicleGroups[1].name,
     year: 2017,
-    fuel: 'Бензин',
+    fuel: testFuels[1].name,
     registration: '1202 AК 63',
     inventory: 'М465890560',
     serial: '678896767968',

@@ -1,0 +1,29 @@
+@use 'variables' as *
+@use 'extends' as *
+
+mat-dialog-container
+
+  &.mat-dialog-container
+    padding-top: 20px
+    padding-left: 30px
+    padding-right: 30px
+    padding-bottom: 15px
+
+  label
+    color: $darker-gray
+
+[mat-dialog-title]
+  font-size: 18px
+  line-height: unset
+
+  &.mat-dialog-title
+    @extend %heading-with-border
+
+mat-dialog-actions
+  justify-content: center
+
+  &.mat-dialog-actions .mat-button-base + .mat-button-base
+    margin-left: 100px
+
+  .mat-button-base
+    width: 200px
