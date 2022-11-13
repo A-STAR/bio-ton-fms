@@ -9,12 +9,14 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { Observable, of } from 'rxjs';
 
 import { Vehicles, VehicleService } from '../vehicle.service';
 
 import { columns, VehicleColumn, VehiclesComponent } from './vehicles.component';
+import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { testVehicles } from '../vehicle.service.spec';
 
@@ -319,5 +321,14 @@ describe('VehiclesComponent', () => {
     await vehicleDialog.close();
 
     overlayContainer.ngOnDestroy();
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<VehicleDialogComponent, true | ''>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await addVehicleButton.click();
   });
 });

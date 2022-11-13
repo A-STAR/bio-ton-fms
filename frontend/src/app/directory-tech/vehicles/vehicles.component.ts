@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 
-import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
 
 import { SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
@@ -27,7 +27,7 @@ import { TableDataSource } from '../table.data-source';
   styleUrls: ['./vehicles.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class VehiclesComponent implements OnInit {
+export class VehiclesComponent implements OnInit, OnDestroy {
   protected vehiclesData$!: Observable<Vehicles>;
   protected vehiclesDataSource!: TableDataSource<VehicleDataSource>;
   protected columns = columns;
@@ -86,15 +86,34 @@ export class VehiclesComponent implements OnInit {
    * Add a new vehicle to table.
    */
   onAddVehicle() {
+    this.#subscription?.unsubscribe();
+
     const dialogConfig: MatDialogConfig = {
       width: '70vw',
       height: '85vh'
     };
 
-    this.dialog.open(VehicleDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | ''>(VehicleDialogComponent, dialogConfig);
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(() => {
+        this.#updateVehicles();
+      });
   }
 
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
+  #subscription: Subscription | undefined;
+
+  /**
+   * Emit vehicles update.
+   */
+  #updateVehicles() {
+    this.#vehicles$.next(this.#vehicles$.value);
+  }
 
   /**
    * Map vehicles data source.
@@ -177,6 +196,10 @@ export class VehiclesComponent implements OnInit {
   ngOnInit() {
     this.#setVehiclesData();
     this.#setColumnKeys();
+  }
+
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
   }
 }
 

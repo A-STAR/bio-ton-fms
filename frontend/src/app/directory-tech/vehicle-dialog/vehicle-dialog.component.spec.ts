@@ -5,6 +5,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -23,6 +24,8 @@ describe('VehicleDialogComponent', () => {
   let loader: HarnessLoader;
   let vehicleService: VehicleService;
 
+  const dialogRef = jasmine.createSpyObj<MatDialogRef<VehicleDialogComponent, true | ''>>('MatDialogRef', ['close']);
+
   let vehicleGroupsSpy: jasmine.Spy<(this: VehicleService) => Observable<VehicleGroup[]>>;
   let fuelsSpy: jasmine.Spy<(this: VehicleService) => Observable<Fuel[]>>;
   let vehicleTypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<string, string>[]>>;
@@ -35,6 +38,12 @@ describe('VehicleDialogComponent', () => {
           NoopAnimationsModule,
           HttpClientTestingModule,
           VehicleDialogComponent
+        ],
+        providers: [
+          {
+            provide: MatDialogRef,
+            useValue: dialogRef
+          }
         ]
       })
       .compileComponents();
@@ -282,5 +291,8 @@ describe('VehicleDialogComponent', () => {
 
     expect(vehicleService.createVehicle)
       .toHaveBeenCalled();
+
+    expect(dialogRef.close)
+      .toHaveBeenCalledWith(true);
   });
 });
