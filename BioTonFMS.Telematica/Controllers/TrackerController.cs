@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Net;
 
 namespace BioTonFMS.Telematica.Controllers;
@@ -110,10 +111,10 @@ public class TrackerController : ValidationControllerBase
     /// Добавляет трекер
     /// </summary>
     /// <param name="createTrackerDto">Модель создания трекера</param>
-    /// <response code="200">Новый трекер успешно создан, возвращет идентификатор нового трекера</response>
+    /// <response code="200">Новый трекер успешно создан, возвращет данные нового трекера</response>
     /// <response code="409">Конфликт при обновлении трекера</response>
     [HttpPost("tracker")]
-    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TrackerDto), StatusCodes.Status200OK)]
     public IActionResult AddTracker(CreateTrackerDto createTrackerDto)
     {
         ValidationResult validationResult = _createValidator.Validate(createTrackerDto);
@@ -126,7 +127,8 @@ public class TrackerController : ValidationControllerBase
         try
         {
             _trackerRepo.AddTracker(newTracker);
-            return Ok(newTracker.Id);
+            var trackerDto = _mapper.Map<TrackerDto>(newTracker);
+            return Ok(trackerDto);
         }
         catch (ArgumentException ex)
         {
