@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  api: 'http://test1.lan.bioton-fms-ru'
+  api: 'http://test2.lan.bioton-fms-ru'
 };
