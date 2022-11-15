@@ -8,7 +8,7 @@ import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/d
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
 
-import { SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
+import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
@@ -85,15 +85,10 @@ export class VehiclesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Add a new vehicle to table.
+   * Create a new vehicle in table.
    */
-  onAddVehicle() {
+  onCreateVehicle() {
     this.#subscription?.unsubscribe();
-
-    const dialogConfig: MatDialogConfig = {
-      width: '70vw',
-      height: '85vh'
-    };
 
     const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | ''>(VehicleDialogComponent, dialogConfig);
 
@@ -105,6 +100,47 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.#updateVehicles();
       });
+  }
+
+  /**
+   * Update a vehicle in table.
+   *
+   * @param vehicleDataSource Vehicle data source.
+   */
+  onUpdateVehicle({
+    id,
+    name,
+    make,
+    model,
+    type,
+    subtype,
+    group,
+    year,
+    fuel,
+    registration,
+    inventory,
+    serial,
+    tracker,
+    description
+  }: VehicleDataSource) {
+    const data: NewVehicle = {
+      id,
+      name,
+      type: type.key,
+      vehicleGroupId: group ? Number(group.key) : undefined,
+      make,
+      model,
+      subType: subtype.key,
+      fuelTypeId: Number(fuel.key),
+      manufacturingYear: year,
+      registrationNumber: registration,
+      inventoryNumber: inventory,
+      serialNumber: serial,
+      trackerId: tracker ? Number(tracker?.key) : undefined,
+      description
+    };
+
+    this.dialog.open<VehicleDialogComponent, NewVehicle, true | ''>(VehicleDialogComponent, { ...dialogConfig, data });
   }
 
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
@@ -270,3 +306,8 @@ export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
     value: 'Описание'
   }
 ];
+
+const dialogConfig: MatDialogConfig<NewVehicle> = {
+  width: '70vw',
+  height: '85vh'
+};

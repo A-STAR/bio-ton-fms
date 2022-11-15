@@ -337,16 +337,13 @@ describe('VehiclesComponent', () => {
 
     await createVehicleButton.click();
 
-    const {
-      0: vehicleDialog,
-      length
-    } = await documentRootLoader.getAllHarnesses(MatDialogHarness);
+    const vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
     expect(length)
       .withContext('render a vehicle dialog')
-      .toBe(1);
+      .toBeDefined();
 
-    await vehicleDialog.close();
+    await vehicleDialog?.close();
 
     overlayContainer.ngOnDestroy();
 
@@ -358,5 +355,31 @@ describe('VehiclesComponent', () => {
       .and.returnValue(dialogRef);
 
     await createVehicleButton.click();
+  });
+
+  it('should update vehicle', async () => {
+    const updateVehicleButtons = await loader.getAllHarnesses(MatButtonHarness.with({
+      ancestor: '.mat-column-action',
+      selector: '[mat-icon-button]',
+      text: 'edit'
+    }));
+
+    await updateVehicleButtons[0].click();
+
+    let vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(vehicleDialog)
+      .withContext('render a vehicle dialog')
+      .toBeDefined();
+
+    await vehicleDialog?.close();
+
+    await updateVehicleButtons[1].click();
+
+    vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    await vehicleDialog?.close();
+
+    overlayContainer.ngOnDestroy();
   });
 });

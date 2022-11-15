@@ -1,4 +1,4 @@
-<button mat-stroked-button color="accent" (click)="onAddVehicle()">Добавить технику</button>
+<button mat-stroked-button color="accent" (click)="onCreateVehicle()">Добавить технику</button>
 
 <mat-table matSort [dataSource]="vehiclesDataSource" *ngIf="vehiclesData$ | async"
   (matSortChange)="onSortChange($event)">
@@ -31,7 +31,7 @@
 
     <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
       <ng-container *ngSwitchCase="VehicleColumn.Action">
-        <button mat-icon-button>
+        <button mat-icon-button (click)="onUpdateVehicle(element)">
           <mat-icon class="md-18">edit</mat-icon>
         </button>
       </ng-container>
