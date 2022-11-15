@@ -3,6 +3,7 @@ import { CommonModule, KeyValue } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
@@ -21,6 +22,7 @@ import { TableDataSource } from '../table.data-source';
     MatButtonModule,
     MatTableModule,
     MatSortModule,
+    MatIconModule,
     MatDialogModule
   ],
   templateUrl: './vehicles.component.html',

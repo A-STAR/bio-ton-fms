@@ -30,6 +30,12 @@
     </ng-container>
 
     <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+      <ng-container *ngSwitchCase="VehicleColumn.Action">
+        <button mat-icon-button>
+          <mat-icon class="md-18">edit</mat-icon>
+        </button>
+      </ng-container>
+
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Type"></ng-container>
 
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Subtype"></ng-container>

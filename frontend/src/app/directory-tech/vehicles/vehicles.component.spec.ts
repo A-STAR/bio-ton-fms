@@ -6,6 +6,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
@@ -165,6 +166,31 @@ describe('VehiclesComponent', () => {
       .toEqual(columnLabels);
   });
 
+  it('should render vehicle table action cells', async () => {
+    const table = await loader.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells()
+    ));
+
+    const updateButtons = await parallel(() => cells.map(
+      ({
+        0: actionCell
+      }) => actionCell.getHarnessOrNull(MatButtonHarness)
+    ));
+
+    updateButtons.forEach(updateButton => {
+      expect(updateButton)
+        .withContext('render update button')
+        .toBeDefined();
+
+      updateButton?.hasHarness(MatIconHarness.with({
+        name: 'edit'
+      }));
+    });
+  });
+
   it('should render vehicle table cells', async () => {
     const table = await loader.getHarness(MatTableHarness);
     const rows = await table.getRows();
@@ -303,13 +329,13 @@ describe('VehiclesComponent', () => {
       .toBe('');
   });
 
-  it('should add vehicle', async () => {
-    const addVehicleButton = await loader.getHarness(MatButtonHarness.with({
+  it('should create vehicle', async () => {
+    const createVehicleButton = await loader.getHarness(MatButtonHarness.with({
       selector: '[mat-stroked-button]',
       text: 'Добавить технику'
     }));
 
-    await addVehicleButton.click();
+    await createVehicleButton.click();
 
     const {
       0: vehicleDialog,
@@ -331,6 +357,6 @@ describe('VehiclesComponent', () => {
     spyOn(component['dialog'], 'open')
       .and.returnValue(dialogRef);
 
-    await addVehicleButton.click();
+    await createVehicleButton.click();
   });
 });
