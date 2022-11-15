@@ -12,7 +12,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { Fuel, VehicleGroup, VehicleService } from '../vehicle.service';
+import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
 
 import { VehicleDialogComponent } from './vehicle-dialog.component';
 
@@ -227,18 +227,8 @@ describe('VehicleDialogComponent', () => {
       .not.toHaveBeenCalled();
   });
 
-  it('should submit vehicle form', async () => {
-    const [
-      nameInput,
-      makeInput,
-      modelInput,
-      yearInput,
-      registrationInput,
-      inventoryInput,
-      serialInput,
-      ,
-      descriptionInput
-    ] = await loader.getAllHarnesses(MatInputHarness.with({
+  it('should submit create vehicle form', async () => {
+    const [nameInput, makeInput, modelInput] = await loader.getAllHarnesses(MatInputHarness.with({
       ancestor: 'form#vehicle-form'
     }));
 
@@ -246,17 +236,12 @@ describe('VehicleDialogComponent', () => {
       ancestor: 'form#vehicle-form'
     }));
 
-    const { name, make, model, manufacturingYear, registrationNumber, inventoryNumber, serialNumber, description } = testNewVehicle;
-
-    const year = manufacturingYear.toString();
-
-    await groupSelect.clickOptions({
-      text: testVehicleGroups[2].name
-    });
+    const { name, make, model } = testNewVehicle;
 
     await typeSelect.clickOptions({
       text: testVehicleTypeEnum[0].value
     });
+
     await subtypeSelect.clickOptions({
       text: testVehicleSubtypeEnum[2].value
     });
@@ -268,11 +253,6 @@ describe('VehicleDialogComponent', () => {
     await nameInput.setValue(name);
     await makeInput.setValue(make);
     await modelInput.setValue(model);
-    await yearInput.setValue(year);
-    await registrationInput.setValue(registrationNumber);
-    await inventoryInput.setValue(inventoryNumber);
-    await serialInput.setValue(serialNumber);
-    await descriptionInput.setValue(description);
 
     spyOn(component, 'submitVehicleForm')
       .and.callThrough();
@@ -289,8 +269,38 @@ describe('VehicleDialogComponent', () => {
     expect(component.submitVehicleForm)
       .toHaveBeenCalled();
 
+    const testVehicle: NewVehicle = {
+      name: testNewVehicle.name,
+      make: testNewVehicle.make,
+      model: testNewVehicle.model,
+      type: testNewVehicle.type,
+      manufacturingYear: undefined,
+      subType: testNewVehicle.subType,
+      fuelTypeId: testNewVehicle.fuelTypeId,
+      vehicleGroupId: undefined,
+      registrationNumber: undefined,
+      inventoryNumber: undefined,
+      serialNumber: undefined,
+      trackerId: undefined,
+      description: undefined
+    };
+
     expect(vehicleService.createVehicle)
-      .toHaveBeenCalled();
+      .toHaveBeenCalledWith(testVehicle);
+
+    expect(dialogRef.close)
+      .toHaveBeenCalledWith(true);
+
+    await groupSelect.clickOptions({
+      text: testVehicleGroups[2].name
+    });
+
+    await saveButton.click();
+
+    testVehicle.vehicleGroupId = testNewVehicle.vehicleGroupId;
+
+    expect(vehicleService.createVehicle)
+      .toHaveBeenCalledWith(testVehicle);
 
     expect(dialogRef.close)
       .toHaveBeenCalledWith(true);

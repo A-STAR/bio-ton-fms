@@ -128,30 +128,18 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       .map(({
         id,
         name,
-        type: {
-          value: type
-        },
-        vehicleGroup: {
-          value: group
-        },
+        type,
+        vehicleGroup: group,
         make,
         model,
-        subType: {
-          value: subtype
-        },
-        fuelType: {
-          value: fuel
-        },
+        subType: subtype,
+        fuelType: fuel,
         manufacturingYear: year,
         registrationNumber: registration,
         inventoryNumber: inventory,
         serialNumber: serial,
         description,
-        tracker: {
-          value: tracker
-        } = {
-          value: undefined
-        }
+        tracker
       }): VehicleDataSource => {
         return { id, name, make, model, type, subtype, group, year, fuel, registration, inventory, serial, tracker, description };
       });
@@ -220,16 +208,14 @@ export enum VehicleColumn {
   Tracker = 'tracker'
 }
 
-export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' | 'model' | 'description'> {
-  type: string;
-  subtype: string;
-  group: string;
-  year: number;
-  fuel: string;
-  registration?: string;
-  inventory?: string;
-  serial?: string;
-  tracker?: string;
+export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' | 'model' | 'type' | 'tracker' | 'description'> {
+  subtype: Vehicle['subType'];
+  group?: Vehicle['vehicleGroup'];
+  year?: Vehicle['manufacturingYear'];
+  fuel: Vehicle['fuelType'];
+  registration?: Vehicle['registrationNumber'];
+  inventory?: Vehicle['inventoryNumber'];
+  serial?: Vehicle['serialNumber'];
 }
 
 export const columns: KeyValue<VehicleColumn, string | undefined>[] = [

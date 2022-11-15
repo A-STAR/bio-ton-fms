@@ -298,7 +298,7 @@ export const testNewVehicle: NewVehicle = {
   model: 'Tundra',
   manufacturingYear: 2015,
   vehicleGroupId: Number(groupId),
-  type: testVehicleGroups[0].id.toString(),
+  type: testVehicleTypeEnum[0].key.toString(),
   subType: testVehicleSubtypeEnum[2].key.toString(),
   fuelTypeId: Number(fuelId),
   registrationNumber: '7777 TT 77',
@@ -314,10 +314,6 @@ export const testVehicles: Vehicles = {
       id: 1,
       name: 'Марьевка',
       type: testVehicleTypeEnum[1],
-      vehicleGroup: {
-        key: testVehicleGroups[0].id.toString(),
-        value: testVehicleGroups[0].name
-      },
       make: 'CLAAS',
       model: 'Tucano 460',
       subType: testVehicleSubtypeEnum[4],
@@ -371,11 +367,6 @@ export const testVehicles: Vehicles = {
         key: testFuels[1].id.toString(),
         value: testFuels[1].name
       },
-      manufacturingYear: 2017,
-      registrationNumber: '1202 AК 63',
-      inventoryNumber: 'М465890560',
-      serialNumber: '678896767968',
-      description: 'Кировское',
       tracker: {
         key: '2',
         value: '18-07-2557'

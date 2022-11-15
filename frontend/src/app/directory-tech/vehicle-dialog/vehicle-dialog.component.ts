@@ -52,18 +52,18 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
 
     const vehicle: NewVehicle = {
       name: name!,
-      type: type!,
-      trackerId: tracker,
-      vehicleGroupId: group!,
       make: make!,
       model: model!,
+      manufacturingYear: year ?? undefined,
+      vehicleGroupId: group ? Number(group): undefined,
+      type: type!,
       subType: subtype!,
-      fuelTypeId: fuel!,
-      manufacturingYear: year!,
-      registrationNumber: registration!,
-      inventoryNumber: inventory!,
-      serialNumber: serial!,
-      description: description!
+      fuelTypeId: Number(fuel!),
+      registrationNumber: registration ?? undefined,
+      inventoryNumber: inventory ?? undefined,
+      serialNumber: serial ?? undefined,
+      trackerId: tracker ?? undefined,
+      description: description ?? undefined
     };
 
     const addVehicle$ = this.vehicleService.createVehicle(vehicle);
@@ -96,26 +96,23 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
-        name: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        name: this.fb.nonNullable.control<string | undefined>(undefined),
         make: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
         model: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-        year: this.fb.nonNullable.control<number | undefined>(undefined, [
-          Validators.required,
-          Validators.pattern(YEAR_PATTERN)
-        ]),
-        group: this.fb.nonNullable.control<number | undefined>(undefined, Validators.required),
+        year: this.fb.nonNullable.control<number | undefined>(undefined, Validators.pattern(YEAR_PATTERN)),
+        group: this.fb.nonNullable.control<number | undefined>(undefined),
         type: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
         subtype: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
         fuel: this.fb.nonNullable.control<number | undefined>(undefined, Validators.required)
       }),
       registration: this.fb.group({
-        registration: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-        inventory: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-        serial: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+        registration: this.fb.nonNullable.control<string | undefined>(undefined),
+        inventory: this.fb.nonNullable.control<string | undefined>(undefined),
+        serial: this.fb.nonNullable.control<string | undefined>(undefined),
         tracker: this.fb.nonNullable.control<number | undefined>(undefined)
       }),
       additional: this.fb.group({
-        description: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required)
+        description: this.fb.nonNullable.control<string | undefined>(undefined)
       })
     });
   }

@@ -196,6 +196,8 @@ describe('VehiclesComponent', () => {
         },
         vehicleGroup: {
           value: group
+        } = {
+          value: undefined
         },
         make,
         model,

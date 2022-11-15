@@ -115,27 +115,27 @@ export type Vehicle = {
   id: number;
   name: string;
   type: KeyValue<string, string>;
-  vehicleGroup: KeyValue<string, string>;
+  vehicleGroup?: KeyValue<string, string>;
   make: string;
   model: string;
   subType: KeyValue<string, string>;
   fuelType: KeyValue<string, string>;
-  manufacturingYear: number;
-  registrationNumber: string;
-  inventoryNumber: string;
-  serialNumber: string;
-  description: string;
-  tracker?: KeyValue<string, string>
+  manufacturingYear?: number;
+  registrationNumber?: string;
+  inventoryNumber?: string;
+  serialNumber?: string;
+  tracker?: KeyValue<string, string>;
+  description?: string;
 }
 
-export interface NewVehicle extends Pick<
+export interface NewVehicle extends Partial<Pick<Vehicle, 'id'>>, Pick<
   Vehicle,
   'name' | 'make' | 'model' | 'manufacturingYear' | 'registrationNumber' | 'inventoryNumber' | 'serialNumber' | 'description'
 > {
-  type: string;
-  vehicleGroupId: number;
-  subType: string;
-  fuelTypeId: number;
+  vehicleGroupId?: VehicleGroup['id'];
+  type: Vehicle['type']['key'];
+  subType: Vehicle['subType']['key'];
+  fuelTypeId: Fuel['id'];
   trackerId?: number;
 }
 
