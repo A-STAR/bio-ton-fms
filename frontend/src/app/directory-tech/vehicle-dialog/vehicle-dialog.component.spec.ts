@@ -5,7 +5,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -40,6 +40,10 @@ describe('VehicleDialogComponent', () => {
           VehicleDialogComponent
         ],
         providers: [
+          {
+            provide: MAT_DIALOG_DATA,
+            useValue: undefined
+          },
           {
             provide: MatDialogRef,
             useValue: dialogRef
@@ -101,6 +105,14 @@ describe('VehicleDialogComponent', () => {
     expect(titleTextDe)
       .withContext('render dialog title element')
       .not.toBeNull();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog title text')
+      .toBe('Добавление технического средства');
+
+    component['data'] = testNewVehicle;
+
+    fixture.detectChanges();
 
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog title text')

@@ -1,4 +1,6 @@
-<h1 mat-dialog-title>Сводная информация о техническом средстве</h1>
+<h1 mat-dialog-title>{{
+  this.data ? 'Сводная информация о техническом средстве' : 'Добавление технического средства'
+  }}</h1>
 
 <mat-dialog-content>
   <form id="vehicle-form" [formGroup]="vehicleForm" (ngSubmit)="submitVehicleForm()">
