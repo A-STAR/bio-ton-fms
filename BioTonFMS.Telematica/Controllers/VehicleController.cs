@@ -1,19 +1,18 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Controllers;
-using BioTonFMS.Infrastructure.EF.Repositories;
+using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
-using BioTonFMS.Telematica.Validation.Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace BioTonFMS.Telematica.Controllers;
 
@@ -27,28 +26,33 @@ namespace BioTonFMS.Telematica.Controllers;
 [Produces("application/json")]
 public class VehicleController : ValidationControllerBase
 {
-    private readonly ILogger<VehicleController> _logger;
-    private readonly IVehicleRepository _vehicleRepository;
+    private readonly IVehicleRepository _vehicleRepo;
+    private readonly ITrackerRepository _trackerRepo;
+    private readonly IFuelTypeRepository _fuelTypeRepo;
+    
     private readonly IValidator<UpdateVehicleDto> _updateValidator;
     private readonly IValidator<VehiclesRequest> _vehiclesRequestValidator;
     private readonly IValidator<CreateVehicleDto> _createValidator;
-    private readonly ITrackerRepository _trackerRepo;
+
+    private readonly ILogger<VehicleController> _logger;
     private readonly IMapper _mapper;
 
     public VehicleController(
-        IVehicleRepository vehicleRepository,
-        ITrackerRepository trackerRepo,
         IMapper mapper,
+        ILogger<VehicleController> logger,
+        IVehicleRepository vehicleRepo,
+        ITrackerRepository trackerRepo,
+        IFuelTypeRepository fuelTypeRepo,
         IValidator<CreateVehicleDto> createValidator,
         IValidator<UpdateVehicleDto> updateValidator,
-        ILogger<VehicleController> logger,
         IValidator<VehiclesRequest> vehiclesRequestValidator)
     {
         _updateValidator = updateValidator;
         _createValidator = createValidator;
         _vehiclesRequestValidator = vehiclesRequestValidator;
         _trackerRepo = trackerRepo;
-        _vehicleRepository = vehicleRepository;
+        _fuelTypeRepo = fuelTypeRepo;
+        _vehicleRepo = vehicleRepo;
         _mapper = mapper;
         _logger = logger;
     }
@@ -71,7 +75,7 @@ public class VehicleController : ValidationControllerBase
         }
 
         var filter = _mapper.Map<VehiclesFilter>(vehiclesRequest);
-        var vehiclesPaging = _vehicleRepository.GetVehicles(filter);
+        var vehiclesPaging = _vehicleRepo.GetVehicles(filter);
         var result = new VehicleResponse
         {
             Vehicles = vehiclesPaging.Results.Select(res => _mapper.Map<VehicleDto>(res)).ToArray(),
@@ -91,12 +95,12 @@ public class VehicleController : ValidationControllerBase
     /// <param name="id">Id машины</param>
     /// <response code="200">Машина успешно возвращена</response>
     /// <response code="404">Машина не найдена</response>
-    [HttpGet("vehicle/{id}")]
+    [HttpGet("vehicle/{id:int}")]
     [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetVehicle(int id)
     {
-        var vehicle = _vehicleRepository[id];
+        var vehicle = _vehicleRepo[id];
 
         if (vehicle is not null)
         {
@@ -124,7 +128,6 @@ public class VehicleController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
-        var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
         if (createVehicleDto.TrackerId.HasValue)
         {
             var trackerId = createVehicleDto.TrackerId.Value;
@@ -136,10 +139,17 @@ public class VehicleController : ValidationControllerBase
                     new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
             }
         }
+        if (_fuelTypeRepo[createVehicleDto.FuelTypeId] is null)
+        {
+            return NotFound(
+                new ServiceErrorResult($"Тип топлива с id = {createVehicleDto.FuelTypeId} не найден"));
+        }
 
+        var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
+        
         try
         {
-            _vehicleRepository.Put(newVehicle);
+            _vehicleRepo.Put(newVehicle);
         }
         catch (Exception ex)
         {
@@ -157,7 +167,7 @@ public class VehicleController : ValidationControllerBase
     /// <param name="updateVehicleDto">Модель обновления машины</param>
     /// <response code="200">Машина успешно обновлена</response>
     /// <response code="404">Машина не найдена</response>
-    [HttpPut("vehicle/{id}")]
+    [HttpPut("vehicle/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult UpdateVehicle(int id, UpdateVehicleDto updateVehicleDto)
@@ -168,36 +178,42 @@ public class VehicleController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
-        var vehicle = _vehicleRepository[id];
-        if (vehicle is not null)
-        {
-            if (updateVehicleDto.TrackerId.HasValue)
-            {
-                var trackerId = updateVehicleDto.TrackerId.Value;
-                var tracker = _trackerRepo[trackerId];
-
-                if (tracker is null)
-                {
-                    return NotFound(
-                        new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
-                }
-            }
-            _mapper.Map(updateVehicleDto, vehicle);
-            try
-            {
-                _vehicleRepository.Update(vehicle);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Ошибка при обновлении машины {@id}", vehicle.Id);
-                throw;
-            }
-            return Ok();
-        }
-        else
+        var vehicle = _vehicleRepo[id];
+        if (vehicle is null)
         {
             return NotFound(new ServiceErrorResult($"Машина с id = {id} не найдена"));
         }
+        
+        if (updateVehicleDto.TrackerId.HasValue)
+        {
+            var trackerId = updateVehicleDto.TrackerId.Value;
+            var tracker = _trackerRepo[trackerId];
+
+            if (tracker is null)
+            {
+                return NotFound(
+                    new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
+            }
+        }
+        if (_fuelTypeRepo[updateVehicleDto.FuelTypeId] is null)
+        {
+            return NotFound(
+                new ServiceErrorResult($"Тип топлива с id = {updateVehicleDto.FuelTypeId} не найден"));
+        }
+        
+        _mapper.Map(updateVehicleDto, vehicle);
+        
+        try
+        {
+            _vehicleRepo.Update(vehicle);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при обновлении машины {@id}", vehicle.Id);
+            throw;
+        }
+        
+        return Ok();
     }
 
     /// <summary>
@@ -206,17 +222,17 @@ public class VehicleController : ValidationControllerBase
     /// <param name="id">Id машины</param>
     /// <response code="200">Машина успешно удалена</response>
     /// <response code="404">Машина не найдена</response>
-    [HttpDelete("vehicle/{id}")]
+    [HttpDelete("vehicle/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult DeleteVehicle(int id)
     {
-        var vehicle = _vehicleRepository[id];
+        var vehicle = _vehicleRepo[id];
         if (vehicle is not null)
         {
             try
             {
-                _vehicleRepository.Remove(vehicle);
+                _vehicleRepo.Remove(vehicle);
             }
             catch (Exception ex)
             {

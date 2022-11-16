@@ -2,18 +2,15 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
-using BioTonFMS.Infrastructure.EF.Repositories;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
-using BioTonFMS.Telematica.Validation.Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using System.Net;
 
 namespace BioTonFMS.Telematica.Controllers;
 
@@ -90,7 +87,7 @@ public class TrackerController : ValidationControllerBase
     /// <param name="id">Id трекера</param>
     /// <response code="200">Трекер успещно возвращен</response>
     /// <response code="404">Трекер не найден</response>
-    [HttpGet("tracker/{id}")]
+    [HttpGet("tracker/{id:int}")]
     [ProducesResponseType(typeof(TrackerDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetTracker(int id)
@@ -144,7 +141,7 @@ public class TrackerController : ValidationControllerBase
     /// <response code="200">Трекер успешно обновлен</response>
     /// <response code="404">Трекер не найден</response>
     /// <response code="409">Конфликт при обновлении трекера</response>
-    [HttpPut("tracker/{id}")]
+    [HttpPut("tracker/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status409Conflict)]
@@ -184,7 +181,7 @@ public class TrackerController : ValidationControllerBase
     /// <response code="200">Трекер успешно удален</response>
     /// <response code="404">Трекер не найден</response>
     /// <response code="409">Конфликт при удалении трекера</response>
-    [HttpDelete("tracker/{id}")]
+    [HttpDelete("tracker/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
