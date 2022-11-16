@@ -72,10 +72,23 @@ export class VehicleService {
   /**
    * Create a new vehicle.
    *
+   * @param vehicle A new vehicle.
+   *
    * @returns An `Observable' of adding vehicle.
    */
   createVehicle(vehicle: NewVehicle) {
     return this.httpClient.post('/api/telematica/vehicle', vehicle);
+  }
+
+  /**
+   * Update a vehicle.
+   *
+   * @param vehicle An updated vehicle.
+   *
+   * @returns An `Observable' of updating vehicle.
+   */
+  updateVehicle(vehicle: NewVehicle) {
+    return this.httpClient.put(`/api/telematica/vehicle/${vehicle.id}`, vehicle);
   }
 
   constructor(private httpClient: HttpClient) { }

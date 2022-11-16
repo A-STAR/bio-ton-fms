@@ -51,6 +51,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     const { description } = additional!;
 
     const vehicle: NewVehicle = {
+      id: this.data?.id,
       name: name!,
       make: make!,
       model: model!,
@@ -66,9 +67,11 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       description: description ?? undefined
     };
 
-    const addVehicle$ = this.vehicleService.createVehicle(vehicle);
+    const vehicle$ = this.data
+      ? this.vehicleService.updateVehicle(vehicle)
+      : this.vehicleService.createVehicle(vehicle);
 
-    await firstValueFrom(addVehicle$);
+    await firstValueFrom(vehicle$);
 
     this.dialogRef.close(true);
   }

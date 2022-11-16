@@ -353,6 +353,7 @@ describe('VehicleDialogComponent', () => {
       .toHaveBeenCalled();
 
     const testVehicle: NewVehicle = {
+      id: undefined,
       name: testNewVehicle.name,
       make: testNewVehicle.make,
       model: testNewVehicle.model,
@@ -384,6 +385,80 @@ describe('VehicleDialogComponent', () => {
 
     expect(vehicleService.createVehicle)
       .toHaveBeenCalledWith(testVehicle);
+  });
+
+  it('should submit update vehicle form', async () => {
+    component['data'] = testNewVehicle;
+
+    component.ngOnInit();
+
+    const [
+      nameInput,
+      ,
+      modelInput,
+      yearInput,
+      registrationInput,
+      ,
+      ,
+      ,
+      descriptionInput
+    ] = await loader.getAllHarnesses(MatInputHarness.with({
+      ancestor: 'form#vehicle-form'
+    }));
+
+    const [, , , fuelSelect] = await loader.getAllHarnesses(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form'
+    }));
+
+    await fuelSelect.clickOptions({
+      text: testFuels[1].name
+    });
+
+    const updatedModel = 'Hilux';
+    const updatedName = `${testNewVehicle.make} ${updatedModel}`;
+
+    await nameInput.setValue(updatedName);
+    await modelInput.setValue(updatedModel);
+
+    const updatedYear = 2020;
+
+    const year = updatedYear?.toString();
+
+    await yearInput.setValue(year);
+
+    const updatedRegistrationNumber = '8888 TH 88';
+
+    await registrationInput.setValue(updatedRegistrationNumber);
+
+    const updatedDescription = 'Патруль';
+
+    await descriptionInput.setValue(updatedDescription);
+
+    spyOn(component, 'submitVehicleForm')
+      .and.callThrough();
+
+    spyOn(vehicleService, 'updateVehicle')
+      .and.callFake(() => of({}));
+
+    const saveButton = await loader.getHarness(MatButtonHarness.with({
+      selector: '[form="vehicle-form"]'
+    }));
+
+    await saveButton.click();
+
+    expect(component.submitVehicleForm)
+      .toHaveBeenCalled();
+
+    expect(vehicleService.updateVehicle)
+      .toHaveBeenCalledWith({
+        ...testNewVehicle,
+        name: updatedName,
+        model: updatedModel,
+        manufacturingYear: updatedYear,
+        fuelTypeId: testFuels[1].id,
+        registrationNumber: updatedRegistrationNumber,
+        description: updatedDescription
+      });
 
     expect(dialogRef.close)
       .toHaveBeenCalledWith(true);

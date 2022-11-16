@@ -208,12 +208,31 @@ describe('VehicleService', () => {
         done();
       });
 
-    const addVehicleRequest = httpTestingController.expectOne({
+    const createVehicleRequest = httpTestingController.expectOne({
       method: 'POST',
       url: '/api/telematica/vehicle'
     }, 'create vehicle request');
 
-    addVehicleRequest.flush(null);
+    createVehicleRequest.flush(null);
+  });
+
+  it('should update vehicle', (done: DoneFn) => {
+    service
+      .updateVehicle(testNewVehicle)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const updateVehicleRequest = httpTestingController.expectOne({
+      method: 'PUT',
+      url: `/api/telematica/vehicle/${testNewVehicle.id}`
+    }, 'update vehicle request');
+
+    updateVehicleRequest.flush(null);
   });
 });
 
@@ -293,6 +312,7 @@ const groupId = testVehicleGroups[2].id.toString();
 const fuelId = testFuels[0].id.toString();
 
 export const testNewVehicle: NewVehicle = {
+  id: 1,
   name: 'Toyota Tundra',
   make: 'Toyota',
   model: 'Tundra',
