@@ -187,15 +187,86 @@ describe('VehicleDialogComponent', () => {
       placeholder: 'Серийный номер кузова'
     }));
 
-    loader.getHarness(MatInputHarness.with({
+    const trackerInput = await loader.getHarness(MatInputHarness.with({
       ancestor: 'form#vehicle-form',
       placeholder: 'GPS трекер'
     }));
+
+    await expectAsync(
+      trackerInput.getType()
+    )
+      .withContext('render tracker input type')
+      .toBeResolvedTo('number');
 
     loader.getHarness(MatInputHarness.with({
       ancestor: 'form#vehicle-form',
       placeholder: 'Описание'
     }));
+  });
+
+  it('should render update vehicle form', async () => {
+    component['data'] = testNewVehicle;
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+
+    const vehicleFormDe = fixture.debugElement.query(By.css('form#vehicle-form'));
+
+    expect(vehicleFormDe)
+      .withContext('render Vehicle form element')
+      .not.toBeNull();
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Наименование машины',
+      value: testNewVehicle.name
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Производитель',
+      value: testNewVehicle.make
+    }));
+
+    loader.getHarness(MatInputHarness.with({
+      ancestor: 'form#vehicle-form',
+      placeholder: 'Модель',
+      value: testNewVehicle.model
+    }));
+
+    const typeSelect = await loader.getHarness(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form',
+      selector: '[placeholder="Тип машины"]'
+    }));
+
+    await expectAsync(
+      typeSelect.getValueText()
+    )
+      .withContext('render type select text')
+      .toBeResolvedTo(testVehicleTypeEnum[0].value);
+
+    const subtypeSelect = await loader.getHarness(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form',
+      selector: '[placeholder="Подтип машины"]'
+    }));
+
+    await expectAsync(
+      subtypeSelect.getValueText()
+    )
+      .withContext('render subtype select text')
+      .toBeResolvedTo(testVehicleSubtypeEnum[2].value);
+
+    const fuelSelect = await loader.getHarness(MatSelectHarness.with({
+      ancestor: 'form#vehicle-form',
+      selector: '[placeholder="Тип топлива"]'
+    }));
+
+    await expectAsync(
+      fuelSelect.getValueText()
+    )
+      .withContext('render fuel select text')
+      .toBeResolvedTo(testFuels[0].name);
   });
 
   it('should submit invalid vehicle form', async () => {

@@ -91,28 +91,28 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialize Vehicle form.
+   * Initialize vehicle form.
    */
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
-        name: this.fb.nonNullable.control<string | undefined>(undefined),
-        make: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-        model: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-        year: this.fb.nonNullable.control<number | undefined>(undefined, Validators.pattern(YEAR_PATTERN)),
-        group: this.fb.nonNullable.control<number | undefined>(undefined),
-        type: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-        subtype: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-        fuel: this.fb.nonNullable.control<number | undefined>(undefined, Validators.required)
+        name: this.fb.nonNullable.control<string | undefined>(this.data?.name, Validators.required),
+        make: this.fb.nonNullable.control<string | undefined>(this.data?.make, Validators.required),
+        model: this.fb.nonNullable.control<string | undefined>(this.data?.model, Validators.required),
+        year: this.fb.nonNullable.control<number | undefined>(this.data?.manufacturingYear, Validators.pattern(YEAR_PATTERN)),
+        group: this.fb.nonNullable.control<number | undefined>(this.data?.vehicleGroupId),
+        type: this.fb.nonNullable.control<string | undefined>(this.data?.type, Validators.required),
+        subtype: this.fb.nonNullable.control<string | undefined>(this.data?.subType, Validators.required),
+        fuel: this.fb.nonNullable.control<number | undefined>(this.data?.fuelTypeId, Validators.required)
       }),
       registration: this.fb.group({
-        registration: this.fb.nonNullable.control<string | undefined>(undefined),
-        inventory: this.fb.nonNullable.control<string | undefined>(undefined),
-        serial: this.fb.nonNullable.control<string | undefined>(undefined),
-        tracker: this.fb.nonNullable.control<number | undefined>(undefined)
+        registration: this.fb.nonNullable.control<string | undefined>(this.data?.registrationNumber),
+        inventory: this.fb.nonNullable.control<string | undefined>(this.data?.inventoryNumber),
+        serial: this.fb.nonNullable.control<string | undefined>(this.data?.serialNumber),
+        tracker: this.fb.nonNullable.control<number | undefined>(this.data?.trackerId)
       }),
       additional: this.fb.group({
-        description: this.fb.nonNullable.control<string | undefined>(undefined)
+        description: this.fb.nonNullable.control<string | undefined>(this.data?.description)
       })
     });
   }

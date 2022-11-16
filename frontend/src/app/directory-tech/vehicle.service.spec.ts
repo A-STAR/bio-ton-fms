@@ -219,26 +219,26 @@ describe('VehicleService', () => {
 
 export const testVehicleGroups: VehicleGroup[] = [
   {
-    id: 0,
+    id: 1,
     name: 'Комбайны CLAAS'
   },
   {
-    id: 1,
+    id: 2,
     name: 'Тракторы Кировцы'
   },
   {
-    id: 2,
+    id: 3,
     name: 'Легковые автомобили'
   }
 ];
 
 export const testFuels: Fuel[] = [
   {
-    id: 0,
+    id: 1,
     name: 'Бензин'
   },
   {
-    id: 1,
+    id: 2,
     name: 'Дизельное топливо'
   }
 ];
