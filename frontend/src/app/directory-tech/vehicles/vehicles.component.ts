@@ -140,7 +140,16 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       description
     };
 
-    this.dialog.open<VehicleDialogComponent, NewVehicle, true | ''>(VehicleDialogComponent, { ...dialogConfig, data });
+    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | ''>(VehicleDialogComponent, { ...dialogConfig, data });
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(() => {
+        this.#updateVehicles();
+      });
   }
 
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});

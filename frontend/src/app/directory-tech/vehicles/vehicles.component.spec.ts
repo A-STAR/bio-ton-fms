@@ -381,5 +381,14 @@ describe('VehiclesComponent', () => {
     await vehicleDialog?.close();
 
     overlayContainer.ngOnDestroy();
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<VehicleDialogComponent, true | ''>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await updateVehicleButtons[0].click();
   });
 });
