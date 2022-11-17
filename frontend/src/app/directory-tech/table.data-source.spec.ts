@@ -45,15 +45,20 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Марьевка',
     make: 'CLAAS',
     model: 'Tucano 460',
-    type: testVehicleTypeEnum[1].value,
-    subtype: testVehicleSubtypeEnum[4].value,
-    group: testVehicleGroups[0].name,
+    type: testVehicleTypeEnum[1],
+    subtype: testVehicleSubtypeEnum[4],
     year: 2022,
-    fuel: testFuels[1].name,
+    fuel: {
+      key: testFuels[1].id.toString(),
+      value: testFuels[1].name
+    },
     registration: '1200 AM 63',
     inventory: 'С293823729',
     serial: '202039293834',
-    tracker: '18-07-2539',
+    tracker: {
+      key: '1',
+      value: '18-07-2539'
+    },
     description: 'Марьевское'
   },
   {
@@ -61,11 +66,17 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Легковая машина',
     make: 'Ford',
     model: 'Focus',
-    type: testVehicleTypeEnum[0].value,
-    subtype: testVehicleSubtypeEnum[5].value,
-    group: testVehicleGroups[2].name,
+    type: testVehicleTypeEnum[0],
+    subtype: testVehicleSubtypeEnum[5],
+    group: {
+      key: testVehicleGroups[2].id.toString(),
+      value: testVehicleGroups[2].name
+    },
     year: 2019,
-    fuel: testFuels[0].name,
+    fuel: {
+      key: testFuels[0].id.toString(),
+      value: testFuels[0].name
+    },
     registration: '1290 AM 63',
     inventory: 'FF800110350',
     serial: '800110350305',
@@ -76,15 +87,20 @@ const testDataSource: VehicleDataSource[] = [
     name: 'Кировец',
     make: 'Кировец',
     model: 'K-744',
-    type: testVehicleTypeEnum[0].value,
-    subtype: testVehicleSubtypeEnum[7].value,
-    group: testVehicleGroups[1].name,
-    year: 2017,
-    fuel: testFuels[1].name,
-    registration: '1202 AК 63',
-    inventory: 'М465890560',
-    serial: '678896767968',
-    tracker: '18-07-2557',
+    type: testVehicleTypeEnum[0],
+    subtype: testVehicleSubtypeEnum[7],
+    group: {
+      key: testVehicleGroups[1].id.toString(),
+      value: testVehicleGroups[1].name
+    },
+    fuel: {
+      key: testFuels[1].id.toString(),
+      value: testFuels[1].name
+    },
+    tracker: {
+      key: '2',
+      value: '18-07-2557'
+    },
     description: 'Кировское'
   }
 ];

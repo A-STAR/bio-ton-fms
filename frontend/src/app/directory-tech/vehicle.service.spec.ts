@@ -208,37 +208,56 @@ describe('VehicleService', () => {
         done();
       });
 
-    const addVehicleRequest = httpTestingController.expectOne({
+    const createVehicleRequest = httpTestingController.expectOne({
       method: 'POST',
       url: '/api/telematica/vehicle'
     }, 'create vehicle request');
 
-    addVehicleRequest.flush(null);
+    createVehicleRequest.flush(null);
+  });
+
+  it('should update vehicle', (done: DoneFn) => {
+    service
+      .updateVehicle(testNewVehicle)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const updateVehicleRequest = httpTestingController.expectOne({
+      method: 'PUT',
+      url: `/api/telematica/vehicle/${testNewVehicle.id}`
+    }, 'update vehicle request');
+
+    updateVehicleRequest.flush(null);
   });
 });
 
 export const testVehicleGroups: VehicleGroup[] = [
   {
-    id: 0,
+    id: 1,
     name: 'Комбайны CLAAS'
   },
   {
-    id: 1,
+    id: 2,
     name: 'Тракторы Кировцы'
   },
   {
-    id: 2,
+    id: 3,
     name: 'Легковые автомобили'
   }
 ];
 
 export const testFuels: Fuel[] = [
   {
-    id: 0,
+    id: 1,
     name: 'Бензин'
   },
   {
-    id: 1,
+    id: 2,
     name: 'Дизельное топливо'
   }
 ];
@@ -293,12 +312,13 @@ const groupId = testVehicleGroups[2].id.toString();
 const fuelId = testFuels[0].id.toString();
 
 export const testNewVehicle: NewVehicle = {
+  id: 1,
   name: 'Toyota Tundra',
   make: 'Toyota',
   model: 'Tundra',
   manufacturingYear: 2015,
   vehicleGroupId: Number(groupId),
-  type: testVehicleGroups[0].id.toString(),
+  type: testVehicleTypeEnum[0].key.toString(),
   subType: testVehicleSubtypeEnum[2].key.toString(),
   fuelTypeId: Number(fuelId),
   registrationNumber: '7777 TT 77',
@@ -314,10 +334,6 @@ export const testVehicles: Vehicles = {
       id: 1,
       name: 'Марьевка',
       type: testVehicleTypeEnum[1],
-      vehicleGroup: {
-        key: testVehicleGroups[0].id.toString(),
-        value: testVehicleGroups[0].name
-      },
       make: 'CLAAS',
       model: 'Tucano 460',
       subType: testVehicleSubtypeEnum[4],
@@ -371,11 +387,6 @@ export const testVehicles: Vehicles = {
         key: testFuels[1].id.toString(),
         value: testFuels[1].name
       },
-      manufacturingYear: 2017,
-      registrationNumber: '1202 AК 63',
-      inventoryNumber: 'М465890560',
-      serialNumber: '678896767968',
-      description: 'Кировское',
       tracker: {
         key: '2',
         value: '18-07-2557'

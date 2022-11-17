@@ -1,4 +1,6 @@
-<h1 mat-dialog-title>Сводная информация о техническом средстве</h1>
+<h1 mat-dialog-title>{{
+  this.data ? 'Сводная информация о техническом средстве' : 'Добавление технического средства'
+  }}</h1>
 
 <mat-dialog-content>
   <form id="vehicle-form" [formGroup]="vehicleForm" (ngSubmit)="submitVehicleForm()">
@@ -41,10 +43,6 @@
         <mat-form-field>
           <input matInput id="year" type="number" placeholder="Год производства" formControlName="year">
 
-          <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['required']">
-            <strong>Год производства</strong> обязательное поле
-          </mat-error>
-
           <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['pattern']">
             <strong>Год производства</strong> введён некорректно
           </mat-error>
@@ -61,8 +59,6 @@
 
               <mat-option [value]="group.id" *ngFor="let group of vehicleData.groups">{{ group.name }}</mat-option>
             </mat-select>
-
-            <mat-error><strong>Группа машин</strong> обязательное поле</mat-error>
           </mat-form-field>
         </div>
 
@@ -120,8 +116,6 @@
 
         <mat-form-field>
           <input matInput id="registration" placeholder="Регистрационный номер" formControlName="registration">
-
-          <mat-error><strong>Регистрационный номер</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -130,8 +124,6 @@
 
         <mat-form-field>
           <input matInput id="inventory" placeholder="Инвентарный номер" formControlName="inventory">
-
-          <mat-error><strong>Инвентарный номер</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -140,8 +132,6 @@
 
         <mat-form-field>
           <input matInput id="serial" placeholder="Серийный номер кузова" formControlName="serial">
-
-          <mat-error><strong>Серийный номер кузова</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
@@ -162,8 +152,6 @@
 
         <mat-form-field>
           <input matInput id="description" placeholder="Описание" formControlName="description">
-
-          <mat-error><strong>Дополнительные сведения</strong> обязательное поле</mat-error>
         </mat-form-field>
       </div>
     </fieldset>

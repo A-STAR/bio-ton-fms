@@ -3,11 +3,12 @@ import { CommonModule, KeyValue } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
 
-import { SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
+import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
@@ -21,6 +22,7 @@ import { TableDataSource } from '../table.data-source';
     MatButtonModule,
     MatTableModule,
     MatSortModule,
+    MatIconModule,
     MatDialogModule
   ],
   templateUrl: './vehicles.component.html',
@@ -83,17 +85,62 @@ export class VehiclesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Add a new vehicle to table.
+   * Create a new vehicle in table.
    */
-  onAddVehicle() {
+  onCreateVehicle() {
     this.#subscription?.unsubscribe();
 
-    const dialogConfig: MatDialogConfig = {
-      width: '70vw',
-      height: '85vh'
+    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | ''>(VehicleDialogComponent, dialogConfig);
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(() => {
+        this.#updateVehicles();
+      });
+  }
+
+  /**
+   * Update a vehicle in table.
+   *
+   * @param vehicleDataSource Vehicle data source.
+   */
+  onUpdateVehicle({
+    id,
+    name,
+    make,
+    model,
+    type,
+    subtype,
+    group,
+    year,
+    fuel,
+    registration,
+    inventory,
+    serial,
+    tracker,
+    description
+  }: VehicleDataSource) {
+    const data: NewVehicle = {
+      id,
+      name,
+      type: type.key,
+      vehicleGroupId: group ? Number(group.key) : undefined,
+      make,
+      model,
+      subType: subtype.key,
+      fuelTypeId: Number(fuel.key),
+      manufacturingYear: year,
+      registrationNumber: registration,
+      inventoryNumber: inventory,
+      serialNumber: serial,
+      trackerId: tracker ? Number(tracker?.key) : undefined,
+      description
     };
 
-    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | ''>(VehicleDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | ''>(VehicleDialogComponent, { ...dialogConfig, data });
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -128,30 +175,18 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       .map(({
         id,
         name,
-        type: {
-          value: type
-        },
-        vehicleGroup: {
-          value: group
-        },
+        type,
+        vehicleGroup: group,
         make,
         model,
-        subType: {
-          value: subtype
-        },
-        fuelType: {
-          value: fuel
-        },
+        subType: subtype,
+        fuelType: fuel,
         manufacturingYear: year,
         registrationNumber: registration,
         inventoryNumber: inventory,
         serialNumber: serial,
         description,
-        tracker: {
-          value: tracker
-        } = {
-          value: undefined
-        }
+        tracker
       }): VehicleDataSource => {
         return { id, name, make, model, type, subtype, group, year, fuel, registration, inventory, serial, tracker, description };
       });
@@ -220,16 +255,14 @@ export enum VehicleColumn {
   Tracker = 'tracker'
 }
 
-export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' | 'model' | 'description'> {
-  type: string;
-  subtype: string;
-  group: string;
-  year: number;
-  fuel: string;
-  registration?: string;
-  inventory?: string;
-  serial?: string;
-  tracker?: string;
+export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' | 'model' | 'type' | 'tracker' | 'description'> {
+  subtype: Vehicle['subType'];
+  group?: Vehicle['vehicleGroup'];
+  year?: Vehicle['manufacturingYear'];
+  fuel: Vehicle['fuelType'];
+  registration?: Vehicle['registrationNumber'];
+  inventory?: Vehicle['inventoryNumber'];
+  serial?: Vehicle['serialNumber'];
 }
 
 export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
@@ -282,3 +315,8 @@ export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
     value: 'Описание'
   }
 ];
+
+const dialogConfig: MatDialogConfig<NewVehicle> = {
+  width: '70vw',
+  height: '85vh'
+};
