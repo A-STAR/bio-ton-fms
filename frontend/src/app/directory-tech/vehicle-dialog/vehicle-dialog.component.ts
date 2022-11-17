@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
 
@@ -21,7 +22,8 @@ import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.servi
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSnackBarModule
   ],
   templateUrl: './vehicle-dialog.component.html',
   styleUrls: ['./vehicle-dialog.component.sass'],
@@ -73,6 +75,9 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
 
     await firstValueFrom(vehicle$);
 
+    const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
+
+    this.snackBar.open(message);
     this.dialogRef.close(true);
   }
 
@@ -131,6 +136,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
+    private snackBar: MatSnackBar,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<VehicleDialogComponent, true | ''>,
     private vehicleService: VehicleService
@@ -169,3 +175,6 @@ type VehicleForm = {
 }
 
 const YEAR_PATTERN = /\d{4}/;
+
+export const VEHICLE_CREATED = 'Машина создана';
+export const VEHICLE_UPDATED = 'Машина обновлена';

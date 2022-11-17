@@ -9,18 +9,20 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 
 import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
 
-import { VehicleDialogComponent } from './vehicle-dialog.component';
+import { VehicleDialogComponent, VEHICLE_CREATED, VEHICLE_UPDATED } from './vehicle-dialog.component';
 
 import { testFuels, testNewVehicle, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
 
 describe('VehicleDialogComponent', () => {
   let component: VehicleDialogComponent;
   let fixture: ComponentFixture<VehicleDialogComponent>;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
   let vehicleService: VehicleService;
 
@@ -53,6 +55,7 @@ describe('VehicleDialogComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(VehicleDialogComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
     vehicleService = TestBed.inject(VehicleService);
 
@@ -372,6 +375,18 @@ describe('VehicleDialogComponent', () => {
     expect(vehicleService.createVehicle)
       .toHaveBeenCalledWith(testVehicle);
 
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(VEHICLE_CREATED);
+
+    await expectAsync(
+      snackBar.hasAction()
+    )
+      .toBeResolvedTo(false);
+
     expect(dialogRef.close)
       .toHaveBeenCalledWith(true);
 
@@ -459,6 +474,13 @@ describe('VehicleDialogComponent', () => {
         registrationNumber: updatedRegistrationNumber,
         description: updatedDescription
       });
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(VEHICLE_UPDATED);
 
     expect(dialogRef.close)
       .toHaveBeenCalledWith(true);
