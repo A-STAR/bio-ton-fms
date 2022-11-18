@@ -5,8 +5,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, firstValueFrom } from 'rxjs';
 
 import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
@@ -23,7 +24,8 @@ import { TableDataSource } from '../table.data-source';
     MatTableModule,
     MatSortModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSnackBarModule
   ],
   templateUrl: './vehicles.component.html',
   styleUrls: ['./vehicles.component.sass'],
@@ -152,6 +154,21 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Delete a vehicle in table.
+   *
+   * @param vehicleDataSource Vehicle data source.
+   */
+   async onDeleteVehicle({ id }: VehicleDataSource) {
+    const deleteVehicle$ = this.vehicleService.deleteVehicle(id);
+
+    await firstValueFrom(deleteVehicle$);
+
+    this.snackBar.open(VEHICLE_DELETED);
+
+    this.#updateVehicles();
+  }
+
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
   #subscription: Subscription | undefined;
 
@@ -226,7 +243,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     this.columnsKeys = this.columns.map(({ key }) => key);
   }
 
-  constructor(private dialog: MatDialog, private vehicleService: VehicleService) { }
+  constructor(private snackBar: MatSnackBar, private dialog: MatDialog, private vehicleService: VehicleService) { }
 
   ngOnInit() {
     this.#setVehiclesData();
@@ -315,6 +332,8 @@ export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
     value: 'Описание'
   }
 ];
+
+export const VEHICLE_DELETED = 'Машина удалена';
 
 const dialogConfig: MatDialogConfig<NewVehicle> = {
   width: '70vw',

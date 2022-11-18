@@ -15,6 +15,8 @@ import {
   VehiclesOptions
 } from './vehicle.service';
 
+import { testDataSource as testVehiclesDataSource } from './table.data-source.spec';
+
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
   let service: VehicleService;
@@ -233,6 +235,25 @@ describe('VehicleService', () => {
     }, 'update vehicle request');
 
     updateVehicleRequest.flush(null);
+  });
+
+  it('should delete vehicle', (done: DoneFn) => {
+    service
+      .deleteVehicle(testVehiclesDataSource[0].id)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const deleteVehicleRequest = httpTestingController.expectOne({
+      method: 'DELETE',
+      url: `/api/telematica/vehicle/${testNewVehicle.id}`
+    }, 'delete vehicle request');
+
+    deleteVehicleRequest.flush(null);
   });
 });
 

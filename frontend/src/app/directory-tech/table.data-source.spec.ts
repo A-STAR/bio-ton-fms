@@ -39,7 +39,7 @@ describe('TableDataSource', () => {
   });
 });
 
-const testDataSource: VehicleDataSource[] = [
+export const testDataSource: VehicleDataSource[] = [
   {
     id: 1,
     name: 'Марьевка',

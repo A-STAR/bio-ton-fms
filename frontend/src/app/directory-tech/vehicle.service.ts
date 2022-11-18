@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 
+import { VehicleDataSource } from './vehicles/vehicles.component';
+
 export const pageNum = 1;
 export const pageSize = 50;
 
@@ -89,6 +91,17 @@ export class VehicleService {
    */
   updateVehicle(vehicle: NewVehicle) {
     return this.httpClient.put(`/api/telematica/vehicle/${vehicle.id}`, vehicle);
+  }
+
+  /**
+   * Delete a vehicle.
+   *
+   * @param id An deleted vehicle ID.
+   *
+   * @returns An `Observable' of deleting vehicle.
+   */
+  deleteVehicle(id: VehicleDataSource['id']) {
+    return this.httpClient.delete(`/api/telematica/vehicle/${id}`);
   }
 
   constructor(private httpClient: HttpClient) { }
