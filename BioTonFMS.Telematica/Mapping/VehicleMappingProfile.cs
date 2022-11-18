@@ -24,21 +24,28 @@ namespace BioTonFMS.Telematica.Mapping
                     EnumExtension.GetKeyValuePair(src.VehicleSubType)))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src =>
                     EnumExtension.GetKeyValuePair(src.Type)))
-                .ForMember(dest => dest.VehicleGroup, opt => opt.MapFrom(src =>
-                    new KeyValuePair()
-                    {
-                        Key = src.VehicleGroup.Id.ToString(),
-                        Value = src.VehicleGroup.Name
-                    }))
                 .ForMember(dest => dest.FuelType, opt => opt.MapFrom(src =>
                     new KeyValuePair()
                     {
                         Key = src.FuelType.Id.ToString(),
                         Value = src.FuelType.Name
                     }))
+                .ForMember(dest => dest.VehicleGroup, opt => opt.Ignore())
                 .ForMember(dest => dest.Tracker, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {
+                    if (src.VehicleGroupId.HasValue)
+                    {
+                        dest.VehicleGroup = new KeyValuePair()
+                        {
+                            Key = src.VehicleGroupId.Value.ToString(),
+                            Value = src.VehicleGroup!.Name.ToString()
+                        };
+                    }
+                    else
+                    {
+                        dest.VehicleGroup = null;
+                    }
                     if (src.TrackerId.HasValue)
                     {
                         dest.Tracker = new KeyValuePair()

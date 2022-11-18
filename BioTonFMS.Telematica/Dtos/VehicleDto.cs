@@ -27,7 +27,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Группа машины (ключ-значение)
         /// </summary>
-        public KeyValuePair VehicleGroup { get; set; }
+        public KeyValuePair? VehicleGroup { get; set; }
 
         /// <summary>
         /// Бренд производителя машины

@@ -25,12 +25,12 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Id группы машин
         /// </summary>
-        public int VehicleGroupId { get; set; }
+        public int? VehicleGroupId { get; set; }
 
         /// <summary>
         /// Группа машин
         /// </summary>
-        public VehicleGroup VehicleGroup { get; set; } = null!;
+        public VehicleGroup? VehicleGroup { get; set; } = null!;
 
         /// <summary>
         /// Бренд производителя машины

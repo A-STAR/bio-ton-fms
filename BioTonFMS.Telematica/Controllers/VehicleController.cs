@@ -4,6 +4,7 @@ using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
+using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
@@ -29,7 +30,7 @@ public class VehicleController : ValidationControllerBase
     private readonly IVehicleRepository _vehicleRepo;
     private readonly ITrackerRepository _trackerRepo;
     private readonly IFuelTypeRepository _fuelTypeRepo;
-    
+    private readonly IVehicleGroupRepository _vehicleGroupRepo;
     private readonly IValidator<UpdateVehicleDto> _updateValidator;
     private readonly IValidator<VehiclesRequest> _vehiclesRequestValidator;
     private readonly IValidator<CreateVehicleDto> _createValidator;
@@ -43,6 +44,7 @@ public class VehicleController : ValidationControllerBase
         IVehicleRepository vehicleRepo,
         ITrackerRepository trackerRepo,
         IFuelTypeRepository fuelTypeRepo,
+        IVehicleGroupRepository vehicleGroupRepo,
         IValidator<CreateVehicleDto> createValidator,
         IValidator<UpdateVehicleDto> updateValidator,
         IValidator<VehiclesRequest> vehiclesRequestValidator)
@@ -52,6 +54,7 @@ public class VehicleController : ValidationControllerBase
         _vehiclesRequestValidator = vehiclesRequestValidator;
         _trackerRepo = trackerRepo;
         _fuelTypeRepo = fuelTypeRepo;
+        _vehicleGroupRepo = vehicleGroupRepo;
         _vehicleRepo = vehicleRepo;
         _mapper = mapper;
         _logger = logger;
@@ -119,7 +122,8 @@ public class VehicleController : ValidationControllerBase
     /// <param name="createVehicleDto">Модель создания машины</param>
     /// <response code="200">Новая машина успешно создана</response>
     [HttpPost("vehicle")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult AddVehicle(CreateVehicleDto createVehicleDto)
     {
         ValidationResult validationResult = _createValidator.Validate(createVehicleDto);
@@ -128,36 +132,34 @@ public class VehicleController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
-        if (createVehicleDto.TrackerId.HasValue)
-        {
-            var trackerId = createVehicleDto.TrackerId.Value;
-            var tracker = _trackerRepo[trackerId];
-
-            if (tracker is null)
-            {
-                return NotFound(
-                    new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
-            }
-        }
         if (_fuelTypeRepo[createVehicleDto.FuelTypeId] is null)
         {
             return NotFound(
                 new ServiceErrorResult($"Тип топлива с id = {createVehicleDto.FuelTypeId} не найден"));
         }
+        if (createVehicleDto.VehicleGroupId.HasValue && _vehicleGroupRepo[createVehicleDto.VehicleGroupId.Value] is null)
+        {
+            return NotFound(
+                new ServiceErrorResult($"Группа машин с id = {createVehicleDto.VehicleGroupId.Value} не найдена"));
+        }
+        if (createVehicleDto.TrackerId.HasValue && _trackerRepo[createVehicleDto.TrackerId.Value] is null)
+        {
+            return NotFound(
+                new ServiceErrorResult($"Трекер с id = {createVehicleDto.TrackerId.Value} не найден"));
+        }
 
         var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
-        
         try
         {
             _vehicleRepo.Put(newVehicle);
+            var vehicleDto = _mapper.Map<VehicleDto>(newVehicle);
+            return Ok(vehicleDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при добавлении машины {@newVehicle}", newVehicle);
             throw;
         }
-
-        return Ok();
     }
 
     /// <summary>
@@ -183,24 +185,22 @@ public class VehicleController : ValidationControllerBase
         {
             return NotFound(new ServiceErrorResult($"Машина с id = {id} не найдена"));
         }
-        
-        if (updateVehicleDto.TrackerId.HasValue)
-        {
-            var trackerId = updateVehicleDto.TrackerId.Value;
-            var tracker = _trackerRepo[trackerId];
-
-            if (tracker is null)
-            {
-                return NotFound(
-                    new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
-            }
-        }
         if (_fuelTypeRepo[updateVehicleDto.FuelTypeId] is null)
         {
             return NotFound(
                 new ServiceErrorResult($"Тип топлива с id = {updateVehicleDto.FuelTypeId} не найден"));
         }
-        
+        if (updateVehicleDto.VehicleGroupId.HasValue && _vehicleGroupRepo[updateVehicleDto.VehicleGroupId.Value] is null)
+        {
+            return NotFound(
+                new ServiceErrorResult($"Группа машин с id = {updateVehicleDto.VehicleGroupId.Value} не найдена"));
+        }
+        if (updateVehicleDto.TrackerId.HasValue && _trackerRepo[updateVehicleDto.TrackerId.Value] is null)
+        {
+            return NotFound(
+                new ServiceErrorResult($"Трекер с id = {updateVehicleDto.TrackerId.Value} не найден"));
+        }
+
         _mapper.Map(updateVehicleDto, vehicle);
         
         try
@@ -224,7 +224,7 @@ public class VehicleController : ValidationControllerBase
     /// <response code="404">Машина не найдена</response>
     [HttpDelete("vehicle/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult DeleteVehicle(int id)
     {
         var vehicle = _vehicleRepo[id];

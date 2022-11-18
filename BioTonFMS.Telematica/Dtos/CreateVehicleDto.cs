@@ -28,7 +28,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Id группы машин
         /// </summary>
-        public int VehicleGroupId { get; set; }
+        public int? VehicleGroupId { get; set; }
 
         /// <summary>
         /// Бренд производителя машины
