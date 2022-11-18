@@ -44,6 +44,24 @@ $mat-button-line-height: 30px !default
     font-weight: unset
     line-height: $mat-button-line-height
 
+.mat-icon-button
+
+  &.mat-accent,
+  &.mat-warn
+    color: unset
+
+  &:hover,
+  &:active
+
+    &.mat-accent
+      color: $light-green
+
+    &.mat-warn
+      color: $red
+
+  &.mat-accent[aria-pressed="false"]
+    color: $light-green
+
 mat-card-actions,
 mat-dialog-actions
   $mat-button-line-height: 40px

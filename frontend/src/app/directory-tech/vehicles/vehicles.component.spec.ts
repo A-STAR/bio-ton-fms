@@ -68,15 +68,15 @@ describe('VehiclesComponent', () => {
       .toHaveBeenCalled();
   });
 
-  it('should render add vehicle button', async () => {
-    const buttons = await loader.getAllHarnesses(MatButtonHarness.with({
+  it('should render create vehicle button', async () => {
+    const createVehicleButton = await loader.getHarnessOrNull(MatButtonHarness.with({
       selector: '[mat-stroked-button]',
       text: 'Добавить технику'
     }));
 
-    expect(buttons.length)
-      .withContext('render an add vehicle button')
-      .toBe(1);
+    expect(createVehicleButton)
+      .withContext('render a create vehicle button')
+      .toBeDefined();
   });
 
   it('should render vehicle table', async () => {
@@ -177,16 +177,33 @@ describe('VehiclesComponent', () => {
     const updateButtons = await parallel(() => cells.map(
       ({
         0: actionCell
-      }) => actionCell.getHarnessOrNull(MatButtonHarness)
+      }) => parallel(() => [
+        actionCell.getHarnessOrNull(MatButtonHarness.with({
+          selector: '[mat-icon-button]',
+          text: 'edit'
+        })),
+        actionCell.getHarnessOrNull(MatButtonHarness.with({
+          selector: '[mat-icon-button]',
+          text: 'delete'
+        }))
+      ])
     ));
 
-    updateButtons.forEach(updateButton => {
+    updateButtons.forEach(([updateButton, deleteButton]) => {
       expect(updateButton)
         .withContext('render update button')
         .toBeDefined();
 
+      expect(deleteButton)
+        .withContext('render delete button')
+        .toBeDefined();
+
       updateButton?.hasHarness(MatIconHarness.with({
         name: 'edit'
+      }));
+
+      deleteButton?.hasHarness(MatIconHarness.with({
+        name: 'delete'
       }));
     });
   });

@@ -1,3 +1,5 @@
+@use 'variables' as *
+
 \:host
   display: block
   padding-bottom: 30px
@@ -15,21 +17,27 @@ mat-table
   margin-right: 30px
 
 .mat-column-action
+  $icon-size: 18px
+  $button-size: 16px
+  $button-spacing-horizontal: 4px
+
   flex: unset
-  flex-basis: 55px
+  flex-basis: 2 * ($button-spacing-horizontal + $button-size + $icon-size) + $button-spacing-horizontal
+  padding-left: $button-spacing-horizontal
+  padding-right: $button-spacing-horizontal
 
   .mat-icon-button
-    $icon-size: 18px
-    $button-spacing: 16px
-
-    width: $button-spacing + $button-spacing
-    height: $button-spacing + $button-spacing
+    width: $button-size + $icon-size
+    height: $button-size + $icon-size
     line-height: unset
 
     .mat-icon.md-18
       width: $icon-size
       height: $icon-size
       line-height: unset
+
+    & + .mat-icon-button
+      margin-left: $button-spacing-horizontal
 
 .mat-column-name
   flex: 2
