@@ -5,21 +5,23 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 
 import { Vehicles, VehicleService } from '../vehicle.service';
 
-import { columns, VehicleColumn, VehiclesComponent } from './vehicles.component';
+import { columns, VehicleColumn, VehiclesComponent, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { testVehicles } from '../vehicle.service.spec';
+import { testDataSource as testVehiclesDataSource } from '../table.data-source.spec';
 
 describe('VehiclesComponent', () => {
   let component: VehiclesComponent;
@@ -27,6 +29,7 @@ describe('VehiclesComponent', () => {
   let overlayContainer: OverlayContainer;
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
+  let vehicleService: VehicleService;
 
   let vehiclesSpy: jasmine.Spy<() => Observable<Vehicles>>;
 
@@ -45,8 +48,7 @@ describe('VehiclesComponent', () => {
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
     overlayContainer = TestBed.inject(OverlayContainer);
-
-    const vehicleService = TestBed.inject(VehicleService);
+    vehicleService = TestBed.inject(VehicleService);
 
     component = fixture.componentInstance;
 
@@ -68,15 +70,15 @@ describe('VehiclesComponent', () => {
       .toHaveBeenCalled();
   });
 
-  it('should render add vehicle button', async () => {
-    const buttons = await loader.getAllHarnesses(MatButtonHarness.with({
+  it('should render create vehicle button', async () => {
+    const createVehicleButton = await loader.getHarnessOrNull(MatButtonHarness.with({
       selector: '[mat-stroked-button]',
       text: 'Добавить технику'
     }));
 
-    expect(buttons.length)
-      .withContext('render an add vehicle button')
-      .toBe(1);
+    expect(createVehicleButton)
+      .withContext('render a create vehicle button')
+      .toBeDefined();
   });
 
   it('should render vehicle table', async () => {
@@ -177,16 +179,33 @@ describe('VehiclesComponent', () => {
     const updateButtons = await parallel(() => cells.map(
       ({
         0: actionCell
-      }) => actionCell.getHarnessOrNull(MatButtonHarness)
+      }) => parallel(() => [
+        actionCell.getHarnessOrNull(MatButtonHarness.with({
+          selector: '[mat-icon-button]',
+          text: 'edit'
+        })),
+        actionCell.getHarnessOrNull(MatButtonHarness.with({
+          selector: '[mat-icon-button]',
+          text: 'delete'
+        }))
+      ])
     ));
 
-    updateButtons.forEach(updateButton => {
+    updateButtons.forEach(([updateButton, deleteButton]) => {
       expect(updateButton)
         .withContext('render update button')
         .toBeDefined();
 
+      expect(deleteButton)
+        .withContext('render delete button')
+        .toBeDefined();
+
       updateButton?.hasHarness(MatIconHarness.with({
         name: 'edit'
+      }));
+
+      deleteButton?.hasHarness(MatIconHarness.with({
+        name: 'delete'
       }));
     });
   });
@@ -390,5 +409,31 @@ describe('VehiclesComponent', () => {
       .and.returnValue(dialogRef);
 
     await updateVehicleButtons[0].click();
+  });
+
+  it('should delete vehicle', async () => {
+    const vehicleVehicleButton = await loader.getHarness(MatButtonHarness.with({
+      ancestor: '.mat-column-action',
+      selector: '[mat-icon-button]',
+      text: 'delete'
+    }));
+
+    spyOn(vehicleService, 'deleteVehicle')
+      .and.callFake(() => of({}));
+
+    await vehicleVehicleButton.click();
+
+    expect(vehicleService.deleteVehicle)
+      .toHaveBeenCalledWith(testVehiclesDataSource[0].id);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(VEHICLE_DELETED);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
   });
 });
