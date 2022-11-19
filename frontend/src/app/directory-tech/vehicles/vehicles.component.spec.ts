@@ -358,11 +358,14 @@ describe('VehiclesComponent', () => {
 
     const vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
-    expect(length)
+    expect(vehicleDialog)
       .withContext('render a vehicle dialog')
       .toBeDefined();
 
     await vehicleDialog?.close();
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
 
     overlayContainer.ngOnDestroy();
 
@@ -393,11 +396,14 @@ describe('VehiclesComponent', () => {
 
     await vehicleDialog?.close();
 
-    await updateVehicleButtons[1].click();
+    await updateVehicleButtons[0].click();
 
     vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
     await vehicleDialog?.close();
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
 
     overlayContainer.ngOnDestroy();
 
@@ -408,7 +414,7 @@ describe('VehiclesComponent', () => {
     spyOn(component['dialog'], 'open')
       .and.returnValue(dialogRef);
 
-    await updateVehicleButtons[0].click();
+    await updateVehicleButtons[1].click();
   });
 
   it('should delete vehicle', async () => {

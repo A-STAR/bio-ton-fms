@@ -89,7 +89,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
   /**
    * Create a new vehicle in table.
    */
-  onCreateVehicle() {
+  protected onCreateVehicle() {
     this.#subscription?.unsubscribe();
 
     const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | ''>(VehicleDialogComponent, dialogConfig);
@@ -109,7 +109,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
    *
    * @param vehicleDataSource Vehicle data source.
    */
-  onUpdateVehicle({
+  protected onUpdateVehicle({
     id,
     name,
     make,
@@ -159,7 +159,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
    *
    * @param vehicleDataSource Vehicle data source.
    */
-   async onDeleteVehicle({ id }: VehicleDataSource) {
+  protected async onDeleteVehicle({ id }: VehicleDataSource) {
     const deleteVehicle$ = this.vehicleService.deleteVehicle(id);
 
     await firstValueFrom(deleteVehicle$);

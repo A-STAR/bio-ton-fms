@@ -273,9 +273,6 @@ describe('VehicleDialogComponent', () => {
   });
 
   it('should submit invalid vehicle form', async () => {
-    spyOn(component, 'submitVehicleForm')
-      .and.callThrough();
-
     spyOn(vehicleService, 'createVehicle')
       .and.callThrough();
 
@@ -286,17 +283,11 @@ describe('VehicleDialogComponent', () => {
 
     await saveButton.click();
 
-    expect(component.submitVehicleForm)
-      .toHaveBeenCalled();
-
     expect(vehicleService.createVehicle)
       .not.toHaveBeenCalled();
   });
 
   it('should submit vehicle form', async () => {
-    spyOn(component, 'submitVehicleForm')
-      .and.callThrough();
-
     spyOn(vehicleService, 'createVehicle')
       .and.callThrough();
 
@@ -305,9 +296,6 @@ describe('VehicleDialogComponent', () => {
     }));
 
     await saveButton.click();
-
-    expect(component.submitVehicleForm)
-      .toHaveBeenCalled();
 
     expect(vehicleService.createVehicle)
       .not.toHaveBeenCalled();
@@ -340,9 +328,6 @@ describe('VehicleDialogComponent', () => {
     await makeInput.setValue(make);
     await modelInput.setValue(model);
 
-    spyOn(component, 'submitVehicleForm')
-      .and.callThrough();
-
     spyOn(vehicleService, 'createVehicle')
       .and.callFake(() => of({}));
 
@@ -351,9 +336,6 @@ describe('VehicleDialogComponent', () => {
     }));
 
     await saveButton.click();
-
-    expect(component.submitVehicleForm)
-      .toHaveBeenCalled();
 
     const testVehicle: NewVehicle = {
       id: undefined,
@@ -449,9 +431,6 @@ describe('VehicleDialogComponent', () => {
 
     await descriptionInput.setValue(updatedDescription);
 
-    spyOn(component, 'submitVehicleForm')
-      .and.callThrough();
-
     spyOn(vehicleService, 'updateVehicle')
       .and.callFake(() => of({}));
 
@@ -460,9 +439,6 @@ describe('VehicleDialogComponent', () => {
     }));
 
     await saveButton.click();
-
-    expect(component.submitVehicleForm)
-      .toHaveBeenCalled();
 
     expect(vehicleService.updateVehicle)
       .toHaveBeenCalledWith({
