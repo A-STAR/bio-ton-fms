@@ -33,7 +33,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   /**
    * Submit Vehicle form, checking validation state.
    */
-  async submitVehicleForm() {
+  protected async submitVehicleForm() {
     this.#subscription?.unsubscribe();
 
     const { invalid, value } = this.vehicleForm;
