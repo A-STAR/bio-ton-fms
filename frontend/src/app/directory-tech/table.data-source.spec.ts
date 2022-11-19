@@ -52,7 +52,7 @@ export const testDataSource: VehicleDataSource[] = [
       key: testFuels[1].id.toString(),
       value: testFuels[1].name
     },
-    registration: '1200 AM 63',
+    registration: '1200AM63',
     inventory: 'С293823729',
     serial: '202039293834',
     tracker: {
@@ -77,7 +77,7 @@ export const testDataSource: VehicleDataSource[] = [
       key: testFuels[0].id.toString(),
       value: testFuels[0].name
     },
-    registration: '1290 AM 63',
+    registration: '1290AM63',
     inventory: 'FF800110350',
     serial: '800110350305',
     description: 'Частное'

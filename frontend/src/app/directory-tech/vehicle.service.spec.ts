@@ -342,7 +342,7 @@ export const testNewVehicle: NewVehicle = {
   type: testVehicleTypeEnum[0].key.toString(),
   subType: testVehicleSubtypeEnum[2].key.toString(),
   fuelTypeId: Number(fuelId),
-  registrationNumber: '7777 TT 77',
+  registrationNumber: '7777TT77',
   inventoryNumber: 'TT77',
   serialNumber: 'TT7777',
   trackerId: 1,
@@ -363,7 +363,7 @@ export const testVehicles: Vehicles = {
         value: testFuels[1].name
       },
       manufacturingYear: 2022,
-      registrationNumber: '1200 AM 63',
+      registrationNumber: '1200AM63',
       inventoryNumber: 'С293823729',
       serialNumber: '202039293834',
       description: 'Марьевское',
@@ -388,7 +388,7 @@ export const testVehicles: Vehicles = {
         value: testFuels[0].name
       },
       manufacturingYear: 2019,
-      registrationNumber: '1290 AM 63',
+      registrationNumber: '1290AM63',
       inventoryNumber: 'FF800110350',
       serialNumber: '800110350305',
       description: 'Частное'
