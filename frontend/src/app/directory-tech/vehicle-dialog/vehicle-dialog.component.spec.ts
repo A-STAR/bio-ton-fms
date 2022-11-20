@@ -423,7 +423,7 @@ describe('VehicleDialogComponent', () => {
 
     await yearInput.setValue(year);
 
-    const updatedRegistrationNumber = '8888 TH 88';
+    const updatedRegistrationNumber = '8888TH88';
 
     await registrationInput.setValue(updatedRegistrationNumber);
 
