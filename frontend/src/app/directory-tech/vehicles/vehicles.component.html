@@ -49,7 +49,7 @@
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Fuel"></ng-container>
 
       <ng-container *ngSwitchCase="VehicleColumn.Registration">
-        <span *ngFor="let node of element[column.key]?.split(' ')">{{ node }}</span>
+        <span *ngFor="let node of element[column.key]?.match(REGISTRATION_NUMBER_PATTERN)">{{ node }}</span>
       </ng-container>
 
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Tracker"></ng-container>

@@ -32,6 +32,8 @@ import { TableDataSource } from '../table.data-source';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VehiclesComponent implements OnInit, OnDestroy {
+  REGISTRATION_NUMBER_PATTERN = REGISTRATION_NUMBER_PATTERN;
+
   protected vehiclesData$!: Observable<Vehicles>;
   protected vehiclesDataSource!: TableDataSource<VehicleDataSource>;
   protected columns = columns;
@@ -333,6 +335,7 @@ export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
   }
 ];
 
+const REGISTRATION_NUMBER_PATTERN = /[a-zA-Zа-яА-ЯёЁ]+|[0-9]+/g;
 export const VEHICLE_DELETED = 'Машина удалена';
 
 const dialogConfig: MatDialogConfig<NewVehicle> = {

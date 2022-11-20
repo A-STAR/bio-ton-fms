@@ -114,7 +114,10 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
         fuel: this.fb.nonNullable.control<number | undefined>(this.data?.fuelTypeId, Validators.required)
       }),
       registration: this.fb.group({
-        registration: this.fb.nonNullable.control<string | undefined>(this.data?.registrationNumber),
+        registration: this.fb.nonNullable.control<string | undefined>(
+          this.data?.registrationNumber,
+          Validators.pattern(REGISTRATION_NUMBER_PATTERN)
+        ),
         inventory: this.fb.nonNullable.control<string | undefined>(this.data?.inventoryNumber),
         serial: this.fb.nonNullable.control<string | undefined>(this.data?.serialNumber),
         tracker: this.fb.nonNullable.control<number | undefined>(this.data?.trackerId)
@@ -175,6 +178,7 @@ type VehicleForm = {
 }
 
 const YEAR_PATTERN = /\d{4}/;
+const REGISTRATION_NUMBER_PATTERN = /^[a-zA-Zа-яА-ЯёЁ0-9]+$/;
 
 export const VEHICLE_CREATED = 'Машина создана';
 export const VEHICLE_UPDATED = 'Машина обновлена';
