@@ -40,10 +40,16 @@ Build-backend:
   stage: build
   script:    
     - docker system prune -af
+    - docker build --target=test -t fms-backend-test:latest .
     - docker build -t fms-back:$DOCKER_TAG .   
     - docker image tag fms-back:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
     - docker image push git.bioton-fms.ru:5050/bioton/fms/backend:latest
+
+Test-backend:
+  stage: test
+  script:
+    - docker run --rm fms-backend-test
 
 Test-frontend:
   stage: test
