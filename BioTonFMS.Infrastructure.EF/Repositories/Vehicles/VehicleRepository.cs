@@ -9,6 +9,7 @@ using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
@@ -119,6 +120,29 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                  filter.PageNum, filter.PageSize);
         }
 
+        public void AddVehicle(Vehicle vehicle)
+        {
+            var vahicleWithTheSameName = QueryableProvider.Linq().Where(v => v.Name == vehicle.Name);
+            if (vahicleWithTheSameName.Any())
+            {
+                throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
+            }
+            this.Put(vehicle);
+        }
+
+        public void UpdateVehicle(Vehicle vehicle)
+        {
+            var vahicleWithTheSameName = QueryableProvider.Linq()
+                .Where(v => v.Name == vehicle.Name && v.Id != vehicle.Id);
+            if (vahicleWithTheSameName.Any())
+            {
+                throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
+            }
+            this.Update(vehicle);
+        }
+
+
+
         // TODO: сделать один метод для repository
         private static IQueryable<Vehicle> SetSortDirection<TKey>(
             VehiclesFilter filter,
@@ -153,5 +177,6 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             return vehiclePredicate;
         }
+
     }
 }

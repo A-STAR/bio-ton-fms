@@ -124,6 +124,7 @@ public class VehicleController : ValidationControllerBase
     [HttpPost("vehicle")]
     [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status409Conflict)]
     public IActionResult AddVehicle(CreateVehicleDto createVehicleDto)
     {
         ValidationResult validationResult = _createValidator.Validate(createVehicleDto);
@@ -151,9 +152,13 @@ public class VehicleController : ValidationControllerBase
         var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
         try
         {
-            _vehicleRepo.Put(newVehicle);
+            _vehicleRepo.AddVehicle(newVehicle);
             var vehicleDto = _mapper.Map<VehicleDto>(newVehicle);
             return Ok(vehicleDto);
+        }
+        catch (ArgumentException ex)
+        {
+            return Conflict(new ServiceErrorResult(ex.Message));
         }
         catch (Exception ex)
         {
@@ -172,6 +177,7 @@ public class VehicleController : ValidationControllerBase
     [HttpPut("vehicle/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status409Conflict)]
     public IActionResult UpdateVehicle(int id, UpdateVehicleDto updateVehicleDto)
     {
         ValidationResult validationResult = _updateValidator.Validate(updateVehicleDto);
@@ -205,7 +211,11 @@ public class VehicleController : ValidationControllerBase
         
         try
         {
-            _vehicleRepo.Update(vehicle);
+            _vehicleRepo.UpdateVehicle(vehicle);
+        }
+        catch (ArgumentException ex)
+        {
+            return Conflict(new ServiceErrorResult(ex.Message));
         }
         catch (Exception ex)
         {

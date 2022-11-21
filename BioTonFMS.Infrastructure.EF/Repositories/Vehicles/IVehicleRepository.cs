@@ -8,5 +8,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
     public interface IVehicleRepository : IRepository<Vehicle>
     {
         PagedResult<Vehicle> GetVehicles(VehiclesFilter filter);
+        public void AddVehicle(Vehicle vehicle);
+        public void UpdateVehicle(Vehicle vehicle);
     }
 }
