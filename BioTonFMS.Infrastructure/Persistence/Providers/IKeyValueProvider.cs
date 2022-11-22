@@ -35,10 +35,10 @@
         /// <param name="entity">
         /// Сущность, которую необходимо добавить.
         /// </param>
-        void Put(T entity);
+        void Add(T entity);
 
         /// <summary>
-        /// Добавляет сущность.
+        /// Обновляет сущность.
         /// </summary>
         /// <param name="entity">
         /// Сущность, которую необходимо обновить.

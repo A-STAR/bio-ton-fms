@@ -152,7 +152,7 @@ public class VehicleController : ValidationControllerBase
         var newVehicle = _mapper.Map<Vehicle>(createVehicleDto);
         try
         {
-            _vehicleRepo.AddVehicle(newVehicle);
+            _vehicleRepo.Add(newVehicle);
             var vehicleDto = _mapper.Map<VehicleDto>(newVehicle);
             return Ok(vehicleDto);
         }
@@ -211,7 +211,7 @@ public class VehicleController : ValidationControllerBase
         
         try
         {
-            _vehicleRepo.UpdateVehicle(vehicle);
+            _vehicleRepo.Update(vehicle);
         }
         catch (ArgumentException ex)
         {

@@ -29,7 +29,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             _logger = logger;
         }
 
-        public void AddTracker(Tracker tracker)
+        public override void Add(Tracker tracker)
         {
             var trackersWithTheSameExternalId = QueryableProvider.Linq().Where(t => t.ExternalId == tracker.ExternalId);
             if (trackersWithTheSameExternalId.Any())
@@ -38,7 +38,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             }
             try
             {
-                Put(tracker);
+                base.Add(tracker);
             }
             catch (Exception ex)
             {
@@ -47,7 +47,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             }
         }
 
-        public void UpdateTracker(Tracker tracker)
+        public override void Update(Tracker tracker)
         {
             var trackersWithTheSameExternalId = QueryableProvider.Linq()
                 .Where(t => t.ExternalId == tracker.ExternalId && t.Id != tracker.Id);
@@ -60,7 +60,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
             try
             {
-                Update(tracker);
+                base.Update(tracker);
             }
             catch (Exception ex)
             {
@@ -69,7 +69,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             }
         }
 
-        public void DeleteTracker(Tracker tracker)
+        public override void Remove(Tracker tracker)
         {
             var vehicle = _vehicleQueryableProvider
                 .Linq().Where(v => v.TrackerId == tracker.Id).FirstOrDefault();
@@ -83,7 +83,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
             try
             {
-                Remove(tracker);
+                base.Remove(tracker);
             }
             catch (Exception ex)
             {

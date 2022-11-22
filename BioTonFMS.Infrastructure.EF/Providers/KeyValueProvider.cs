@@ -52,7 +52,7 @@ namespace BioTonFMS.Infrastructure.EF.Providers
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException">Переданный аргумент имеет значение <see langword="null"/>.</exception>
-        public void Put(T entity)
+        public void Add(T entity)
         {
             if (entity == null)
             {

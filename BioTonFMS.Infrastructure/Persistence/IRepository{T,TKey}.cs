@@ -42,7 +42,7 @@ namespace BioTonFMS.Infrastructure.Persistence
         /// Добавляет сущность в репозиторий.
         /// </summary>
         /// <param name="entity">Сохраняемая сущность.</param>
-        void Put(T entity);
+        void Add(T entity);
 
         /// <summary>
         /// Обновляет сущность в репозитории.

@@ -51,7 +51,7 @@ namespace BioTonFMS.Infrastructure.Persistence
         }
 
         /// <inheritdoc />
-        public void Remove(T entity)
+        public virtual void Remove(T entity)
         {
             using (_unitOfWorkFactory.GetUnitOfWork())
             {
@@ -60,16 +60,16 @@ namespace BioTonFMS.Infrastructure.Persistence
         }
 
         /// <inheritdoc />
-        public void Put(T entity)
+        public virtual void Add(T entity)
         {
             using (_unitOfWorkFactory.GetUnitOfWork())
             {
-                _keyValueProvider.Put(entity);
+                _keyValueProvider.Add(entity);
             }
         }
 
         /// <inheritdoc />
-        public void Update(T entity)
+        public virtual void Update(T entity)
         {
             using (_unitOfWorkFactory.GetUnitOfWork())
             {

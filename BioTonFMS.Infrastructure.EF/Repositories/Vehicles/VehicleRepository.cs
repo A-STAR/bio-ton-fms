@@ -120,17 +120,17 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                  filter.PageNum, filter.PageSize);
         }
 
-        public void AddVehicle(Vehicle vehicle)
+        public override void Add(Vehicle vehicle)
         {
             var vahicleWithTheSameName = QueryableProvider.Linq().Where(v => v.Name == vehicle.Name);
             if (vahicleWithTheSameName.Any())
             {
                 throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
             }
-            this.Put(vehicle);
+            base.Add(vehicle);
         }
 
-        public void UpdateVehicle(Vehicle vehicle)
+        public override void Update(Vehicle vehicle)
         {
             var vahicleWithTheSameName = QueryableProvider.Linq()
                 .Where(v => v.Name == vehicle.Name && v.Id != vehicle.Id);
@@ -138,10 +138,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             {
                 throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
             }
-            this.Update(vehicle);
+            base.Update(vehicle);
         }
-
-
 
         // TODO: сделать один метод для repository
         private static IQueryable<Vehicle> SetSortDirection<TKey>(

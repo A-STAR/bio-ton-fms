@@ -123,7 +123,7 @@ public class TrackerController : ValidationControllerBase
         var newTracker = _mapper.Map<Tracker>(createTrackerDto);
         try
         {
-            _trackerRepo.AddTracker(newTracker);
+            _trackerRepo.Add(newTracker);
             var trackerDto = _mapper.Map<TrackerDto>(newTracker);
             return Ok(trackerDto);
         }
@@ -160,7 +160,7 @@ public class TrackerController : ValidationControllerBase
 
             try
             {
-                _trackerRepo.UpdateTracker(tracker);
+                _trackerRepo.Update(tracker);
             }
             catch (ArgumentException ex)
             {
@@ -192,7 +192,7 @@ public class TrackerController : ValidationControllerBase
         {
             try
             {
-                _trackerRepo.DeleteTracker(tracker);
+                _trackerRepo.Remove(tracker);
                 return Ok();
             }
             catch (ArgumentException ex)
