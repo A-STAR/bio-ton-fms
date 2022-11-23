@@ -40,7 +40,7 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Tелескопический погрузчик
         /// </summary>
-        [Description("Tелескопический погрузчик")]
+        [Description("Телескопический погрузчик")]
         Telehandler = 7,
         /// <summary>
         /// Трактор

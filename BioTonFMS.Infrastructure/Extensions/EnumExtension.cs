@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace BioTonFMS.Infrastructure.Extensions
 {
@@ -28,7 +30,7 @@ namespace BioTonFMS.Infrastructure.Extensions
         {
             var pairsList = new List<KeyValuePair>();
 
-            foreach (var key in (T[])Enum.GetValues(typeof(T)))
+            foreach (var key in ((T[])Enum.GetValues(typeof(T))).OrderBy(e => e))
             {
                 var pair = new KeyValuePair
                 {
@@ -38,7 +40,6 @@ namespace BioTonFMS.Infrastructure.Extensions
 
                 pairsList.Add(pair);
             }
-
             KeyValuePair[]? list = pairsList.OrderBy(p => p.Value).ToArray();
             return list;
         }
