@@ -35,6 +35,9 @@
             "style": "kebab-case"
           }
         ],
+        "keyword-spacing": [
+          "error"
+        ],
         "max-len": [
           "warn",
           {
