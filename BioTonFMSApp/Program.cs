@@ -4,7 +4,11 @@ using BioTonFMS.Security.Controllers;
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -49,6 +53,17 @@ await app.ApplyMigrationsAsync(builder.Configuration);
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Для приложения выставляем явные параметры локализации для каждого запроса
+// Мы работаем только с русским языком
+string locale = "ru-RU";
+RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions
+{
+    SupportedCultures = new List<CultureInfo> { new CultureInfo(locale) },
+    SupportedUICultures = new List<CultureInfo> { new CultureInfo(locale) },
+    DefaultRequestCulture = new RequestCulture(locale)
+};
+app.UseRequestLocalization(localizationOptions);
 
 app.MapControllers();
 
