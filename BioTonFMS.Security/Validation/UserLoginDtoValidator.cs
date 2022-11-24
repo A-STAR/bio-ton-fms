@@ -7,7 +7,7 @@ public class UserLoginDtoValidator : AbstractValidator<UserLoginDto>
 {
     public UserLoginDtoValidator()
     {
-        RuleFor(x => x.UserName).NotEmpty().Length(3, 16);
+        RuleFor(x => x.UserName).NotEmpty();
         RuleFor(x => x.Password).NotEmpty();
     }
 }
