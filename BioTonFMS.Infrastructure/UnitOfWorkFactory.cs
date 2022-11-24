@@ -1,5 +1,4 @@
-﻿
-using BioTonFMS.Infrastructure.Persistence.Providers;
+﻿using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BioTonFMS.Infrastructure
@@ -13,7 +12,7 @@ namespace BioTonFMS.Infrastructure
             _serviceProvider = serviceProvider;
         }
 
-        public IUnitOfWork GetUnitOfWork()
+        public virtual IUnitOfWork GetUnitOfWork()
         {
             return _serviceProvider.GetRequiredService<IUnitOfWork>();
         }
