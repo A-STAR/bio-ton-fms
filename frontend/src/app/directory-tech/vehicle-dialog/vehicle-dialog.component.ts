@@ -30,6 +30,15 @@ import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.servi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VehicleDialogComponent implements OnInit, OnDestroy {
+  protected vehicleData$!: Observable<{
+    groups: VehicleGroup[];
+    fuels: Fuel[];
+    type: KeyValue<string, string>[];
+    subtype: KeyValue<string, string>[];
+  }>;
+
+  protected vehicleForm!: FormGroup<VehicleForm>;
+
   /**
    * Submit Vehicle form, checking validation state.
    */
@@ -127,15 +136,6 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       })
     });
   }
-
-  protected vehicleData$!: Observable<{
-    groups: VehicleGroup[];
-    fuels: Fuel[];
-    type: KeyValue<string, string>[];
-    subtype: KeyValue<string, string>[];
-  }>;
-
-  protected vehicleForm!: FormGroup<VehicleForm>;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,

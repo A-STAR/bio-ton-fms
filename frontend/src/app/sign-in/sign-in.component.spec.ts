@@ -180,9 +180,6 @@ describe('SignInComponent', () => {
       title: 'Вход в личный кабинет'
     }));
 
-    spyOn(component, 'submitSignInForm')
-      .and.callThrough();
-
     spyOn(authService, 'signIn')
       .and.callThrough();
 
@@ -193,9 +190,6 @@ describe('SignInComponent', () => {
     }));
 
     await signInButton.click();
-
-    expect(component.submitSignInForm)
-      .toHaveBeenCalled();
 
     expect(authService.signIn)
       .not.toHaveBeenCalled();
@@ -221,9 +215,6 @@ describe('SignInComponent', () => {
     await usernameInput.setValue(testMalformedCredentials.username);
     await passwordInput.setValue(testMalformedCredentials.password);
 
-    spyOn(component, 'submitSignInForm')
-      .and.callThrough();
-
     spyOn(authService, 'signIn')
       .and.callThrough();
 
@@ -234,9 +225,6 @@ describe('SignInComponent', () => {
     }));
 
     await signInButton.click();
-
-    expect(component.submitSignInForm)
-      .toHaveBeenCalled();
 
     expect(authService.signIn)
       .toHaveBeenCalledWith(testMalformedCredentials);
@@ -286,9 +274,6 @@ describe('SignInComponent', () => {
     await usernameInput.setValue(testCredentials.username);
     await passwordInput.setValue(testCredentials.password);
 
-    spyOn(component, 'submitSignInForm')
-      .and.callThrough();
-
     spyOn(authService, 'signIn')
       .and.callThrough();
 
@@ -299,9 +284,6 @@ describe('SignInComponent', () => {
     }));
 
     await signInButton.click();
-
-    expect(component.submitSignInForm)
-      .toHaveBeenCalled();
 
     expect(authService.signIn)
       .toHaveBeenCalledWith(testCredentials);

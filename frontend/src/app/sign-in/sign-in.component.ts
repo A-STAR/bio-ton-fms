@@ -34,10 +34,25 @@ import { AuthService, Credentials } from '../auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SignInComponent implements OnInit, OnDestroy {
+  protected systemVersion$!: Observable<string>;
+  protected signInForm!: FormGroup<SignInForm>;
+  protected hidePassword = true;
+
+  /**
+   * Toggle password field visibility in Sign in form.
+   *
+   * @param event Click event going from a toggle password visibility button.
+   */
+  protected togglePasswordVisibility(event: MouseEvent) {
+    event.stopPropagation();
+
+    this.hidePassword = !this.hidePassword;
+  }
+
   /**
    * Submit Sign in form, checking validation state.
    */
-  async submitSignInForm() {
+  protected async submitSignInForm() {
     this.#subscription?.unsubscribe();
 
     const { invalid, value } = this.signInForm;
@@ -64,21 +79,6 @@ export class SignInComponent implements OnInit, OnDestroy {
           this.signInForm.setErrors(errors);
         }
       });
-  }
-
-  protected systemVersion$!: Observable<string>;
-  protected signInForm!: FormGroup<SignInForm>;
-  protected hidePassword = true;
-
-  /**
-   * Toggle password field visibility in Sign in form.
-   *
-   * @param event Click event going from a toggle password visibility button.
-   */
-  protected togglePasswordVisibility(event: MouseEvent) {
-    event.stopPropagation();
-
-    this.hidePassword = !this.hidePassword;
   }
 
   #subscription: Subscription | undefined;
