@@ -5,8 +5,6 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class SystemService {
-  constructor(private httpClient: HttpClient) { }
-
   /**
    * Get system version.
    *
@@ -15,4 +13,6 @@ export class SystemService {
   get getVersion$() {
     return this.httpClient.get<string>('/system/get-version');
   }
+
+  constructor(private httpClient: HttpClient) { }
 }

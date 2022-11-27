@@ -30,6 +30,15 @@ import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.servi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VehicleDialogComponent implements OnInit, OnDestroy {
+  protected vehicleData$!: Observable<{
+    groups: VehicleGroup[];
+    fuels: Fuel[];
+    type: KeyValue<string, string>[];
+    subtype: KeyValue<string, string>[];
+  }>;
+
+  protected vehicleForm!: FormGroup<VehicleForm>;
+
   /**
    * Submit Vehicle form, checking validation state.
    */
@@ -81,11 +90,13 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close(true);
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #subscription: Subscription | undefined;
 
   /**
    * Get groups, fuels, type, subtype. Set vehicle data.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #setVehicleData() {
     this.vehicleData$ = forkJoin([
       this.vehicleService.vehicleGroups$,
@@ -101,6 +112,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   /**
    * Initialize vehicle form.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
@@ -128,15 +140,6 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  protected vehicleData$!: Observable<{
-    groups: VehicleGroup[];
-    fuels: Fuel[];
-    type: KeyValue<string, string>[];
-    subtype: KeyValue<string, string>[];
-  }>;
-
-  protected vehicleForm!: FormGroup<VehicleForm>;
-
   constructor(
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
     private snackBar: MatSnackBar,
@@ -145,11 +148,13 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     private vehicleService: VehicleService
   ) { }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#setVehicleData();
     this.#initVehicleForm();
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnDestroy() {
     this.#subscription?.unsubscribe();
   }

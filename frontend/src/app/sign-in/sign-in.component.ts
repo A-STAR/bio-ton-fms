@@ -34,10 +34,25 @@ import { AuthService, Credentials } from '../auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SignInComponent implements OnInit, OnDestroy {
+  protected systemVersion$!: Observable<string>;
+  protected signInForm!: FormGroup<SignInForm>;
+  protected hidePassword = true;
+
+  /**
+   * Toggle password field visibility in Sign in form.
+   *
+   * @param event Click event going from a toggle password visibility button.
+   */
+  protected togglePasswordVisibility(event: MouseEvent) {
+    event.stopPropagation();
+
+    this.hidePassword = !this.hidePassword;
+  }
+
   /**
    * Submit Sign in form, checking validation state.
    */
-  async submitSignInForm() {
+  protected async submitSignInForm() {
     this.#subscription?.unsubscribe();
 
     const { invalid, value } = this.signInForm;
@@ -66,26 +81,13 @@ export class SignInComponent implements OnInit, OnDestroy {
       });
   }
 
-  protected systemVersion$!: Observable<string>;
-  protected signInForm!: FormGroup<SignInForm>;
-  protected hidePassword = true;
-
-  /**
-   * Toggle password field visibility in Sign in form.
-   *
-   * @param event Click event going from a toggle password visibility button.
-   */
-  protected togglePasswordVisibility(event: MouseEvent) {
-    event.stopPropagation();
-
-    this.hidePassword = !this.hidePassword;
-  }
-
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #subscription: Subscription | undefined;
 
   /**
    * Initialize Sign in form.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #initSignInForm() {
     this.signInForm = this.fb.group({
       username: this.fb.control<string | null>(null, [
@@ -99,12 +101,14 @@ export class SignInComponent implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder, private router: Router, private systemService: SystemService, private authService: AuthService) { }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.systemVersion$ = this.systemService.getVersion$;
 
     this.#initSignInForm();
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnDestroy() {
     this.#subscription?.unsubscribe();
   }

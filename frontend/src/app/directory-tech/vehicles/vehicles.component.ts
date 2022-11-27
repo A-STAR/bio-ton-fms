@@ -171,12 +171,15 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     this.#updateVehicles();
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #subscription: Subscription | undefined;
 
   /**
    * Emit vehicles update.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #updateVehicles() {
     this.#vehicles$.next(this.#vehicles$.value);
   }
@@ -188,6 +191,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
    *
    * @returns Mapped vehicles data source.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #mapVehiclesDataSource({ vehicles }: Vehicles) {
     return Object
       .freeze(vehicles)
@@ -216,6 +220,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
    *
    * @param vehicles Vehicles.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #setVehiclesDataSource(vehicles: Vehicles) {
     const vehiclesDataSource = this.#mapVehiclesDataSource(vehicles);
 
@@ -229,6 +234,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
   /**
    * Get and set vehicles data.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #setVehiclesData() {
     this.vehiclesData$ = this.#vehicles$.pipe(
       switchMap(vehiclesOptions => this.vehicleService.getVehicles(vehiclesOptions)),
@@ -241,17 +247,20 @@ export class VehiclesComponent implements OnInit, OnDestroy {
   /**
    * Set column keys.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #setColumnKeys() {
     this.columnsKeys = this.columns.map(({ key }) => key);
   }
 
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog, private vehicleService: VehicleService) { }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#setVehiclesData();
     this.#setColumnKeys();
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnDestroy() {
     this.#subscription?.unsubscribe();
   }

@@ -5,12 +5,6 @@ import { Observable, ReplaySubject } from 'rxjs';
 export class TableDataSource<T> extends DataSource<T> {
   #dataSource$ = new ReplaySubject<T[]>();
 
-  constructor(dataSource: T[]) {
-    super();
-
-    this.setDataSource(dataSource);
-  }
-
   connect(): Observable<T[]> {
     return this.#dataSource$.asObservable();
   }
@@ -19,5 +13,11 @@ export class TableDataSource<T> extends DataSource<T> {
 
   setDataSource(dataSource: T[]) {
     this.#dataSource$.next(dataSource);
+  }
+
+  constructor(dataSource: T[]) {
+    super();
+
+    this.setDataSource(dataSource);
   }
 }
