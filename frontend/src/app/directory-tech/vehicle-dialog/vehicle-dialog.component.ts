@@ -90,11 +90,13 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close(true);
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #subscription: Subscription | undefined;
 
   /**
    * Get groups, fuels, type, subtype. Set vehicle data.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #setVehicleData() {
     this.vehicleData$ = forkJoin([
       this.vehicleService.vehicleGroups$,
@@ -110,6 +112,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   /**
    * Initialize vehicle form.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
@@ -145,11 +148,13 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     private vehicleService: VehicleService
   ) { }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#setVehicleData();
     this.#initVehicleForm();
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnDestroy() {
     this.#subscription?.unsubscribe();
   }

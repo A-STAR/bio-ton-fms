@@ -71,6 +71,7 @@ export class AuthService {
       );
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #authenticated$ = new BehaviorSubject(false);
 
   /**
@@ -78,6 +79,7 @@ export class AuthService {
    *
    * @param authenticated An authenticated state.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #setAuthenticated(authenticated: boolean) {
     this.#authenticated$.next(authenticated);
   }

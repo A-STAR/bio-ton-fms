@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
 
   constructor(private authService: AuthService) { }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.authenticated$ = this.authService.authenticated$;
   }

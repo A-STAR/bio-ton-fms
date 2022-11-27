@@ -81,11 +81,13 @@ export class SignInComponent implements OnInit, OnDestroy {
       });
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #subscription: Subscription | undefined;
 
   /**
    * Initialize Sign in form.
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   #initSignInForm() {
     this.signInForm = this.fb.group({
       username: this.fb.control<string | null>(null, [
@@ -99,12 +101,14 @@ export class SignInComponent implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder, private router: Router, private systemService: SystemService, private authService: AuthService) { }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.systemVersion$ = this.systemService.getVersion$;
 
     this.#initSignInForm();
   }
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnDestroy() {
     this.#subscription?.unsubscribe();
   }
