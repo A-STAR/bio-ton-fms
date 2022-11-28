@@ -2,27 +2,27 @@
 {
     public class ServiceErrorResult
     {
+        private readonly List<string> _errors = new();
         /// <summary>
-        ///  Вложенный объект с сообщением об ошибке
+        /// Сообщения об ошибке
         /// </summary>
-        public ErrorWithMessage Error { get; set; }
+        public string[] Messages
+        {
+            get
+            {
+                return _errors.ToArray();
+            }
+        }
+
+        public ServiceErrorResult()
+        {
+        }
 
         public ServiceErrorResult(string message)
         {
-            Error = new ErrorWithMessage(message);
+            _errors.Add(message);
         }
 
-        public class ErrorWithMessage
-        {
-            /// <summary>
-            /// Сообщение об ошибке
-            /// </summary>
-            public string Message { get; set; } = "";
-
-            public ErrorWithMessage(string message)
-            {
-                Message = message;
-            }
-        }
+        public void AddError(string message) => _errors.Add(message);
     }
 }
