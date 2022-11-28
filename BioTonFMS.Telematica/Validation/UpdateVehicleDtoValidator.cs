@@ -11,7 +11,7 @@ namespace BioTonFMS.Telematica.Validation
             RuleFor(x => x.Make).NotEmpty().Length(1, 30);
             RuleFor(x => x.Model).NotEmpty().Length(1, 30);
             RuleFor(x => x.FuelTypeId).NotEmpty();
-            RuleFor(x => x.ManufacturingYear).GreaterThan(0).LessThan(DateTime.Now.Year + 1);
+            RuleFor(x => x.ManufacturingYear).GreaterThan(0).LessThan(DateTime.Now.Year + 1).WithMessage($"Год производства должен быть не больше {DateTime.Now.Year}");
             When(x => x.InventoryNumber != string.Empty, () => RuleFor(x => x.InventoryNumber).Length(1, 30));
             When(x => x.SerialNumber != string.Empty, () => RuleFor(x => x.SerialNumber).Length(1, 40));
             When(x => x.RegistrationNumber != string.Empty,
