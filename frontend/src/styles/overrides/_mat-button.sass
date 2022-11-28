@@ -9,6 +9,12 @@ $mat-button-line-height: 30px !default
   transition-duration: 200ms
   transition-timing-function: cubic-bezier(0.35, 0, 0.25, 1)
 
+.mat-button,
+.mat-stroked-button
+
+  &:hover:not(.mat-button-disabled) span.mat-button-focus-overlay
+    opacity: 0
+
 .mat-flat-button,
 .mat-stroked-button
   font-size: unset
@@ -39,9 +45,6 @@ $mat-button-line-height: 30px !default
     background-color: $green
     color: $white
     border-color: $green
-
-    span.mat-button-focus-overlay
-      opacity: 0
 
   @at-root button#{&}
     $mat-button-line-height: $mat-button-line-height - 2 * $mat-stroked-button-border-width
