@@ -4,9 +4,9 @@ using BioTonFMS.Telematica.Dtos;
 
 namespace BioTonFMS.Telematica.Mapping
 {
-    public class VehicleGroupProfile : Profile
+    public class VehicleGroupMappingProfile : Profile
     {
-        public VehicleGroupProfile()
+        public VehicleGroupMappingProfile()
         {
             CreateMap<VehicleGroup, VehicleGroupDto>();
         }
