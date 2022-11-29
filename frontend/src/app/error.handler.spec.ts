@@ -61,7 +61,7 @@ describe('ErrorHandler', () => {
       .toHaveBeenCalledWith(testRejectionError.rejection);
   });
 
-  it('should handle error response', () => {
+  it('should handle error response with multiple errors', () => {
     const testErrorResponse = new HttpErrorResponse({
       error: {
         message: 'Http failure response for https://bioton-fms.ru: 504 Gateway Timeout'
@@ -88,6 +88,40 @@ describe('ErrorHandler', () => {
     expect(snackBarSpy.open)
       .toHaveBeenCalledWith(
         testErrorResponse.error.messages.join(' '),
+        ERROR_ACTION,
+        snackBarConfig
+      );
+
+    expect(console.error)
+      .toHaveBeenCalledWith(testErrorResponse);
+  });
+
+  it('should handle error response', () => {
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        errors: {
+          manufacturingYear: ['Год производства должен быть меньше текущего', 'Год производства введён некорректно'],
+          trakerId: ['Трекер с ID 10 не найден']
+        },
+        message: 'Произошла ошибка валидации запроса'
+      },
+      status: 400,
+      statusText: 'Bad Request',
+      url: 'https://bioton-fms.ru/api/api/telematica/vehicle/1'
+    });
+
+    handler.handleError(testErrorResponse);
+
+    const [
+      [manufacturingYearMaxErrorMessage, manufacturingYearPatternErrorMessage],
+      [trakerIDErrorMessage]
+    ] = Object.values(testErrorResponse.error.errors as {
+      [key: string]: string[]
+    });
+
+    expect(snackBarSpy.open)
+      .toHaveBeenCalledWith(
+        `${manufacturingYearMaxErrorMessage} ${manufacturingYearPatternErrorMessage} ${trakerIDErrorMessage}`,
         ERROR_ACTION,
         snackBarConfig
       );
