@@ -35,12 +35,14 @@ Build-frontend:
       - frontend/dist/  
 
 Build-backend:
-  variables:
-    GIT_DEPTH: 100
   stage: build
   script:    
     - docker system prune -af
-    - docker build --target=test -t fms-backend-test:latest .
+    - mkdir dir
+    - cd dir
+    - git clone git@git.bioton-fms.ru:BioTon/fms.git .
+    - git checkout ${CI_COMMIT_BRANCH}
+    - docker build --target=test -t fms-backend-test:$DOCKER_TAG .
     - docker build -t fms-back:$DOCKER_TAG .   
     - docker image tag fms-back:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
@@ -116,10 +118,9 @@ Deploy-stage.bioton-fms.ru:
   stage: deploy
   extends: .node-job
   script:
-    - ssh user@stage.bioton-fms.ru \
-      && docker rm -f fms-backend || true \
-      "docker pull git.bioton-fms.ru:5050/bioton/fms/backend:latest \      
-      && docker run --name fms-backend -p 8080:80 -v /etc/fms/stage:/app/config -v /var/log/fms/stage:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:latest"
+    - ssh user@stage.bioton-fms.ru docker rm -f fms-backend || true
+    - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/backend:latest
+    - ssh user@stage.bioton-fms.ru docker run --name fms-backend -p 8080:80 -v /etc/fms/stage:/app/config -v /var/log/fms/stage:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:latest      
     - npm run build:stage
     - rsync -avu dist/bio-ton-field-management-system/ user@stage.bioton-fms.ru:/var/www/stage   
   rules:    
