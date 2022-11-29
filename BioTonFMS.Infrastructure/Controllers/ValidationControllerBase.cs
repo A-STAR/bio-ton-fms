@@ -10,12 +10,15 @@ namespace BioTonFMS.Infrastructure.Controllers
     {
         public IActionResult ReturnValidationErrors(ValidationResult result)
         {
-            var errorResult = new ServiceErrorResult();
-            foreach (var error in result.Errors)
-            {
-                errorResult.AddError(error.ErrorMessage);
-            }
-            return BadRequest(errorResult);
+            result.AddToModelState(ModelState);
+            return ValidationProblem(
+                new ValidationProblemDetails(ModelState)
+                {
+                    Status = (int)HttpStatusCode.BadRequest,
+                    Type = "/bad-request",
+                    Title = "Запрос не соответствует требованиям API",
+                    Detail = "Произошла ошибка валидации запроса"
+                });
         }
     }
 }
