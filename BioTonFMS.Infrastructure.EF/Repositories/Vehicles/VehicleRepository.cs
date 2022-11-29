@@ -31,7 +31,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                     .Fetch(v => v.FuelType)
                     .Fetch(v => v.Tracker)
                     .Linq()
-                    .Where(v => v.Id == key).SingleOrDefault();
+                    .SingleOrDefault(v => v.Id == key);
                 return vehicle;
             }
         }
