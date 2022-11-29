@@ -1,10 +1,26 @@
 @use 'variables' as *
 
+.mat-snack-bar-container,
+.mat-simple-snackbar-action
+  color: $light
+
 .mat-snack-bar-container
   background-color: $light-green
-  color: $light
   box-shadow: $box-shadow
+
+  &.error
+    background-color: $red
 
 .mat-simple-snack-bar-content
   flex: 1
   text-align: center
+
+.mat-simple-snackbar-action button
+  $button-size: 24px
+
+  width: $button-size
+  height: $button-size
+  max-height: unset
+  padding: unset
+  border-radius: 50%
+  line-height: $button-size

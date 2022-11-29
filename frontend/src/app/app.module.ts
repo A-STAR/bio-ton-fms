@@ -1,13 +1,14 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatSnackBarConfig, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
+import { MatSnackBarConfig, MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MatFormFieldDefaultOptions, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 import { AuthInterceptor } from './auth.interceptor';
 import { APIInterceptor } from './api.interceptor';
+import { ErrorHandler as ErrorHandlerClass } from './error.handler';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -35,6 +36,7 @@ const formFieldOptions: MatFormFieldDefaultOptions = {
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    MatSnackBarModule,
     AppRoutingModule,
     SidebarComponent
   ],
@@ -48,6 +50,10 @@ const formFieldOptions: MatFormFieldDefaultOptions = {
       provide: HTTP_INTERCEPTORS,
       useClass: APIInterceptor,
       multi: true
+    },
+    {
+      provide: ErrorHandler,
+      useClass: ErrorHandlerClass
     },
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
