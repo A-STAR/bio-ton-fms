@@ -8,11 +8,11 @@ namespace BioTonFMS.Infrastructure.EF.Models.Filters
         /// <summary>
         /// Номер страницы для постраничного вывода
         /// </summary>
-        public int PageNum { get; set; }
+        public int PageNum { get; set; } = 1;
 
         /// <summary>
         /// Размер страницы для постраничного вывода
         /// </summary>
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } = 10;
     }
 }
