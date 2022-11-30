@@ -1,6 +1,6 @@
-﻿using BioTonFMS.Domain;
+﻿using System.Linq.Expressions;
+using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models;
-using BioTonFMS.Infrastructure.EF.Providers;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.Paging;
@@ -9,8 +9,6 @@ using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 {
@@ -61,7 +59,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             if (filter.GroupId.HasValue)
             {
                 Expression<Func<Vehicle, bool>>? groupPredicate =
-                    vehicle => vehicle.VehicleGroup.Id == filter.GroupId;
+                    vehicle => vehicle.VehicleGroupId == filter.GroupId;
 
                 vehiclePredicate = SetPredicate(vehiclePredicate, groupPredicate);
             }
@@ -77,7 +75,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             if (filter.FuelTypeId.HasValue)
             {
                 Expression<Func<Vehicle, bool>>? fuelTypePredicate =
-                    vehicle => vehicle.FuelType.Id == filter.FuelTypeId;
+                    vehicle => vehicle.FuelTypeId == filter.FuelTypeId;
 
                 vehiclePredicate = SetPredicate(vehiclePredicate, fuelTypePredicate);
             }
@@ -122,8 +120,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
         public override void Add(Vehicle vehicle)
         {
-            var vahicleWithTheSameName = QueryableProvider.Linq().Where(v => v.Name == vehicle.Name);
-            if (vahicleWithTheSameName.Any())
+            var vehicleWithTheSameName = QueryableProvider.Linq().Where(v => v.Name == vehicle.Name);
+            if (vehicleWithTheSameName.Any())
             {
                 throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
             }
@@ -132,9 +130,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
         public override void Update(Vehicle vehicle)
         {
-            var vahicleWithTheSameName = QueryableProvider.Linq()
+            var vehicleWithTheSameName = QueryableProvider.Linq()
                 .Where(v => v.Name == vehicle.Name && v.Id != vehicle.Id);
-            if (vahicleWithTheSameName.Any())
+            if (vehicleWithTheSameName.Any())
             {
                 throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
             }
