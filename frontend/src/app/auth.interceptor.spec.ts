@@ -34,6 +34,8 @@ describe('AuthInterceptor', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
 
     tokenService = TestBed.inject(TokenService);
+
+    tokenService.clear();
   });
 
   afterEach(() => {
