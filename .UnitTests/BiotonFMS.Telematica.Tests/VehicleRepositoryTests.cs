@@ -1,17 +1,25 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure;
+using BioTonFMS.Infrastructure.EF.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using FluentAssertions;
-using BioTonFMS.Infrastructure.EF.Models;
+using Xunit.Abstractions;
 
 namespace BiotonFMS.Telematica.Tests
 {
     public class VehicleRepositoryTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public VehicleRepositoryTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         #region Filters
 
         public static IEnumerable<object[]> Data =>
@@ -19,60 +27,106 @@ namespace BiotonFMS.Telematica.Tests
             {
                 new object[]
                 {
+                    "Name filter",
                     new VehiclesFilter { Name = "Красная машина" },
                     SampleVehicles.Where(x => x.Name == "Красная машина").ToList()
                 },
                 new object[]
                 {
+                    "Type filter",
                     new VehiclesFilter { Type = VehicleTypeEnum.Transport },
                     SampleVehicles.Where(x => x.Type == VehicleTypeEnum.Transport).ToList()
                 },
                 new object[]
                 {
+                    "Group filter",
                     new VehiclesFilter { GroupId = 1 },
                     SampleVehicles.Where(x => (x.VehicleGroupId ?? 0) == 1).ToList()
                 },
                 new object[]
                 {
+                    "Subtype filter",
                     new VehiclesFilter { SubType = VehicleSubTypeEnum.Car },
                     SampleVehicles.Where(x => x.VehicleSubType == VehicleSubTypeEnum.Car).ToList()
                 },
                 new object[]
                 {
+                    "Name asc sort",
                     new VehiclesFilter { SortBy = VehicleSortBy.Name, SortDirection = SortDirection.Ascending },
                     SampleVehicles.OrderBy(x => x.Name).ToList(),
                     true
                 },
                 new object[]
                 {
-                    new VehiclesFilter { SortBy = VehicleSortBy.Group },
+                    "Group asc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.Group, SortDirection = SortDirection.Ascending },
                     SampleVehicles.OrderBy(x => x.VehicleGroup?.Name).ToList(),
                     true
                 },
                 new object[]
                 {
+                    "Type asc sort",
                     new VehiclesFilter { SortBy = VehicleSortBy.Type, SortDirection = SortDirection.Ascending },
                     SampleVehicles.OrderBy(x => x.Type).ToList(),
                     true
                 },
                 new object[]
                 {
-                    new VehiclesFilter { SortBy = VehicleSortBy.FuelType },
+                    "Fuel type asc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.FuelType, SortDirection = SortDirection.Ascending },
                     SampleVehicles.OrderBy(x => x.FuelType.Name).ToList(),
                     true
                 },
                 new object[]
                 {
-                    new VehiclesFilter { SortBy = VehicleSortBy.SubType },
+                    "Subtype asc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.SubType, SortDirection = SortDirection.Ascending },
                     SampleVehicles.OrderBy(x => x.VehicleSubType).ToList(),
+                    true
+                },
+                new object[]
+                {
+                    "Name desc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.Name, SortDirection = SortDirection.Descending },
+                    SampleVehicles.OrderByDescending(x => x.Name).ToList(),
+                    true
+                },
+                new object[]
+                {
+                    "Group desc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.Group, SortDirection = SortDirection.Descending },
+                    SampleVehicles.OrderByDescending(x => x.VehicleGroup?.Name).ToList(),
+                    true
+                },
+                new object[]
+                {
+                    "Type desc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.Type, SortDirection = SortDirection.Descending },
+                    SampleVehicles.OrderByDescending(x => x.Type).ToList(),
+                    true
+                },
+                new object[]
+                {
+                    "Fuel type desc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.FuelType, SortDirection = SortDirection.Descending },
+                    SampleVehicles.OrderByDescending(x => x.FuelType.Name).ToList(),
+                    true
+                },
+                new object[]
+                {
+                    "Subtype desc sort",
+                    new VehiclesFilter { SortBy = VehicleSortBy.SubType, SortDirection = SortDirection.Descending },
+                    SampleVehicles.OrderByDescending(x => x.VehicleSubType).ToList(),
                     true
                 }
             };
 
         [Theory, MemberData(nameof(Data))]
-        public void GetVehicles_WithFilters_ShouldFilter(VehiclesFilter filter,
+        public void GetVehicles_WithFilters_ShouldFilter(string testName, VehiclesFilter filter,
             List<Vehicle> expected, bool considerOrder = false)
         {
+            _testOutputHelper.WriteLine(testName);
+            
             var results = CreateVehicleRepository(SampleVehicles).GetVehicles(filter).Results;
 
             Assert.Equal(results.Count, expected.Count);
