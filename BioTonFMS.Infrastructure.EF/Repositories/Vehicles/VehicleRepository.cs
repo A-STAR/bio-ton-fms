@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Numerics;
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
@@ -103,7 +104,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.Type);
                         break;
                     case VehicleSortBy.Group:
-                        vehicles = SetSortDirection(filter, vehicles, v => v.VehicleGroup.Name);
+                        vehicles = SetSortDirection(filter, vehicles, v => GroupName(v.VehicleGroup));
                         break;
                     case VehicleSortBy.SubType:
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.VehicleSubType);
@@ -116,6 +117,20 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             return vehicles.AsNoTracking().GetPagedQueryable(
                  filter.PageNum, filter.PageSize);
+        }
+
+        private string GroupName(VehicleGroup? vehicleGroup)
+        {
+            if (vehicleGroup is null)
+            {
+                return "";
+            }
+            return vehicleGroup.Name;
+        }
+
+        private bool IsNull(VehicleGroup? vehicleGroup)
+        {
+            return vehicleGroup is null;
         }
 
         public override void Add(Vehicle vehicle)
