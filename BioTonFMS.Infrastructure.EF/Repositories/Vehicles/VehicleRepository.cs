@@ -104,7 +104,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.Type);
                         break;
                     case VehicleSortBy.Group:
-                        vehicles = SetSortDirection(filter, vehicles, v => GroupName(v.VehicleGroup));
+                        vehicles = SetSortDirection(filter, vehicles.ToList().AsQueryable(), v => GroupName(v.VehicleGroup));
                         break;
                     case VehicleSortBy.SubType:
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.VehicleSubType);
