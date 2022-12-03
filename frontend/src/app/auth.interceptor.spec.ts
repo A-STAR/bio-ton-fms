@@ -54,7 +54,7 @@ describe('AuthInterceptor', () => {
     const httpClient = TestBed.inject(HttpClient);
     const httpTestingController = TestBed.inject(HttpTestingController);
 
-    const testRequestURL = `/`;
+    const testRequestURL = '/';
 
     httpClient
       .get(testRequestURL)
@@ -75,7 +75,7 @@ describe('AuthInterceptor', () => {
     spyOnProperty(tokenService, 'token')
       .and.returnValue(testCredentialsResponse.accessToken);
 
-    const testRequestURL = `/`;
+    const testRequestURL = '/';
 
     httpClient
       .get(testRequestURL)
@@ -104,7 +104,7 @@ describe('AuthInterceptor', () => {
     spyOnProperty(tokenService, 'token')
       .and.returnValue(testCredentialsResponse.accessToken);
 
-    const testRequestURL = `/`;
+    const testRequestURL = '/';
 
     const testErrorResponse = {
       message: 'Unauthorized'
