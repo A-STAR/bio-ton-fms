@@ -98,6 +98,13 @@
             "code": 140
           }
         ],
+        "quotes": [
+          "error",
+          "single",
+          {
+            "allowTemplateLiterals": true
+          }
+        ],
         "semi": [
           "error",
           "always"
