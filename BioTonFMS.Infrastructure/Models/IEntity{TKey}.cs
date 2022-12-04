@@ -11,7 +11,7 @@
     /// has the same Identity. Whichever way you choose to represent it, an Entity is  defined by having an Identity.
     /// Remove Setters only, and make Getters representative of the  outside “shape” of the Entity. Entities can hold
     /// references to any <see cref="IAggregateRoot"/> , but never to any other Entity or 
-    /// <see cref="IValueObject"/> within the Aggregate.
+    /// IValueObject within the Aggregate.
     /// </remarks>
     public interface IEntity<out TKey>
     {

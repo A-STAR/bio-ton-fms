@@ -104,7 +104,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.Type);
                         break;
                     case VehicleSortBy.Group:
-                        vehicles = SetSortDirection(filter, vehicles.ToList().AsQueryable(), v => GroupName(v.VehicleGroup));
+                        vehicles = SetSortDirection(filter, vehicles, v => !v.VehicleGroupId.HasValue ? "" : v.VehicleGroup!.Name);
                         break;
                     case VehicleSortBy.SubType:
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.VehicleSubType);
@@ -117,20 +117,6 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             return vehicles.AsNoTracking().GetPagedQueryable(
                  filter.PageNum, filter.PageSize);
-        }
-
-        private string GroupName(VehicleGroup? vehicleGroup)
-        {
-            if (vehicleGroup is null)
-            {
-                return "";
-            }
-            return vehicleGroup.Name;
-        }
-
-        private bool IsNull(VehicleGroup? vehicleGroup)
-        {
-            return vehicleGroup is null;
         }
 
         public override void Add(Vehicle vehicle)

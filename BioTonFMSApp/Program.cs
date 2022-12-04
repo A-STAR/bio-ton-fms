@@ -6,6 +6,7 @@ using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using System.Globalization;
 using System.Text;
@@ -28,7 +29,8 @@ builder.Services.AddDbContext<BioTonDBContext>(
         options => options
                     .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
                         x => x.MigrationsAssembly("BioTonFMS.Migrations"))
-                    .UseSnakeCaseNamingConvention());
+                    .UseSnakeCaseNamingConvention()
+                    .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
 builder.AddMappingProfiles();
 builder.RegisterInfrastructureComponents();
