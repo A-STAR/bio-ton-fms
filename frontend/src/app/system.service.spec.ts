@@ -23,7 +23,7 @@ describe('SystemService', () => {
 
     const testVersion = '1.0.0';
 
-    service.getVersion$.subscribe(version => {
+    service.version$.subscribe(version => {
       expect(version)
         .withContext('emit version')
         .toBe(testVersion);

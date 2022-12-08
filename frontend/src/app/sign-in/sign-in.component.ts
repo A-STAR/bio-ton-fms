@@ -103,7 +103,7 @@ export class SignInComponent implements OnInit, OnDestroy {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
-    this.systemVersion$ = this.systemService.getVersion$;
+    this.systemVersion$ = this.systemService.version$;
 
     this.#initSignInForm();
   }
