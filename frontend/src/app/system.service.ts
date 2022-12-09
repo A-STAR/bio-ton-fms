@@ -10,7 +10,7 @@ export class SystemService {
    *
    * @returns An `Observable' of system version stream.
    */
-  get getVersion$() {
+  get version$() {
     return this.httpClient.get<string>('/system/get-version');
   }
 
