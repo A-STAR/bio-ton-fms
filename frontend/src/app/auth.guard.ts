@@ -14,6 +14,7 @@ export class AuthGuard implements CanActivate, CanLoad {
 
     return this.#canActivate(url);
   }
+
   canLoad(route: Route, segments: UrlSegment[]): Observable<boolean> {
     const { path } = route;
 
