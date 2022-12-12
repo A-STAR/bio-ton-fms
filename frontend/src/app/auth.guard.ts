@@ -9,13 +9,13 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate, CanLoad {
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+  canActivate(_: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     const { url } = state;
 
     return this.#canActivate(url);
   }
 
-  canLoad(route: Route, segments: UrlSegment[]): Observable<boolean> {
+  canLoad(route: Route, _: UrlSegment[]): Observable<boolean> {
     const { path } = route;
 
     return this.#canActivate(path);
@@ -48,5 +48,5 @@ export class AuthGuard implements CanActivate, CanLoad {
     );
   }
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) { }
 }
