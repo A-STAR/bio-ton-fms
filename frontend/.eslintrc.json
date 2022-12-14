@@ -120,6 +120,10 @@
         ],
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
+        "padded-blocks": [
+          "error",
+          "never"
+        ],
         "quotes": [
           "error",
           "single",
