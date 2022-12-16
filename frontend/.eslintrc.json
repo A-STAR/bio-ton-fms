@@ -89,6 +89,10 @@
             ]
           }
         ],
+        "func-call-spacing": [
+          "error",
+          "never"
+        ],
         "indent": [
           "error",
           2,
