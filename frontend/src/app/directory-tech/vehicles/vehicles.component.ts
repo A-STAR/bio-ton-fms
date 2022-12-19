@@ -5,7 +5,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, firstValueFrom } from 'rxjs';
 
@@ -24,8 +24,7 @@ import { TableDataSource } from '../table.data-source';
     MatTableModule,
     MatSortModule,
     MatIconModule,
-    MatDialogModule,
-    MatSnackBarModule
+    MatDialogModule
   ],
   templateUrl: './vehicles.component.html',
   styleUrls: ['./vehicles.component.sass'],
