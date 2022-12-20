@@ -30,7 +30,7 @@ import { TableDataSource } from '../table.data-source';
   styleUrls: ['./vehicles.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class VehiclesComponent implements OnInit, OnDestroy {
+export default class VehiclesComponent implements OnInit, OnDestroy {
   REGISTRATION_NUMBER_PATTERN = REGISTRATION_NUMBER_PATTERN;
 
   protected vehiclesData$!: Observable<Vehicles>;

@@ -14,7 +14,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { AuthService } from '../auth.service';
 
-import { SignInComponent } from './sign-in.component';
+import SignInComponent from './sign-in.component';
 
 import { testCredentials, testCredentialsResponse } from '../auth.service.spec';
 

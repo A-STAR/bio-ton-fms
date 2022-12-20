@@ -18,7 +18,7 @@ import { Observable, of } from 'rxjs';
 
 import { Vehicles, VehicleService } from '../vehicle.service';
 
-import { columns, VehicleColumn, VehiclesComponent, VEHICLE_DELETED } from './vehicles.component';
+import VehiclesComponent, { columns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { testVehicles } from '../vehicle.service.spec';
