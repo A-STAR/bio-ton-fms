@@ -33,7 +33,7 @@ import { AuthService, Credentials } from '../auth.service';
   styleUrls: ['./sign-in.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SignInComponent implements OnInit, OnDestroy {
+export default class SignInComponent implements OnInit, OnDestroy {
   protected systemVersion$!: Observable<string>;
   protected signInForm!: FormGroup<SignInForm>;
   protected hidePassword = true;

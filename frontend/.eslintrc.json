@@ -63,10 +63,8 @@
               "protected-abstract-set",
               "private-static-get",
               "private-instance-get",
-              "private-abstract-get",
               "private-static-set",
               "private-instance-set",
-              "private-abstract-set",
               "public-static-field",
               "public-instance-field",
               "public-abstract-field",
@@ -81,10 +79,8 @@
               "protected-abstract-method",
               "private-static-field",
               "private-instance-field",
-              "private-abstract-field",
               "private-static-method",
               "private-instance-method",
-              "private-abstract-method",
               "constructor"
             ]
           }

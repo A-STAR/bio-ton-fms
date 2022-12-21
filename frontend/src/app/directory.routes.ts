@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-export const directory: Routes = [
+const routes: Routes = [
   {
     path: '',
     redirectTo: 'tech',
@@ -9,6 +9,7 @@ export const directory: Routes = [
   {
     path: 'tech',
     loadChildren: () => import('./directory-tech/directory-tech.routes')
-      .then(({ directoryTech }) => directoryTech)
   }
 ];
+
+export default routes;

@@ -1,12 +1,65 @@
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ErrorHandler, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, bootstrapApplication } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+import { MatSnackBarConfig, MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
+import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { MatFormFieldDefaultOptions, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
-import { AppModule } from './app/app.module';
-import { environment } from './environments/environment';
+import { ErrorHandler as ErrorHandlerClass } from './app/error.handler';
+import { AuthInterceptor } from './app/auth.interceptor';
+import { APIInterceptor } from './app/api.interceptor';
 
-if (environment.production) {
-  enableProdMode();
-}
+import { AppComponent } from './app/app.component';
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+import { routes } from './app/app.routes';
+
+const snackBarOptions: MatSnackBarConfig = {
+  duration: 4000
+};
+
+const dialogOptions: MatDialogConfig = {
+  autoFocus: 'dialog',
+  restoreFocus: false
+};
+
+const formFieldOptions: MatFormFieldDefaultOptions = {
+  appearance: 'outline',
+  floatLabel: 'always'
+};
+
+const appConfig: ApplicationConfig = {
+  providers: [
+    importProvidersFrom(BrowserAnimationsModule, HttpClientModule, MatSnackBarModule),
+    {
+      provide: ErrorHandler,
+      useClass: ErrorHandlerClass
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: APIInterceptor,
+      multi: true
+    },
+    provideRouter(routes),
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: snackBarOptions
+    },
+    {
+      provide: MAT_DIALOG_DEFAULT_OPTIONS,
+      useValue: dialogOptions
+    },
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: formFieldOptions
+    }
+  ]
+};
+
+bootstrapApplication(AppComponent, appConfig);

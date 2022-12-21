@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-export const directoryTech: Routes = [
+const routes: Routes = [
   {
     path: '',
     redirectTo: 'vehicles',
@@ -9,6 +9,7 @@ export const directoryTech: Routes = [
   {
     path: 'vehicles',
     loadComponent: () => import('./vehicles/vehicles.component')
-      .then(({ VehiclesComponent }) => VehiclesComponent)
   }
 ];
+
+export default routes;

@@ -5,6 +5,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
@@ -17,7 +18,7 @@ import { Observable, of } from 'rxjs';
 
 import { Vehicles, VehicleService } from '../vehicle.service';
 
-import { columns, VehicleColumn, VehiclesComponent, VEHICLE_DELETED } from './vehicles.component';
+import VehiclesComponent, { columns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { testVehicles } from '../vehicle.service.spec';
@@ -39,6 +40,7 @@ describe('VehiclesComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatSnackBarModule,
           VehiclesComponent
         ]
       })

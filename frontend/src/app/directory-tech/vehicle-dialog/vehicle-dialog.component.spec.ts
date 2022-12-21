@@ -5,6 +5,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
@@ -39,6 +40,7 @@ describe('VehicleDialogComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatSnackBarModule,
           VehicleDialogComponent
         ],
         providers: [

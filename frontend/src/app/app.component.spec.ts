@@ -5,8 +5,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { firstValueFrom } from 'rxjs';
 
-import { SidebarComponent } from './sidebar/sidebar.component';
-
 import { AuthService } from './auth.service';
 
 import { AppComponent } from './app.component';
@@ -23,11 +21,10 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed
       .configureTestingModule({
-        declarations: [AppComponent],
         imports: [
           HttpClientTestingModule,
           RouterTestingModule,
-          SidebarComponent
+          AppComponent
         ]
       })
       .compileComponents();
