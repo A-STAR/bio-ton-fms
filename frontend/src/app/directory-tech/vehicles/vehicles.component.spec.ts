@@ -5,14 +5,14 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogRef } from '@angular/material/dialog';
-import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
+import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
+import { MatLegacyButtonHarness as MatButtonHarness } from '@angular/material/legacy-button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
-import { MatTableHarness } from '@angular/material/table/testing';
+import { MatLegacyTableHarness as MatTableHarness } from '@angular/material/legacy-table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
-import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
+import { MatLegacyDialogHarness as MatDialogHarness } from '@angular/material/legacy-dialog/testing';
+import { MatLegacySnackBarHarness as MatSnackBarHarness } from '@angular/material/legacy-snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 

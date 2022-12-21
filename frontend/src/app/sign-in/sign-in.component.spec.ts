@@ -7,10 +7,10 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatCardHarness } from '@angular/material/card/testing';
+import { MatLegacyCardHarness as MatCardHarness } from '@angular/material/legacy-card/testing';
 import { MatDividerHarness } from '@angular/material/divider/testing';
-import { MatInputHarness } from '@angular/material/input/testing';
-import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatLegacyInputHarness as MatInputHarness } from '@angular/material/legacy-input/testing';
+import { MatLegacyButtonHarness as MatButtonHarness } from '@angular/material/legacy-button/testing';
 
 import { AuthService } from '../auth.service';
 

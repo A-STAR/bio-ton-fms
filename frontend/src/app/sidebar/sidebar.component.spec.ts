@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatNavListHarness } from '@angular/material/list/testing';
+import { MatLegacyNavListHarness as MatNavListHarness } from '@angular/material/legacy-list/testing';
 
 import { AuthService } from '../auth.service';
 
