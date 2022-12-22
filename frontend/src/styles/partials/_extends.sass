@@ -1,7 +1,7 @@
 @use 'sass:map'
 @use 'variables' as *
 
-.authentication
+%authentication
   display: flex
   justify-content: center
   align-items: flex-start
@@ -9,70 +9,80 @@
   padding-bottom: 40px
 
   mat-card
-    $mat-card-padding: 60px
-
     width: 520px
     min-height: 480px
-    padding: 10px $mat-card-padding $mat-card-padding
 
-    mat-card-title-group
-      align-items: center
-      height: 69px
+  mat-card-title-group
+    align-items: center
+    height: 69px + $mat-card-padding
 
-      mat-card-title,
-      .logo
-        position: relative
+  $mat-card-padding: 60px
 
-      mat-card-title
-        top: 4px
-        margin-bottom: unset
+  mat-card-title-group,
+  mat-card-content,
+  mat-card-actions
+    padding-left: $mat-card-padding
+    padding-right: $mat-card-padding
 
-      .logo
-        top: 2px
-        align-self: flex-start
+  mat-card-title,
+  .logo
+    position: relative
 
-        a
-        .version
-          display: block
+  mat-card-title
+    top: 4px
+    margin-bottom: unset
 
-        .version
-          margin-top: 5px
-          color: $green
-          font-size: 10px
-          text-align: right
+  .logo
+    top: 2px
+    align-self: flex-start
 
-    mat-divider[inset]
-      width: calc(100% + 2 * $mat-card-padding)
-      margin-bottom: 35px
-      margin-left: -$mat-card-padding
+    a
+    .version
+      display: block
 
-    mat-card-content
-      margin-bottom: 30px - $mat-card-actions-spacing-vertical
+    .version
+      margin-top: 5px
+      color: $green
+      font-size: 10px
+      text-align: right
 
-    mat-card-content mat-form-field,
-    mat-card-actions button
+  mat-divider[inset]
+    width: calc(100% + 2 * $mat-card-padding)
+    margin-bottom: 35px
+    margin-left: -$mat-card-padding
+
+  $mat-card-actions-spacing-vertical: 8px
+
+  mat-card-content
+    margin-bottom: 30px - $mat-card-actions-spacing-vertical
+
+  mat-card-actions
+    padding-bottom: $mat-card-padding - $mat-card-actions-spacing-vertical
+
+  mat-card-content mat-form-field,
+  mat-card-actions button
+    width: 100%
+
+  form
+    position: relative
+
+    > mat-error
+      position: absolute
+      bottom: 0
       width: 100%
+      height: map.get($mat-form-field-subscript-wrapper, 'margin-vertical') + 2 * map.get($mat-form-field-subscript-wrapper, 'line-height')
+      padding-left: map.get($mat-form-field-subscript-wrapper, 'padding-horizontal')
+      padding-right: map.get($mat-form-field-subscript-wrapper, 'padding-horizontal')
+      animation: transitionmessages 300ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
 
-    form
-      position: relative
+      @keyframes transitionmessages
+        from
+          opacity: 0
+          transform: translateY(-5px)
 
-      > mat-error
-        position: absolute
-        bottom: 0
-        width: 100%
-        height: map.get($mat-form-field-subscript-wrapper, 'margin-vertical') + 2 * map.get($mat-form-field-subscript-wrapper, 'line-height')
-        padding-left: map.get($mat-form-field-subscript-wrapper, 'padding-horizontal')
-        padding-right: map.get($mat-form-field-subscript-wrapper, 'padding-horizontal')
-        animation: transitionmessages 300ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
-
-        @keyframes transitionmessages
-          from
-            opacity: 0
-            transform: translateY(-5px)
-
-          to
-            opacity: 1
-            transform: translateY(0)
+        to
+          opacity: 1
+          transform: translateY(0)
 
 %heading-with-border
   padding-bottom: 10px

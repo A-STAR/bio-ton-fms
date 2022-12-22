@@ -1,21 +1,25 @@
 @use 'variables' as *
 
-.mat-card
-  color: unset
-  font-size: unset
+.mat-mdc-card
+  box-shadow: $box-shadow
 
-  &:not([class*=mat-elevation-z])
-    box-shadow: $box-shadow
+mat-card-title-group,
+mat-card-content,
+mat-card-actions
+  padding-left: $mat-card-padding
+  padding-right: $mat-card-padding
 
-.mat-card-title
+mat-card-title-group,
+mat-card-content
+
+  &:first-child
+    padding-top: $mat-card-padding
+
+mat-card-title
   font-size: 20px
   font-weight: 700
 
-mat-card-actions.mat-card-actions
-  margin-left: unset
-  margin-right: unset
-  padding-top: $mat-card-actions-spacing-vertical
-  padding-bottom: $mat-card-actions-spacing-vertical
+mat-card-content
 
-  .mat-card > &:last-child
-    margin-bottom: -$mat-card-actions-spacing-vertical
+  &:last-child
+    padding-top: $mat-card-padding
