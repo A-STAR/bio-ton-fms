@@ -7,8 +7,8 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
 import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
-import { MatLegacyInputHarness as MatInputHarness } from '@angular/material/legacy-input/testing';
-import { MatLegacySelectHarness as MatSelectHarness } from '@angular/material/legacy-select/testing';
+import { MatInputHarness } from '@angular/material/input/testing';
+import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatLegacyButtonHarness as MatButtonHarness } from '@angular/material/legacy-button/testing';
 import { MatLegacySnackBarHarness as MatSnackBarHarness } from '@angular/material/legacy-snack-bar/testing';
 

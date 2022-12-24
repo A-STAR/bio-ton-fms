@@ -9,7 +9,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCardHarness } from '@angular/material/card/testing';
 import { MatDividerHarness } from '@angular/material/divider/testing';
-import { MatLegacyInputHarness as MatInputHarness } from '@angular/material/legacy-input/testing';
+import { MatInputHarness } from '@angular/material/input/testing';
 import { MatLegacyButtonHarness as MatButtonHarness } from '@angular/material/legacy-button/testing';
 
 import { AuthService } from '../auth.service';
@@ -154,7 +154,7 @@ describe('SignInComponent', () => {
   it('should toggle password visibility', async () => {
     const passwordVisibilityButton = await loader.getHarness(MatButtonHarness.with({
       ancestor: 'form#sign-in-form label[for="password"] + mat-form-field',
-      selector: '[matSuffix]'
+      selector: '[matIconSuffix]'
     }));
 
     await passwordVisibilityButton.click();

@@ -1,98 +1,112 @@
 @use 'sass:map'
+@use 'sass:math'
 @use 'variables' as *
-@use 'functions' as *
 
-.mat-form-field
-  font-size: $mat-form-field-font-size
+mat-form-field
+  font-size: $mat-form-field-font
 
-.mat-form-field-appearance-outline
-  .mat-form-field-wrapper
-    padding-bottom: coerce-px-to-em(map.get($mat-form-field-subscript-wrapper, 'margin-vertical') + 2 * map.get($mat-form-field-subscript-wrapper, 'line-height'), $mat-form-field-font-size)
+$mdc-text-field-padding-horizontal: 12px
 
-  div.mat-form-field-wrapper
-    margin-top: unset
-    margin-bottom: coerce-px-to-em(map.get($mat-form-field-subscript-wrapper, 'margin-vertical'), $mat-form-field-font-size)
+.mat-mdc-form-field-has-icon-suffix div.mat-mdc-text-field-wrapper
+  padding-right: $mdc-text-field-padding-horizontal
 
-  div.mat-form-field-flex
-    margin-top: unset
-    padding-left: coerce-px-to-em(12px, $mat-form-field-font-size)
-    padding-right: coerce-px-to-em(12px, $mat-form-field-font-size)
+.mdc-text-field--outlined
 
-  .mat-form-field-outline
-    color: $light-gray
+  @at-root div#{&}
+    padding-left: $mdc-text-field-padding-horizontal
+    padding-right: $mdc-text-field-padding-horizontal
 
-  .mat-form-field-outline-thick
-    color: $gray
+  .mdc-notched-outline div
+    $mdc-notched-outline-border-radius: 3px
 
-  div.mat-form-field-outline
-    top: 0
+    &.mdc-notched-outline__leading
+      border-top-left-radius: $mdc-notched-outline-border-radius
+      border-bottom-left-radius: $mdc-notched-outline-border-radius
 
-  div
-    $border-radius: 3px
+    &.mdc-notched-outline__trailing
+      border-top-right-radius: $mdc-notched-outline-border-radius
+      border-bottom-right-radius: $mdc-notched-outline-border-radius
 
-    &.mat-form-field-outline-start,
-    &.mat-form-field-outline-end
-      min-width: $border-radius
+  &:not(.mdc-text-field--disabled, .mdc-text-field--invalid)
 
-    &.mat-form-field-outline-start
-      border-top-left-radius: $border-radius
-      border-bottom-left-radius: $border-radius
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing
+      border-color: $light-gray
 
-    &.mat-form-field-outline-end
-      border-top-right-radius: $border-radius
-      border-bottom-right-radius: $border-radius
+    &:not(.mdc-text-field--focused):hover .mdc-notched-outline
 
-  .mat-form-field-outline-thick div
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing
+        border-color: $gray
 
-    &.mat-form-field-outline-start,
-    &.mat-form-field-outline-gap,
-    &.mat-form-field-outline-end
-      border-width: 1px
+.mdc-text-field--focused div
 
-  .mat-form-field-infix
-    padding-top: coerce-px-to-em(12.13px, $mat-form-field-font-size)
-    padding-bottom: coerce-px-to-em(12.13px, $mat-form-field-font-size)
+  &.mdc-notched-outline__leading,
+  &.mdc-notched-outline__notch,
+  &.mdc-notched-outline__trailing
+    border-width: 1px
 
-  div.mat-form-field-prefix,
-  div.mat-form-field-suffix
-    top: unset
-
-  div.mat-form-field-subscript-wrapper
-    top: unset
-    margin-top: coerce-px-to-em(map.get($mat-form-field-subscript-wrapper, 'margin-vertical'), $mat-form-field-font-size)
-    padding-left: coerce-px-to-em(map.get($mat-form-field-subscript-wrapper, 'padding-horizontal'), $mat-form-field-font-size)
-    padding-right: coerce-px-to-em(map.get($mat-form-field-subscript-wrapper, 'padding-horizontal'), $mat-form-field-font-size)
-
-.mat-form-field-prefix,
-.mat-form-field-suffix
+.mat-mdc-form-field-icon-prefix,
+.mat-mdc-form-field-icon-suffix
   color: $gray
 
-.mat-form-field:not(.mat-form-field-appearance-legacy)
+mat-form-field
 
-  & .mat-form-field-prefix,
-  & .mat-form-field-suffix
+  & .mat-mdc-form-field-icon-prefix,
+  & .mat-mdc-form-field-icon-suffix
 
     button.mat-icon-button
-      width: 24px
-      height: 24px
-      vertical-align: middle
+      $mat-mdc-form-field-icon-prefix-suffix-button-size: 24px
 
-.mat-form-field-infix
-  border-top: unset
+      width: $mat-mdc-form-field-icon-prefix-suffix-button-size
+      height: $mat-mdc-form-field-icon-prefix-suffix-button-size
+      background-color: unset
+      line-height: $mat-mdc-form-field-icon-prefix-suffix-button-size
 
-.mat-form-field-label-wrapper
-  display: none
+.mat-mdc-form-field-infix
+  $mat-mdc-form-field-infix-height: 40px
 
-.mat-form-field-subscript-wrapper
-  font-size: unset
+  min-height: $mat-mdc-form-field-infix-height
+
+  @at-root .mat-mdc-text-field-wrapper.mdc-text-field--outlined &
+    $mat-mdc-text-field-height: 16.5px
+    $mat-mdc-text-field-infix-padding-vertical: math.div($mat-mdc-form-field-infix-height - $mat-mdc-text-field-height, 2)
+
+    padding-top: $mat-mdc-text-field-infix-padding-vertical
+    padding-bottom: $mat-mdc-text-field-infix-padding-vertical
+
+.mat-mdc-form-field-subscript-wrapper,
+div.mat-mdc-form-field-hint-wrapper,
+div.mat-mdc-form-field-error-wrapper
+  padding-top: map.get($mat-mdc-form-field-subscript-wrapper, 'padding', 'vertical')
+  padding-bottom: map.get($mat-mdc-form-field-subscript-wrapper, 'padding', 'vertical')
+
+div.mat-mdc-form-field-bottom-align::before
+  display: block
+  height: 2 * map.get($mat-mdc-form-field-subscript-wrapper, 'line-height')
+
+div
+
+  &.mat-mdc-form-field-hint-wrapper,
+  &.mat-mdc-form-field-error-wrapper
+    padding-left: map.get($mat-mdc-form-field-subscript-wrapper, 'padding', 'horizontal')
+    padding-right: map.get($mat-mdc-form-field-subscript-wrapper, 'padding', 'horizontal')
+
+  &.mat-mdc-form-field-hint-wrapper
+    display: unset
 
 mat-hint,
 mat-error
-  line-height: map.get($mat-form-field-subscript-wrapper, 'line-height')
+  line-height: map.get($mat-mdc-form-field-subscript-wrapper, 'line-height')
   text-align: center
 
-.mat-hint
-  color: unset
+  &.mat-mdc-form-field-bottom-align::before
+    height: unset
 
-div.mat-form-field-hint-spacer
-  flex: unset
+mat-hint
+  display: block
+
+.mat-mdc-form-field-hint-spacer
+  display: none

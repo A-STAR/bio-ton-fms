@@ -15,10 +15,7 @@ import {
   MAT_LEGACY_DIALOG_DEFAULT_OPTIONS as MAT_DIALOG_DEFAULT_OPTIONS
 } from '@angular/material/legacy-dialog';
 
-import {
-  MatLegacyFormFieldDefaultOptions as MatFormFieldDefaultOptions,
-  MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS as MAT_FORM_FIELD_DEFAULT_OPTIONS
-} from '@angular/material/legacy-form-field';
+import { MatFormFieldDefaultOptions, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 import { ErrorHandler as ErrorHandlerClass } from './app/error.handler';
 import { AuthInterceptor } from './app/auth.interceptor';

@@ -2,6 +2,7 @@
 @use 'extends' as *
 
 mat-dialog-container
+  background-color: $white
 
   &.mat-dialog-container
     padding-top: 20px
@@ -22,8 +23,8 @@ mat-dialog-container
 mat-dialog-actions
   justify-content: center
 
-  &.mat-dialog-actions .mat-button-base + .mat-button-base
+  &.mat-dialog-actions .mat-mdc-button-base + .mat-mdc-button-base
     margin-left: 100px
 
-  .mat-button-base
+  button
     width: 200px

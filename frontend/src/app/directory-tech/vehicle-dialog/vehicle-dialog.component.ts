@@ -8,9 +8,9 @@ import {
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA
 } from '@angular/material/legacy-dialog';
 
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
-import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 
