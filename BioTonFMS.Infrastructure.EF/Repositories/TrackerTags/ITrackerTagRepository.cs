@@ -14,7 +14,7 @@ public interface ITrackerTagRepository : IRepository<TrackerTag>
     /// Возвращает тег для заданного протокола trackerType,
     /// определяемый кодом protocolTagCode, если маппинг определён или null.
     /// </summary>
-    TagDto GetTagForTrackerType(TrackerTypeEnum trackerType, int protocolTagCode);
+    TagDto? GetTagForTrackerType(TrackerTypeEnum trackerType, int protocolTagCode);
 }
 
 // Нужно перенести куда-нибудь
