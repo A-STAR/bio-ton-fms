@@ -15,14 +15,14 @@ public class TrackerTagRepository : Repository<TrackerTag>, ITrackerTagRepositor
     public IEnumerable<TagDto> GetTagsForTrackerType(TrackerTypeEnum trackerType)
     {
         var tags = QueryableProvider
-            .Fetch(x => x.ProtocolTag)
+            .Fetch(x => x.ProtocolTags)
             .Linq()
-            .Where(x => x.ProtocolTag.TrackerType == trackerType)
+            .Where(x => x.ProtocolTags.Any(t => t.TrackerType == trackerType))
             .Select(x => new TagDto
             {
                 Id = x.Id,
-                ProtocolTagCode = x.ProtocolTag.ProtocolTagCode,
-                TrackerType = x.ProtocolTag.TrackerType,
+                ProtocolTagCode = x.ProtocolTags.First(t => t.TrackerType == trackerType).ProtocolTagCode,
+                TrackerType = trackerType,
                 Description = x.Description,
                 Name = x.Name,
                 DataType = x.DataType,
@@ -35,23 +35,24 @@ public class TrackerTagRepository : Repository<TrackerTag>, ITrackerTagRepositor
 
     public TagDto? GetTagForTrackerType(TrackerTypeEnum trackerType, int protocolTagCode)
     {
+        
         var tag = QueryableProvider
-            .Fetch(x => x.ProtocolTag)
+            .Fetch(x => x.ProtocolTags)
             .Linq()
-            .Where(x => x.ProtocolTag.TrackerType == trackerType &&
-                        x.ProtocolTag.ProtocolTagCode == protocolTagCode)
+            .Where(x => x.ProtocolTags.Any(t => t.TrackerType == trackerType &&
+                                                t.ProtocolTagCode == protocolTagCode))
             .Select(x => new TagDto
             {
                 Id = x.Id,
-                ProtocolTagCode = x.ProtocolTag.ProtocolTagCode,
-                TrackerType = x.ProtocolTag.TrackerType,
+                ProtocolTagCode = x.ProtocolTags.First(t => t.TrackerType == trackerType).ProtocolTagCode,
+                TrackerType = trackerType,
                 Description = x.Description,
                 Name = x.Name,
                 DataType = x.DataType,
                 StructType = x.StructType
             })
             .SingleOrDefault();
-
+        
         return tag;
     }
 }
