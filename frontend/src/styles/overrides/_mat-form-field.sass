@@ -8,7 +8,9 @@ mat-form-field
 $mdc-text-field-padding-horizontal: 12px
 
 .mat-mdc-form-field-has-icon-suffix div.mat-mdc-text-field-wrapper
-  padding-right: $mdc-text-field-padding-horizontal
+  $mat-mdc-form-field-icon-suffix-padding: $mdc-text-field-padding-horizontal - $mat-icon-button-padding
+
+  padding-right: $mat-mdc-form-field-icon-suffix-padding
 
 .mdc-text-field--outlined
 
@@ -51,19 +53,6 @@ $mdc-text-field-padding-horizontal: 12px
 .mat-mdc-form-field-icon-prefix,
 .mat-mdc-form-field-icon-suffix
   color: $gray
-
-mat-form-field
-
-  & .mat-mdc-form-field-icon-prefix,
-  & .mat-mdc-form-field-icon-suffix
-
-    button.mat-icon-button
-      $mat-mdc-form-field-icon-prefix-suffix-button-size: 24px
-
-      width: $mat-mdc-form-field-icon-prefix-suffix-button-size
-      height: $mat-mdc-form-field-icon-prefix-suffix-button-size
-      background-color: unset
-      line-height: $mat-mdc-form-field-icon-prefix-suffix-button-size
 
 .mat-mdc-form-field-infix
   $mat-mdc-form-field-infix-height: 40px
