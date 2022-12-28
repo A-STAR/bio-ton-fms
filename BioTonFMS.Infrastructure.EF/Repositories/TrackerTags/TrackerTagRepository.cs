@@ -12,46 +12,25 @@ public class TrackerTagRepository : Repository<TrackerTag>, ITrackerTagRepositor
     {
     }
 
-    public IEnumerable<TagDto> GetTagsForTrackerType(TrackerTypeEnum trackerType)
+    public IEnumerable<TrackerTag> GetTagsForTrackerType(TrackerTypeEnum trackerType)
     {
         var tags = QueryableProvider
             .Fetch(x => x.ProtocolTags)
             .Linq()
             .Where(x => x.ProtocolTags.Any(t => t.TrackerType == trackerType))
-            .Select(x => new TagDto
-            {
-                Id = x.Id,
-                ProtocolTagCode = x.ProtocolTags.First(t => t.TrackerType == trackerType).ProtocolTagCode,
-                TrackerType = trackerType,
-                Description = x.Description,
-                Name = x.Name,
-                DataType = x.DataType,
-                StructType = x.StructType
-            })
             .ToList();
 
         return tags;
     }
 
-    public TagDto? GetTagForTrackerType(TrackerTypeEnum trackerType, int protocolTagCode)
+    public TrackerTag? GetTagForTrackerType(TrackerTypeEnum trackerType, int protocolTagCode)
     {
         
         var tag = QueryableProvider
             .Fetch(x => x.ProtocolTags)
             .Linq()
-            .Where(x => x.ProtocolTags.Any(t => t.TrackerType == trackerType &&
-                                                t.ProtocolTagCode == protocolTagCode))
-            .Select(x => new TagDto
-            {
-                Id = x.Id,
-                ProtocolTagCode = x.ProtocolTags.First(t => t.TrackerType == trackerType).ProtocolTagCode,
-                TrackerType = trackerType,
-                Description = x.Description,
-                Name = x.Name,
-                DataType = x.DataType,
-                StructType = x.StructType
-            })
-            .SingleOrDefault();
+            .SingleOrDefault(x => x.ProtocolTags.Any(t => t.TrackerType == trackerType &&
+                                                          t.ProtocolTagCode == protocolTagCode));
         
         return tag;
     }
