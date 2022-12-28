@@ -22,18 +22,18 @@
     <ng-container *ngFor="let item of group">
       <a mat-list-item routerLinkActive="active" #link="routerLinkActive" [title]="item.title" [routerLink]="item.link"
         *ngIf="item.link; else button">
-        <img mat-list-icon width="24" height="24"
+        <img matListItemIcon width="24" height="24"
           [src]="'assets/images/' + item.icon + (link?.isActive ? '-white.svg' : '-green.svg')" [alt]="item.alt">
 
-        <span mat-line>{{ item.title }}</span>
+        <span matListItemTitle>{{ item.title }}</span>
       </a>
 
       <ng-template #button>
         <button mat-list-item (click)="onNavigationButtonClick(item.type!)">
-          <img mat-list-icon width="24" height="24" [src]="'assets/images/' + item.icon + '-green.svg'"
+          <img matListItemIcon width="24" height="24" [src]="'assets/images/' + item.icon + '-green.svg'"
             [alt]="item.alt">
 
-          <span mat-line>{{ item.title }}</span>
+          <span matListItemTitle>{{ item.title }}</span>
         </button>
       </ng-template>
     </ng-container>

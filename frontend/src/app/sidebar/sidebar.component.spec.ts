@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatLegacyNavListHarness as MatNavListHarness } from '@angular/material/legacy-list/testing';
+import { MatNavListHarness } from '@angular/material/list/testing';
 
 import { AuthService } from '../auth.service';
 
@@ -119,7 +119,7 @@ describe('SidebarComponent', () => {
       list => parallel(() => list.map(
         group => parallel(() => group.map(
           item => parallel(() => [
-            item.getText(),
+            item.getFullText(),
             item.getHref(),
             item.hasIcon()
           ]))
