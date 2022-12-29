@@ -29,17 +29,17 @@ public enum StructTypeEnum
     /// Уровень топлива
     /// </summary>
     [Description("Уровень топлива")]
-    FuelLevel,
+    FuelLevel = 4,
     
     /// <summary>
     /// Температура охлаждающей жидкости
     /// </summary>
     [Description("Температура охлаждающей жидкости")]
-    TempCool,
+    TempCool = 5,
     
     /// <summary>
     /// Обороты двигателя
     /// </summary>
     [Description("Обороты двигателя")]
-    EngineSpeed
+    EngineSpeed = 6
 }

@@ -121,7 +121,7 @@ public class TrackerTagRepositoryTests
                         Id = 4,
                         Size = 4,
                         TrackerType = TrackerTypeEnum.WialonIPS,
-                        ProtocolTagCode = 0x2
+                        ProtocolTagCode = 0x22
                     }
                 }
             },

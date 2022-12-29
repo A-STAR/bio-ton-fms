@@ -19,7 +19,7 @@ public class TrackerTagRepository : Repository<TrackerTag>, ITrackerTagRepositor
             .Linq()
             .Where(x => x.ProtocolTags.Any(t => t.TrackerType == trackerType))
             .ToList();
-
+        
         return tags;
     }
 
@@ -31,7 +31,6 @@ public class TrackerTagRepository : Repository<TrackerTag>, ITrackerTagRepositor
             .Linq()
             .SingleOrDefault(x => x.ProtocolTags.Any(t => t.TrackerType == trackerType &&
                                                           t.ProtocolTagCode == protocolTagCode));
-        
         return tag;
     }
 }
