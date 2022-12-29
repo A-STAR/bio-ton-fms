@@ -26,20 +26,8 @@ public enum StructTypeEnum
     Acceleration = 3,
     
     /// <summary>
-    /// Уровень топлива
+    /// Уровень топлива, температура охлаждающей жидкости и обороты двигателя
     /// </summary>
-    [Description("Уровень топлива")]
-    FuelLevel = 4,
-    
-    /// <summary>
-    /// Температура охлаждающей жидкости
-    /// </summary>
-    [Description("Температура охлаждающей жидкости")]
-    TempCool = 5,
-    
-    /// <summary>
-    /// Обороты двигателя
-    /// </summary>
-    [Description("Обороты двигателя")]
-    EngineSpeed = 6
+    [Description("Уровень топлива, температура охлаждающей жидкости и обороты двигателя")]
+    FuelLevel_TempCool_EngineSpeed = 4
 }
