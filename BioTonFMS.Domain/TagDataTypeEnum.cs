@@ -35,6 +35,11 @@ public enum TagDataTypeEnum
     [Description("Набор битов")]
     Bits = 6,
     /// <summary>
+    /// Байт
+    /// </summary>
+    [Description("Байт")]
+    Byte = 7,
+    /// <summary>
     /// Структура
     /// </summary>
     [Description("Структура")]

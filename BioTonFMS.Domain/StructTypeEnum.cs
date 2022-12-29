@@ -22,5 +22,12 @@ public enum StructTypeEnum
     /// <summary>
     /// Ускорение
     /// </summary>
-    [Description("Ускорение")] Acceleration = 3
+    [Description("Ускорение")]
+    Acceleration = 3,
+    
+    /// <summary>
+    /// Уровень топлива, температура охлаждающей жидкости и обороты двигателя
+    /// </summary>
+    [Description("Уровень топлива, температура охлаждающей жидкости и обороты двигателя")]
+    FuelLevel_TempCool_EngineSpeed = 4
 }
