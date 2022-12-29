@@ -1,6 +1,8 @@
-@use 'variables' as *
+@use 'extends'
 
 \:host
+  @extend %striped-table
+
   display: block
   padding-bottom: 30px
   text-align: right
@@ -11,36 +13,6 @@
   margin-top: $tech-navigation-padding-vertical
   margin-bottom: $tech-navigation-padding-vertical + 30px
   margin-right: 30px
-
-mat-table
-  margin-left: 30px
-  margin-right: 30px
-
-.mat-column-action
-  $button-spacing-horizontal: 4px
-  $button-size: 34px
-  $icon-size: 18px
-
-  flex: unset
-  flex-basis: 2 * ($button-spacing-horizontal + $button-size) + $button-spacing-horizontal
-  padding-left: $button-spacing-horizontal
-  padding-right: $button-spacing-horizontal
-
-  .mat-mdc-icon-button
-    width: $button-size
-    height: $button-size
-    line-height: unset
-
-    .mat-icon.md-18
-      width: $icon-size
-      height: $icon-size
-      line-height: unset
-
-    & + .mat-mdc-icon-button
-      margin-left: $button-spacing-horizontal
-
-.mat-column-name
-  flex: 2
 
 .mat-column-registration span
   font-size: 10px

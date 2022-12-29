@@ -9,7 +9,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
 import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
-import { MatLegacyTableHarness as MatTableHarness } from '@angular/material/legacy-table/testing';
+import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatLegacyDialogHarness as MatDialogHarness } from '@angular/material/legacy-dialog/testing';
 import { MatLegacySnackBarHarness as MatSnackBarHarness } from '@angular/material/legacy-snack-bar/testing';
