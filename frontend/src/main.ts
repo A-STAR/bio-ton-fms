@@ -10,11 +10,7 @@ import {
   MAT_LEGACY_SNACK_BAR_DEFAULT_OPTIONS as MAT_SNACK_BAR_DEFAULT_OPTIONS
 } from '@angular/material/legacy-snack-bar';
 
-import {
-  MatLegacyDialogConfig as MatDialogConfig,
-  MAT_LEGACY_DIALOG_DEFAULT_OPTIONS as MAT_DIALOG_DEFAULT_OPTIONS
-} from '@angular/material/legacy-dialog';
-
+import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MatFormFieldDefaultOptions, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 import { ErrorHandler as ErrorHandlerClass } from './app/error.handler';

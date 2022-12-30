@@ -4,13 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
-
-import {
-  MatLegacyDialog as MatDialog,
-  MatLegacyDialogConfig as MatDialogConfig,
-  MatLegacyDialogModule as MatDialogModule
-} from '@angular/material/legacy-dialog';
-
+import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, firstValueFrom } from 'rxjs';

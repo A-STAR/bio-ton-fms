@@ -1,30 +1,54 @@
 @use 'variables' as *
 @use 'extends' as *
 
-mat-dialog-container
-  background-color: $white
+mat-dialog-container label
+  color: $darker-gray
 
-  &.mat-dialog-container
-    padding-top: 20px
-    padding-left: 30px
-    padding-right: 30px
-    padding-bottom: 15px
+$mdc-dialog-spacing-horizontal: 30px
 
-  label
-    color: $darker-gray
+h1.mdc-dialog__title
+  margin-top: 20px
+  margin-left: $mdc-dialog-spacing-horizontal
+  margin-right: $mdc-dialog-spacing-horizontal
+  padding-left: unset
+  padding-right: unset
 
-[mat-dialog-title]
-  font-size: 18px
+  &::before
+    content: unset
+
+.mat-mdc-dialog-container h1.mdc-dialog__title,
+.mdc-dialog mat-dialog-content.mdc-dialog__content
+  font-size: unset
+  font-family: unset
   line-height: unset
+  letter-spacing: unset
 
-  &.mat-dialog-title
-    @extend %heading-with-border
+.mat-mdc-dialog-container h1.mdc-dialog__title
+  @extend %heading-with-border
+
+  font-size: 18px
+
+.mdc-dialog mat-dialog-content.mdc-dialog__content
+  font-weight: unset
+
+.mdc-dialog mat-dialog-content.mdc-dialog__content,
+mat-dialog-actions.mdc-dialog__actions
+  padding-left: $mdc-dialog-spacing-horizontal
+  padding-right: $mdc-dialog-spacing-horizontal
+
+.mdc-dialog mat-dialog-content.mdc-dialog__content
+  padding-bottom: 2px
 
 mat-dialog-actions
-  justify-content: center
 
-  &.mat-dialog-actions .mat-mdc-button-base + .mat-mdc-button-base
-    margin-left: 100px
+  &.mat-mdc-dialog-actions
+    justify-content: center
+
+    .mat-mdc-button-base + .mat-mdc-button-base
+      margin-left: 100px
+
+  &.mdc-dialog__actions
+    padding-bottom: 15px
 
   button
     width: 200px
