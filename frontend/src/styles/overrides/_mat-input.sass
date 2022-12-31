@@ -1,4 +1,12 @@
 @use 'variables' as *
 
-.mat-input-element::placeholder
-  color: $dark-gray
+.mdc-text-field
+
+  &:not(.mdc-text-field--invalid) .mdc-text-field__input
+    caret-color: $dark
+
+  &:not(.mdc-text-field--disabled) .mdc-text-field__input
+    color: $dark
+
+    &::placeholder
+      color: $dark-gray

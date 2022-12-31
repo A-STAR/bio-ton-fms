@@ -154,7 +154,7 @@ describe('SignInComponent', () => {
   it('should toggle password visibility', async () => {
     const passwordVisibilityButton = await loader.getHarness(MatButtonHarness.with({
       ancestor: 'form#sign-in-form label[for="password"] + mat-form-field',
-      selector: '[matSuffix]'
+      selector: '[matIconSuffix]'
     }));
 
     await passwordVisibilityButton.click();

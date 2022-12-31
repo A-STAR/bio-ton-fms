@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 $black: #000000
 $dark: #0B110B
 $dark-shady: #1E4929
@@ -15,11 +17,14 @@ $lighter-gray: #F0F1EB
 $light: #F8F9F4
 $white: #FFFFFF
 
-$mat-card-actions-spacing-vertical: 5px
+$mat-card-padding: 10px !default
 
-$mat-form-field-font-size: 14px
-$mat-form-field-subscript-wrapper: ('margin-vertical': 5px, 'padding-horizontal': 50px, 'line-height': 20px)
-$mat-list-item-content-padding-horizontal: 10px
+$mat-form-field-font: 14px
+$mat-mdc-form-field-subscript-wrapper: ('padding': ('vertical': 5px, 'horizontal': 50px), 'line-height': 20px)
+
+$mat-icon-button-size: 30px
+$mat-icon-size: 24px
+$mat-icon-button-padding: math.div($mat-icon-button-size - $mat-icon-size, 2)
 
 $sidebar-width: 100px
 

@@ -1,62 +1,49 @@
 @use 'variables' as *
 
-$mat-stroked-button-border-width: 1px !default
-$mat-button-line-height: 30px !default
+.mat-mdc-unelevated-button,
+.mat-mdc-outlined-button
 
-.mat-flat-button,
-.mat-stroked-button,
-.mat-icon-button
-  transition-duration: 200ms
-  transition-timing-function: cubic-bezier(0.35, 0, 0.25, 1)
+  & span.mat-mdc-button-touch-target,
+  &.mat-mdc-button-base
+    height: 30px
 
-.mat-button,
-.mat-stroked-button
+  mat-card-actions &,
+  mat-dialog-actions &
+    font-weight: 500
 
-  &:hover:not(.mat-button-disabled) span.mat-button-focus-overlay
-    opacity: 0
+    &[form]:hover:not(:disabled)
+      box-shadow: 0 4px 8px rgba($dark-shady, 13%)
 
-.mat-flat-button,
-.mat-stroked-button
-  font-size: unset
-  transition-property: box-shadow
+    & .mat-mdc-button-touch-target,
+    &.mat-mdc-button-base
+      height: 40px
 
-  &:not([class*=mat-elevation-z])
-    box-shadow: unset
+.mat-mdc-outlined-button
+
+  &:hover:not(:disabled)
+    background-color: $green
+    color: $white
+
+  @at-root button#{&}
+    transition-property: background-color, color, border, box-shadow
+
+    &:not(:disabled)
+      border-color: $green
+
+  span.mat-mdc-button-persistent-ripple::before
+    background-color: $white
+
+  div.mat-ripple-element
+    background-color: rgba($white, 0.1)
 
   mat-card-actions &,
   mat-dialog-actions &
 
-    &[form]:hover:not(.mat-button-disabled)
-      box-shadow: 0px 4px 8px rgba($dark-shady, 13%)
+    &:hover:not(:disabled)
+      box-shadow: $box-shadow
 
-.mat-stroked-button,
-.mat-icon-button
-  transition-property: background-color, color
-
-.mat-flat-button
-  line-height: $mat-button-line-height
-
-.mat-stroked-button
-
-  &:not(.mat-button-disabled)
-    border-color: unset
-
-  &:hover:not(.mat-button-disabled)
-    background-color: $green
-    color: $white
-    border-color: $green
-
-  @at-root button#{&}
-    $mat-button-line-height: $mat-button-line-height - 2 * $mat-stroked-button-border-width
-
-    font-weight: unset
-    line-height: $mat-button-line-height
-
-.mat-icon-button
-
-  &.mat-accent,
-  &.mat-warn
-    color: unset
+.mat-mdc-icon-button
+  transition: background-color, color 280ms cubic-bezier(0.4, 0, 0.2, 1)
 
   &:hover,
   &:active
@@ -67,21 +54,20 @@ $mat-button-line-height: 30px !default
     &.mat-warn
       color: $red
 
+  & span.mat-mdc-button-touch-target,
+  &.mat-mdc-button-base
+    width: $mat-icon-button-size
+    height: $mat-icon-button-size
+
+  &.mat-mdc-button-base
+    padding: $mat-icon-button-padding
+
+  &.mat-accent,
+  &.mat-warn
+    color: unset
+
   &.mat-accent[aria-pressed="false"]
     color: $light-green
 
-mat-card-actions,
-mat-dialog-actions
-  $mat-button-line-height: 40px
-
-  .mat-flat-button
-    line-height: $mat-button-line-height
-
-  .mat-stroked-button
-    $mat-button-line-height: $mat-button-line-height - 2 * $mat-stroked-button-border-width
-
-    font-weight: 500
-    line-height: $mat-button-line-height
-
-    &:hover:not(.mat-button-disabled)
-      box-shadow: $box-shadow
+button.mat-mdc-unelevated-button
+  transition-property: border, box-shadow

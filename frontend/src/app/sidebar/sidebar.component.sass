@@ -1,7 +1,8 @@
+@use 'sass:math'
 @use 'variables' as *
 
-$mat-list-item-spacing-vertical: 10px
-$mat-list-icon-size: 24px
+$mat-mdc-list-item-spacing-vertical: 10px
+$mat-mdc-list-item-icon-size: 24px
 
 \:host
   z-index: 1
@@ -22,20 +23,20 @@ $mat-list-icon-size: 24px
   &,
   .logo,
   .logo img,
-  .mat-list-icon,
-  .mat-line,
+  .mat-mdc-list-item-icon,
+  .mat-mdc-list-item-title,
   mat-divider
     transition-duration: 200ms
     transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1)
 
   .logo img,
-  .mat-line
+  .mat-mdc-list-item-title
     transition-property: opacity
 
   .logo
     $sunflower-logo-width: 42px
 
-    margin-left: 0.5 * ($sidebar-width - $sunflower-logo-width)
+    margin-left: math.div($sidebar-width - $sunflower-logo-width, 2)
     transition-property: margin-left
 
     img
@@ -44,17 +45,21 @@ $mat-list-icon-size: 24px
       &[src*="logo-white"]
         opacity: 0
 
-  .mat-list-icon,
+  button.mat-mdc-list-item
+    background-color: unset
+    border: unset
+
+  .mat-mdc-list-item-icon,
   mat-divider
     transition-property: margin-left, margin-right
 
-  .mat-list-icon
-    $mat-list-icon-margin-horizontal: 0.5 * ($sidebar-width - 2 * $mat-list-item-content-padding-horizontal - $mat-list-icon-size)
+  .mat-mdc-list-item-icon
+    $mat-mdc-list-item-icon-margin-horizontal: math.div($sidebar-width - $mat-mdc-list-item-icon-size, 2)
 
-    margin-left: $mat-list-icon-margin-horizontal
-    margin-right: $mat-list-icon-margin-horizontal
+    margin-left: $mat-mdc-list-item-icon-margin-horizontal
+    margin-right: $mat-mdc-list-item-icon-margin-horizontal
 
-  .mat-line
+  .mat-mdc-list-item-title
     opacity: 0
 
   mat-divider
@@ -62,7 +67,7 @@ $mat-list-icon-size: 24px
     margin-right: 10px
 
   &:hover
-    $mat-list-icon-spacing-horizontal: 30px
+    $mat-mdc-list-item-icon-spacing-horizontal: 30px
 
     width: 255px
 
@@ -80,22 +85,22 @@ $mat-list-icon-size: 24px
         &[src*="logo-white"]
           opacity: 1
 
-    .mat-list-icon
-      margin-left: $mat-list-icon-spacing-horizontal - $mat-list-item-content-padding-horizontal
+    .mat-mdc-list-item-icon
+      margin-left: $mat-mdc-list-item-icon-spacing-horizontal
       margin-right: unset
 
-    .mat-line
+    .mat-mdc-list-item-title
       opacity: 1
 
     mat-divider
-      margin-left: $mat-list-icon-spacing-horizontal
-      margin-right: $mat-list-icon-spacing-horizontal
+      margin-left: $mat-mdc-list-item-icon-spacing-horizontal
+      margin-right: $mat-mdc-list-item-icon-spacing-horizontal
 
 .logo
   position: relative
   flex-shrink: 0
   height: 44px
-  margin-bottom: 30px - $mat-list-item-spacing-vertical
+  margin-bottom: 30px - $mat-mdc-list-item-spacing-vertical
 
   a
     height: 100%
@@ -113,25 +118,22 @@ mat-nav-list
     margin-bottom: auto
 
   &:last-of-type
-    margin-top: 2 * $mat-list-item-spacing-vertical
+    margin-top: 2 * $mat-mdc-list-item-spacing-vertical
 
-.mat-list-base
+.mat-mdc-list-item.mdc-list-item--with-leading-icon.mdc-list-item--with-one-line
+  height: 2 * $mat-mdc-list-item-spacing-vertical + $mat-mdc-list-item-icon-size
 
-  .mat-list-item
-    height: $mat-list-icon-size + 2 * $mat-list-item-spacing-vertical
-    color: $green
+.mdc-list-item__primary-text
+  color: $green
 
-    &.active
-      color: $white
+  @at-root .active &
+    color: $white
 
-    .mat-list-icon
-      padding: unset
-
-    .mat-line
-      font-weight: 500
+.mat-mdc-list-item-title
+  font-weight: 500
 
 mat-divider
-  margin-top: $mat-list-item-spacing-vertical
-  margin-bottom: $mat-list-item-spacing-vertical
+  margin-top: $mat-mdc-list-item-spacing-vertical
+  margin-bottom: $mat-mdc-list-item-spacing-vertical
   border-top-color: $lighter-green
   border-top-style: dashed

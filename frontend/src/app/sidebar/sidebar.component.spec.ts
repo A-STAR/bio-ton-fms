@@ -119,7 +119,7 @@ describe('SidebarComponent', () => {
       list => parallel(() => list.map(
         group => parallel(() => group.map(
           item => parallel(() => [
-            item.getText(),
+            item.getFullText(),
             item.getHref(),
             item.hasIcon()
           ]))

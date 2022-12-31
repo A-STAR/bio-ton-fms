@@ -66,7 +66,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       make: make!,
       model: model!,
       manufacturingYear: year ?? undefined,
-      vehicleGroupId: group ? Number(group): undefined,
+      vehicleGroupId: group ? Number(group) : undefined,
       type: type!,
       subType: subtype!,
       fuelTypeId: Number(fuel!),

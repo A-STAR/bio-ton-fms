@@ -1,7 +1,14 @@
 @use 'variables' as *
 
-.mat-form-field-appearance-outline div.mat-select-arrow-wrapper
-  transform: unset
+.mat-mdc-select-value-text,
+.mat-mdc-select-arrow
+  color: $dark
 
-div.mat-select-arrow
-  color: $gray
+.mat-mdc-select-placeholder
+  color: $dark-gray
+
+div.mat-mdc-select-arrow-wrapper
+  height: unset
+
+mat-select svg
+  max-width: unset
