@@ -5,14 +5,14 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { MatLegacySnackBarHarness as MatSnackBarHarness } from '@angular/material/legacy-snack-bar/testing';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 

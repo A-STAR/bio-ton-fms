@@ -1,26 +1,38 @@
 @use 'variables' as *
 
-.mat-snack-bar-container,
-.mat-simple-snackbar-action
-  color: $light
+.mat-mdc-snack-bar-container
 
-.mat-snack-bar-container
-  background-color: $light-green
-  box-shadow: $box-shadow
+  div
 
-  &.error
+    &.mdc-snackbar__surface
+      background-color: $light-green
+      box-shadow: $box-shadow
+
+    &.mdc-snackbar__label
+      font-size: 14px
+
+  div.mdc-snackbar__label
+    color: $light
+
+  button.mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled)
+    color: $white
+
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled),
+  .mat-mdc-button .mat-mdc-button-touch-target
+    height: $mat-icon-button-size
+
+  .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled)
+    width: $mat-icon-button-size
+    border-radius: 50%
+
+  &.error .mdc-snackbar__surface
     background-color: $red
 
-.mat-simple-snack-bar-content
-  flex: 1
+.mat-mdc-snack-bar-label
   text-align: center
 
-.mat-simple-snackbar-action button
-  $button-size: 36px
-
-  width: $button-size
-  height: $button-size
-  max-height: unset
-  padding: unset
-  border-radius: 50%
-  line-height: $button-size
+.mdc-button.mat-mdc-snack-bar-action
+  min-width: unset
+  padding-left: $mat-icon-button-padding
+  padding-right: $mat-icon-button-padding
+  font-size: $mat-icon-size

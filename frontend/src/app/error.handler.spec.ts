@@ -1,7 +1,7 @@
 import { ErrorHandler } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DEFAULT_ERROR_MESSAGE, ErrorHandler as ErrorHandlerClass, ERROR_ACTION, snackBarConfig } from './error.handler';
 
