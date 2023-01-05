@@ -81,13 +81,11 @@ export default class SignInComponent implements OnInit, OnDestroy {
       });
   }
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   #subscription: Subscription | undefined;
 
   /**
    * Initialize Sign in form.
    */
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   #initSignInForm() {
     this.signInForm = this.fb.group({
       username: this.fb.control<string | null>(null, [

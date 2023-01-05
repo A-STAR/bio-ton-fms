@@ -38,7 +38,6 @@ export class ErrorHandler implements ErrorHanlderInterface {
    *
    * @returns Combined error message.
    */
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   #getErrorsMessage(errors: {
     [key: string]: string[]
   }) {
