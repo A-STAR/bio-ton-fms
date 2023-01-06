@@ -40,6 +40,7 @@
           {
             "default": [
               "signature",
+              "call-signature",
               "public-decorated-get",
               "public-decorated-set",
               "public-decorated-field",
@@ -61,9 +62,13 @@
               "protected-static-set",
               "protected-instance-set",
               "protected-abstract-set",
+              "#private-static-get",
+              "#private-static-set",
               "private-static-get",
-              "private-instance-get",
               "private-static-set",
+              "#private-instance-get",
+              "#private-instance-set",
+              "private-instance-get",
               "private-instance-set",
               "public-static-field",
               "public-instance-field",
@@ -77,9 +82,13 @@
               "protected-static-method",
               "protected-instance-method",
               "protected-abstract-method",
+              "#private-static-field",
               "private-static-field",
+              "#private-instance-field",
               "private-instance-field",
+              "#private-static-method",
               "private-static-method",
+              "#private-instance-method",
               "private-instance-method",
               "constructor"
             ]
