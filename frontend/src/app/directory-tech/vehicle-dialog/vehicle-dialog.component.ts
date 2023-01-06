@@ -37,6 +37,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   }>;
 
   protected vehicleForm!: FormGroup<VehicleForm>;
+  protected maxManufacturingYear = maxManufacturingYear;
 
   /**
    * Submit Vehicle form, checking validation state.
@@ -115,7 +116,10 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
         name: this.fb.nonNullable.control<string | undefined>(this.data?.name, Validators.required),
         make: this.fb.nonNullable.control<string | undefined>(this.data?.make, Validators.required),
         model: this.fb.nonNullable.control<string | undefined>(this.data?.model, Validators.required),
-        year: this.fb.nonNullable.control<number | undefined>(this.data?.manufacturingYear, Validators.pattern(YEAR_PATTERN)),
+        year: this.fb.nonNullable.control<number | undefined>(this.data?.manufacturingYear, [
+          Validators.max(maxManufacturingYear),
+          Validators.pattern(YEAR_PATTERN)
+        ]),
         group: this.fb.nonNullable.control<number | undefined>(this.data?.vehicleGroupId),
         type: this.fb.nonNullable.control<string | undefined>(this.data?.type, Validators.required),
         subtype: this.fb.nonNullable.control<string | undefined>(this.data?.subType, Validators.required),
@@ -177,6 +181,9 @@ type VehicleForm = {
     description: FormControl<string | undefined>;
   }>;
 }
+
+const maxManufacturingYear = new Date()
+  .getFullYear();
 
 const YEAR_PATTERN = /\d{4}/;
 const REGISTRATION_NUMBER_PATTERN = /^[a-zA-Zа-яА-ЯёЁ0-9]+$/;

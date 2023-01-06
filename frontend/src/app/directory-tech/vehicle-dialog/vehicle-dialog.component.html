@@ -41,7 +41,12 @@
         <label for="year">Год производства</label>
 
         <mat-form-field>
-          <input matInput id="year" type="number" placeholder="Год производства" formControlName="year">
+          <input matInput id="year" type="number" placeholder="Год производства" formControlName="year"
+            [max]="maxManufacturingYear">
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['max'] as error">
+            <strong>Год производства</strong> должен быть менее {{ error.max + 1 }}
+          </mat-error>
 
           <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['pattern']">
             <strong>Год производства</strong> введён некорректно
