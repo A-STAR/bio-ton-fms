@@ -17,7 +17,7 @@ builder.WebHost.UseKestrel(so =>
       epo => epo.UseConnectionHandler<GalileoTrackerConnectionHandler>());
 });
 builder.Services.AddOptions();
-builder.Services.Configure<MessageBrockerSettingsOptions>(builder.Configuration.GetSection("MessageBrockerSettings"));
+builder.Services.Configure<MessageBrokerSettingsOptions>(builder.Configuration.GetSection("MessageBrockerSettings"));
 builder.Services.AddTransient<IMessageBus, RabbitMQMessageBus>();
 var app = builder.Build();
 

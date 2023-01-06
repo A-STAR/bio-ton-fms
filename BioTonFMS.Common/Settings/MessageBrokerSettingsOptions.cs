@@ -1,6 +1,6 @@
 ﻿namespace BioTonFMS.Common.Settings
 {
-    public class MessageBrockerSettingsOptions
+    public class MessageBrokerSettingsOptions
     {
         public string HostName { get; set; } = string.Empty;
     }

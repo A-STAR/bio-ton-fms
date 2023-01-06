@@ -13,7 +13,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
         private readonly IConnection _connection;
         private readonly IModel? _channel;
 
-        public RabbitMQMessageBus(IOptions<MessageBrockerSettingsOptions> opts)
+        public RabbitMQMessageBus(IOptions<MessageBrokerSettingsOptions> opts)
         {
             _factory = new ConnectionFactory() { HostName = opts.Value.HostName };
             _connection = _factory.CreateConnection();

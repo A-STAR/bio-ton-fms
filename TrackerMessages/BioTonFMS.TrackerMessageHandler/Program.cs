@@ -9,7 +9,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
         services.AddOptions();
-        services.Configure<MessageBrockerSettingsOptions>(hostContext.Configuration.GetSection("MessageBrockerSettings"));
+        services.Configure<MessageBrokerSettingsOptions>(hostContext.Configuration.GetSection("MessageBrockerSettings"));
         services.AddTransient<GalileoSkyMessageHandler>();
         services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
         services.AddHostedService<MessageHandlerWorker>();
