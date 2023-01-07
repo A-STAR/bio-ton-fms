@@ -41,7 +41,12 @@
         <label for="year">Год производства</label>
 
         <mat-form-field>
-          <input matInput id="year" type="number" placeholder="Год производства" formControlName="year">
+          <input matInput id="year" type="number" placeholder="Год производства" formControlName="year"
+            [max]="maxManufacturingYear">
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['max'] as error">
+            <strong>Год производства</strong> должен быть менее {{ error.max + 1 }}
+          </mat-error>
 
           <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['pattern']">
             <strong>Год производства</strong> введён некорректно
@@ -141,7 +146,7 @@
         <label for="tracker">GPS трекер</label>
 
         <mat-form-field>
-          <input matInput id="tracker" type="number" placeholder="GPS трекер" min="1" formControlName="tracker">
+          <input matInput id="tracker" type="number" placeholder="GPS трекер" formControlName="tracker">
         </mat-form-field>
       </div>
     </fieldset>
