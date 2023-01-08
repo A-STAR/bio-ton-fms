@@ -11,7 +11,7 @@ namespace BioTonFMS.TrackerTcpServer
 
         public GalileoTrackerConnectionHandler(
                 ILogger<GalileoTrackerConnectionHandler> logger,
-                IMessageBus messageBus//,
+                IMessageBus messageBus
             )
         {
             _logger = logger;

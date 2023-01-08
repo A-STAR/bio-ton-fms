@@ -16,6 +16,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
         public RabbitMQMessageBus(IOptions<MessageBrokerSettingsOptions> opts)
         {
             _factory = new ConnectionFactory() { HostName = opts.Value.HostName };
+            _factory.AutomaticRecoveryEnabled = true;
             _connection = _factory.CreateConnection();
             _channel = _connection.CreateModel();
             _channel.QueueDeclare(queue: "RawTrackerMessages",
