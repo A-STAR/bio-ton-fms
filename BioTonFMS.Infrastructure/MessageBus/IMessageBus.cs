@@ -7,6 +7,7 @@ namespace BioTonFMS.Infrastructure.MessageBus
     {
         void Publish(byte[] message);
 
-        void Subscribe<TEvenArgs>(EventHandler<TEvenArgs> handler);
+        void Subscribe<TBusMessageHandler>()
+            where TBusMessageHandler : IBusMessageHandler;
     }
 }
