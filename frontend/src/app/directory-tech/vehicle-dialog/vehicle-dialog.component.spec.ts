@@ -16,6 +16,7 @@ import { Observable, of } from 'rxjs';
 
 import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
 
+import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 import { VehicleDialogComponent, VEHICLE_CREATED, VEHICLE_UPDATED } from './vehicle-dialog.component';
 
 import { testFuels, testNewVehicle, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
@@ -157,6 +158,14 @@ describe('VehicleDialogComponent', () => {
       .withContext('render year input type')
       .toBeResolvedTo('number');
 
+    const [yearInputEl, trackerInputEl] = fixture.debugElement.queryAll(
+      By.directive(NumberOnlyInputDirective)
+    );
+
+    expect(yearInputEl.nativeElement.placeholder)
+      .withContext('render year input with `NumberOnlyDirective`')
+      .toBe('Год производства');
+
     loader.getHarness(MatSelectHarness.with({
       ancestor: 'form#vehicle-form',
       selector: '[placeholder="Группа машин"]'
@@ -202,6 +211,10 @@ describe('VehicleDialogComponent', () => {
     )
       .withContext('render tracker input type')
       .toBeResolvedTo('number');
+
+    expect(trackerInputEl.nativeElement.placeholder)
+      .withContext('render tracker input with `NumberOnlyDirective`')
+      .toBe('GPS трекер');
 
     loader.getHarness(MatInputHarness.with({
       ancestor: 'form#vehicle-form',

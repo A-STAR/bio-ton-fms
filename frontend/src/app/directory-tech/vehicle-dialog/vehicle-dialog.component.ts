@@ -12,6 +12,8 @@ import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
 
 import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
 
+import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
+
 @Component({
   selector: 'bio-vehicle-dialog',
   standalone: true,
@@ -22,7 +24,8 @@ import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.servi
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    MatButtonModule,
+    NumberOnlyInputDirective
   ],
   templateUrl: './vehicle-dialog.component.html',
   styleUrls: ['./vehicle-dialog.component.sass'],
