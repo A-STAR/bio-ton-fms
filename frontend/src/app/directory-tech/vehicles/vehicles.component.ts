@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
@@ -161,13 +161,17 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    * @param vehicleDataSource Vehicle data source.
    */
   protected async onDeleteVehicle({ id }: VehicleDataSource) {
-    const deleteVehicle$ = this.vehicleService.deleteVehicle(id);
+    try {
+      const deleteVehicle$ = this.vehicleService.deleteVehicle(id);
 
-    await firstValueFrom(deleteVehicle$);
+      await firstValueFrom(deleteVehicle$);
 
-    this.snackBar.open(VEHICLE_DELETED);
-
-    this.#updateVehicles();
+      this.snackBar.open(VEHICLE_DELETED);
+    } catch (error) {
+      this.errorHandler.handleError(error);
+    } finally {
+      this.#updateVehicles();
+    }
   }
 
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
@@ -244,7 +248,12 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
     this.columnsKeys = this.columns.map(({ key }) => key);
   }
 
-  constructor(private snackBar: MatSnackBar, private dialog: MatDialog, private vehicleService: VehicleService) { }
+  constructor(
+    private errorHandler: ErrorHandler,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private vehicleService: VehicleService
+  ) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {

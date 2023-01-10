@@ -1,6 +1,8 @@
+import { ErrorHandler } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
@@ -14,13 +16,14 @@ import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { Vehicles, VehicleService } from '../vehicle.service';
 
 import VehiclesComponent, { columns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
+import { environment } from '../../../../src/environments/environment';
 import { testVehicles } from '../vehicle.service.spec';
 import { testDataSource as testVehiclesDataSource } from '../table.data-source.spec';
 
@@ -420,16 +423,16 @@ describe('VehiclesComponent', () => {
   });
 
   it('should delete vehicle', async () => {
-    const vehicleVehicleButton = await loader.getHarness(MatButtonHarness.with({
+    const deleteVehicleSpy = spyOn(vehicleService, 'deleteVehicle')
+      .and.callFake(() => of({}));
+
+    let vehicleButton = await loader.getHarness(MatButtonHarness.with({
       ancestor: '.mat-column-action',
       selector: '[mat-icon-button]',
       text: 'delete'
     }));
 
-    spyOn(vehicleService, 'deleteVehicle')
-      .and.callFake(() => of({}));
-
-    await vehicleVehicleButton.click();
+    await vehicleButton.click();
 
     expect(vehicleService.deleteVehicle)
       .toHaveBeenCalledWith(testVehiclesDataSource[0].id);
@@ -440,6 +443,45 @@ describe('VehiclesComponent', () => {
       snackBar.getMessage()
     )
       .toBeResolvedTo(VEHICLE_DELETED);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+
+    deleteVehicleSpy.calls.reset();
+    overlayContainer.ngOnDestroy();
+
+    /* Handle an error although update vehicles anyway. */
+
+    const testURL = `${environment.api}/api/telematica/vehicle/${testVehiclesDataSource[1].id}`;
+
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        message: `Http failure response for ${testURL}: 500 Internal Server Error`
+      },
+      status: 500,
+      statusText: 'Internal Server Error',
+      url: testURL
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    spyOn(errorHandler, 'handleError');
+    deleteVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    [, vehicleButton] = await loader.getAllHarnesses(MatButtonHarness.with({
+      ancestor: '.mat-column-action',
+      selector: '[mat-icon-button]',
+      text: 'delete'
+    }));
+
+    await vehicleButton.click();
+
+    expect(vehicleService.deleteVehicle)
+      .toHaveBeenCalledWith(testVehiclesDataSource[1].id);
+
+    expect(errorHandler.handleError)
+      .toHaveBeenCalledWith(testErrorResponse);
 
     expect(vehiclesSpy)
       .toHaveBeenCalled();
