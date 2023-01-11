@@ -57,7 +57,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 // ƒл€ приложени€ выставл€ем €вные параметры локализации дл€ каждого запроса
-// ћы работаем только с русским €зыком
+// ћы работаем только с русским €зыком.
 string locale = "ru-RU";
 RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions
 {
