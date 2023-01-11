@@ -31,12 +31,8 @@
 
     <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
       <ng-container *ngSwitchCase="VehicleColumn.Action">
-        <button mat-icon-button color="accent" (click)="onUpdateVehicle(element)">
-          <mat-icon class="md-18">edit</mat-icon>
-        </button>
-
-        <button mat-icon-button color="warn" (click)="onDeleteVehicle(element)">
-          <mat-icon class="md-18">delete</mat-icon>
+        <button mat-icon-button>
+          <mat-icon>more_horiz</mat-icon>
         </button>
       </ng-container>
 

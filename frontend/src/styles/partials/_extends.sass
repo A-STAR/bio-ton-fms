@@ -141,27 +141,28 @@
     padding-right: $mat-mdc-cell-padding-horizontal
 
   .mat-column-action
-    $button-spacing-horizontal: 4px
+    $column-spacing-horizontal: 10px
     $button-size: 34px
-    $icon-size: 18px
 
     flex: unset
-    flex-basis: 2 * ($button-spacing-horizontal + $button-size) + $button-spacing-horizontal
-    padding-left: $button-spacing-horizontal
-    padding-right: $button-spacing-horizontal
+    flex-basis: 2 * $column-spacing-horizontal + $button-size
 
     .mat-mdc-icon-button
       width: $button-size
       height: $button-size
-      line-height: unset
+
+      &.mat-unthemed
+        color: $gray
 
       .mat-icon.md-18
+        $icon-size: 18px
+
         width: $icon-size
         height: $icon-size
         line-height: unset
 
       & + .mat-mdc-icon-button
-        margin-left: $button-spacing-horizontal
+        margin-left: 4px
 
   .mat-column-name
     flex: 2
