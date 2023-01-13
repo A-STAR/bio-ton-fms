@@ -10,9 +10,7 @@
 [mat-stroked-button]
   $tech-navigation-padding-vertical: 12px
 
-  margin-top: $tech-navigation-padding-vertical
-  margin-bottom: $tech-navigation-padding-vertical + 30px
-  margin-right: 30px
+  margin: $tech-navigation-padding-vertical 30px $tech-navigation-padding-vertical + 30px 0
 
 .mat-column-registration span
   font-size: 10px
@@ -21,14 +19,14 @@
   &:last-child
     font-weight: 500
 
-  &:not(:first-child)
-    padding-left: 2px
-
-  &:not(:last-child)
-    padding-right: 2px
-
   &:first-child
     font-size: 15px
 
   &:last-child
     font-size: 11px
+
+  &:not(:first-child)
+    margin-left: 2px
+
+  &:not(:last-child)
+    margin-right: 2px
