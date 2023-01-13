@@ -34,6 +34,16 @@
         <button mat-icon-button>
           <mat-icon>more_horiz</mat-icon>
         </button>
+
+        <div class="actions">
+          <button mat-icon-button title="Редактировать" color="accent" (click)="onUpdateVehicle(element)">
+            <mat-icon class="md-18">edit</mat-icon>
+          </button>
+
+          <button mat-icon-button title="Удалить" color="warn" (click)="onDeleteVehicle(element)">
+            <mat-icon class="md-18">delete</mat-icon>
+          </button>
+        </div>
       </ng-container>
 
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="VehicleColumn.Type"></ng-container>

@@ -190,10 +190,12 @@ describe('VehiclesComponent', () => {
           text: 'more_horiz'
         })),
         actionCell.getHarnessOrNull(MatButtonHarness.with({
+          ancestor: '.actions',
           selector: '[mat-icon-button]',
           text: 'edit'
         })),
         actionCell.getHarnessOrNull(MatButtonHarness.with({
+          ancestor: '.actions',
           selector: '[mat-icon-button]',
           text: 'delete'
         }))
@@ -207,11 +209,11 @@ describe('VehiclesComponent', () => {
 
       expect(updateButton)
         .withContext('render update button')
-        .toBeNull();
+        .not.toBeNull();
 
       expect(deleteButton)
         .withContext('render delete button')
-        .toBeNull();
+        .not.toBeNull();
 
       actionButton?.hasHarness(MatIconHarness.with({
         name: 'more_horiz'
@@ -396,9 +398,9 @@ describe('VehiclesComponent', () => {
     await createVehicleButton.click();
   });
 
-  xit('should update vehicle', async () => {
+  it('should update vehicle', async () => {
     const updateVehicleButtons = await loader.getAllHarnesses(MatButtonHarness.with({
-      ancestor: '.mat-column-action',
+      ancestor: '.mat-column-action .actions',
       selector: '[mat-icon-button]',
       text: 'edit'
     }));
@@ -434,12 +436,12 @@ describe('VehiclesComponent', () => {
     await updateVehicleButtons[1].click();
   });
 
-  xit('should delete vehicle', async () => {
+  it('should delete vehicle', async () => {
     const deleteVehicleSpy = spyOn(vehicleService, 'deleteVehicle')
       .and.callFake(() => of({}));
 
     let vehicleButton = await loader.getHarness(MatButtonHarness.with({
-      ancestor: '.mat-column-action',
+      ancestor: '.mat-column-action .actions',
       selector: '[mat-icon-button]',
       text: 'delete'
     }));

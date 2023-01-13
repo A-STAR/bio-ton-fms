@@ -106,6 +106,7 @@
     min-height: 45px
 
   mat-row
+    position: relative
 
     &:nth-child(odd)
       background-color: $light
@@ -154,15 +155,33 @@
       &.mat-unthemed
         color: $gray
 
+    button:hover + .actions,
+    .actions:hover
+      display: flex
+
+    .actions
+      $transparent-gradient-extra-spacing: 30px
+      $actions-padding-right: $transparent-gradient-extra-spacing + $column-spacing-horizontal
+
+      position: absolute
+      top: 0
+      left: 0
+      display: none
+      align-items: center
+      height: 100%
+      padding: 0 $actions-padding-right 0 $column-spacing-horizontal
+      background: linear-gradient(to left, transparent, $white $actions-padding-right)
+      border-bottom: 1px solid $light-gray
+
+      [mat-icon-button] + [mat-icon-button]
+        margin-left: 4px
+
       .mat-icon.md-18
         $icon-size: 18px
 
         width: $icon-size
         height: $icon-size
         line-height: unset
-
-      & + .mat-mdc-icon-button
-        margin-left: 4px
 
   .mat-column-name
     flex: 2
