@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BioTonFMS.Common.Settings;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Reflection;
 using System.Text.Json;
 
@@ -11,11 +13,14 @@ namespace BioTonFMSApp.Controllers
     [Produces("application/json")]
     public class SystemInfoController : ControllerBase
     {
+        private readonly IOptions<VersionInfoOptions> _versionInfoOptions;
         private readonly ILogger<SystemInfoController> _logger;
 
         public SystemInfoController(
+            IOptions<VersionInfoOptions> versionInfoOptions,
             ILogger<SystemInfoController> logger)
         {
+            _versionInfoOptions = versionInfoOptions;
             _logger = logger;
         }
 
@@ -24,11 +29,20 @@ namespace BioTonFMSApp.Controllers
         /// </summary>
         /// <returns>Строка с номером версии</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [Route("system/get-version")]
-        public object GetVersion()
+        public IActionResult GetVersion()
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            var versionString = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "";
+            bool? showBranchInfo = _versionInfoOptions.Value?.ShowBranchInfo;
+            string versionString = "";
+            if (showBranchInfo.HasValue && showBranchInfo.Value)
+            {
+                versionString = GetVersionWithBranchInfo(); ;
+            }
+            else
+            {
+                versionString = GetVersionString();
+            }
             return Ok(versionString);
         }
 
@@ -37,17 +51,29 @@ namespace BioTonFMSApp.Controllers
         /// </summary>
         /// <returns>Строка с информацией о сборке</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [Route("system/get-build-info")]
-        public string GetBuildInfo()
+        public IActionResult GetBuildInfo()
         {
-            var version = Assembly
+            string version = GetVersionWithBranchInfo();
+            return Ok(version);
+        }
+
+        private static string GetVersionString()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var versionString = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "";
+            return versionString;
+        }
+
+        private static string GetVersionWithBranchInfo()
+        {
+            return Assembly
                 .GetExecutingAssembly()
                 .GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)
                 .Cast<AssemblyInformationalVersionAttribute>()
                 .Select(e => e.InformationalVersion)
                 .Single();
-
-            return version;
         }
     }
 }
