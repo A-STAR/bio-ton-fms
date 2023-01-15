@@ -1,3 +1,4 @@
+using BioTonFMS.Common.Settings;
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMS.Security.Controllers;
@@ -6,10 +7,7 @@ using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 using System.Globalization;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -24,6 +22,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 })
 .AddApplicationPart(typeof(AuthController).Assembly)
 .AddApplicationPart(typeof(TrackerController).Assembly);
+
+builder.Services.AddOptions();
+builder.Services.Configure<VersionInfoOptions>(builder.Configuration.GetSection("ShowVersionOptions"));
 
 builder.Services.AddDbContext<BioTonDBContext>(
         options => options
