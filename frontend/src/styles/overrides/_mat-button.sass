@@ -62,6 +62,9 @@
     justify-content: center
     align-items: center
 
+  @at-root .mat-column-action > #{&}:hover .mat-mdc-button-persistent-ripple::before
+    opacity: 0
+
   &.mat-mdc-button-base
     width: $mat-icon-button-size
     height: $mat-icon-button-size

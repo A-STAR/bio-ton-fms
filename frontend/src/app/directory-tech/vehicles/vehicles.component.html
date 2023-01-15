@@ -31,7 +31,7 @@
 
     <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
       <ng-container *ngSwitchCase="VehicleColumn.Action">
-        <button mat-icon-button>
+        <button mat-icon-button bioTableActionsTrigger>
           <mat-icon>more_horiz</mat-icon>
         </button>
 
