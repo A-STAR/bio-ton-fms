@@ -90,14 +90,8 @@
 %striped-table
 
   mat-table
-    margin-left: 30px
-    margin-right: 30px
+    margin: 0 30px
     box-shadow: $box-shadow
-
-  mat-row,
-  mat-header-cell,
-  mat-cell
-    border-color: $light-gray
 
   mat-header-row
     white-space: pre-line
@@ -106,6 +100,8 @@
     min-height: 45px
 
   mat-row
+    position: relative
+    transition: $panel-transition-duration $panel-transition-timing-function
 
     &:nth-child(odd)
       background-color: $light
@@ -117,51 +113,77 @@
     min-height: 40px
 
   mat-header-cell,
+  mat-cell,
+  .mdc-data-table__row:last-child .mdc-data-table__cell,
+  .mdc-data-table__row:not(:last-child) .actions
+    border: math.div(1px, 2) solid $light-gray
+
+  mat-header-cell,
   mat-cell
     justify-content: center
     text-align: center
 
-    &:not(:first-child)
-      border-width: math.div(1px, 2)
-      border-left-style: solid
-      border-right-style: solid
+    &:first-child
+      border-left-color: transparent
+
+    &:last-child
+      border-right-color: transparent
 
   mat-header-cell
     font-size: 10px
     font-weight: 500
+    border-top-color: transparent
 
   mat-cell
     font-size: 14px
 
   .mdc-data-table__header-cell,
   .mdc-data-table__cell
-    $mat-mdc-cell-padding-horizontal: math.div(16px, 2)
+    padding: 0 math.div(16px, 2)
 
-    padding-left: $mat-mdc-cell-padding-horizontal
-    padding-right: $mat-mdc-cell-padding-horizontal
+  .mdc-data-table__row:last-child .mdc-data-table__cell
+    border-bottom-color: transparent
 
   .mat-column-action
-    $button-spacing-horizontal: 4px
+    $column-spacing-horizontal: 10px
     $button-size: 34px
-    $icon-size: 18px
 
     flex: unset
-    flex-basis: 2 * ($button-spacing-horizontal + $button-size) + $button-spacing-horizontal
-    padding-left: $button-spacing-horizontal
-    padding-right: $button-spacing-horizontal
+    flex-basis: 2 * $column-spacing-horizontal + $button-size
 
     .mat-mdc-icon-button
       width: $button-size
       height: $button-size
+
+      &.mat-unthemed
+        color: $gray
+
+    button.deferred-hover + .actions,
+    .actions:hover
+      display: flex
+
+    .actions
+      $transparent-gradient-extra-spacing: 30px
+      $actions-padding-right: $transparent-gradient-extra-spacing + $column-spacing-horizontal
+
+      position: absolute
+      top: 0
+      left: 0
+      display: none
+      align-items: center
+      height: 100%
+      padding: 0 $actions-padding-right 0 $column-spacing-horizontal
+      background: linear-gradient(to left, transparent, $white $actions-padding-right)
+
+      [mat-icon-button] + [mat-icon-button]
+        margin-left: 4px
+
+    .mat-icon.md-18
+      $icon-size: 18px
+
+      width: $icon-size
+      height: $icon-size
       line-height: unset
-
-      .mat-icon.md-18
-        width: $icon-size
-        height: $icon-size
-        line-height: unset
-
-      & + .mat-mdc-icon-button
-        margin-left: $button-spacing-horizontal
 
   .mat-column-name
     flex: 2

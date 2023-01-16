@@ -11,6 +11,7 @@ import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, firs
 
 import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
+import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { TableDataSource } from '../table.data-source';
@@ -24,7 +25,8 @@ import { TableDataSource } from '../table.data-source';
     MatTableModule,
     MatSortModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    TableActionsTriggerDirective
   ],
   templateUrl: './vehicles.component.html',
   styleUrls: ['./vehicles.component.sass'],

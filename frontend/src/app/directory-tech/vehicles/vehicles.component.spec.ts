@@ -181,29 +181,43 @@ describe('VehiclesComponent', () => {
       row => row.getCells()
     ));
 
-    const updateButtons = await parallel(() => cells.map(
+    const actionButtons = await parallel(() => cells.map(
       ({
         0: actionCell
       }) => parallel(() => [
         actionCell.getHarnessOrNull(MatButtonHarness.with({
           selector: '[mat-icon-button]',
+          text: 'more_horiz'
+        })),
+        actionCell.getHarnessOrNull(MatButtonHarness.with({
+          ancestor: '.actions',
+          selector: '[mat-icon-button]',
           text: 'edit'
         })),
         actionCell.getHarnessOrNull(MatButtonHarness.with({
+          ancestor: '.actions',
           selector: '[mat-icon-button]',
           text: 'delete'
         }))
       ])
     ));
 
-    updateButtons.forEach(([updateButton, deleteButton]) => {
+    actionButtons.forEach(([actionButton, updateButton, deleteButton]) => {
+      expect(actionButton)
+        .withContext('render action button')
+        .not.toBeNull();
+
       expect(updateButton)
         .withContext('render update button')
-        .toBeDefined();
+        .not.toBeNull();
 
       expect(deleteButton)
         .withContext('render delete button')
-        .toBeDefined();
+        .not.toBeNull();
+
+      actionButton?.hasHarness(MatIconHarness.with({
+        name: 'more_horiz'
+      }));
 
       updateButton?.hasHarness(MatIconHarness.with({
         name: 'edit'
@@ -386,7 +400,7 @@ describe('VehiclesComponent', () => {
 
   it('should update vehicle', async () => {
     const updateVehicleButtons = await loader.getAllHarnesses(MatButtonHarness.with({
-      ancestor: '.mat-column-action',
+      ancestor: '.mat-column-action .actions',
       selector: '[mat-icon-button]',
       text: 'edit'
     }));
@@ -427,7 +441,7 @@ describe('VehiclesComponent', () => {
       .and.callFake(() => of({}));
 
     let vehicleButton = await loader.getHarness(MatButtonHarness.with({
-      ancestor: '.mat-column-action',
+      ancestor: '.mat-column-action .actions',
       selector: '[mat-icon-button]',
       text: 'delete'
     }));
