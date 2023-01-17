@@ -9,6 +9,10 @@ const routes: Routes = [
   {
     path: 'vehicles',
     loadComponent: () => import('./vehicles/vehicles.component')
+  },
+  {
+    path: 'trackers/:id',
+    loadComponent: () => import('./tracker/tracker.component')
   }
 ];
 
