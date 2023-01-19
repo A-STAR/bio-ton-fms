@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
 
 import { of } from 'rxjs';
@@ -31,6 +32,20 @@ describe('TrackerComponent', () => {
   it('should create', () => {
     expect(component)
       .toBeTruthy();
+  });
+
+  it('should render Tracker page heading', () => {
+    const headingDe = fixture.debugElement.query(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render heading element')
+      .not.toBeNull();
+
+    expect(headingDe.nativeElement.textContent)
+      .withContext('render heading text')
+      .toBe('Конфигурация данных GPS-трекера');
   });
 });
 
