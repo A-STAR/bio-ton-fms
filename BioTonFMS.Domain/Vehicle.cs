@@ -68,7 +68,7 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Год выпуска
         /// </summary>
-        public int ManufacturingYear { get; set; }
+        public int? ManufacturingYear { get; set; }
 
         /// <summary>
         /// Регистрационный номер
