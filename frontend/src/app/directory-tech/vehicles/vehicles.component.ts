@@ -15,12 +15,14 @@ import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/ta
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { TableDataSource } from '../table.data-source';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'bio-vehicles',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatButtonModule,
     MatTableModule,
     MatSortModule,

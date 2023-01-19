@@ -40,6 +40,11 @@
             <mat-icon class="md-18">edit</mat-icon>
           </button>
 
+          <a mat-icon-button title="GPS-трекер" color="accent" [routerLink]="['../trackers', element.tracker.key]"
+            *ngIf="element.tracker">
+            <mat-icon class="md-18">location_on</mat-icon>
+          </a>
+
           <button mat-icon-button title="Удалить" color="warn" (click)="onDeleteVehicle(element)">
             <mat-icon class="md-18">delete</mat-icon>
           </button>
