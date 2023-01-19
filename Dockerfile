@@ -6,10 +6,12 @@ COPY . ./
 
 RUN git describe
 # Restore as distinct layers
-RUN dotnet restore BioTonFMSApp/
-RUN dotnet build BioTonFMSApp/
+RUN dotnet restore BioTonFMSApp/BioTonFMSApp.sln
+RUN dotnet build -c release .tools/BioTonFMS.Version
+RUN dotnet build -c release BioTonFMSApp/BioTonFMSApp.csproj
+RUN dotnet build -c release .UnitTests/BiotonFMS.Telematica.Tests/
 
-# run the unit tests
+# run the unit tests 
 FROM build AS test
 WORKDIR /app/.UnitTests/BiotonFMS.Telematica.Tests
 CMD ["dotnet", "test", "--logger:trx"]
@@ -17,7 +19,7 @@ CMD ["dotnet", "test", "--logger:trx"]
 #Publish
 FROM build AS publish
 WORKDIR /app/
-RUN dotnet publish -c Release -o out  BioTonFMSApp/
+RUN dotnet publish -c Release -o out  BioTonFMSApp/BioTonFMSApp.csproj 
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
