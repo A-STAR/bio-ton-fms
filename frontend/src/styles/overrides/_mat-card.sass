@@ -1,4 +1,5 @@
 @use 'variables' as *
+@use 'extends'
 
 .mat-mdc-card
   box-shadow: $box-shadow
@@ -15,9 +16,10 @@ mat-card-content
   &:first-child
     padding-top: $mat-card-padding
 
-mat-card-title
-  font-size: 20px
-  font-weight: 700
+mat-card > .mat-mdc-card-title
+  margin: $mat-card-padding $mat-card-padding 20px
+  font-size: 13px
+  font-size: 500
 
 mat-card-content
 

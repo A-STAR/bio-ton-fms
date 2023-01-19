@@ -4,6 +4,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -43,6 +44,7 @@ describe('VehiclesComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          RouterTestingModule,
           MatSnackBarModule,
           VehiclesComponent
         ]
@@ -186,23 +188,29 @@ describe('VehiclesComponent', () => {
         0: actionCell
       }) => parallel(() => [
         actionCell.getHarnessOrNull(MatButtonHarness.with({
-          selector: '[mat-icon-button]',
+          variant: 'icon',
           text: 'more_horiz'
         })),
         actionCell.getHarnessOrNull(MatButtonHarness.with({
           ancestor: '.actions',
-          selector: '[mat-icon-button]',
+          variant: 'icon',
           text: 'edit'
         })),
         actionCell.getHarnessOrNull(MatButtonHarness.with({
           ancestor: '.actions',
-          selector: '[mat-icon-button]',
+          selector: 'a',
+          variant: 'icon',
+          text: 'location_on'
+        })),
+        actionCell.getHarnessOrNull(MatButtonHarness.with({
+          ancestor: '.actions',
+          variant: 'icon',
           text: 'delete'
         }))
       ])
     ));
 
-    actionButtons.forEach(([actionButton, updateButton, deleteButton]) => {
+    actionButtons.forEach(async ([actionButton, updateButton, trackerAnchor, deleteButton], index) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
@@ -210,6 +218,27 @@ describe('VehiclesComponent', () => {
       expect(updateButton)
         .withContext('render update button')
         .not.toBeNull();
+
+      if (testVehicles.vehicles[index].tracker) {
+        expect(trackerAnchor)
+          .withContext('render GPS tracker anchor')
+          .not.toBeNull();
+
+        try {
+          const anchorEl = await trackerAnchor?.host();
+          const routerLink = await anchorEl?.getAttribute('ng-reflect-router-link');
+
+          expect(routerLink)
+            .withContext('render GPS tracker anchor router link')
+            .toBe(
+              ['../trackers', testVehicles.vehicles[index].tracker?.key].join()
+            );
+        } catch { }
+
+        trackerAnchor?.hasHarness(MatIconHarness.with({
+          name: 'location_on'
+        }));
+      }
 
       expect(deleteButton)
         .withContext('render delete button')
