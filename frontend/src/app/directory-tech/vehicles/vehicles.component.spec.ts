@@ -224,16 +224,14 @@ describe('VehiclesComponent', () => {
           .withContext('render GPS tracker anchor')
           .not.toBeNull();
 
-        try {
-          const anchorEl = await trackerAnchor?.host();
-          const routerLink = await anchorEl?.getAttribute('ng-reflect-router-link');
+        const anchorEl = await trackerAnchor?.host();
+        const routerLink = await anchorEl?.getAttribute('ng-reflect-router-link');
 
-          expect(routerLink)
-            .withContext('render GPS tracker anchor router link')
-            .toBe(
-              ['../trackers', testVehicles.vehicles[index].tracker?.key].join()
-            );
-        } catch { }
+        expect(routerLink)
+          .withContext('render GPS tracker anchor router link')
+          .toBe(
+            ['../trackers', testVehicles.vehicles[index].tracker?.key].join()
+          );
 
         trackerAnchor?.hasHarness(MatIconHarness.with({
           name: 'location_on'
