@@ -59,8 +59,8 @@ app.UseAuthorization();
 
 // Для приложения выставляем явные параметры локализации для каждого запроса
 // Мы работаем только с русским языком.
-string locale = "ru-RU";
-RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions
+const string locale = "ru-RU";
+var localizationOptions = new RequestLocalizationOptions
 {
     SupportedCultures = new List<CultureInfo> { new CultureInfo(locale) },
     SupportedUICultures = new List<CultureInfo> { new CultureInfo(locale) },
