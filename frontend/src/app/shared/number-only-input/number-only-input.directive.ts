@@ -22,7 +22,7 @@ export class NumberOnlyInputDirective {
   /**
     * Prevent characters other than number from paste into input of type `number`.
     *
-    * @param event Paset `ClipboardEvent`.
+    * @param event Paste `ClipboardEvent`.
     */
   @HostListener('paste', ['$event'])
   protected handlePaste(event: ClipboardEvent) {
