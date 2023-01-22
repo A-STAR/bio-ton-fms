@@ -2458,7 +2458,7 @@ namespace BioTonFMSApp.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("make");
 
-                    b.Property<int>("ManufacturingYear")
+                    b.Property<int?>("ManufacturingYear")
                         .HasColumnType("integer")
                         .HasColumnName("manufacturing_year");
 
