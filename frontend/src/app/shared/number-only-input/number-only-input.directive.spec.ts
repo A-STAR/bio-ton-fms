@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -9,10 +9,7 @@ describe('NumberOnlyInputDirective', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        TestNumberInputComponent,
-        NumberOnlyInputDirective
-      ]
+      imports: [TestNumberInputComponent]
     })
       .compileComponents();
 
@@ -28,49 +25,53 @@ describe('NumberOnlyInputDirective', () => {
       .toBeTruthy();
   });
 
-  it('should prevent characters from input', async () => {
+  it('should prevent characters from input', () => {
     const directiveDe = fixture.debugElement.query(
       By.directive(NumberOnlyInputDirective)
     );
-
-    const input = directiveDe.nativeElement as HTMLInputElement;
 
     const event = new KeyboardEvent('keydown', {
-      key: 'e'
+      key: 'e',
+      cancelable: true
     });
 
-    input.dispatchEvent(event);
-    fixture.detectChanges();
+    const isEventSucceeded = (directiveDe.nativeElement as HTMLInputElement)
+      .dispatchEvent(event);
 
-    expect(input.value)
-      .withContext('prevent character input')
-      .toBe('');
+    expect(isEventSucceeded)
+      .withContext('prevent keydown event')
+      .toBe(false);
   });
 
-  it('should prevent characters from paste', async () => {
+  it('should prevent characters from paste', () => {
     const directiveDe = fixture.debugElement.query(
       By.directive(NumberOnlyInputDirective)
     );
 
-    const input = directiveDe.nativeElement as HTMLInputElement;
     const clipboardData = new DataTransfer();
 
     clipboardData.setData('text/plain', 'e');
 
-    const event = new ClipboardEvent('paste', { clipboardData });
+    const event = new ClipboardEvent('paste', {
+      clipboardData,
+      cancelable: true
+    });
 
-    input.dispatchEvent(event);
-    fixture.detectChanges();
+    const isEventSucceeded = (directiveDe.nativeElement as HTMLInputElement)
+      .dispatchEvent(event);
 
-    expect(input.value)
-      .withContext('prevent character paste')
-      .toBe('');
+    expect(isEventSucceeded)
+      .withContext('prevent paste event')
+      .toBe(false);
   });
 });
 
 @Component({
   standalone: true,
   imports: [NumberOnlyInputDirective],
-  template: '<input type="number" bioNumberOnlyInput>'
+  template: `
+    <input type="number" bioNumberOnlyInput>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 class TestNumberInputComponent { }
