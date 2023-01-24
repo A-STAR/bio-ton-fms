@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogTitle } from '@angular/material/dialog';
+import { By } from '@angular/platform-browser';
 
 import { ConfirmationDialogComponent } from './confirmation-dialog.component';
 
@@ -21,5 +23,19 @@ describe('ConfirmationDialogComponent', () => {
   it('should create', () => {
     expect(component)
       .toBeTruthy();
+  });
+
+  it('should render dialog title', () => {
+    const dialogTitleDe = fixture.debugElement.query(
+      By.directive(MatDialogTitle)
+    );
+
+    expect(dialogTitleDe)
+      .withContext('render dialog title element')
+      .not.toBeNull();
+
+    expect(dialogTitleDe.nativeElement.textContent)
+      .withContext('render dialog title text')
+      .toBe('Удаление');
   });
 });
