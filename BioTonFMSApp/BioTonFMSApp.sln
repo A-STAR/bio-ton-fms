@@ -33,9 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.TrackerTcpServer"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTcpTrackerClient", "..\TrackerMessages\TestTcpClient\TestTcpTrackerClient.csproj", "{A2D2B6AC-A654-45DF-A9BC-CCB568EE0707}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BioTonFMS.Infrastructure.RabbitMQ", "..\BioTonFMS.Infrastructure.RabbitMQ\BioTonFMS.Infrastructure.RabbitMQ.csproj", "{6F0B62DC-1A05-48F5-9B4F-BC07DCFF7C58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.Infrastructure.RabbitMQ", "..\BioTonFMS.Infrastructure.RabbitMQ\BioTonFMS.Infrastructure.RabbitMQ.csproj", "{6F0B62DC-1A05-48F5-9B4F-BC07DCFF7C58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BioTonFMS.Common", "..\BioTonFMS.Common\BioTonFMS.Common.csproj", "{F6363A4F-AFE1-4794-9B18-CD2E4B45C1D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.Common", "..\BioTonFMS.Common\BioTonFMS.Common.csproj", "{F6363A4F-AFE1-4794-9B18-CD2E4B45C1D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

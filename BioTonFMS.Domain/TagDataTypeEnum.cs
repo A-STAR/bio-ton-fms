@@ -43,5 +43,5 @@ public enum TagDataTypeEnum
     /// Структура
     /// </summary>
     [Description("Структура")]
-    Struct = 7
+    Struct = 8
 }

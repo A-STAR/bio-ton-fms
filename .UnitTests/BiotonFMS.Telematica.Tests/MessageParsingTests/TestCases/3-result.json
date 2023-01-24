@@ -1,0 +1,233 @@
+{
+  "$type": "System.Collections.Generic.List`1[[BioTonFMS.Domain.TrackerMessages.TrackerMessage, BioTonFMS.Domain]], System.Private.CoreLib",
+  "$values": [
+    {
+      "$type": "BioTonFMS.Domain.TrackerMessages.TrackerMessage, BioTonFMS.Domain",
+      "Id": 0,
+      "TrId": 1836,
+      "Imei": "",
+      "ServerDateTime": "2023-01-24T09:38:57.867906Z",
+      "TrackerDateTime": "2022-12-19T08:16:49Z",
+      "Latitude": 50.148621,
+      "Longitude": 53.20456,
+      "SatNumber": 12,
+      "CoordCorrectness": 0,
+      "Height": 111.0,
+      "Speed": 0.0,
+      "Direction": 204.3,
+      "FuelLevel": 24,
+      "CoolantTemperature": -40,
+      "EngineSpeed": 0,
+      "Tags": {
+        "$type": "System.Collections.Generic.List`1[[BioTonFMS.Domain.TrackerMessages.MessageTag, BioTonFMS.Domain]], System.Private.CoreLib",
+        "$values": [
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 15956,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 5
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 6,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 10
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 14336,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 11
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 12417,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 12
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 3736,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 13
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 35,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 14
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 59692,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 27
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 28
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 29
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 30
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 31
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 32
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 1,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 33
+          }
+        ]
+      }
+    },
+    {
+      "$type": "BioTonFMS.Domain.TrackerMessages.TrackerMessage, BioTonFMS.Domain",
+      "Id": 0,
+      "TrId": 1836,
+      "Imei": "",
+      "ServerDateTime": "2023-01-24T09:38:57.867911Z",
+      "TrackerDateTime": "2022-12-19T08:14:49Z",
+      "Latitude": 50.148621,
+      "Longitude": 53.20456,
+      "SatNumber": 12,
+      "CoordCorrectness": 0,
+      "Height": 111.0,
+      "Speed": 0.0,
+      "Direction": 204.3,
+      "FuelLevel": 24,
+      "CoolantTemperature": -40,
+      "EngineSpeed": 0,
+      "Tags": {
+        "$type": "System.Collections.Generic.List`1[[BioTonFMS.Domain.TrackerMessages.MessageTag, BioTonFMS.Domain]], System.Private.CoreLib",
+        "$values": [
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 15955,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 5
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 6,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 10
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 14336,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 11
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 12384,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 12
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 3739,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 13
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 36,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 14
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
+            "Value": 59692,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 27
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 28
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 29
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 30
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 31
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 0,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 32
+          },
+          {
+            "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagByte, BioTonFMS.Domain",
+            "Value": 1,
+            "Id": 0,
+            "TrackerMessageId": 0,
+            "TrackerTagId": 33
+          }
+        ]
+      }
+    }
+  ]
+}

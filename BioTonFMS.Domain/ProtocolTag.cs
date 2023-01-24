@@ -19,12 +19,12 @@ public class ProtocolTag : EntityBase, IAggregateRoot
     /// </summary>
     [Required]
     public int TagId { get; set; }
-    
+
     /// <summary>
     /// Ссылка на тег
     /// </summary>
     [Required]
-    public TrackerTag Tag { get; set; }
+    public TrackerTag Tag { get; set; } = null!;
 
     /// <summary>
     /// Код тега в протоколе

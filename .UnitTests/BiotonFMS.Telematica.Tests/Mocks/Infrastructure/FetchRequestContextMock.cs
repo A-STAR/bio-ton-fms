@@ -16,7 +16,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
         /// <exception cref="ArgumentNullException">Переданный аргумент имеет значение <see langword="null"/>.</exception>
         public FetchRequestContextMock(IQueryable<TQueried> query)
         {
-            _query = query ?? throw new ArgumentNullException("query");
+            _query = query ?? throw new ArgumentNullException(nameof(query));
         }
 
         /// <inheritdoc />

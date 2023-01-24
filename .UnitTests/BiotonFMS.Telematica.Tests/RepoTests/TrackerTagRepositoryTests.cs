@@ -5,7 +5,7 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using FluentAssertions;
 
-namespace BiotonFMS.Telematica.Tests;
+namespace BiotonFMS.Telematica.Tests.RepoTests;
 
 public class TrackerTagRepositoryTests
 {
