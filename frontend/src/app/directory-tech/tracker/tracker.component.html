@@ -2,4 +2,6 @@
 
 <mat-card>
   <mat-card-title>Дополнительные параметры</mat-card-title>
+
+  <ng-container *ngIf="sensors$ | async"></ng-container>
 </mat-card>

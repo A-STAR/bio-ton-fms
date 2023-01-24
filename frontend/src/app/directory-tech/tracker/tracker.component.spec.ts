@@ -1,24 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCardHarness } from '@angular/material/card/testing';
 
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
+
+import { Sensors, TrackerService } from '../tracker.service';
 
 import TrackerComponent from './tracker.component';
+
+import { testSensors, TEST_TRACKER_ID } from '../tracker.service.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
   let fixture: ComponentFixture<TrackerComponent>;
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
+  let trackerService: TrackerService;
+
+  let sensorsSpy: jasmine.Spy<() => Observable<Sensors>>;
 
   beforeEach(async () => {
     await TestBed
       .configureTestingModule({
-        imports: [TrackerComponent],
+        imports: [
+          TrackerComponent,
+          HttpClientTestingModule
+        ],
         providers: [
           {
             provide: ActivatedRoute,
@@ -31,8 +42,14 @@ describe('TrackerComponent', () => {
     fixture = TestBed.createComponent(TrackerComponent);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    trackerService = TestBed.inject(TrackerService);
 
     component = fixture.componentInstance;
+
+    const sensors$ = of(testSensors);
+
+    sensorsSpy = spyOn(trackerService, 'getSensors')
+      .and.returnValue(sensors$);
 
     fixture.detectChanges();
   });
@@ -65,12 +82,15 @@ describe('TrackerComponent', () => {
       .withContext('render sensors card')
       .not.toBeNull();
   });
+
+  it('should get sensors', () => {
+    expect(sensorsSpy)
+      .toHaveBeenCalled();
+  });
 });
 
-const TRACKER_ID = 1;
-
 const testParams: Params = {
-  id: TRACKER_ID
+  id: TEST_TRACKER_ID
 };
 
 const testParamMap = convertToParamMap(testParams);
