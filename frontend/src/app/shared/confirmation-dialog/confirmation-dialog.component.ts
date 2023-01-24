@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatDialogConfig } from '@angular/material/dialog';
 
 @Component({
   selector: 'bio-confirmation-dialog',
@@ -10,3 +11,9 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmationDialogComponent { }
+
+export type ConfirmationDialogData = {}
+
+export const confirmationDialogConfig: MatDialogConfig<ConfirmationDialogData> = {
+  width: '630px'
+};

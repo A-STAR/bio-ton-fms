@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -13,9 +14,13 @@ import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, V
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
+import {
+  ConfirmationDialogData,
+  ConfirmationDialogComponent,
+  confirmationDialogConfig
+} from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { TableDataSource } from '../table.data-source';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'bio-vehicles',
@@ -165,6 +170,8 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    * @param vehicleDataSource Vehicle data source.
    */
   protected async onDeleteVehicle({ id }: VehicleDataSource) {
+    this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData>(ConfirmationDialogComponent, confirmationDialogConfig);
+
     try {
       const deleteVehicle$ = this.vehicleService.deleteVehicle(id);
 
