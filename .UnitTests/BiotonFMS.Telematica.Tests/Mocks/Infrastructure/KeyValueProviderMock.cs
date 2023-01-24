@@ -10,7 +10,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
 
         public KeyValueProviderMock(ICollection<TEntity> collection)
         {
-            _collection = collection ?? throw new ArgumentNullException("collection");
+            _collection = collection ?? throw new ArgumentNullException(nameof(collection));
         }
 
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             _collection.Remove(entity);
@@ -36,7 +36,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
             if (!_collection.Contains(entity))
             {
@@ -48,7 +48,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
         }
 

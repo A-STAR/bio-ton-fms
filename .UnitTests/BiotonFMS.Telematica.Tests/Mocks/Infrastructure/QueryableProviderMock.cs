@@ -12,7 +12,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
 
         public QueryableProviderMock(ICollection<TEntity> collection)
         {
-            _collection = collection ?? throw new ArgumentNullException("collection");
+            _collection = collection ?? throw new ArgumentNullException(nameof(collection));
         }
 
         public IQueryable<TEntity> Linq()

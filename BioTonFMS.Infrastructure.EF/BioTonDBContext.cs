@@ -4,6 +4,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using Bogus;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+// ReSharper disable InconsistentNaming
 
 namespace BioTonFMS.Infrastructure.EF
 {

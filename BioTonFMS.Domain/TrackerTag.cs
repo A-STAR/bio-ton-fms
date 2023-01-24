@@ -31,9 +31,9 @@ public class TrackerTag : EntityBase, IAggregateRoot
     /// </summary>
     [MaxLength(500)]
     public string? Description { get; set; }
-    
+
     /// <summary>
     /// Ссылки на теги протокола
     /// </summary>
-    public ICollection<ProtocolTag> ProtocolTags { get; set; }
+    public ICollection<ProtocolTag> ProtocolTags { get; set; } = null!;
 }

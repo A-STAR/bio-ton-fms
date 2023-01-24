@@ -9,7 +9,7 @@ using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using FluentAssertions;
 using Xunit.Abstractions;
 
-namespace BiotonFMS.Telematica.Tests;
+namespace BiotonFMS.Telematica.Tests.RepoTests;
 
 public class VehicleRepositoryTests
 {

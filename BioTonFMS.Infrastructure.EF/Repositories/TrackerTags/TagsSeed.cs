@@ -277,6 +277,54 @@ public static class TagsSeed
             ProtocolTagCode = 0xDB,
             Size = 4,
             TrackerType = TrackerTypeEnum.GalileoSkyV50
+        },
+        new ProtocolTag
+        {
+            Id = 35,
+            TagId = 35,
+            ProtocolTagCode = 0x54,
+            Size = 2,
+            TrackerType = TrackerTypeEnum.GalileoSkyV50
+        },
+        new ProtocolTag
+        {
+            Id = 36,
+            TagId = 36,
+            ProtocolTagCode = 0x55,
+            Size = 2,
+            TrackerType = TrackerTypeEnum.GalileoSkyV50
+        },
+        new ProtocolTag
+        {
+            Id = 37,
+            TagId = 37,
+            ProtocolTagCode = 0x90,
+            Size = 4,
+            TrackerType = TrackerTypeEnum.GalileoSkyV50
+        },
+        new ProtocolTag
+        {
+            Id = 38,
+            TagId = 38,
+            ProtocolTagCode = 0xD3,
+            Size = 4,
+            TrackerType = TrackerTypeEnum.GalileoSkyV50
+        },
+        new ProtocolTag
+        {
+            Id = 39,
+            TagId = 39,
+            ProtocolTagCode = 0xD5,
+            Size = 1,
+            TrackerType = TrackerTypeEnum.GalileoSkyV50
+        },
+        new ProtocolTag
+        {
+            Id = 40,
+            TagId = 40,
+            ProtocolTagCode = 0x48,
+            Size = 2,
+            TrackerType = TrackerTypeEnum.GalileoSkyV50
         }
     };
 
@@ -585,6 +633,70 @@ public static class TagsSeed
             Description = @"В зависимости от настроек один из вариантов:
 CAN32BITR0
 полное время работы двигателя, ч"
+        },
+        new TrackerTag
+        {
+            Id = 35,
+            Name = "Port 4",
+            DataType = TagDataTypeEnum.Integer,
+            StructType = null,
+            Description = @"Значение на входе 4.
+В зависимости от настроек один из вариантов:
+1. напряжение, мВ
+2. число импульсов
+3. частота, Гц"
+        },
+        new TrackerTag
+        {
+            Id = 36,
+            Name = "Port 5",
+            DataType = TagDataTypeEnum.Integer,
+            StructType = null,
+            Description = @"Значение на входе 5.
+В зависимости от настроек один из вариантов:
+1. напряжение, мВ
+2. число импульсов
+3. частота, Гц"
+        },
+        new TrackerTag
+        {
+            Id = 37,
+            Name = "iButton 1",
+            DataType = TagDataTypeEnum.Integer,
+            StructType = null,
+            Description = @"Идентификационный номер первого ключа iButton"
+        },
+        new TrackerTag
+        {
+            Id = 38,
+            Name = "iButton 2",
+            DataType = TagDataTypeEnum.Integer,
+            StructType = null,
+            Description = @"Идентификационный номер второго ключа iButton"
+        },
+        new TrackerTag
+        {
+            Id = 39,
+            Name = "iButton Keys",
+            DataType = TagDataTypeEnum.Byte,
+            StructType = null,
+            Description = @"Состояние ключей iButton, идентификаторы которых заданы командой iButtons.
+Каждый бит соответствует одному ключу.
+Например, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи."
+        },
+        new TrackerTag
+        {
+            Id = 40,
+            Name = "expanded_terminal_status",
+            DataType = TagDataTypeEnum.Bits,
+            StructType = null,
+            Description = @"0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.
+1 – статус GPRS сессии. 1- установлена, 0 – нет.
+2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.
+3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.
+4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.
+5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.
+6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует."
         }
     };
 }
