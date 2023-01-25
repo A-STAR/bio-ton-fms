@@ -76,9 +76,10 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
             if (vehicle is not null)
             {
+                var regNum = vehicle.RegistrationNumber.Length > 0 ? vehicle.RegistrationNumber : "незаполнен";
                 _logger.LogError($"Нельзя удалить трекер (id - {tracker.Id}) " +
                    $"привязанный к машине (id - {vehicle.Id})!");
-                throw new ArgumentException("Нельзя удалить трекер привязанный к машине");
+                throw new ArgumentException($"Нельзя удалить трекер привязанный к машине (название - '{vehicle.Name}', регистрационный номер - {regNum})");
             }
 
             try
