@@ -10,6 +10,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
+using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 
 namespace BioTonFMSApp.Startup
@@ -63,6 +64,10 @@ namespace BioTonFMSApp.Startup
             builder.Services.AddTransient<IKeyValueProvider<SensorGroup, int>, KeyValueProvider<SensorGroup, int>>();
             builder.Services.AddTransient<IQueryableProvider<SensorGroup>, QueryableProvider<SensorGroup>>();
             builder.Services.AddTransient<ISensorGroupRepository, SensorGroupRepository>();
+
+            builder.Services.AddTransient<IKeyValueProvider<Unit, int>, KeyValueProvider<Unit, int>>();
+            builder.Services.AddTransient<IQueryableProvider<Unit>, QueryableProvider<Unit>>();
+            builder.Services.AddTransient<IUnitRepository, UnitRepository>();
             
             return builder;
         }

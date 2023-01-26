@@ -9,14 +9,14 @@ namespace BioTonFMS.Domain
     /// </summary>
     public sealed class SensorType : EntityBase, IAggregateRoot
     {
-        public SensorType(int id, int sensorGroupId, string name, string description, SensorDataTypeEnum? dataType, SensorUnitEnum? unit)
+        public SensorType(int id, int sensorGroupId, string name, string description, SensorDataTypeEnum? dataType, int? unitId)
         {
             Id = id;
             SensorGroupId = sensorGroupId;
             Name = name;
             Description = description;
             DataType = dataType;
-            Unit = unit;
+            UnitId = unitId;
         }
 
         /// <summary>
@@ -51,7 +51,12 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Идентификатор единицы измерения для датчиков данного типа. Если не указан, то датчики могут иметь любые единицы измерения.
         /// </summary>
-        public SensorUnitEnum? Unit { get; set; }
+        public int? UnitId { get; set; }
+        
+        /// <summary>
+        /// Единица измерения для датчиков данного типа. Если не указана, то датчики могут иметь любые единицы измерения.
+        /// </summary>        
+        public Unit Unit { get; set; }
 
  /// <summary>
         /// Сенсоры данного типа
