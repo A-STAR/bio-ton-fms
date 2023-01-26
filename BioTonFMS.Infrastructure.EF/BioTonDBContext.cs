@@ -2,6 +2,7 @@
 using BioTonFMS.Domain.Identity;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
+using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using Bogus;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace BioTonFMS.Infrastructure.EF
         public DbSet<Sensor> Sensors => Set<Sensor>();
         public DbSet<SensorGroup> SensorGroups => Set<SensorGroup>();
         public DbSet<SensorType> SensorTypes => Set<SensorType>();
+        public DbSet<Unit> Units => Set<Unit>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +45,9 @@ namespace BioTonFMS.Infrastructure.EF
 
             modelBuilder.Entity<SensorType>()
                 .HasData(SensorTypePredefinedData.SensorTypes);
+
+            modelBuilder.Entity<Unit>()
+                .HasData(UnitPredefinedData.Units);
         }
     }
 }

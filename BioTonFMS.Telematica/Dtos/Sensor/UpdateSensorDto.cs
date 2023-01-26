@@ -46,10 +46,10 @@ namespace BioTonFMS.Telematica.Dtos
         public string Formula { get; set; }
 
         /// <summary>
-        /// Единица измерения датчика
+        /// Идентификатор единицы измерения датчика
         /// </summary>
         [Required]
-        public SensorUnitEnum Unit { get; set; }
+        public int UnitId { get; set; }
 
         /// <summary>
         /// Использовать последние принятые от трекера значения 

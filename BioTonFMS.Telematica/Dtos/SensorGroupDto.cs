@@ -6,7 +6,7 @@
 public class SensorGroupDto
 {
     /// <summary>
-    /// Id группы сенсоров
+    /// Id группы датчиков
     /// </summary>
     public int Id { get; set; }    
     

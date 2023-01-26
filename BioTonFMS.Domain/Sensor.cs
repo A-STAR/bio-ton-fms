@@ -62,8 +62,7 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Единица измерения датчика
         /// </summary>
-        [Required]
-        public SensorUnitEnum Unit { get; set; }
+        public Unit Unit { get; set; }
 
         /// <summary>
         /// Использовать последние принятые от трекера значения 
