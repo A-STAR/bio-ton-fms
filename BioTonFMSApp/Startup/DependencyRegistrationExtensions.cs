@@ -7,7 +7,9 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
+using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
+using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 
 namespace BioTonFMSApp.Startup
@@ -53,6 +55,14 @@ namespace BioTonFMSApp.Startup
             builder.Services.AddTransient<IKeyValueProvider<Sensor, int>, KeyValueProvider<Sensor, int>>();
             builder.Services.AddTransient<IQueryableProvider<Sensor>, QueryableProvider<Sensor>>();
             builder.Services.AddTransient<ISensorRepository, SensorRepository>();
+
+            builder.Services.AddTransient<IKeyValueProvider<SensorType, int>, KeyValueProvider<SensorType, int>>();
+            builder.Services.AddTransient<IQueryableProvider<SensorType>, QueryableProvider<SensorType>>();
+            builder.Services.AddTransient<ISensorTypeRepository, SensorTypeRepository>();
+
+            builder.Services.AddTransient<IKeyValueProvider<SensorGroup, int>, KeyValueProvider<SensorGroup, int>>();
+            builder.Services.AddTransient<IQueryableProvider<SensorGroup>, QueryableProvider<SensorGroup>>();
+            builder.Services.AddTransient<ISensorGroupRepository, SensorGroupRepository>();
             
             return builder;
         }

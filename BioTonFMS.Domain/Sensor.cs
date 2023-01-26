@@ -36,10 +36,15 @@ namespace BioTonFMS.Domain
         public SensorDataTypeEnum DataType { get; set; }
         
         /// <summary>
-        /// Тип сенсора
+        /// Идентификатор типа сенсора
         /// </summary>
         [Required]
-        public int TypeId { get; set; }
+        public int SensorTypeId { get; set; }
+
+        /// <summary>
+        /// Тип сенсора
+        /// </summary>
+        public SensorType SensorType { get; set; }
 
         /// <summary>
         /// Описание датчика
@@ -58,7 +63,7 @@ namespace BioTonFMS.Domain
         /// Единица измерения датчика
         /// </summary>
         [Required]
-        public int UnitId { get; set; }
+        public SensorUnitEnum Unit { get; set; }
 
         /// <summary>
         /// Использовать последние принятые от трекера значения 

@@ -1,4 +1,4 @@
-﻿using BioTonFMS.Domain;
+using BioTonFMS.Domain;
 #pragma warning disable CS8618
 
 namespace BioTonFMS.Telematica.Dtos
@@ -31,7 +31,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Тип сенсора
         /// </summary>
-        public int TypeId { get; set; }
+        public int SensorTypeId { get; set; }
 
         /// <summary>
         /// Описание
@@ -46,7 +46,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Единица измерения датчика
         /// </summary>
-        public int UnitId { get; set; }
+        public SensorUnitEnum Unit { get; set; }
 
         /// <summary>
         /// Использовать последние принятые от трекера значения 

@@ -3,6 +3,7 @@ using System;
 using BioTonFMS.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMSApp.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    partial class BioTonDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230125161603_SensorGroupsAndSensorTypes")]
+    partial class SensorGroupsAndSensorTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -506,54 +508,6 @@ namespace BioTonFMSApp.Migrations
                             ProtocolTagCode = 219,
                             Size = 4,
                             TagId = 34,
-                            TrackerType = 1
-                        },
-                        new
-                        {
-                            Id = 35,
-                            ProtocolTagCode = 84,
-                            Size = 2,
-                            TagId = 35,
-                            TrackerType = 1
-                        },
-                        new
-                        {
-                            Id = 36,
-                            ProtocolTagCode = 85,
-                            Size = 2,
-                            TagId = 36,
-                            TrackerType = 1
-                        },
-                        new
-                        {
-                            Id = 37,
-                            ProtocolTagCode = 144,
-                            Size = 4,
-                            TagId = 37,
-                            TrackerType = 1
-                        },
-                        new
-                        {
-                            Id = 38,
-                            ProtocolTagCode = 211,
-                            Size = 4,
-                            TagId = 38,
-                            TrackerType = 1
-                        },
-                        new
-                        {
-                            Id = 39,
-                            ProtocolTagCode = 213,
-                            Size = 1,
-                            TagId = 39,
-                            TrackerType = 1
-                        },
-                        new
-                        {
-                            Id = 40,
-                            ProtocolTagCode = 72,
-                            Size = 2,
-                            TagId = 40,
                             TrackerType = 1
                         });
                 });
@@ -1076,7 +1030,7 @@ namespace BioTonFMSApp.Migrations
                         new
                         {
                             Id = 7,
-                            DataType = 8,
+                            DataType = 7,
                             Description = "Координаты в градусах, число спутников, признак корректности определения координат и источник координат.",
                             Name = "coord_struct",
                             StructType = 1
@@ -1084,7 +1038,7 @@ namespace BioTonFMSApp.Migrations
                         new
                         {
                             Id = 8,
-                            DataType = 8,
+                            DataType = 7,
                             Description = "Скорость в км/ч и направление в градусах",
                             Name = "speed_direction",
                             StructType = 2
@@ -1211,7 +1165,7 @@ namespace BioTonFMSApp.Migrations
                         new
                         {
                             Id = 26,
-                            DataType = 8,
+                            DataType = 7,
                             Description = "Данные CAN-шины (CAN_A1) или CAN-LOG.\nУровень топлива, %;\nтемпература охлаждающей жидкости, °C;\nобороты двигателя, об/мин.",
                             Name = "CAN_A1",
                             StructType = 4
@@ -1271,48 +1225,6 @@ namespace BioTonFMSApp.Migrations
                             DataType = 1,
                             Description = "В зависимости от настроек один из вариантов:\nCAN32BITR0\nполное время работы двигателя, ч",
                             Name = "CAN32BITR0"
-                        },
-                        new
-                        {
-                            Id = 35,
-                            DataType = 1,
-                            Description = "Значение на входе 4.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
-                            Name = "Port 4"
-                        },
-                        new
-                        {
-                            Id = 36,
-                            DataType = 1,
-                            Description = "Значение на входе 5.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
-                            Name = "Port 5"
-                        },
-                        new
-                        {
-                            Id = 37,
-                            DataType = 1,
-                            Description = "Идентификационный номер первого ключа iButton",
-                            Name = "iButton 1"
-                        },
-                        new
-                        {
-                            Id = 38,
-                            DataType = 1,
-                            Description = "Идентификационный номер второго ключа iButton",
-                            Name = "iButton 2"
-                        },
-                        new
-                        {
-                            Id = 39,
-                            DataType = 7,
-                            Description = "Состояние ключей iButton, идентификаторы которых заданы командой iButtons.\nКаждый бит соответствует одному ключу.\nНапример, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи.",
-                            Name = "iButton Keys"
-                        },
-                        new
-                        {
-                            Id = 40,
-                            DataType = 6,
-                            Description = "0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.\n1 – статус GPRS сессии. 1- установлена, 0 – нет.\n2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.\n3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.\n4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.\n5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.\n6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует.",
-                            Name = "expanded_terminal_status"
                         });
                 });
 

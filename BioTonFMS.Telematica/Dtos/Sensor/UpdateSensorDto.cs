@@ -32,7 +32,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// Тип сенсора
         /// </summary>
         [Required]
-        public int TypeId { get; set; }
+        public int SensorTypeId { get; set; }
 
         /// <summary>
         /// Описание
@@ -49,7 +49,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// Единица измерения датчика
         /// </summary>
         [Required]
-        public int UnitId { get; set; }
+        public SensorUnitEnum Unit { get; set; }
 
         /// <summary>
         /// Использовать последние принятые от трекера значения 
