@@ -79,7 +79,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
                 linqProvider.Where(sensorPredicate) :
                 linqProvider;
 
-            if (filter.SortBy is not SensorSortBy.AlphabetOrder)
+            if (filter.SortBy is not SensorSortBy.Name)
                 return sensors.AsNoTracking().GetPagedQueryable(
                     filter.PageNum, filter.PageSize);
 

@@ -11,7 +11,8 @@ public static class Seeds
         var sensors = new Faker<Sensor>()
             .RuleFor(v => v.Id, (f, v) => sensorId--)
             .RuleFor(v => v.Name, (f, v) => f.Hacker.Noun())
-            .RuleFor(v => v.Formula, (f, v) => "someParam");
+            .RuleFor(v => v.Formula, (f, v) => "someParam")
+            .RuleFor(v => v.SensorTypeId, (f, v) => f.Random.Int(1, 23));
 
         var trackerId = -1;
         var trackers = new Faker<Tracker>()
