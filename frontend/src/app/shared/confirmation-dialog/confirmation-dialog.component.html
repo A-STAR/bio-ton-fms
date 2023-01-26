@@ -1,3 +1,9 @@
 <h1 mat-dialog-title>Удаление</h1>
 
 <mat-dialog-content [innerHTML]="data.content"></mat-dialog-content>
+
+<mat-dialog-actions fxLayoutAlign="space-between">
+  <button mat-stroked-button color="accent" [mat-dialog-close]="false">Отмена</button>
+
+  <button mat-flat-button color="warn" [mat-dialog-close]="true">Удалить</button>
+</mat-dialog-actions>

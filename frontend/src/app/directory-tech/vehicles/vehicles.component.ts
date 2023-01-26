@@ -103,7 +103,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
   protected onCreateVehicle() {
     this.#subscription?.unsubscribe();
 
-    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | ''>(VehicleDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | '' | undefined>(VehicleDialogComponent, dialogConfig);
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -153,7 +153,10 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       description
     };
 
-    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | ''>(VehicleDialogComponent, { ...dialogConfig, data });
+    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | '' | undefined>(
+      VehicleDialogComponent,
+      { ...dialogConfig, data }
+    );
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -175,7 +178,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       content: getConfirmationDialogContent(name)
     };
 
-    this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData>(
+    this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
       ConfirmationDialogComponent,
       { ...confirmationDialogConfig, data }
     );
