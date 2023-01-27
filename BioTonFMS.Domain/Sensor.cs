@@ -1,6 +1,7 @@
 ﻿using BioTonFMS.Infrastructure.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 #pragma warning disable CS8618
 
 namespace BioTonFMS.Domain
@@ -60,6 +61,12 @@ namespace BioTonFMS.Domain
         public string Formula { get; set; }
 
         /// <summary>
+        /// Идентификатор единицы измерения датчика
+        /// </summary>
+        [Required]
+        public int UnitId { get; set; }
+
+        /// <summary>
         /// Единица измерения датчика
         /// </summary>
         public Unit Unit { get; set; }
@@ -75,12 +82,12 @@ namespace BioTonFMS.Domain
         /// </summary>
         public int? ValidatorId { get; set; }
         [ForeignKey("ValidatorId")]
-        public Sensor Validator { get; set; }
+        public Sensor? Validator { get; set; }
 
         /// <summary>
         /// Тип валидации
         /// </summary>
-        public ValidationTypeEnum ValidationType { get; set; }
+        public ValidationTypeEnum? ValidationType { get; set; }
 
         /// <summary>
         /// Использование горючего (л/c)

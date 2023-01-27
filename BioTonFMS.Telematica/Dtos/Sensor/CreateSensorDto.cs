@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BioTonFMS.Domain;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable UnusedMember.Global
 #pragma warning disable CS8618
 
 namespace BioTonFMS.Telematica.Dtos
@@ -65,7 +67,7 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Тип валидации
         /// </summary>
-        public ValidationTypeEnum ValidationType { get; set; }
+        public ValidationTypeEnum? ValidationType { get; set; }
 
         /// <summary>
         /// Использование горючего (л/c)

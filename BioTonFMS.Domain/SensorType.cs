@@ -56,7 +56,7 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Единица измерения для датчиков данного типа. Если не указана, то датчики могут иметь любые единицы измерения.
         /// </summary>        
-        public Unit Unit { get; set; }
+        public Unit? Unit { get; set; }
 
  /// <summary>
         /// Сенсоры данного типа

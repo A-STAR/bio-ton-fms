@@ -25,6 +25,16 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
             _logger = logger;
         }
 
+        public IQueryable<Sensor> HydratedQuery =>
+            QueryableProvider
+                .Fetch(v => v.Tracker)
+                .Fetch(v => v.Validator)
+                .Fetch(v => v.SensorType)
+                .Fetch(v => v.Unit)
+                .Linq();
+
+        public new Sensor? this[int id] => HydratedQuery.SingleOrDefault(s => s.Id == id);
+
         public override void Add(Sensor sensor)
         {
             try
@@ -66,8 +76,6 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
 
         public PagedResult<Sensor> GetSensors(SensorsFilter filter)
         {
-            var linqProvider = QueryableProvider.Linq();
-
             Expression<Func<Sensor, bool>>? sensorPredicate = null;
 
             if (filter.TrackerId.HasValue)
@@ -75,9 +83,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
                 sensorPredicate = sensor => sensor.TrackerId == filter.TrackerId;
             }
             
-            var sensors = sensorPredicate != null ?
-                linqProvider.Where(sensorPredicate) :
-                linqProvider;
+            var sensors = sensorPredicate != null ? HydratedQuery.Where(sensorPredicate) : HydratedQuery;
 
             if (filter.SortBy is not SensorSortBy.Name)
                 return sensors.AsNoTracking().GetPagedQueryable(

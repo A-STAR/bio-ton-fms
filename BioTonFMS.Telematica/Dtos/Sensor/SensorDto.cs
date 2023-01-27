@@ -1,4 +1,6 @@
 using BioTonFMS.Domain;
+using BioTonFMS.Infrastructure.Extensions;
+// ReSharper disable UnusedMember.Global
 #pragma warning disable CS8618
 
 namespace BioTonFMS.Telematica.Dtos
@@ -14,14 +16,14 @@ namespace BioTonFMS.Telematica.Dtos
         public int Id { get; set; }
 
         /// <summary>
-        /// Идентификатор родительского трекера
+        /// Родительский трекер
         /// </summary>
-        public int TrackerId { get; set; }
+        public ForeignKeyValue<int, string> Tracker { get; set; }
 
         /// <summary>
         /// Название датчика
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; }
         
         /// <summary>
         /// Тип данных
@@ -31,12 +33,12 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Тип сенсора
         /// </summary>
-        public int SensorTypeId { get; set; }
+        public ForeignKeyValue<int, string> SensorType { get; set; }
 
         /// <summary>
         /// Описание
         /// </summary>
-        public string Description { get; set; } = "";
+        public string Description { get; set; }
         
         /// <summary>
         /// Формула по которой рассчитывается значение датчика
@@ -46,22 +48,22 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Единица измерения датчика
         /// </summary>
-        public int UnitId { get; set; }
+        public ForeignKeyValue<int, string> Unit { get; set; }
 
         /// <summary>
         /// Использовать последние принятые от трекера значения 
         /// </summary>
-        public bool UseLastReceived { get; set; } = false;
+        public bool UseLastReceived { get; set; }
 
         /// <summary>
         /// Валидатор используется для модификации значения датчика  
         /// </summary>
-        public int ValidatorId { get; set; }
+        public ForeignKeyValue<int, string>? Validator { get; set; }
 
         /// <summary>
         /// Тип валидации
         /// </summary>
-        public ValidationTypeEnum ValidationType { get; set; }
+        public ValidationTypeEnum? ValidationType { get; set; }
 
         /// <summary>
         /// Использование горючего (л/c)
