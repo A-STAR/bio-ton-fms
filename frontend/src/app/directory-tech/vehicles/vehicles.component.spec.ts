@@ -483,7 +483,15 @@ describe('VehiclesComponent', () => {
       .withContext('render a confirmation dialog')
       .not.toBeNull();
 
-    await confirmationDialog?.close();
+    let dialogDeleteButton = await confirmationDialog?.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await dialogDeleteButton?.click();
 
     expect(vehicleService.deleteVehicle)
       .toHaveBeenCalledWith(testVehiclesDataSource[0].id);
@@ -531,7 +539,15 @@ describe('VehiclesComponent', () => {
 
     confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
-    await confirmationDialog?.close();
+    dialogDeleteButton = await confirmationDialog?.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await dialogDeleteButton?.click();
 
     expect(vehicleService.deleteVehicle)
       .toHaveBeenCalledWith(testVehiclesDataSource[1].id);

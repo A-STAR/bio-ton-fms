@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
 
 import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
@@ -178,22 +178,28 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       content: getConfirmationDialogContent(name)
     };
 
-    this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
       ConfirmationDialogComponent,
       { ...confirmationDialogConfig, data }
     );
 
-    try {
-      const deleteVehicle$ = this.vehicleService.deleteVehicle(id);
-
-      await firstValueFrom(deleteVehicle$);
-
-      this.snackBar.open(VEHICLE_DELETED);
-    } catch (error) {
-      this.errorHandler.handleError(error);
-    } finally {
-      this.#updateVehicles();
-    }
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        mergeMap(() => this.vehicleService.deleteVehicle(id))
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open(VEHICLE_DELETED);
+        },
+        error: error => {
+          this.errorHandler.handleError(error);
+        },
+        complete: () => {
+          this.#updateVehicles();
+        }
+      });
   }
 
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});
