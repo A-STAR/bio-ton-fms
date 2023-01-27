@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -7,15 +8,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
 
 import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
+import {
+  ConfirmationDialogData,
+  ConfirmationDialogComponent,
+  confirmationDialogConfig,
+  getConfirmationDialogContent
+} from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { TableDataSource } from '../table.data-source';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'bio-vehicles',
@@ -97,7 +103,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
   protected onCreateVehicle() {
     this.#subscription?.unsubscribe();
 
-    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | ''>(VehicleDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | '' | undefined>(VehicleDialogComponent, dialogConfig);
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -147,7 +153,10 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       description
     };
 
-    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | ''>(VehicleDialogComponent, { ...dialogConfig, data });
+    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | '' | undefined>(
+      VehicleDialogComponent,
+      { ...dialogConfig, data }
+    );
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -164,18 +173,33 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    *
    * @param vehicleDataSource Vehicle data source.
    */
-  protected async onDeleteVehicle({ id }: VehicleDataSource) {
-    try {
-      const deleteVehicle$ = this.vehicleService.deleteVehicle(id);
+  protected async onDeleteVehicle({ id, name }: VehicleDataSource) {
+    const data: ConfirmationDialogData = {
+      content: getConfirmationDialogContent(name)
+    };
 
-      await firstValueFrom(deleteVehicle$);
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
+      ConfirmationDialogComponent,
+      { ...confirmationDialogConfig, data }
+    );
 
-      this.snackBar.open(VEHICLE_DELETED);
-    } catch (error) {
-      this.errorHandler.handleError(error);
-    } finally {
-      this.#updateVehicles();
-    }
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        mergeMap(() => this.vehicleService.deleteVehicle(id))
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open(VEHICLE_DELETED);
+        },
+        error: error => {
+          this.errorHandler.handleError(error);
+        },
+        complete: () => {
+          this.#updateVehicles();
+        }
+      });
   }
 
   #vehicles$ = new BehaviorSubject<VehiclesOptions>({});

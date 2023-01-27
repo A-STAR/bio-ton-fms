@@ -467,13 +467,31 @@ describe('VehiclesComponent', () => {
     const deleteVehicleSpy = spyOn(vehicleService, 'deleteVehicle')
       .and.callFake(() => of({}));
 
-    let vehicleButton = await loader.getHarness(MatButtonHarness.with({
-      ancestor: '.mat-column-action .actions',
-      selector: '[mat-icon-button]',
-      text: 'delete'
-    }));
+    let deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        variant: 'icon',
+        text: 'delete'
+      })
+    );
 
-    await vehicleButton.click();
+    await deleteButton.click();
+
+    let confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+
+    let dialogDeleteButton = await confirmationDialog?.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await dialogDeleteButton?.click();
 
     expect(vehicleService.deleteVehicle)
       .toHaveBeenCalledWith(testVehiclesDataSource[0].id);
@@ -489,7 +507,6 @@ describe('VehiclesComponent', () => {
       .toHaveBeenCalled();
 
     deleteVehicleSpy.calls.reset();
-    overlayContainer.ngOnDestroy();
 
     /* Handle an error although update vehicles anyway. */
 
@@ -510,13 +527,27 @@ describe('VehiclesComponent', () => {
     spyOn(errorHandler, 'handleError');
     deleteVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
 
-    [, vehicleButton] = await loader.getAllHarnesses(MatButtonHarness.with({
-      ancestor: '.mat-column-action',
-      selector: '[mat-icon-button]',
-      text: 'delete'
-    }));
+    [, deleteButton] = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        variant: 'icon',
+        text: 'delete'
+      })
+    );
 
-    await vehicleButton.click();
+    await deleteButton.click();
+
+    confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    dialogDeleteButton = await confirmationDialog?.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await dialogDeleteButton?.click();
 
     expect(vehicleService.deleteVehicle)
       .toHaveBeenCalledWith(testVehiclesDataSource[1].id);
@@ -526,5 +557,7 @@ describe('VehiclesComponent', () => {
 
     expect(vehiclesSpy)
       .toHaveBeenCalled();
+
+    overlayContainer.ngOnDestroy();
   });
 });
