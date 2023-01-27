@@ -1,4 +1,7 @@
-﻿namespace BioTonFMS.Telematica.Dtos;
+// ReSharper disable UnusedMember.Global
+#pragma warning disable CS8618
+
+namespace BioTonFMS.Telematica.Dtos;
 
 /// <summary>
 /// Группа датчиков
@@ -14,7 +17,12 @@ public class SensorGroupDto
     /// Название группы датчиков
     /// </summary>
     public string Name { get; set; } = "";
-        
+    
+    /// <summary>
+    /// Типы датчиков данной группы
+    /// </summary>
+    public List<SensorTypeNestedDto> SensorTypes { get; set; }
+
     /// <summary>
     /// Описание группы датчиков
     /// </summary>

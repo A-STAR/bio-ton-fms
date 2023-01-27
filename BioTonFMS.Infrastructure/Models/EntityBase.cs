@@ -41,7 +41,7 @@ namespace BioTonFMS.Infrastructure.Models
         /// <param name="entityA">Первая сущность.</param>
         /// <param name="entityB">Вторая сущность.</param>
         /// <returns><c>true</c>, если сущности равны.</returns>
-        public static bool operator ==(EntityBase entityA, EntityBase entityB)
+        public static bool operator ==(EntityBase? entityA, EntityBase? entityB)
         {
             return Equals(entityA, entityB);
         }
@@ -52,7 +52,7 @@ namespace BioTonFMS.Infrastructure.Models
         /// <param name="entityA">Первая сущность.</param>
         /// <param name="entityB">Вторая сущность.</param>
         /// <returns><c>true</c>, если сущности не равны.</returns>
-        public static bool operator !=(EntityBase entityA, EntityBase entityB)
+        public static bool operator !=(EntityBase? entityA, EntityBase? entityB)
         {
             return !(entityA == entityB);
         }

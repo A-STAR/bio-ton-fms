@@ -15,7 +15,11 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.SensorGroups
 
         public IEnumerable<SensorGroup> GetSensorGroups()
         {
-            var linqProvider = QueryableProvider.Linq().AsNoTracking().OrderBy(c => c.Name);
+            var linqProvider = QueryableProvider
+                .Linq()
+                .Include(s => s.SensorTypes)
+                .AsNoTracking()
+                .OrderBy(c => c.Id);
             return linqProvider.ToList();
         }
     }

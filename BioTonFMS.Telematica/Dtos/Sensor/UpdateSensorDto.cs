@@ -60,12 +60,12 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Валидатор используется для модификации значения датчика  
         /// </summary>
-        public int ValidatorId { get; set; }
+        public int? ValidatorId { get; set; }
 
         /// <summary>
         /// Тип валидации
         /// </summary>
-        public ValidationTypeEnum ValidationType { get; set; }
+        public ValidationTypeEnum? ValidationType { get; set; }
 
         /// <summary>
         /// Использование горючего (л/c)
