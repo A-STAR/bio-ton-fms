@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,7 @@ import { DEFERRED_HOVER_CLASS_NAME, HOVER_DELAY_MS, TableActionsTriggerDirective
 
 describe('TableActionsTriggerDirective', () => {
   let fixture: ComponentFixture<TestActionButtonComponent>;
-  let buttonEl: HTMLButtonElement;
+  let directiveDe: DebugElement;
 
   beforeEach(async () => {
     await TestBed
@@ -21,11 +21,9 @@ describe('TableActionsTriggerDirective', () => {
 
     fixture.detectChanges();
 
-    const directiveDe = fixture.debugElement.query(
+    directiveDe = fixture.debugElement.query(
       By.directive(TableActionsTriggerDirective)
     );
-
-    buttonEl = directiveDe.nativeElement as HTMLButtonElement;
   });
 
   it('should create an instance', () => {
@@ -36,26 +34,26 @@ describe('TableActionsTriggerDirective', () => {
   });
 
   it('should prevent adding deferred hover class on mouse leave before delay expires', fakeAsync(() => {
-    const event = new MouseEvent('mouseleave');
-
-    buttonEl.dispatchEvent(event);
+    directiveDe.triggerEventHandler('mouseleave', {
+      target: directiveDe.nativeElement
+    });
 
     tick(HOVER_DELAY_MS);
 
     expect(
-      buttonEl.classList.contains(DEFERRED_HOVER_CLASS_NAME)
+      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('have deferred hover class after delay')
       .toBeFalse();
   }));
 
   it('should defer adding deferred hover class after delay on mouse enter', fakeAsync(() => {
-    const event = new MouseEvent('mouseenter');
-
-    buttonEl.dispatchEvent(event);
+    directiveDe.triggerEventHandler('mouseenter', {
+      target: directiveDe.nativeElement
+    });
 
     expect(
-      buttonEl.classList.contains(DEFERRED_HOVER_CLASS_NAME)
+      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('initially defer adding deferred hover class')
       .toBeFalse();
@@ -65,7 +63,7 @@ describe('TableActionsTriggerDirective', () => {
     tick(beforeDelayMS);
 
     expect(
-      buttonEl.classList.contains(DEFERRED_HOVER_CLASS_NAME)
+      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('defer adding deferred hover class right before delay expires')
       .toBeFalse();
@@ -73,31 +71,31 @@ describe('TableActionsTriggerDirective', () => {
     tick(HOVER_DELAY_MS);
 
     expect(
-      buttonEl.classList.contains(DEFERRED_HOVER_CLASS_NAME)
+      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('add deferred hover class after delay')
       .toBeTrue();
   }));
 
   it('should remove deferred hover class on mouse leave', fakeAsync(() => {
-    let event = new MouseEvent('mouseenter');
-
-    buttonEl.dispatchEvent(event);
+    directiveDe.triggerEventHandler('mouseenter', {
+      target: directiveDe.nativeElement
+    });
 
     tick(HOVER_DELAY_MS);
 
     expect(
-      buttonEl.classList.contains(DEFERRED_HOVER_CLASS_NAME)
+      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('have deferred hover class after delay')
       .toBeTrue();
 
-    event = new MouseEvent('mouseleave');
-
-    buttonEl.dispatchEvent(event);
+    directiveDe.triggerEventHandler('mouseleave', {
+      target: directiveDe.nativeElement
+    });
 
     expect(
-      buttonEl.classList.contains(DEFERRED_HOVER_CLASS_NAME)
+      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('remove deferred hover class after leaving button')
       .toBeFalse();
