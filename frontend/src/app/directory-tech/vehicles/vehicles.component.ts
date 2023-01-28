@@ -192,11 +192,12 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.snackBar.open(VEHICLE_DELETED);
+
+          this.#updateVehicles();
         },
         error: error => {
           this.errorHandler.handleError(error);
-        },
-        complete: () => {
+
           this.#updateVehicles();
         }
       });
