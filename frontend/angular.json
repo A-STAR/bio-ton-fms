@@ -160,7 +160,10 @@
                 "src/styles/partials"
               ]
             },
-            "scripts": []
+            "scripts": [],
+            "codeCoverageExclude": [
+              "src/app/directory-tech/directory-tech.routes.ts"
+            ]
           }
         },
         "lint": {
