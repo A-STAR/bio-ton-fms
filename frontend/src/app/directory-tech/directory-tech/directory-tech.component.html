@@ -1,6 +1,8 @@
 <nav>
   <ng-container *ngFor="let item of navigation">
-    <a mat-flat-button routerLinkActive [routerLink]="item.link" #link="routerLinkActive" [hidden]="link.isActive">
+    <a mat-flat-button routerLinkActive [routerLink]="item.link" #link="routerLinkActive" [hidden]="link.isActive" [routerLinkActiveOptions]="{
+      exact: true
+    }">
       <ng-container *ngTemplateOutlet="itemTitle; context: { item }"></ng-container>
     </a>
 
