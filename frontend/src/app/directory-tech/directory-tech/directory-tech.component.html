@@ -1,0 +1,17 @@
+<nav>
+  <ng-container *ngFor="let item of navigation">
+    <a mat-flat-button routerLinkActive [routerLink]="item.link" #link="routerLinkActive" [hidden]="link.isActive">
+      <ng-container *ngTemplateOutlet="itemTitle; context: { item }"></ng-container>
+    </a>
+
+    <ng-container *ngIf="link.isActive">
+      <span>
+        <ng-container *ngTemplateOutlet="itemTitle; context: { item }"></ng-container>
+      </span>
+    </ng-container>
+  </ng-container>
+
+  <ng-template #itemTitle let-item="item">{{ item.title }}</ng-template>
+</nav>
+
+<router-outlet></router-outlet>
