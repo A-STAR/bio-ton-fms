@@ -124,7 +124,7 @@ describe('DirectoryTechComponent', () => {
 
     const TRACKER_ID = 1;
 
-    // navigate to trackers
+    // navigate to tracker
     await ngZone.run(async () => {
       await router.navigate([
         routes[0].children?.[2].path?.split('/')[0],
@@ -139,14 +139,8 @@ describe('DirectoryTechComponent', () => {
     );
 
     expect(activeItemDe)
-      .withContext('render active item element')
-      .not.toBeNull();
-
-    activeItemIndex = 1;
-
-    expect(activeItemDe.nativeElement.textContent)
-      .withContext('render trackers active item text')
-      .toBe(navigation[activeItemIndex].title);
+      .withContext('render no active item element')
+      .toBeNull();
 
     navigationAnchorAttributes = navigationAnchorDes.map(
       anchorDe => [
@@ -155,16 +149,7 @@ describe('DirectoryTechComponent', () => {
       ]
     );
 
-    expect(navigationAnchorAttributes[activeItemIndex])
-      .withContext('render active navigation anchor link hidden')
-      .toEqual([navigation[activeItemIndex].link, '']);
-
-    testNavigation = navigation
-      .slice()
-      .map(({ link }) => [link, null]);
-
-    navigationAnchorAttributes.splice(activeItemIndex, 1);
-    testNavigation.splice(activeItemIndex, 1);
+    testNavigation = navigation.map(({ link }) => [link, null]);
 
     expect(navigationAnchorAttributes)
       .withContext('render navigation anchor links')
