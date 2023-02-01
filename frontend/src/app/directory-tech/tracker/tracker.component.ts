@@ -5,7 +5,9 @@ import { MatCardModule } from '@angular/material/card';
 
 import { BehaviorSubject, filter, map, Observable, switchMap, tap } from 'rxjs';
 
-import { Sensors, TrackerService } from '../tracker.service';
+import { Sensor, Sensors, TrackerService } from '../tracker.service';
+
+import { TableDataSource } from '../table.data-source';
 
 @Component({
   selector: 'bio-tracker',
@@ -19,11 +21,44 @@ import { Sensors, TrackerService } from '../tracker.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class TrackerComponent implements OnInit {
-  sensors$!: Observable<Sensors | undefined>;
+  protected sensors$!: Observable<Sensors | undefined>;
+  protected sensorsDataSource!: TableDataSource<SensorDataSource>;
   #sensors$ = new BehaviorSubject<Sensors | undefined>(undefined);
 
   /**
-   * Get and set tracker sensors.
+   * Map sensors data source.
+   *
+   * @param sensors Sensors with pagination.
+   *
+   * @returns Mapped sensors data source.
+   */
+  #mapSensorsDataSource({ sensors }: Sensors) {
+    return Object
+      .freeze(sensors)
+      .map(({
+        id,
+        name,
+        sensorType: type,
+        description,
+        formula,
+        unit,
+        visibility
+      }): SensorDataSource => ({ id, name, type, description, formula, unit, visibility }));
+  }
+
+  /**
+   * Initialize `TableDataSource` and set sensors data source.
+   *
+   * @param sensors Sensors.
+   */
+  #setSensorsDataSource(sensors: Sensors) {
+    const sensorsDataSource = this.#mapSensorsDataSource(sensors);
+
+    this.sensorsDataSource = new TableDataSource<SensorDataSource>(sensorsDataSource);
+  }
+
+  /**
+   * Get and set tracker sensors data.
    */
   #setSensors() {
     this.sensors$ = this.route.paramMap.pipe(
@@ -33,6 +68,7 @@ export default class TrackerComponent implements OnInit {
       switchMap(trackerId => this.sensorService.getSensors({ trackerId })),
       tap(sensors => {
         this.#sensors$.next(sensors);
+        this.#setSensorsDataSource(sensors);
       }),
       switchMap(() => this.#sensors$)
     );
@@ -44,4 +80,8 @@ export default class TrackerComponent implements OnInit {
   ngOnInit() {
     this.#setSensors();
   }
+}
+
+interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'formula' | 'description' | 'visibility'> {
+  type: Sensor['sensorType']
 }
