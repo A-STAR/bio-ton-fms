@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 
@@ -23,6 +23,8 @@ import { TableDataSource } from '../table.data-source';
 export default class TrackerComponent implements OnInit {
   protected sensors$!: Observable<Sensors | undefined>;
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
+  protected sensorColumns = sensorColumns;
+  protected sensorColumnKeys!: string[];
   #sensors$ = new BehaviorSubject<Sensors | undefined>(undefined);
 
   /**
@@ -74,14 +76,63 @@ export default class TrackerComponent implements OnInit {
     );
   }
 
+  /**
+   * Set column keys.
+   */
+  #setColumnKeys() {
+    this.sensorColumnKeys = this.sensorColumns.map(({ key }) => key);
+  }
+
   constructor(private route: ActivatedRoute, private sensorService: TrackerService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#setSensors();
+    this.#setColumnKeys();
   }
+}
+
+export enum SensorColumn {
+  Action = 'action',
+  Name = 'name',
+  Type = 'type',
+  Unit = 'unit',
+  Formula = 'formula',
+  Description = 'description',
+  Visibility = 'visibility'
 }
 
 interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'formula' | 'description' | 'visibility'> {
   type: Sensor['sensorType']
 }
+
+export const sensorColumns: KeyValue<SensorColumn, string | undefined>[] = [
+  {
+    key: SensorColumn.Action,
+    value: undefined
+  },
+  {
+    key: SensorColumn.Name,
+    value: 'Имя'
+  },
+  {
+    key: SensorColumn.Type,
+    value: 'Тип'
+  },
+  {
+    key: SensorColumn.Unit,
+    value: 'Ед. измерения'
+  },
+  {
+    key: SensorColumn.Formula,
+    value: 'Параметр'
+  },
+  {
+    key: SensorColumn.Description,
+    value: 'Описание'
+  },
+  {
+    key: SensorColumn.Visibility,
+    value: 'Видимость'
+  }
+];
