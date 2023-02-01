@@ -15,8 +15,17 @@ const routes: Routes = [
         loadComponent: () => import('./vehicles/vehicles.component')
       },
       {
-        path: 'trackers/:id',
-        loadComponent: () => import('./tracker/tracker.component')
+        path: 'trackers',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./trackers/trackers.component')
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('./tracker/tracker.component')
+          }
+        ]
       }
     ]
   }
