@@ -26,6 +26,11 @@ namespace BioTonFMS.Telematica.Dtos
         public string Name { get; set; }
         
         /// <summary>
+        /// Датчик скрыт
+        /// </summary>
+        public bool IsHidden { get; set; }
+        
+        /// <summary>
         /// Тип данных
         /// </summary>
         public SensorDataTypeEnum DataType { get; set; }
