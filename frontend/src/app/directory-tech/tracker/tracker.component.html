@@ -3,5 +3,45 @@
 <mat-card>
   <mat-card-title>Дополнительные параметры</mat-card-title>
 
-  <ng-container *ngIf="sensors$ | async"></ng-container>
+  <mat-card-content>
+    <mat-table [dataSource]="sensorsDataSource" *ngIf="sensors$ | async">
+      <ng-container [matColumnDef]="column.key" *ngFor="let column of sensorColumns">
+        <ng-container [ngSwitch]="column.key">
+          <ng-container *ngSwitchCase="SensorColumn.Action">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          </ng-container>
+
+          <ng-container *ngSwitchDefault>
+            <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+          </ng-container>
+        </ng-container>
+
+        <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+          <ng-container *ngSwitchCase="SensorColumn.Action">
+            <button mat-icon-button bioTableActionsTrigger>
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+          </ng-container>
+
+          <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="SensorColumn.Type"></ng-container>
+
+          <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="SensorColumn.Unit"></ng-container>
+
+          <ng-container [ngTemplateOutlet]="toggle" *ngSwitchCase="SensorColumn.Visibility"></ng-container>
+
+          <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+
+          <ng-template #toggle>
+            <mat-slide-toggle disabled [checked]="element[column.key]"></mat-slide-toggle>
+          </ng-template>
+
+          <ng-template #value>{{ element[column.key]?.value }}</ng-template>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="sensorColumnKeys"></mat-header-row>
+
+      <mat-row *matRowDef="let row; columns: sensorColumnKeys"></mat-row>
+    </mat-table>
+  </mat-card-content>
 </mat-card>

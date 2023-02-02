@@ -2,10 +2,16 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { BehaviorSubject, filter, map, Observable, switchMap, tap } from 'rxjs';
 
 import { Sensor, Sensors, TrackerService } from '../tracker.service';
+
+import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 
 import { TableDataSource } from '../table.data-source';
 
@@ -14,7 +20,12 @@ import { TableDataSource } from '../table.data-source';
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule
+    MatCardModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSlideToggleModule,
+    TableActionsTriggerDirective
   ],
   templateUrl: './tracker.component.html',
   styleUrls: ['./tracker.component.sass'],
@@ -25,6 +36,7 @@ export default class TrackerComponent implements OnInit {
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
   protected sensorColumns = sensorColumns;
   protected sensorColumnKeys!: string[];
+  protected SensorColumn = SensorColumn;
   #sensors$ = new BehaviorSubject<Sensors | undefined>(undefined);
 
   /**
