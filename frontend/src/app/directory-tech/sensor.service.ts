@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 
+import { Tracker } from './trackers.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -48,8 +50,8 @@ export type SensorsOptions = Partial<{
 
 export type Sensor = {
   id: number;
-  tracker: KeyValue<number, string>;
-  name?: string;
+  tracker: KeyValue<Tracker['id'], Tracker['name']>;
+  name: string;
   dataType: SensorDataTypeEnum;
   sensorType: KeyValue<number, string>;
   description?: string;

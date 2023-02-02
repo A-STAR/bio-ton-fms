@@ -105,6 +105,7 @@ export const testSensors: Sensors = {
         key: 1,
         value: 'Трекер Arnavi'
       },
+      name: 'Пробег',
       visibility: true,
       dataType: SensorDataTypeEnum.String,
       sensorType: {
@@ -131,7 +132,7 @@ export const testSensors: Sensors = {
         key: 1,
         value: 'Трекер TKSTAR'
       },
-      name: 'panel',
+      name: 'Разгон',
       visibility: false,
       dataType: SensorDataTypeEnum.Boolean,
       sensorType: {
@@ -157,7 +158,7 @@ export const testSensors: Sensors = {
         key: 2,
         value: 'Трекер Micodus MV720'
       },
-      name: 'program',
+      name: 'Скорость',
       visibility: true,
       dataType: SensorDataTypeEnum.Number,
       sensorType: {
