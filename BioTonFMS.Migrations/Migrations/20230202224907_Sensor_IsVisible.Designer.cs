@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMSApp.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    [Migration("20230202224907_Sensor_IsHidden")]
-    partial class Sensor_IsHidden
+    [Migration("20230202224907_Sensor_IsVisible")]
+    partial class Sensor_IsVisible
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -589,9 +589,9 @@ namespace BioTonFMSApp.Migrations
                         .HasColumnType("real")
                         .HasColumnName("fuel_use");
 
-                    b.Property<bool>("IsHidden")
+                    b.Property<bool>("IsVisible")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_hidden");
+                        .HasColumnName("is_visible");
 
                     b.Property<string>("Name")
                         .IsRequired()
