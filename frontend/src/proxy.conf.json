@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://test.lan.bioton-fms-ru",
+    "target": "https://test.bioton-fms.ru",
     "secure": false,
     "pathRewrite": {
       "^/api": ""
