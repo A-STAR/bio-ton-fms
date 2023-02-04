@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
 
-import { NewVehicle, SortBy, SortDirection, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
+import { NewVehicle, VehiclesSortBy, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
@@ -21,7 +21,9 @@ import {
   getConfirmationDialogContent
 } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
-import { TableDataSource } from '../table.data-source';
+import { SortDirection } from '../shared/sort';
+
+import { TableDataSource } from '../shared/table/table.data-source';
 
 @Component({
   selector: 'bio-vehicles',
@@ -60,27 +62,27 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
     if (active && direction) {
       switch (active) {
         case VehicleColumn.Name:
-          vehiclesOptions.sortBy = SortBy.Name;
+          vehiclesOptions.sortBy = VehiclesSortBy.Name;
 
           break;
 
         case VehicleColumn.Type:
-          vehiclesOptions.sortBy = SortBy.Type;
+          vehiclesOptions.sortBy = VehiclesSortBy.Type;
 
           break;
 
         case VehicleColumn.Subtype:
-          vehiclesOptions.sortBy = SortBy.Subtype;
+          vehiclesOptions.sortBy = VehiclesSortBy.Subtype;
 
           break;
 
         case VehicleColumn.Group:
-          vehiclesOptions.sortBy = SortBy.Group;
+          vehiclesOptions.sortBy = VehiclesSortBy.Group;
 
           break;
 
         case VehicleColumn.Fuel:
-          vehiclesOptions.sortBy = SortBy.Fuel;
+          vehiclesOptions.sortBy = VehiclesSortBy.Fuel;
       }
 
       switch (direction) {

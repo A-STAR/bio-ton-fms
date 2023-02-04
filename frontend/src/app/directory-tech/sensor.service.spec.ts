@@ -1,15 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import {
-  pageNum,
-  pageSize,
-  SensorDataTypeEnum,
-  Sensors,
-  SensorsOptions,
-  SensorService,
-  ValidationTypeEnum
-} from './sensor.service';
+import { SensorDataTypeEnum, Sensors, SensorService, SensorsOptions, ValidationTypeEnum } from './sensor.service';
+
+import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
 
 describe('SensorService', () => {
   let httpTestingController: HttpTestingController;
@@ -41,7 +35,7 @@ describe('SensorService', () => {
       });
 
     let sensorsRequest = httpTestingController.expectOne(
-      `/api/telematica/sensors?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/sensors?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'sensors request'
     );
 
@@ -60,7 +54,7 @@ describe('SensorService', () => {
       });
 
     sensorsRequest = httpTestingController.expectOne(
-      `/api/telematica/sensors?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/sensors?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'sensors request'
     );
 
@@ -87,7 +81,7 @@ describe('SensorService', () => {
       });
 
     sensorsRequest = httpTestingController.expectOne(
-      `/api/telematica/sensors?pageNum=${pageNum}&pageSize=${pageSize}&trackerId=${testSensorsOptions.trackerId}`,
+      `/api/telematica/sensors?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&trackerId=${testSensorsOptions.trackerId}`,
       'sensors request'
     );
 

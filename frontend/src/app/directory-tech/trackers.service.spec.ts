@@ -1,9 +1,11 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { SortDirection, Trackers, TrackersOptions, TrackersService, TrackersSortBy, TrackerTypeEnum } from './trackers.service';
+import { Trackers, TrackersOptions, TrackersService, TrackersSortBy, TrackerTypeEnum } from './trackers.service';
 
-import { pageNum, pageSize } from './trackers.service';
+import { SortDirection } from './shared/sort';
+
+import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
 import { testVehicles } from './vehicle.service.spec';
 
 describe('TrackersService', () => {
@@ -40,7 +42,7 @@ describe('TrackersService', () => {
       });
 
     let trackersRequest = httpTestingController.expectOne(
-      `/api/telematica/trackers?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'trackers request'
     );
 
@@ -61,7 +63,7 @@ describe('TrackersService', () => {
       });
 
     trackersRequest = httpTestingController.expectOne(
-      `/api/telematica/trackers?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'trackers request'
     );
 
@@ -83,7 +85,7 @@ describe('TrackersService', () => {
     const URL = '/api/telematica/trackers';
 
     let trackersRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${pageNum}&pageSize=${pageSize}&sortBy=${TrackersSortBy.Name}&sortDirection=${SortDirection.Acending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${TrackersSortBy.Name}&sortDirection=${SortDirection.Acending}`,
       'sorted by name trackers request'
     );
 
@@ -103,7 +105,7 @@ describe('TrackersService', () => {
       });
 
     trackersRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${pageNum}&pageSize=${pageSize}&sortBy=${TrackersSortBy.Start}&sortDirection=${SortDirection.Descending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${TrackersSortBy.Start}&sortDirection=${SortDirection.Descending}`,
       'descendingly sorted by start date trackers request'
     );
 
@@ -124,7 +126,7 @@ describe('TrackersService', () => {
       });
 
     trackersRequest = httpTestingController.expectOne(
-      `/api/telematica/trackers?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'unsorted trackers request'
     );
 

@@ -13,7 +13,7 @@ import { Sensor, Sensors, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 
-import { TableDataSource } from '../table.data-source';
+import { TableDataSource } from '../shared/table/table.data-source';
 
 @Component({
   selector: 'bio-tracker',

@@ -26,7 +26,7 @@ import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.compone
 
 import { environment } from '../../../../src/environments/environment';
 import { testVehicles } from '../vehicle.service.spec';
-import { testDataSource as testVehiclesDataSource } from '../table.data-source.spec';
+import { testDataSource as testVehiclesDataSource } from '../shared/table/table.data-source.spec';
 
 describe('VehiclesComponent', () => {
   let component: VehiclesComponent;

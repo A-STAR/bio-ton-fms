@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 
+import { SortOptions } from './shared/sort';
+
 import { Vehicle } from './vehicle.service';
+
+import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from './shared/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -44,23 +48,13 @@ export enum TrackersSortBy {
   Vehicle = 'vehicle'
 }
 
-export enum SortDirection {
-  Acending = 'ascending',
-  Descending = 'descending'
-}
-
 export enum TrackerTypeEnum {
   GalileoSkyV50 = 'galileoSkyV50',
   Retranslator = 'retranslator',
   WialonIPS = 'wialonIPS'
 }
 
-export type TrackersOptions = Partial<{
-  pageNum: number;
-  pageSize: number;
-  sortBy: TrackersSortBy;
-  sortDirection: SortDirection;
-}>
+export type TrackersOptions = PaginationOptions & SortOptions<TrackersSortBy>
 
 export type Tracker = {
   id: number;
@@ -74,15 +68,6 @@ export type Tracker = {
   vehicle?: KeyValue<Vehicle['id'], Vehicle['name']>;
 }
 
-type Pagination = {
-  pageIndex: number;
-  total: number;
-}
-
-export type Trackers = {
+export interface Trackers extends Pagination {
   trackers: Tracker[];
-  pagination: Pagination;
 }
-
-export const pageNum = 1;
-export const pageSize = 50;
