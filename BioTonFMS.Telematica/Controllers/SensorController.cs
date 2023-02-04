@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BioTonFMS.Telematica.Controllers;
 
 /// <summary>
-/// API cервиса для работы с датчиками
+/// Сервис для работы с датчиками
 /// </summary>
 [Authorize]
 [ApiController]
