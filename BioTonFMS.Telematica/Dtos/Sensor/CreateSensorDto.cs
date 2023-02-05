@@ -25,9 +25,9 @@ namespace BioTonFMS.Telematica.Dtos
         public string Name { get; set; } = "";
         
         /// <summary>
-        /// Датчик скрыт
+        /// Датчик видим
         /// </summary>
-        public bool IsHidden { get; set; }
+        public bool Visibility { get; set; }
 
         /// <summary>
         /// Тип данных

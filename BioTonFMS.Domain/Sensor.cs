@@ -31,9 +31,9 @@ namespace BioTonFMS.Domain
         public string Name { get; set; } = "";
         
         /// <summary>
-        /// Датчик скрыт
+        /// Датчик видим
         /// </summary>
-        public bool IsHidden { get; set; }
+        public bool IsVisible { get; set; }
         
         /// <summary>
         /// Тип данных

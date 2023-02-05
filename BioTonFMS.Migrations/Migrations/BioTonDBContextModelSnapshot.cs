@@ -539,9 +539,9 @@ namespace BioTonFMSApp.Migrations
                         .HasColumnType("real")
                         .HasColumnName("fuel_use");
 
-                    b.Property<bool>("IsHidden")
+                    b.Property<bool>("IsVisible")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_hidden");
+                        .HasColumnName("is_visible");
 
                     b.Property<string>("Name")
                         .IsRequired()
