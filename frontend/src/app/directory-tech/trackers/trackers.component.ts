@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { BehaviorSubject, switchMap, Observable } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
-import { Trackers, TrackersService } from '../trackers.service';
+import { Tracker, Trackers, TrackersService } from '../trackers.service';
+
+import { TableDataSource } from '../shared/table/table.data-source';
 
 @Component({
   selector: 'bio-trackers',
@@ -15,14 +17,52 @@ import { Trackers, TrackersService } from '../trackers.service';
 })
 export default class TrackersComponent implements OnInit {
   protected trackers$!: Observable<Trackers>;
+  protected trackersDataSource!: TableDataSource<TrackerDataSource>;
   #trackers$ = new BehaviorSubject(undefined);
+
+  /**
+   * Map trackers data source.
+   *
+   * @param trackers Trackers with pagination.
+   *
+   * @returns Mapped trackers data source.
+   */
+  #mapTrackersDataSource({ trackers }: Trackers) {
+    return Object
+      .freeze(trackers)
+      .map(({
+        id,
+        externalId: external,
+        name,
+        simNumber: sim,
+        imei,
+        trackerType: type,
+        startDate: start,
+        description,
+        vehicle
+      }): TrackerDataSource => ({ id, name, external, type, sim, imei, start, description, vehicle }));
+  }
+
+  /**
+   * Initialize `TableDataSource` and set trackers data source.
+   *
+   * @param trackers Trackers.
+   */
+  #setTrackersDataSource(trackers: Trackers) {
+    const trackersDataSource = this.#mapTrackersDataSource(trackers);
+
+    this.trackersDataSource = new TableDataSource<TrackerDataSource>(trackersDataSource);
+  }
 
   /**
    * Get and set trackers.
    */
   #setTrackers() {
     this.trackers$ = this.#trackers$.pipe(
-      switchMap(() => this.trackersService.getTrackers())
+      switchMap(() => this.trackersService.getTrackers()),
+      tap(trackers => {
+        this.#setTrackersDataSource(trackers);
+      })
     );
   }
 
@@ -32,4 +72,11 @@ export default class TrackersComponent implements OnInit {
   ngOnInit() {
     this.#setTrackers();
   }
+}
+
+interface TrackerDataSource extends Pick<Tracker, 'id' | 'name' | 'imei' | 'description' | 'vehicle'> {
+  external: Tracker['externalId'],
+  type: Tracker['trackerType'],
+  sim: Tracker['simNumber'],
+  start: Tracker['startDate']
 }
