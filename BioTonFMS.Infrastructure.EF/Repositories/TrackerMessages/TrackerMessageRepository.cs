@@ -5,11 +5,11 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
-public class TrackerMessageRepository : Repository<TrackerMessage>, ITrackerMessageRepository
+public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBContext>, ITrackerMessageRepository
 {
     public TrackerMessageRepository(IKeyValueProvider<TrackerMessage, int> keyValueProvider,
         IQueryableProvider<TrackerMessage> queryableProvider,
-        UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
     }
     

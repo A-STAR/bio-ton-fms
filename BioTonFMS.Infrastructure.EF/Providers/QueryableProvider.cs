@@ -1,7 +1,6 @@
 namespace BioTonFMS.Infrastructure.EF.Providers
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
 
@@ -16,25 +15,29 @@ namespace BioTonFMS.Infrastructure.EF.Providers
     /// Реализация для NHibernate провайдера коллекции, способной выполнять выборку сущностей при помощи LINQ-запросов.
     /// </summary>
     /// <typeparam name="T">Тип сущности.</typeparam>
-    public sealed class QueryableProvider<T> : IQueryableProvider<T> where T : class
+    public sealed class QueryableProvider<T, TDbContext> : IQueryableProvider<T> where T : class
     {
-        private readonly Factory<DbContext> _dbContextFactory;
+        private readonly Factory<TDbContext> _dbContextFactory;
 
         /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="QueryableProvider{T}"/>.
+        /// Инициализирует новый экземпляр класса <see cref="QueryableProvider{T, TDbContext}"/>.
         /// </summary>
         /// <param name="dbContextFactory">Контекст</param>
         /// <exception cref="ArgumentNullException">Переданный аргумент имеет значение <see langword="null"/>.</exception>
-        public QueryableProvider(Factory<DbContext> dbContextFactory)
+        public QueryableProvider(Factory<TDbContext> dbContextFactory)
         {
-            _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
+            _dbContextFactory = dbContextFactory;
         }
 
         /// <inheritdoc />
         public IQueryable<T> Linq()
         {
-            var context = _dbContextFactory.Invoke();
-            return context.Set<T>();
+            DbContext? dbContext = _dbContextFactory.Invoke() as DbContext;
+            if (dbContext == null)
+            {
+                throw new InvalidOperationException($"DbContext типа {typeof(TDbContext)} не зарегистрирован");
+            }
+            return dbContext.Set<T>();
         }
 
         /// <inheritdoc />

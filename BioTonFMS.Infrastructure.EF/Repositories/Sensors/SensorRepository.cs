@@ -12,7 +12,7 @@ using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
 {
-    public class SensorRepository : Repository<Sensor>, ISensorRepository
+    public class SensorRepository : Repository<Sensor, BioTonDBContext>, ISensorRepository
     {
         private readonly ILogger<SensorRepository> _logger;
 
@@ -20,7 +20,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
             ILogger<SensorRepository> logger,
             IKeyValueProvider<Sensor, int> keyValueProvider,
             IQueryableProvider<Sensor> queryableProvider,
-            UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
         {
             _logger = logger;
         }

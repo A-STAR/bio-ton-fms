@@ -13,11 +13,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 {
-    public class VehicleRepository : Repository<Vehicle>, IVehicleRepository
+    public class VehicleRepository : Repository<Vehicle, BioTonDBContext>, IVehicleRepository
     {
         public VehicleRepository(IKeyValueProvider<Vehicle, int> keyValueProvider,
             IQueryableProvider<Vehicle> queryableProvider,
-            UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
         {
         }
 

@@ -4,6 +4,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using FluentAssertions;
+using BioTonFMS.Infrastructure.EF;
 
 namespace BiotonFMS.Telematica.Tests.RepoTests;
 
@@ -62,7 +63,7 @@ public class TrackerTagRepositoryTests
     {
         IKeyValueProvider<TrackerTag, int> keyValueProviderMock = new KeyValueProviderMock<TrackerTag, int>(trackerTags);
         IQueryableProvider<TrackerTag> vehicleQueryProviderMock = new QueryableProviderMock<TrackerTag>(trackerTags);
-        UnitOfWorkFactory unitOfWorkFactoryMock = new UnitOfWorkFactoryMock();
+        UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactoryMock = new BioTonDBContextUnitOfWorkFactoryMock();
 
         var repo = new TrackerTagRepository(keyValueProviderMock, vehicleQueryProviderMock, unitOfWorkFactoryMock);
         return repo;

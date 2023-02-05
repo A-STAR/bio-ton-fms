@@ -4,11 +4,11 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 
-public class ProtocolTagRepository : Repository<ProtocolTag>, IProtocolTagRepository
+public class ProtocolTagRepository : Repository<ProtocolTag, BioTonDBContext>, IProtocolTagRepository
 {
     public ProtocolTagRepository(IKeyValueProvider<ProtocolTag, int> keyValueProvider,
         IQueryableProvider<ProtocolTag> queryableProvider,
-        UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+        UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
     }
 

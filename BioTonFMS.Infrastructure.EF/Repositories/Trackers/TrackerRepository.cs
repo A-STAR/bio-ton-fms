@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 {
-    public class TrackerRepository : Repository<Tracker>, ITrackerRepository
+    public class TrackerRepository : Repository<Tracker, BioTonDBContext>, ITrackerRepository
     {
         private readonly ILogger<TrackerRepository> _logger;
         private readonly IQueryableProvider<Vehicle> _vehicleQueryableProvider;
@@ -23,7 +23,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             IQueryableProvider<Vehicle> vehicleQueryableProvider,
             IKeyValueProvider<Tracker, int> keyValueProvider,
             IQueryableProvider<Tracker> queryableProvider,
-            UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
         {
             _vehicleQueryableProvider = vehicleQueryableProvider;
             _logger = logger;

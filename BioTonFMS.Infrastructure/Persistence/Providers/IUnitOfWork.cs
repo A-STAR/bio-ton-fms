@@ -7,7 +7,7 @@
     /// исключения, Commit не будет выполнен.
     /// </summary>
     /// TODO: Доработать UnitOfWork и все места его использования
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork<TDbContext> : IDisposable
     {
         /// <summary>
         /// Отменяет набор операций.

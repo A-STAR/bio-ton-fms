@@ -1,3 +1,4 @@
+using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioTonFMS.Infrastructure.EF;
 
-public class MessagesDBContext : DbContext
+public class MessagesDBContext : DbContext 
 {
     public MessagesDBContext(DbContextOptions<MessagesDBContext> options)
         : base(options)
@@ -13,7 +14,7 @@ public class MessagesDBContext : DbContext
     }
     
     public DbSet<TrackerMessage> Trackers => Set<TrackerMessage>();
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
