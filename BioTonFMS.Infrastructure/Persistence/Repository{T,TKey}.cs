@@ -13,14 +13,14 @@ namespace BioTonFMS.Infrastructure.Persistence
     /// Основная реализация репозитория.
     /// </summary>
     /// <inheritdoc />
-    public class Repository<T, TKey> : IRepository<T, TKey>
+    public class Repository<T, TDbContext, TKey> : IRepository<T, TKey>
         where T : class, IAggregateRoot, IEntity<TKey>
     {
         private readonly IKeyValueProvider<T, TKey> _keyValueProvider;
 
         private readonly IQueryableProvider<T> _queryableProvider;
 
-        private readonly UnitOfWorkFactory _unitOfWorkFactory;
+        private readonly UnitOfWorkFactory<TDbContext> _unitOfWorkFactory;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="Repository{T,TKey}"/>.
@@ -32,7 +32,7 @@ namespace BioTonFMS.Infrastructure.Persistence
         public Repository(
             IKeyValueProvider<T, TKey> keyValueProvider,
             IQueryableProvider<T> queryableProvider,
-            UnitOfWorkFactory unitOfWorkFactory)
+            UnitOfWorkFactory<TDbContext> unitOfWorkFactory)
         {
             _keyValueProvider = keyValueProvider ?? throw new ArgumentNullException(nameof(keyValueProvider));
             _queryableProvider = queryableProvider ?? throw new ArgumentNullException(nameof(queryableProvider));

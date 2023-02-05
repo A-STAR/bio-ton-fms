@@ -1,5 +1,6 @@
 ﻿using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BioTonFMS.Infrastructure.EF.Providers
 {
@@ -12,22 +13,31 @@ namespace BioTonFMS.Infrastructure.EF.Providers
     /// <typeparam name="TKey">
     /// Ключ выборки, может быть <see cref="int"/> или пользовательский ссылаемый тип.
     /// </typeparam>
-    public sealed class KeyValueProvider<T, TKey> : IKeyValueProvider<T, TKey>
+    public sealed class KeyValueProvider<T, TDbContext, TKey> : IKeyValueProvider<T, TKey>
         where T : class
     {
-        private readonly Factory<DbContext> _dbContextFactory;
+        private readonly Factory<TDbContext> _dbContextFactory;
 
         /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="KeyValueProvider{T, TKey}"/>.
+        /// Инициализирует новый экземпляр класса <see cref="KeyValueProvider{T, TDbContext, TKey}"/>.
         /// </summary>
-        /// <param name="dbContextFactory">Сессия NHibernate.</param>
         /// <exception cref="ArgumentNullException">Переданный аргумент имеет значение <see langword="null"/>.</exception>
-        public KeyValueProvider(Factory<DbContext> dbContextFactory)
+        public KeyValueProvider(Factory<TDbContext> dbContextFactory)
         {
-            _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
+            _dbContextFactory = dbContextFactory;
         }
 
-        private DbContext DbContext => _dbContextFactory.Invoke();
+        private DbContext DbContext { 
+            get
+            {
+                DbContext? dbContext = _dbContextFactory.Invoke() as DbContext;
+                if (dbContext == null)
+                {
+                    throw new InvalidOperationException($"DbContext типа {typeof(TDbContext)} не зарегистрирован");
+                }
+                return dbContext;
+            }
+        }
 
         /// <inheritdoc />
         public T? this[TKey key] => Get(key);

@@ -4,11 +4,11 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 
-public class TrackerTagRepository : Repository<TrackerTag>, ITrackerTagRepository
+public class TrackerTagRepository : Repository<TrackerTag, BioTonDBContext>, ITrackerTagRepository
 {
     public TrackerTagRepository(IKeyValueProvider<TrackerTag, int> keyValueProvider,
         IQueryableProvider<TrackerTag> queryableProvider,
-        UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+        UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
     }
 
