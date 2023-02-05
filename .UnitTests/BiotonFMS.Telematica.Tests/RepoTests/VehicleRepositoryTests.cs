@@ -8,6 +8,7 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using FluentAssertions;
 using Xunit.Abstractions;
+using BioTonFMS.Infrastructure.EF;
 
 namespace BiotonFMS.Telematica.Tests.RepoTests;
 
@@ -225,7 +226,7 @@ public class VehicleRepositoryTests
     {
         IKeyValueProvider<Vehicle, int> keyValueProviderMock = new KeyValueProviderMock<Vehicle, int>(vehicleList);
         IQueryableProvider<Vehicle> vehicleQueryProviderMock = new QueryableProviderMock<Vehicle>(vehicleList);
-        UnitOfWorkFactory unitOfWorkFactoryMock = new UnitOfWorkFactoryMock();
+        UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactoryMock = new BioTonDBContextUnitOfWorkFactoryMock();
 
         var repo = new VehicleRepository(keyValueProviderMock, vehicleQueryProviderMock, unitOfWorkFactoryMock);
         return repo;

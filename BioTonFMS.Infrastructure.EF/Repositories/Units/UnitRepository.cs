@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Units
 {
-    public class UnitRepository : Repository<Unit>, IUnitRepository
+    public class UnitRepository : Repository<Unit, BioTonDBContext>, IUnitRepository
     {
         public UnitRepository(IKeyValueProvider<Unit, int> keyValueProvider,
             IQueryableProvider<Unit> queryableProvider,
-            UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
         {
         }
 

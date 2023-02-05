@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
+using BioTonFMS.Infrastructure.EF;
 
 namespace BiotonFMS.Telematica.Tests.MessageParsingTests;
 
@@ -313,10 +314,10 @@ public class GalileoskyMessageParserTests
         var str = JsonConvert.SerializeObject(results, settings);
         File.WriteAllText(expectedPath, str);
 
-        //var str = File.ReadAllText(expectedPath);
         var expected = JsonConvert.DeserializeObject<List<TrackerMessage>>(str, settings);
 
-        Assert.Equal(expected.Count, results.Count);
+        Assert.NotNull(expected);
+        Assert.Equal(expected!.Count, results.Count);
 
         for (var i = 0; i < expected.Count; i++)
         {
@@ -355,7 +356,7 @@ public class GalileoskyMessageParserTests
     {
         var keyValueProviderMock = new KeyValueProviderMock<TrackerMessage, int>(list);
         var vehicleQueryProviderMock = new QueryableProviderMock<TrackerMessage>(list);
-        var unitOfWorkFactoryMock = new UnitOfWorkFactoryMock();
+        var unitOfWorkFactoryMock = new MessagesDBContextUnitOfWorkFactoryMock();
 
         var repo = new TrackerMessageRepository(
             keyValueProviderMock,

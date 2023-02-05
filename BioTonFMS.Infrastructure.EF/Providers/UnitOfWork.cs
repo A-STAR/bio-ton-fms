@@ -14,11 +14,11 @@ namespace BioTonFMS.Infrastructure.EF.Providers
     /// открыта ли она была или еще нет.
     /// </summary>
     
-    public sealed class UnitOfWork : IUnitOfWork
+    public sealed class UnitOfWork<TDbContext> : IUnitOfWork<TDbContext> where TDbContext : DbContext
     {
         private static int curId = 0;
-        private readonly Factory<DbContext> _dbContextFactory;
-        private readonly DbContext _dbContext;
+        private readonly Factory<TDbContext> _dbContextFactory;
+        private readonly TDbContext _dbContext;
 
         private IDbContextTransaction? _transaction;
         private bool _disposed;
@@ -29,7 +29,7 @@ namespace BioTonFMS.Infrastructure.EF.Providers
         /// </summary>
         /// <param name="session">Сессия NHibernate.</param>
         /// <exception cref="ArgumentNullException">Переданный аргумент имеет значение <see langword="null"/>.</exception>
-        public UnitOfWork(Factory<DbContext> dbContextFactory)
+        public UnitOfWork(Factory<TDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
             _dbContext = _dbContextFactory.Invoke();

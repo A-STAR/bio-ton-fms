@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.SensorTypes
 {
-    public class SensorTypeRepository : Repository<SensorType>, ISensorTypeRepository
+    public class SensorTypeRepository : Repository<SensorType, BioTonDBContext>, ISensorTypeRepository
     {
         public SensorTypeRepository(IKeyValueProvider<SensorType, int> keyValueProvider,
             IQueryableProvider<SensorType> queryableProvider,
-            UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
         {
         }
         

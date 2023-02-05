@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.FuelTypes
 {
-    public class FuelTypeRepository : Repository<FuelType>, IFuelTypeRepository
+    public class FuelTypeRepository : Repository<FuelType, BioTonDBContext>, IFuelTypeRepository
     {
         public FuelTypeRepository(IKeyValueProvider<FuelType, int> keyValueProvider,
             IQueryableProvider<FuelType> queryableProvider,
-            UnitOfWorkFactory unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
         {
         }
 

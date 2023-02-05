@@ -1,4 +1,5 @@
-﻿using BioTonFMS.Infrastructure.Persistence.Providers;
+﻿using BioTonFMS.Infrastructure.EF;
+using BioTonFMS.Infrastructure.Persistence.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
 {
-    public class UnitOfWorkMock : IUnitOfWork
+    public class MessagesDBContextUnitOfWorkMock : IUnitOfWork<MessagesDBContext>
     {
         /// <summary>
         /// Commit транзакции.

@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BioTonFMS.Infrastructure
 {
-    public class UnitOfWorkFactory
+    public class UnitOfWorkFactory<TDbContext>
     {
         private IServiceProvider _serviceProvider;
 
@@ -12,9 +12,9 @@ namespace BioTonFMS.Infrastructure
             _serviceProvider = serviceProvider;
         }
 
-        public virtual IUnitOfWork GetUnitOfWork()
+        public virtual IUnitOfWork<TDbContext> GetUnitOfWork()
         {
-            return _serviceProvider.GetRequiredService<IUnitOfWork>();
+            return _serviceProvider.GetRequiredService<IUnitOfWork<TDbContext>>();
         }
     }
 }
