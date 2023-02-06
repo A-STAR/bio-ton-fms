@@ -47,8 +47,8 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
 
   protected vehiclesData$!: Observable<Vehicles>;
   protected vehiclesDataSource!: TableDataSource<VehicleDataSource>;
-  protected columns = columns;
-  protected columnsKeys!: string[];
+  protected columns = vehicleColumns;
+  protected columnKeys!: string[];
   protected VehicleColumn = VehicleColumn;
 
   /**
@@ -276,7 +276,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    * Set column keys.
    */
   #setColumnKeys() {
-    this.columnsKeys = this.columns.map(({ key }) => key);
+    this.columnKeys = this.columns.map(({ key }) => key);
   }
 
   constructor(
@@ -325,7 +325,7 @@ export interface VehicleDataSource extends Pick<Vehicle, 'id' | 'name' | 'make' 
   serial?: Vehicle['serialNumber'];
 }
 
-export const columns: KeyValue<VehicleColumn, string | undefined>[] = [
+export const vehicleColumns: KeyValue<VehicleColumn, string | undefined>[] = [
   {
     key: VehicleColumn.Action,
     value: undefined

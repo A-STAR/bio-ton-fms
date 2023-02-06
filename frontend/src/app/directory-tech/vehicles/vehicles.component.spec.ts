@@ -21,7 +21,7 @@ import { Observable, of, throwError } from 'rxjs';
 
 import { Vehicles, VehicleService } from '../vehicle.service';
 
-import VehiclesComponent, { columns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
+import VehiclesComponent, { vehicleColumns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { environment } from '../../../../src/environments/environment';
@@ -120,7 +120,7 @@ describe('VehiclesComponent', () => {
 
     expect(headerCells.length)
       .withContext('render header cells')
-      .toBe(12);
+      .toBe(vehicleColumns.length);
 
     const headerCellTexts = await parallel(
       () => headerCells
@@ -128,7 +128,7 @@ describe('VehiclesComponent', () => {
         .map(cell => cell.getText())
     );
 
-    const columnLabels = columns
+    const columnLabels = vehicleColumns
       .filter((column): column is KeyValue<VehicleColumn, string> => column.value !== undefined)
       .map(
         ({ value }) => value
@@ -162,7 +162,13 @@ describe('VehiclesComponent', () => {
       header => header.getLabel()
     ));
 
-    const columnLabels = [columns[1].value, columns[4].value, columns[5].value, columns[6].value, columns[8].value]
+    const columnLabels = [
+      vehicleColumns[1].value,
+      vehicleColumns[4].value,
+      vehicleColumns[5].value,
+      vehicleColumns[6].value,
+      vehicleColumns[8].value
+    ]
       .filter((value): value is string => value !== undefined)
       .map(
         value => value
@@ -267,7 +273,7 @@ describe('VehiclesComponent', () => {
     cells.forEach(({ length }) => {
       expect(length)
         .withContext('render cells')
-        .toBe(12);
+        .toBe(vehicleColumns.length);
     });
 
     const cellTexts = await parallel(() => cells.map(
