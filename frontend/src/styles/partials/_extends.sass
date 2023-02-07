@@ -95,7 +95,7 @@
 
 %striped-table
 
-  mat-table
+  mat-table:not(mat-card *)
     box-shadow: $box-shadow
 
   mat-header-row
@@ -117,6 +117,7 @@
   .mat-mdc-row
     min-height: 40px
 
+  mat-card .mdc-data-table__table,
   mat-header-cell,
   mat-cell,
   .mdc-data-table__row:last-child .mdc-data-table__cell,
@@ -128,16 +129,20 @@
     justify-content: center
     text-align: center
 
-    &:first-child
-      border-left-color: transparent
+    &:not(mat-card *)
 
-    &:last-child
-      border-right-color: transparent
+      &:first-child
+        border-left-color: transparent
+
+      &:last-child
+        border-right-color: transparent
 
   mat-header-cell
     font-size: 10px
     font-weight: 500
-    border-top-color: transparent
+
+    &:not(mat-card *)
+      border-top-color: transparent
 
   mat-cell
     font-size: 14px
@@ -146,7 +151,7 @@
   .mdc-data-table__cell
     padding: 0 math.div(16px, 2)
 
-  .mdc-data-table__row:last-child .mdc-data-table__cell
+  .mdc-data-table__row:last-child .mdc-data-table__cell:not(mat-card *)
     border-bottom-color: transparent
 
   .mat-column-action
