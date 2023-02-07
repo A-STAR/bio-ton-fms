@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 
 import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
@@ -18,6 +18,8 @@ import { TableDataSource } from '../shared/table/table.data-source';
 export default class TrackersComponent implements OnInit {
   protected trackers$!: Observable<Trackers>;
   protected trackersDataSource!: TableDataSource<TrackerDataSource>;
+  protected columns = trackerColumns;
+  protected columnKeys!: string[];
   #trackers$ = new BehaviorSubject(undefined);
 
   /**
@@ -66,12 +68,32 @@ export default class TrackersComponent implements OnInit {
     );
   }
 
+  /**
+   * Set column keys.
+   */
+  #setColumnKeys() {
+    this.columnKeys = this.columns.map(({ key }) => key);
+  }
+
   constructor(private trackersService: TrackersService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#setTrackers();
+    this.#setColumnKeys();
   }
+}
+
+enum TrackerColumn {
+  Action = 'action',
+  Name = 'name',
+  External = 'external',
+  Type = 'type',
+  Sim = 'sim',
+  IMEI = 'imei',
+  Start = 'start',
+  Description = 'description',
+  Vehicle = 'vehicle'
 }
 
 interface TrackerDataSource extends Pick<Tracker, 'id' | 'name' | 'imei' | 'description' | 'vehicle'> {
@@ -80,3 +102,42 @@ interface TrackerDataSource extends Pick<Tracker, 'id' | 'name' | 'imei' | 'desc
   sim: Tracker['simNumber'],
   start: Tracker['startDate']
 }
+
+const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
+  {
+    key: TrackerColumn.Action,
+    value: undefined
+  },
+  {
+    key: TrackerColumn.Name,
+    value: 'Наименование&#10;трекера'
+  },
+  {
+    key: TrackerColumn.External,
+    value: 'Внешний ID&#10;трекера'
+  },
+  {
+    key: TrackerColumn.Type,
+    value: 'Тип&#10;устройств'
+  },
+  {
+    key: TrackerColumn.Sim,
+    value: 'Номер SIM-&#10;карты'
+  },
+  {
+    key: TrackerColumn.IMEI,
+    value: 'IMEI&#10;трекера'
+  },
+  {
+    key: TrackerColumn.Start,
+    value: 'Время&#10;начала'
+  },
+  {
+    key: TrackerColumn.Description,
+    value: 'Описание'
+  },
+  {
+    key: TrackerColumn.Vehicle,
+    value: 'Машина'
+  }
+];
