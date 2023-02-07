@@ -1,0 +1,26 @@
+@use 'variables' as *
+
+.mdc-switch__icons
+  display: none
+
+.mat-column-visibility .mat-mdc-slide-toggle .mdc-switch
+
+  &:disabled
+
+    .mdc-switch__track,
+    .mdc-switch__handle::after
+      opacity: 0.58
+
+    .mdc-switch__track
+
+      &::before
+        background-color: var(--mdc-switch-unselected-track-color)
+
+      &::after
+        background-color: var(--mdc-switch-selected-track-color)
+
+  &.mdc-switch--unselected:disabled .mdc-switch__handle::after
+    background-color: $gray
+
+  &.mdc-switch--selected:disabled .mdc-switch__handle::after
+    background-color: var(--mdc-switch-selected-focus-state-layer-color)
