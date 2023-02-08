@@ -280,6 +280,25 @@ describe('TrackerComponent', () => {
         .not.toBeNull();
     });
   });
+
+  it('should render create sensor button', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
+
+    const createSensorButton = await card.getHarnessOrNull(
+      MatButtonHarness.with({
+        variant: 'flat',
+        text: 'Добавить запись'
+      })
+    );
+
+    expect(createSensorButton)
+      .withContext('render a create sensor button')
+      .not.toBeNull();
+  });
 });
 
 const testParams: Params = {

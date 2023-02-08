@@ -1,7 +1,11 @@
 <h1>Конфигурация данных GPS-трекера</h1>
 
 <mat-card>
-  <mat-card-title>Дополнительные параметры</mat-card-title>
+  <mat-card-header>
+    <mat-card-title>Дополнительные параметры</mat-card-title>
+
+    <button mat-flat-button color="accent">Добавить запись</button>
+  </mat-card-header>
 
   <mat-card-content>
     <mat-table [dataSource]="sensorsDataSource" *ngIf="sensors$ | async">

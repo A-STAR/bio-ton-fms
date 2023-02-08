@@ -5,12 +5,14 @@
   box-shadow: $box-shadow
 
 mat-card-title-group,
+mat-card-header,
 mat-card-content,
 mat-card-actions
   padding-left: $mat-card-padding
   padding-right: $mat-card-padding
 
 mat-card-title-group,
+mat-card-header,
 mat-card-content
 
   &:first-child
@@ -18,10 +20,10 @@ mat-card-content
 
 mat-card > .mat-mdc-card-title
   margin: $mat-card-padding $mat-card-padding 20px
+
+mat-card-content:last-child
+  padding-top: $mat-card-padding
+
+mat-card-title
   font-size: 13px
-  font-size: 500
-
-mat-card-content
-
-  &:last-child
-    padding-top: $mat-card-padding
+  font-weight: 500
