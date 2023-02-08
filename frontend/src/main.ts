@@ -1,7 +1,9 @@
-import { ErrorHandler, importProvidersFrom } from '@angular/core';
+import { ErrorHandler, importProvidersFrom, LOCALE_ID } from '@angular/core';
 import { ApplicationConfig, bootstrapApplication } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { registerLocaleData } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import localeRu from '@angular/common/locales/ru';
 import { provideRouter } from '@angular/router';
 import { MatSnackBarConfig, MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
@@ -48,6 +50,10 @@ const appConfig: ApplicationConfig = {
     },
     provideRouter(routes),
     {
+      provide: LOCALE_ID,
+      useValue: 'ru-RU'
+    },
+    {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
       useValue: snackBarOptions
     },
@@ -61,5 +67,7 @@ const appConfig: ApplicationConfig = {
     }
   ]
 };
+
+registerLocaleData(localeRu, 'ru-RU');
 
 bootstrapApplication(AppComponent, appConfig);

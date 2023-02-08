@@ -1,16 +1,27 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
 import { Tracker, Trackers, TrackersService } from '../trackers.service';
+
+import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 
 import { TableDataSource } from '../shared/table/table.data-source';
 
 @Component({
   selector: 'bio-trackers',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    TableActionsTriggerDirective
+  ],
   templateUrl: './trackers.component.html',
   styleUrls: ['./trackers.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,6 +31,8 @@ export default class TrackersComponent implements OnInit {
   protected trackersDataSource!: TableDataSource<TrackerDataSource>;
   protected columns = trackerColumns;
   protected columnKeys!: string[];
+  protected TrackerColumn = TrackerColumn;
+  protected DATE_FORMAT = DATE_FORMAT;
   #trackers$ = new BehaviorSubject(undefined);
 
   /**
@@ -84,7 +97,7 @@ export default class TrackersComponent implements OnInit {
   }
 }
 
-enum TrackerColumn {
+export enum TrackerColumn {
   Action = 'action',
   Name = 'name',
   External = 'external',
@@ -103,7 +116,7 @@ interface TrackerDataSource extends Pick<Tracker, 'id' | 'name' | 'imei' | 'desc
   start: Tracker['startDate']
 }
 
-const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
+export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
   {
     key: TrackerColumn.Action,
     value: undefined
@@ -141,3 +154,5 @@ const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
     value: 'Машина'
   }
 ];
+
+export const DATE_FORMAT = 'd MMMM, y г., h:mm';
