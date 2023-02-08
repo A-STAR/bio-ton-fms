@@ -12,11 +12,11 @@ import { MatIconHarness } from '@angular/material/icon/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { Sensors, TrackerService } from '../tracker.service';
+import { Sensors, SensorService } from '../sensor.service';
 
 import TrackerComponent, { SensorColumn, sensorColumns } from './tracker.component';
 
-import { testSensors, TEST_TRACKER_ID } from '../tracker.service.spec';
+import { testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
@@ -25,7 +25,7 @@ describe('TrackerComponent', () => {
   let fixture: ComponentFixture<TrackerComponent>;
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
-  let trackerService: TrackerService;
+  let sensorService: SensorService;
 
   let sensorsSpy: jasmine.Spy<() => Observable<Sensors>>;
 
@@ -49,13 +49,13 @@ describe('TrackerComponent', () => {
     fixture = TestBed.createComponent(TrackerComponent);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
-    trackerService = TestBed.inject(TrackerService);
+    sensorService = TestBed.inject(SensorService);
 
     component = fixture.componentInstance;
 
     const sensors$ = of(testSensors);
 
-    sensorsSpy = spyOn(trackerService, 'getSensors')
+    sensorsSpy = spyOn(sensorService, 'getSensors')
       .and.returnValue(sensors$);
 
     fixture.detectChanges();
@@ -234,13 +234,7 @@ describe('TrackerComponent', () => {
         }
       } = testSensors.sensors[index];
 
-      const sensorTexts = [
-        name,
-        type,
-        unit,
-        formula,
-        description
-      ].map(value => typeof value === 'string' ? value?.toString() : '');
+      const sensorTexts = [name, type, unit, formula, description].map(value => value?.toString() ?? '');
 
       expect(rowCellTexts)
         .withContext('render cells text')

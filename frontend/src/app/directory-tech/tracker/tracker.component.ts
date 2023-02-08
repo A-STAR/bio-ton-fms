@@ -9,7 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { BehaviorSubject, filter, map, Observable, switchMap, tap } from 'rxjs';
 
-import { Sensor, Sensors, TrackerService } from '../tracker.service';
+import { Sensor, Sensors, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 
@@ -72,7 +72,7 @@ export default class TrackerComponent implements OnInit {
   }
 
   /**
-   * Get and set tracker sensors data.
+   * Get and set tracker sensors.
    */
   #setSensors() {
     this.sensors$ = this.route.paramMap.pipe(
@@ -82,6 +82,7 @@ export default class TrackerComponent implements OnInit {
       switchMap(trackerId => this.sensorService.getSensors({ trackerId })),
       tap(sensors => {
         this.#sensors$.next(sensors);
+
         this.#setSensorsDataSource(sensors);
       }),
       switchMap(() => this.#sensors$)
@@ -95,7 +96,7 @@ export default class TrackerComponent implements OnInit {
     this.sensorColumnKeys = this.sensorColumns.map(({ key }) => key);
   }
 
-  constructor(private route: ActivatedRoute, private sensorService: TrackerService) { }
+  constructor(private route: ActivatedRoute, private sensorService: SensorService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {

@@ -7,13 +7,13 @@ import {
   SensorDataTypeEnum,
   Sensors,
   SensorsOptions,
-  TrackerService,
+  SensorService,
   ValidationTypeEnum
-} from './tracker.service';
+} from './sensor.service';
 
-describe('TrackerService', () => {
+describe('SensorService', () => {
   let httpTestingController: HttpTestingController;
-  let service: TrackerService;
+  let service: SensorService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -21,7 +21,7 @@ describe('TrackerService', () => {
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
-    service = TestBed.inject(TrackerService);
+    service = TestBed.inject(SensorService);
   });
 
   it('should be created', () => {
