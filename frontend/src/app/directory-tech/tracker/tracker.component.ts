@@ -6,12 +6,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, filter, map, Observable, switchMap, tap } from 'rxjs';
 
 import { Sensor, Sensors, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
+import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
 
 import { TableDataSource } from '../shared/table/table.data-source';
 
@@ -25,6 +27,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
     MatButtonModule,
     MatIconModule,
     MatSlideToggleModule,
+    MatDialogModule,
     TableActionsTriggerDirective
   ],
   templateUrl: './tracker.component.html',
@@ -37,6 +40,20 @@ export default class TrackerComponent implements OnInit {
   protected sensorColumns = sensorColumns;
   protected sensorColumnKeys!: string[];
   protected SensorColumn = SensorColumn;
+
+  /**
+   * Add a new sensor to sensors table.
+   */
+  protected onCreateSensor() {
+    const data: SensorDialogData = {
+      trackerId: Number(
+        this.route.snapshot.paramMap.get('id')!
+      )
+    };
+
+    this.dialog.open(SensorDialogComponent, { data });
+  }
+
   #sensors$ = new BehaviorSubject<Sensors | undefined>(undefined);
 
   /**
@@ -96,7 +113,7 @@ export default class TrackerComponent implements OnInit {
     this.sensorColumnKeys = this.sensorColumns.map(({ key }) => key);
   }
 
-  constructor(private route: ActivatedRoute, private sensorService: SensorService) { }
+  constructor(private route: ActivatedRoute, private dialog: MatDialog, private sensorService: SensorService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {

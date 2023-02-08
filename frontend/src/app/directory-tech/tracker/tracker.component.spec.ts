@@ -3,6 +3,7 @@ import { By } from '@angular/platform-browser';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCardHarness } from '@angular/material/card/testing';
@@ -10,6 +11,7 @@ import { MatTableHarness } from '@angular/material/table/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -22,6 +24,8 @@ import { testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
   let fixture: ComponentFixture<TrackerComponent>;
+  let overlayContainer: OverlayContainer;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
   let sensorService: SensorService;
 
@@ -44,7 +48,9 @@ describe('TrackerComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(TrackerComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    overlayContainer = TestBed.inject(OverlayContainer);
     sensorService = TestBed.inject(SensorService);
 
     component = fixture.componentInstance;
@@ -299,6 +305,33 @@ describe('TrackerComponent', () => {
       .withContext('render a create sensor button')
       .not.toBeNull();
   });
+
+  it('should create tracker sensor', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
+
+    const createSensorButton = await card.getHarness(
+      MatButtonHarness.with({
+        variant: 'flat',
+        text: 'Добавить запись'
+      })
+    );
+
+    await createSensorButton.click();
+
+    const sensorDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(sensorDialog)
+      .withContext('render a sensor dialog')
+      .not.toBeNull();
+
+    await sensorDialog!.close();
+
+    overlayContainer.ngOnDestroy();
+  });
 });
 
 const testParams: Params = {
@@ -309,7 +342,12 @@ const testParamMap = convertToParamMap(testParams);
 
 const testActivatedRoute = {
   params: testParams,
+  snapshot: {
+    get paramMap() {
+      return testParamMap;
+    }
+  },
   get paramMap() {
     return of(testParamMap);
   }
-} as Pick<ActivatedRoute, 'params' | 'paramMap'>;
+} as Pick<ActivatedRoute, 'params' | 'paramMap' | 'snapshot'>;

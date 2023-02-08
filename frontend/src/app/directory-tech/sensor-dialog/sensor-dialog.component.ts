@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { Tracker } from '../tracker.service';
+
 @Component({
   selector: 'bio-sensor-dialog',
   standalone: true,
@@ -10,3 +12,7 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SensorDialogComponent { }
+
+export type SensorDialogData = Partial<{
+  trackerId: Tracker['id'];
+}>
