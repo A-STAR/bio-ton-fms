@@ -5,7 +5,7 @@ import { KeyValue } from '@angular/common';
 @Injectable({
   providedIn: 'root'
 })
-export class TrackerService {
+export class SensorService {
   /**
    * Get sensors.
    *
