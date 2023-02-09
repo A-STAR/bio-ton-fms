@@ -1,7 +1,6 @@
 ﻿using BioTonFMS.Domain.Identity;
 using BioTonFMS.Security.Authentication;
 using BioTonFMS.Security.Dtos.Auth;
-using BioTonFMS.Telematica.Validation.Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace BioTonFMS.Security.Controllers;
 

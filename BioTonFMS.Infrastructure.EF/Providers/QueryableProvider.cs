@@ -8,7 +8,6 @@ namespace BioTonFMS.Infrastructure.EF.Providers
     using BioTonFMS.Infrastructure.Persistence.Providers;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Query;
-    using Microsoft.Extensions.Logging;
 
 
     /// <summary>

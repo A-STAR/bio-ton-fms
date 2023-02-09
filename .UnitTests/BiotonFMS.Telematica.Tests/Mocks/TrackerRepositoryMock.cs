@@ -6,9 +6,11 @@ using Moq;
 
 namespace BiotonFMS.Telematica.Tests.Mocks;
 
-public static class TrackerMock
+public static class TrackerRepositoryMock
 {
-    public static PagedResult<Tracker> GetTrackers() =>
+    public const int NonExistentTrackerId = -1;
+    public const int ExistentTrackerId = 1;
+    private static PagedResult<Tracker> GetTrackers() =>
         new()
         {
             CurrentPage = 1,
@@ -30,6 +32,8 @@ public static class TrackerMock
         var repo = new Mock<ITrackerRepository>();
         repo.Setup(x => x.GetTrackers(It.IsAny<TrackersFilter>()))
             .Returns(GetTrackers);
+        repo.Setup(x => x[It.IsAny<int>()])
+            .Returns((int i) => GetTrackers().Results.FirstOrDefault(x => x.Id == i));
         return repo.Object;
     }
 }

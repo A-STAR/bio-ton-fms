@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Reflection;
-using System.Text.Json;
 
 namespace BioTonFMSApp.Controllers
 {

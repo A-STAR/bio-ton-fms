@@ -1,5 +1,4 @@
-﻿using BioTonFMS.Infrastructure.Services;
-using BioTonFMS.Telematica.Validation.Extensions;
+﻿using BioTonFMS.Telematica.Validation.Extensions;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;

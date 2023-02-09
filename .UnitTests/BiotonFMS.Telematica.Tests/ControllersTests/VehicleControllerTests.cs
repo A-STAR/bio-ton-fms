@@ -332,7 +332,7 @@ public class VehicleControllerTests
             mapper,
             loggerDummy,
             VehicleMock.GetStub(),
-            TrackerMock.GetStub(),
+            TrackerRepositoryMock.GetStub(),
             FuelTypeMock.GetStub(),
             VehicleGroupMock.GetStub(),
             new CreateVehicleDtoValidator(),
