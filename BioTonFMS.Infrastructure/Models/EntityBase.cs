@@ -16,11 +16,9 @@
 // ----------------------------------------------------------------------------
 namespace BioTonFMS.Infrastructure.Models
 {
-    using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Globalization;
-    using System.Reflection;
 
     /// <summary>
     /// Базовая реализация бизнес-сущности.

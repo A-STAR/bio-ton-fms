@@ -1,8 +1,6 @@
 namespace BioTonFMS.Version.Git
 {
     using System;
-    using System.IO;
-    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Provides Mercurial information for a particular file path, by executing and scraping

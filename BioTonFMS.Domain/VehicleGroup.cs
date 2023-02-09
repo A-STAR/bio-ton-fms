@@ -1,6 +1,5 @@
 ﻿using BioTonFMS.Infrastructure.Models;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BioTonFMS.Domain
 {

@@ -1,7 +1,4 @@
-﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Repositories.Models;
-
-namespace BioTonFMS.Infrastructure.EF.Models.Filters
+﻿namespace BioTonFMS.Infrastructure.EF.Models.Filters
 {
     public abstract class PageableFilter
     {

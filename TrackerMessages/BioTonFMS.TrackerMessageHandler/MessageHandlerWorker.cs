@@ -1,4 +1,3 @@
-using RabbitMQ.Client.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using BioTonFMS.Infrastructure.MessageBus;
@@ -21,7 +20,7 @@ public class MessageHandlerWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("MessageHandlerWorker обработка начата в : {time}", DateTimeOffset.Now);
+        _logger.LogInformation("MessageHandlerWorker РѕР±СЂР°Р±РѕС‚РєР° РЅР°С‡Р°С‚Р° РІ : {time}", DateTimeOffset.Now);
 
         _messageBus.Subscribe<TrackerMessageHandler>();
         while (!stoppingToken.IsCancellationRequested)
@@ -29,7 +28,7 @@ public class MessageHandlerWorker : BackgroundService
             await Task.Yield();
         }
 
-        _logger.LogInformation("MessageHandlerWorker обработка закончена в : {time}", DateTimeOffset.Now);
+        _logger.LogInformation("MessageHandlerWorker РѕР±СЂР°Р±РѕС‚РєР° Р·Р°РєРѕРЅС‡РµРЅР° РІ : {time}", DateTimeOffset.Now);
 
     }
 }

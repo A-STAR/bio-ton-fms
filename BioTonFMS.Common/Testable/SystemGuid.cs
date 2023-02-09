@@ -1,8 +1,6 @@
 namespace BioTonFMS.Common.Testable
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     public static class SystemGuid
     {

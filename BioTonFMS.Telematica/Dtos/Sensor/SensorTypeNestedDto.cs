@@ -1,5 +1,4 @@
 ﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.Extensions;
 
 namespace BioTonFMS.Telematica.Dtos;
 

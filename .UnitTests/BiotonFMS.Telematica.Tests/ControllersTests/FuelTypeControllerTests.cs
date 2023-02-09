@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Mapping;
 using BiotonFMS.Telematica.Tests.Mocks;

@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-
-namespace BioTonFMS.Infrastructure.MessageBus
+﻿namespace BioTonFMS.Infrastructure.MessageBus
 {
     public interface IMessageBus
     {

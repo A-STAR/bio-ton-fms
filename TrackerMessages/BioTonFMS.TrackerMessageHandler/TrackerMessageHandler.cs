@@ -1,6 +1,5 @@
 ﻿using BioTonFMS.Infrastructure.MessageBus;
 using Microsoft.Extensions.Logging;
-using RabbitMQ.Client.Events;
 using System.Text;
 
 namespace BioTonFMS.TrackerMessageHandler

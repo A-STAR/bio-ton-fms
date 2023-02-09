@@ -1,5 +1,3 @@
-using System;
-
 namespace BioTonFMS.Common.Testable
 {
     public static class SystemTime

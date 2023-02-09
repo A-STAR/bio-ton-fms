@@ -1,31 +1,30 @@
 namespace BioTonFMS.Infrastructure.Persistence.Providers
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Контекст настройки Eager Loading для LINQ-запроса.
+    /// РљРѕРЅС‚РµРєСЃС‚ РЅР°СЃС‚СЂРѕР№РєРё Eager Loading РґР»СЏ LINQ-Р·Р°РїСЂРѕСЃР°.
     /// </summary>
-    /// <typeparam name="TQueried">Тип запрашиваемой сущности.</typeparam>
-    /// <typeparam name="TFetch">Тип сущности навигационного свойства.</typeparam>
+    /// <typeparam name="TQueried">РўРёРї Р·Р°РїСЂР°С€РёРІР°РµРјРѕР№ СЃСѓС‰РЅРѕСЃС‚Рё.</typeparam>
+    /// <typeparam name="TFetch">РўРёРї СЃСѓС‰РЅРѕСЃС‚Рё РЅР°РІРёРіР°С†РёРѕРЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°.</typeparam>
     public interface IFetchRequestContext<TQueried, TFetch> : IFetchRequest<TQueried>
     {
         /// <summary>
-        /// Пометить ссылочное навигационное свойство для Eager Loading и вернуть новый контекст.
+        /// РџРѕРјРµС‚РёС‚СЊ СЃСЃС‹Р»РѕС‡РЅРѕРµ РЅР°РІРёРіР°С†РёРѕРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ РґР»СЏ Eager Loading Рё РІРµСЂРЅСѓС‚СЊ РЅРѕРІС‹Р№ РєРѕРЅС‚РµРєСЃС‚.
         /// </summary>
-        /// <typeparam name="TRelated">Тип сущности навигационного свойства.</typeparam>
-        /// <param name="selector">Выражение получения навигационного свойства.</param>
-        /// <returns>Новый контекст.</returns>
+        /// <typeparam name="TRelated">РўРёРї СЃСѓС‰РЅРѕСЃС‚Рё РЅР°РІРёРіР°С†РёРѕРЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°.</typeparam>
+        /// <param name="selector">Р’С‹СЂР°Р¶РµРЅРёРµ РїРѕР»СѓС‡РµРЅРёСЏ РЅР°РІРёРіР°С†РёРѕРЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°.</param>
+        /// <returns>РќРѕРІС‹Р№ РєРѕРЅС‚РµРєСЃС‚.</returns>
         IFetchRequestContext<TQueried, TRelated> ThenFetch<TRelated>(
             Expression<Func<TFetch, TRelated>> selector);
         /*
         /// <summary>
-        /// Пометить перечислимое навигационное свойство для Eager Loading и вернуть новый контекст.
+        /// РџРѕРјРµС‚РёС‚СЊ РїРµСЂРµС‡РёСЃР»РёРјРѕРµ РЅР°РІРёРіР°С†РёРѕРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ РґР»СЏ Eager Loading Рё РІРµСЂРЅСѓС‚СЊ РЅРѕРІС‹Р№ РєРѕРЅС‚РµРєСЃС‚.
         /// </summary>
-        /// <typeparam name="TRelated">Тип сущности навигационного свойства.</typeparam>
-        /// <param name="selector">Выражение получения навигационного свойства.</param>
-        /// <returns>Новый контекст.</returns>
+        /// <typeparam name="TRelated">РўРёРї СЃСѓС‰РЅРѕСЃС‚Рё РЅР°РІРёРіР°С†РёРѕРЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°.</typeparam>
+        /// <param name="selector">Р’С‹СЂР°Р¶РµРЅРёРµ РїРѕР»СѓС‡РµРЅРёСЏ РЅР°РІРёРіР°С†РёРѕРЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°.</param>
+        /// <returns>РќРѕРІС‹Р№ РєРѕРЅС‚РµРєСЃС‚.</returns>
         IFetchRequestContext<TQueried, TRelated> ThenFetchMany<TRelated>(
             Expression<Func<TFetch, IEnumerable<TRelated>>> selector);*/
     }

@@ -37,6 +37,12 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
 
         public override void Add(Sensor sensor)
         {
+            var sameNameRecord = QueryableProvider.Linq().Where(v => v.Name == sensor.Name && v.TrackerId == sensor.TrackerId);
+            if (sameNameRecord.Any())
+            {
+                throw new ArgumentException($"Датчик с именем {sensor.Name} уже существует!");
+            }
+            
             try
             {
                 base.Add(sensor);
@@ -85,16 +91,19 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
             
             var sensors = sensorPredicate != null ? HydratedQuery.Where(sensorPredicate) : HydratedQuery;
 
-            if (filter.SortBy is not SensorSortBy.Name)
-                return sensors.AsNoTracking().GetPagedQueryable(
-                    filter.PageNum, filter.PageSize);
-
-            sensors = filter.SortDirection switch
+            if (filter.SortBy is SensorSortBy.Name)
             {
-                SortDirection.Ascending => sensors.OrderBy(s => s.Name),
-                SortDirection.Descending => sensors.OrderByDescending(s => s.Name),
-                _ => sensors
-            };
+                sensors = filter.SortDirection switch
+                {
+                    SortDirection.Ascending => sensors.OrderBy(s => s.Name),
+                    SortDirection.Descending => sensors.OrderByDescending(s => s.Name),
+                    _ => sensors.OrderBy(s => s.Name)
+                };
+            }
+            else
+            {
+                sensors = sensors.OrderBy(s => s.Id);
+            }
 
             return sensors.AsNoTracking().GetPagedQueryable(
                  filter.PageNum, filter.PageSize);

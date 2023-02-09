@@ -3,7 +3,6 @@ using BioTonFMS.Domain.Identity;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
-using Bogus;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 // ReSharper disable InconsistentNaming

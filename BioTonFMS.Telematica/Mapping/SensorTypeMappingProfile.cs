@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
 using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMS.Telematica.Dtos;
 

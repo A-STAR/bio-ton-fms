@@ -3,6 +3,7 @@ using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
+using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
 using FluentValidation;
@@ -22,23 +23,29 @@ namespace BioTonFMS.Telematica.Controllers;
 [Produces("application/json")]
 public class SensorController : ValidationControllerBase
 {
-    private readonly ISensorRepository _sensorRepo;
+    private readonly ISensorRepository _sensorRepository;
+    private readonly ISensorTypeRepository _sensorTypeRepository;
     private readonly IValidator<UpdateSensorDto> _updateValidator;
     private readonly IValidator<SensorsRequest> _sensorsRequestValidator;
     private readonly IValidator<CreateSensorDto> _createValidator;
+    private readonly IValidator<Sensor> _sensorValidator;
     private readonly IMapper _mapper;
 
     public SensorController(
-        ISensorRepository sensorRepo,
+        ISensorRepository sensorRepository,
+        ISensorTypeRepository sensorTypeRepository,
         IMapper mapper,
         IValidator<UpdateSensorDto> updateValidator,
         IValidator<CreateSensorDto> createValidator,
+        IValidator<Sensor> sensorValidator,
         IValidator<SensorsRequest> sensorsRequestValidator)
     {
-        _sensorRepo = sensorRepo;
+        _sensorRepository = sensorRepository;
+        _sensorTypeRepository = sensorTypeRepository;
         _mapper = mapper;
         _updateValidator = updateValidator;
         _createValidator = createValidator;
+        _sensorValidator = sensorValidator;
         _sensorsRequestValidator = sensorsRequestValidator;
     }
 
@@ -61,7 +68,7 @@ public class SensorController : ValidationControllerBase
 
         var filter = _mapper.Map<SensorsFilter>(sensorsRequest);
 
-        var sensorsPaging = _sensorRepo.GetSensors(filter);
+        var sensorsPaging = _sensorRepository.GetSensors(filter);
 
         var result = new SensorsResponse
         {
@@ -87,7 +94,7 @@ public class SensorController : ValidationControllerBase
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetSensor(int id)
     {
-        var sensor = _sensorRepo[id];
+        var sensor = _sensorRepository[id];
         if (sensor is not null)
         {
             var sensorDto = _mapper.Map<SensorDto>(sensor);
@@ -109,16 +116,25 @@ public class SensorController : ValidationControllerBase
     [ProducesResponseType(typeof(SensorDto), StatusCodes.Status200OK)]
     public IActionResult AddSensor(CreateSensorDto createSensorDto)
     {
-        var validationResult = _createValidator.Validate(createSensorDto);
-        if (!validationResult.IsValid)
+        var validationResult1 = _createValidator.Validate(createSensorDto);
+        if (!validationResult1.IsValid)
         {
-            return ReturnValidationErrors(validationResult);
+            return ReturnValidationErrors(validationResult1);
         }
 
         var newSensor = _mapper.Map<Sensor>(createSensorDto);
+
+        var validationResult2 = _sensorValidator.Validate(newSensor);
+        if (!validationResult2.IsValid)
+        {
+            return ReturnValidationErrors(validationResult2);
+        }
+
+        ApplySensorTypeConstraints(newSensor);
+
         try
         {
-            _sensorRepo.Add(newSensor);
+            _sensorRepository.Add(newSensor);
             var sensorDto = _mapper.Map<SensorDto>(newSensor);
             return Ok(sensorDto);
         }
@@ -148,14 +164,22 @@ public class SensorController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
-        var sensor = _sensorRepo[id];
+        var sensor = _sensorRepository[id];
         if (sensor is not null)
         {
             _mapper.Map(updateSensorDto, sensor);
+            
+            var validationResult2 = _sensorValidator.Validate(sensor);
+            if (!validationResult2.IsValid)
+            {
+                return ReturnValidationErrors(validationResult2);
+            }
+            
+            ApplySensorTypeConstraints(sensor);
 
             try
             {
-                _sensorRepo.Update(sensor);
+                _sensorRepository.Update(sensor);
             }
             catch (ArgumentException ex)
             {
@@ -182,12 +206,12 @@ public class SensorController : ValidationControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public IActionResult DeleteSensor(int id)
     {
-        var sensor = _sensorRepo[id];
+        var sensor = _sensorRepository[id];
         if (sensor is not null)
         {
             try
             {
-                _sensorRepo.Remove(sensor);
+                _sensorRepository.Remove(sensor);
                 return Ok();
             }
             catch (ArgumentException ex)
@@ -199,5 +223,16 @@ public class SensorController : ValidationControllerBase
         {
             return NotFound(new ServiceErrorResult($"Датчик с id = {id} не найден"));
         }
+    }
+    
+    private void ApplySensorTypeConstraints(Sensor newSensor)
+    {
+        var sensorType = _sensorTypeRepository[newSensor.SensorTypeId];
+        if (sensorType is null)
+            return;
+        if (sensorType.UnitId.HasValue)
+            newSensor.UnitId = sensorType.UnitId.Value;
+        if (sensorType.DataType.HasValue)
+            newSensor.DataType = sensorType.DataType.Value;
     }
 }

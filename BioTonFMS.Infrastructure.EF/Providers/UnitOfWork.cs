@@ -6,7 +6,6 @@ namespace BioTonFMS.Infrastructure.EF.Providers
     using BioTonFMS.Infrastructure.Persistence.Providers;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Storage;
-    using Microsoft.Extensions.Logging;
     using ICommonLog = global::Microsoft.Extensions.Logging.ILogger;
 
     /// <summary>
