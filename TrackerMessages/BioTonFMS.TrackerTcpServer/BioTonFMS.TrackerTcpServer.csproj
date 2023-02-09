@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\BioTonFMS.Common\BioTonFMS.Common.csproj" />
+    <ProjectReference Include="..\..\BioTonFMS.Domain\BioTonFMS.Domain.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.Infrastructure.RabbitMQ\BioTonFMS.Infrastructure.RabbitMQ.csproj" />
   </ItemGroup>
 

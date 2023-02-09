@@ -33,9 +33,10 @@ builder.Services.AddDbContext<BioTonDBContext>(
                     .UseSnakeCaseNamingConvention()
                     .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
-builder.AddMappingProfiles();
-builder.RegisterInfrastructureComponents();
-builder.RegisterDataAccess();
+builder.Services
+    .AddMappingProfiles()
+    .RegisterInfrastructureComponents()
+    .RegisterDataAccess();
 
 builder.AddAuth();
 builder.AddValidation();

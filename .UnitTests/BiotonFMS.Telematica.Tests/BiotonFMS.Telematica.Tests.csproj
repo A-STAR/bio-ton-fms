@@ -26,19 +26,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj" />
+    <ProjectReference Include="..\..\TrackerMessages\BioTonFMS.TrackerTcpServer\BioTonFMS.TrackerTcpServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="MessageParsingTests\TestCases\*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="MessageParsingTests\TestCases\2-message.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="MessageParsingTests\TestCases\3-message.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="MessageParsingTests\TestCases\4-message.txt">
+    <None Update="GalileoskyTests\TestCases\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

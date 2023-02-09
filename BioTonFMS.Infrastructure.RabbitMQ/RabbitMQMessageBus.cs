@@ -10,11 +10,10 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
     public class RabbitMQMessageBus : IMessageBus
     {
         private readonly ILogger<RabbitMQMessageBus> _logger;
-        private readonly ConnectionFactory _factory;
-        private readonly IConnection _connection;
         private readonly IModel? _channel;
+        private readonly MessageBrokerSettingsOptions _settings;
 
-        private List<Type> _handlers = new List<Type>();
+        private readonly List<Type> _handlers = new();
         private readonly IServiceProvider _serviceProvider;
 
         public RabbitMQMessageBus(
@@ -25,13 +24,20 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _factory = new ConnectionFactory() { HostName = opts.Value.HostName };
-            _factory.AutomaticRecoveryEnabled = true;
-            _factory.DispatchConsumersAsync = true;
+            _settings = opts.Value;
+            var factory = new ConnectionFactory
+            {
+                HostName = _settings.HostName,
+                Port = _settings.Port,
+                Password = _settings.Password,
+                UserName = _settings.UserName,
+                AutomaticRecoveryEnabled = true,
+                DispatchConsumersAsync = true
+            };
 
-            _connection = _factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: "RawTrackerMessages",
+            var connection = factory.CreateConnection();
+            _channel = connection.CreateModel();
+            _channel.QueueDeclare(queue: _settings.Queue,
                                                 durable: false,
                                                 exclusive: false,
                                                 autoDelete: false,
@@ -42,7 +48,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
         {
 
             _channel.BasicPublish(exchange: "",
-                                    routingKey: "RawTrackerMessages",
+                                    routingKey: _settings.Queue,
                                     basicProperties: null,
                                     body: message);
         }
@@ -57,7 +63,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
 
             _channel.BasicConsume
             (
-                queue: "RawTrackerMessages",
+                queue: _settings.Queue,
                 autoAck: true,
                 consumer: consumer
             );
@@ -82,7 +88,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Ошибка при обработке сообщения: {body}.", body);
+                _logger.LogWarning(ex, "Ошибка при обработке сообщения: {Body}", body);
             }
         }
 
