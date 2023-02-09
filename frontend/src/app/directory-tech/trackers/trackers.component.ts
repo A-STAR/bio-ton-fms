@@ -1,14 +1,17 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
-import { Tracker, Trackers, TrackersService } from '../trackers.service';
+import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackersService } from '../trackers.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
+
+import { SortDirection } from '../shared/sort';
 
 import { TableDataSource } from '../shared/table/table.data-source';
 
@@ -18,6 +21,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
   imports: [
     CommonModule,
     MatTableModule,
+    MatSortModule,
     MatButtonModule,
     MatIconModule,
     TableActionsTriggerDirective
@@ -33,7 +37,61 @@ export default class TrackersComponent implements OnInit {
   protected columnKeys!: string[];
   protected TrackerColumn = TrackerColumn;
   protected DATE_FORMAT = DATE_FORMAT;
-  #trackers$ = new BehaviorSubject(undefined);
+
+  /**
+   * `sortChange` handler sorting trackers.
+   *
+   * @param sort Sort state.
+   */
+  protected onSortChange({ active, direction }: Sort) {
+    const trackersOptions: TrackersOptions = {};
+
+    if (active && direction) {
+      switch (active) {
+        case TrackerColumn.Name:
+          trackersOptions.sortBy = TrackersSortBy.Name;
+
+          break;
+
+        case TrackerColumn.External:
+          trackersOptions.sortBy = TrackersSortBy.External;
+
+          break;
+
+        case TrackerColumn.Type:
+          trackersOptions.sortBy = TrackersSortBy.Type;
+
+          break;
+
+        case TrackerColumn.Sim:
+          trackersOptions.sortBy = TrackersSortBy.Sim;
+
+          break;
+
+        case TrackerColumn.Start:
+          trackersOptions.sortBy = TrackersSortBy.Start;
+
+          break;
+
+        case TrackerColumn.Vehicle:
+          trackersOptions.sortBy = TrackersSortBy.Vehicle;
+      }
+
+      switch (direction) {
+        case 'asc':
+          trackersOptions.sortDirection = SortDirection.Acending;
+
+          break;
+
+        case 'desc':
+          trackersOptions.sortDirection = SortDirection.Descending;
+      }
+    }
+
+    this.#trackers$.next(trackersOptions);
+  }
+
+  #trackers$ = new BehaviorSubject<TrackersOptions>({});
 
   /**
    * Map trackers data source.
@@ -74,7 +132,7 @@ export default class TrackersComponent implements OnInit {
    */
   #setTrackers() {
     this.trackers$ = this.#trackers$.pipe(
-      switchMap(() => this.trackersService.getTrackers()),
+      switchMap(vehiclesOptions => this.trackersService.getTrackers(vehiclesOptions)),
       tap(trackers => {
         this.#setTrackersDataSource(trackers);
       })

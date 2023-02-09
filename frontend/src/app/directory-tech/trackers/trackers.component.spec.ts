@@ -1,11 +1,13 @@
 import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatTableHarness } from '@angular/material/table/testing';
+import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 
@@ -28,6 +30,7 @@ describe('TrackersComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           HttpClientTestingModule,
           TrackersComponent
         ],
@@ -120,6 +123,45 @@ describe('TrackersComponent', () => {
       .toEqual(columnLabels);
   });
 
+  it('should render tracker table sort headers', async () => {
+    const sort = await loader.getHarnessOrNull(MatSortHarness);
+
+    expect(sort)
+      .withContext('render a sort')
+      .not.toBeNull();
+
+    const sortHeaders = await sort!.getSortHeaders({
+      sortDirection: ''
+    });
+
+    expect(sortHeaders!.length)
+      .withContext('render sort headers')
+      .toBe(6);
+
+    const sortHeaderLabels = await parallel(() => sortHeaders!.map(
+      header => header.getLabel()
+    ));
+
+    const columnLabels = [
+      trackerColumns[1].value,
+      trackerColumns[2].value,
+      trackerColumns[3].value,
+      trackerColumns[4].value,
+      trackerColumns[6].value,
+      trackerColumns[8].value
+    ]
+      .filter((value): value is string => value !== undefined)
+      .map(
+        value => value
+          .replace('&#10;', '\n')
+          .replace('&shy;', '­')
+      );
+
+    expect(sortHeaderLabels)
+      .withContext('render sort header labels')
+      .toEqual(columnLabels);
+  });
+
   it('should render tracker table action cells', async () => {
     const table = await loader.getHarness(MatTableHarness);
     const rows = await table.getRows();
@@ -202,5 +244,82 @@ describe('TrackersComponent', () => {
         .withContext('render cells text')
         .toEqual(trackerTexts);
     });
+  });
+
+  it('should sort tracker table', async () => {
+    const sort = await loader.getHarness(MatSortHarness);
+
+    const [
+      nameSortHeader,
+      externalSortHeader,
+      typeSortHeader,
+      simSortHeader,
+      startSortHeader,
+      vehicleSortHeader
+    ] = await sort.getSortHeaders();
+
+    await nameSortHeader.click();
+
+    let sortDirection = await nameSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render name sort header sorted')
+      .toBe('asc');
+
+    await externalSortHeader.click();
+
+    sortDirection = await externalSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render external ID sort header sorted')
+      .toBe('asc');
+
+    await typeSortHeader.click();
+
+    sortDirection = await typeSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render type sort header sorted')
+      .toBe('asc');
+
+    await simSortHeader.click();
+
+    sortDirection = await simSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render sim number sort header sorted')
+      .toBe('asc');
+
+    await startSortHeader.click();
+
+    sortDirection = await startSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render start date sort header sorted')
+      .toBe('asc');
+
+    await vehicleSortHeader.click();
+
+    sortDirection = await vehicleSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render vehicle sort header sorted')
+      .toBe('asc');
+
+    await vehicleSortHeader.click();
+
+    sortDirection = await vehicleSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render vehicle sort header sorted in descending direction')
+      .toBe('desc');
+
+    await vehicleSortHeader.click();
+
+    sortDirection = await vehicleSortHeader.getSortDirection();
+
+    expect(sortDirection)
+      .withContext('render vehicle sort header unsorted')
+      .toBe('');
   });
 });

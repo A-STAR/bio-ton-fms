@@ -1,13 +1,31 @@
-<mat-table [dataSource]="trackersDataSource" *ngIf="trackers$ | async">
+<mat-table matSort [dataSource]="trackersDataSource" *ngIf="trackers$ | async" (matSortChange)="onSortChange($event)">
   <ng-container [matColumnDef]="column.key" *ngFor="let column of columns">
     <ng-container [ngSwitch]="column.key">
       <ng-container *ngSwitchCase="TrackerColumn.Action">
         <mat-header-cell *matHeaderCellDef></mat-header-cell>
       </ng-container>
 
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Name"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.External"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Type"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Sim"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Start"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Vehicle"></ng-container>
+
       <ng-container *ngSwitchDefault>
         <mat-header-cell [innerHTML]="column.value" *matHeaderCellDef></mat-header-cell>
       </ng-container>
+
+      <ng-template #sort>
+        <mat-header-cell mat-sort-header *matHeaderCellDef>
+          <div [innerHTML]="column.value"></div>
+        </mat-header-cell>
+      </ng-template>
     </ng-container>
 
     <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
