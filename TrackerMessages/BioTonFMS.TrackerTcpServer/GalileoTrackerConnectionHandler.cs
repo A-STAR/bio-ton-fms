@@ -1,32 +1,32 @@
-﻿using BioTonFMS.Infrastructure.MessageBus;
+﻿using System.Net;
+using BioTonFMS.Domain;
+using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 using Microsoft.AspNetCore.Connections;
-using System.Net;
 
 namespace BioTonFMS.TrackerTcpServer
 {
     public class GalileoTrackerConnectionHandler : ConnectionHandler
     {
         private readonly ILogger<GalileoTrackerConnectionHandler> _logger;
-        private IMessageBus _messageBus;
+        private readonly IProtocolMessageHandler _handler;
 
         public GalileoTrackerConnectionHandler(
                 ILogger<GalileoTrackerConnectionHandler> logger,
-                IMessageBus messageBus
-            )
+                Func<TrackerTypeEnum, IProtocolMessageHandler> handlerProvider)
         {
             _logger = logger;
-            _messageBus = messageBus;
+            _handler = handlerProvider(TrackerTypeEnum.GalileoSkyV50);
         }
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
         {
-            _logger.LogInformation(connection.ConnectionId + " connected");
+            _logger.LogInformation("{Id} connected", connection.ConnectionId);
 
-            var ipEndPoint = connection.RemoteEndPoint as IPEndPoint;
-            if (ipEndPoint != null)
+            if (connection.RemoteEndPoint is IPEndPoint ipEndPoint)
             { 
-                _logger.LogInformation($"Получен запрос от {ipEndPoint.Address}:{ipEndPoint.Port}");
+                _logger.LogInformation("Получен запрос от {Address}:{Port}", ipEndPoint.Address, ipEndPoint.Port);
             }
+            
             List<byte> message = new();
             while (true)
             {
@@ -41,14 +41,15 @@ namespace BioTonFMS.TrackerTcpServer
 
                 if (result.IsCompleted)
                 {
-                    _messageBus.Publish(message.ToArray());
+                    var resp = _handler.HandleMessage(message.ToArray());
+                    await connection.Transport.Output.WriteAsync(resp);
                     break;
                 }
 
                 connection.Transport.Input.AdvanceTo(buffer.End);
             }
 
-            _logger.LogInformation(message: connection.ConnectionId + " disconnected");
+            _logger.LogInformation("{Id} disconnected", connection.ConnectionId);
         }
     }
 }

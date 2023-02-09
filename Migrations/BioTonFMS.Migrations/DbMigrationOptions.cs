@@ -1,4 +1,4 @@
-namespace BioTonFMSApp.Migrations;
+namespace BioTonFMS.Migrations;
 
 public class DbMigrationOptions
 {

@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using Xunit.Abstractions;
 using BioTonFMS.Infrastructure.EF;
 
-namespace BiotonFMS.Telematica.Tests.MessageParsingTests;
+namespace BiotonFMS.Telematica.Tests.GalileoskyTests;
 
 public class GalileoskyMessageParserTests
 {
@@ -265,31 +265,32 @@ public class GalileoskyMessageParserTests
             new object[]
             {
                 "[BIO-81] Расшифровка_пакет_а_JD_с_CAN_данными.docx",
-                "./MessageParsingTests/TestCases/1-message.txt",
-                "./MessageParsingTests/TestCases/1-result.json"
+                "./GalileoskyTests/TestCases/1-message.txt",
+                "./GalileoskyTests/TestCases/1-result.json"
             },
             new object[]
             {
                 "[BIO-81] Расшифровка_пакета_сигнализация.docx",
-                "./MessageParsingTests/TestCases/2-message.txt",
-                "./MessageParsingTests/TestCases/2-result.json"
+                "./GalileoskyTests/TestCases/2-message.txt",
+                "./GalileoskyTests/TestCases/2-result.json"
             },
             new object[]
             {
                 "[BIO-81] Расшифровка пакетов 3 легковые.docx",
-                "./MessageParsingTests/TestCases/3-message.txt",
-                "./MessageParsingTests/TestCases/3-result.json"
+                "./GalileoskyTests/TestCases/3-message.txt",
+                "./GalileoskyTests/TestCases/3-result.json"
             },
             new object[]
             {
                 "[BIO-81] Расшифровка пакетов 2 легковые.docx",
-                "./MessageParsingTests/TestCases/4-message.txt",
-                "./MessageParsingTests/TestCases/4-result.json"
+                "./GalileoskyTests/TestCases/4-message.txt",
+                "./GalileoskyTests/TestCases/4-result.json"
             }
         };
 
     [Theory, MemberData(nameof(Files))]
-    public void Test(string title, string messagePath, string expectedPath)
+    public void ParseMessage_ValidTagsValuesFromFile_ShouldParseCorrectly(
+        string title, string messagePath, string expectedPath)
     {
         _testOutputHelper.WriteLine(title);
 
@@ -311,9 +312,10 @@ public class GalileoskyMessageParserTests
             Converters = new List<JsonConverter> { new BitArrayConverter() }
         };
 
-        var str = JsonConvert.SerializeObject(results, settings);
-        File.WriteAllText(expectedPath, str);
+        //var str = JsonConvert.SerializeObject(results, settings);
+        //File.WriteAllText(expectedPath, str);
 
+        var str = File.ReadAllText(expectedPath);
         var expected = JsonConvert.DeserializeObject<List<TrackerMessage>>(str, settings);
 
         Assert.NotNull(expected);

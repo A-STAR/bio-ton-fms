@@ -25,6 +25,11 @@ public abstract class MessageTag : EntityBase
     /// Идентификатор тега
     /// </summary>
     public int TrackerTagId { get; set; }
+
+    /// <summary>
+    /// Дискриминатор
+    /// </summary>
+    public byte TagType { get; set; }
 }
 
 public class MessageTagInteger : MessageTag

@@ -1,4 +1,5 @@
 ﻿using BioTonFMS.Domain;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.EF.Providers;
@@ -7,94 +8,99 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
+using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 
-namespace BioTonFMSApp.Startup
+namespace BioTonFMSApp.Startup;
+
+public static class DependencyRegistrationExtensions
 {
-    public static class DependencyRegistrationExtensions
+    public static IServiceCollection RegisterInfrastructureComponents(this IServiceCollection services)
     {
-        public static WebApplicationBuilder RegisterInfrastructureComponents(this WebApplicationBuilder builder)
+        services.AddScoped<Factory<BioTonDBContext>>(sp =>
         {
-            /*builder.Services.AddScoped<Factory<DbContext>>(sp =>
-            {
-                var instance = sp.GetRequiredService<BioTonDBContext>();
-                return () => instance;
-            });*/
-            builder.Services.AddScoped<Factory<BioTonDBContext>>(sp =>
-            {
-                var instance = sp.GetRequiredService<BioTonDBContext>();
-                return () => instance;
-            });
-            builder.Services.AddScoped<Factory<MessagesDBContext>>(sp =>
-            {
-                var instance = sp.GetRequiredService<MessagesDBContext>();
-                return () => instance;
-            });
-
-            builder.Services.AddScoped<Factory<DbContext[]>>(sp =>
-            {
-                var contexts = new DbContext[2];
-                contexts[0] = sp.GetRequiredService<BioTonDBContext>();
-                contexts[1] = sp.GetRequiredService<MessagesDBContext>();
-
-                return () => contexts;
-            });
-
-            builder.Services.AddTransient<IUnitOfWork<BioTonDBContext>, UnitOfWork<BioTonDBContext>>();
-            builder.Services.AddTransient<IUnitOfWork<MessagesDBContext>, UnitOfWork<MessagesDBContext>>();
-
-            builder.Services.AddTransient(sp =>
-            {
-                Console.WriteLine("UnitOfWorkFactory<BioTonDBContext> invoked");
-                return new UnitOfWorkFactory<BioTonDBContext>(sp);
-            });
-            builder.Services.AddTransient(sp =>
-            {
-                Console.WriteLine("UnitOfWorkFactory<MessagesDBContext> invoked");
-                return new UnitOfWorkFactory<MessagesDBContext>(sp);
-            });
-            return builder;
-        }
-
-        public static WebApplicationBuilder RegisterDataAccess(this WebApplicationBuilder builder)
+            var instance = sp.GetRequiredService<BioTonDBContext>();
+            return () => instance;
+        });
+        services.AddScoped<Factory<MessagesDBContext>>(sp =>
         {
-            builder.Services.AddTransient<IKeyValueProvider<Tracker, int>, KeyValueProvider<Tracker, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<Tracker>, QueryableProvider<Tracker, BioTonDBContext>>();
-            builder.Services.AddTransient<ITrackerRepository, TrackerRepository>();
+            var instance = sp.GetRequiredService<MessagesDBContext>();
+            return () => instance;
+        });
 
-            builder.Services.AddTransient<IKeyValueProvider<Vehicle, int>, KeyValueProvider<Vehicle, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<Vehicle>, QueryableProvider<Vehicle, BioTonDBContext>>();
-            builder.Services.AddTransient<IVehicleRepository, VehicleRepository>();
+        services.AddTransient<IUnitOfWork<BioTonDBContext>, UnitOfWork<BioTonDBContext>>();
+        services.AddTransient<IUnitOfWork<MessagesDBContext>, UnitOfWork<MessagesDBContext>>();
 
-            builder.Services.AddTransient<IKeyValueProvider<VehicleGroup, int>, KeyValueProvider<VehicleGroup, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<VehicleGroup>, QueryableProvider<VehicleGroup, BioTonDBContext>>();
-            builder.Services.AddTransient<IVehicleGroupRepository, VehicleGroupRepository>();
+        services.AddTransient(sp =>
+        {
+            Console.WriteLine("UnitOfWorkFactory<BioTonDBContext> invoked");
+            return new UnitOfWorkFactory<BioTonDBContext>(sp);
+        });
+        services.AddTransient(sp =>
+        {
+            Console.WriteLine("UnitOfWorkFactory<MessagesDBContext> invoked");
+            return new UnitOfWorkFactory<MessagesDBContext>(sp);
+        });
+        return services;
+    }
 
-            builder.Services.AddTransient<IKeyValueProvider<FuelType, int>, KeyValueProvider<FuelType, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<FuelType>, QueryableProvider<FuelType, BioTonDBContext>>();
-            builder.Services.AddTransient<IFuelTypeRepository, FuelTypeRepository>();
+    public static IServiceCollection RegisterDataAccess(this IServiceCollection services)
+    {
+        services.AddTransient<IKeyValueProvider<Tracker, int>, KeyValueProvider<Tracker, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<Tracker>, QueryableProvider<Tracker, BioTonDBContext>>();
+        services.AddTransient<ITrackerRepository, TrackerRepository>();
 
-            builder.Services.AddTransient<IKeyValueProvider<Sensor, int>, KeyValueProvider<Sensor, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<Sensor>, QueryableProvider<Sensor, BioTonDBContext>>();
-            builder.Services.AddTransient<ISensorRepository, SensorRepository>();
+        services.AddTransient<IKeyValueProvider<Vehicle, int>, KeyValueProvider<Vehicle, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<Vehicle>, QueryableProvider<Vehicle, BioTonDBContext>>();
+        services.AddTransient<IVehicleRepository, VehicleRepository>();
 
-            builder.Services.AddTransient<IKeyValueProvider<SensorType, int>, KeyValueProvider<SensorType, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<SensorType>, QueryableProvider<SensorType, BioTonDBContext>>();
-            builder.Services.AddTransient<ISensorTypeRepository, SensorTypeRepository>();
+        services.AddTransient<IKeyValueProvider<VehicleGroup, int>, KeyValueProvider<VehicleGroup, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<VehicleGroup>, QueryableProvider<VehicleGroup, BioTonDBContext>>();
+        services.AddTransient<IVehicleGroupRepository, VehicleGroupRepository>();
 
-            builder.Services.AddTransient<IKeyValueProvider<SensorGroup, int>, KeyValueProvider<SensorGroup, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<SensorGroup>, QueryableProvider<SensorGroup, BioTonDBContext>>();
-            builder.Services.AddTransient<ISensorGroupRepository, SensorGroupRepository>();
+        services.AddTransient<IKeyValueProvider<FuelType, int>, KeyValueProvider<FuelType, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<FuelType>, QueryableProvider<FuelType, BioTonDBContext>>();
+        services.AddTransient<IFuelTypeRepository, FuelTypeRepository>();
 
-            builder.Services.AddTransient<IKeyValueProvider<Unit, int>, KeyValueProvider<Unit, BioTonDBContext, int>>();
-            builder.Services.AddTransient<IQueryableProvider<Unit>, QueryableProvider<Unit, BioTonDBContext>>();
-            builder.Services.AddTransient<IUnitRepository, UnitRepository>();
+        services.AddTransient<IKeyValueProvider<Sensor, int>, KeyValueProvider<Sensor, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<Sensor>, QueryableProvider<Sensor, BioTonDBContext>>();
+        services.AddTransient<ISensorRepository, SensorRepository>();
+
+        services.AddTransient<IKeyValueProvider<SensorType, int>, KeyValueProvider<SensorType, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<SensorType>, QueryableProvider<SensorType, BioTonDBContext>>();
+        services.AddTransient<ISensorTypeRepository, SensorTypeRepository>();
+
+        services.AddTransient<IKeyValueProvider<SensorGroup, int>, KeyValueProvider<SensorGroup, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<SensorGroup>, QueryableProvider<SensorGroup, BioTonDBContext>>();
+        services.AddTransient<ISensorGroupRepository, SensorGroupRepository>();
+
+        services.AddTransient<IKeyValueProvider<Unit, int>, KeyValueProvider<Unit, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<Unit>, QueryableProvider<Unit, BioTonDBContext>>();
+        services.AddTransient<IUnitRepository, UnitRepository>();
+
+        services.AddTransient<IKeyValueProvider<TrackerTag, int>, KeyValueProvider<TrackerTag, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<TrackerTag>, QueryableProvider<TrackerTag, BioTonDBContext>>();
+        services.AddTransient<ITrackerTagRepository, TrackerTagRepository>();
+
+        services.AddTransient<IKeyValueProvider<ProtocolTag, int>, KeyValueProvider<ProtocolTag, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<ProtocolTag>, QueryableProvider<ProtocolTag, BioTonDBContext>>();
+        services.AddTransient<IProtocolTagRepository, ProtocolTagRepository>();
             
-            return builder;
-        }
+        return services;
+    }
+
+    public static IServiceCollection RegisterMessagesDataAccess(this IServiceCollection services)
+    {
+        services.AddTransient<IKeyValueProvider<TrackerMessage, int>, KeyValueProvider<TrackerMessage, MessagesDBContext, int>>();
+        services.AddTransient<IQueryableProvider<TrackerMessage>, QueryableProvider<TrackerMessage, MessagesDBContext>>();
+        services.AddTransient<ITrackerMessageRepository, TrackerMessageRepository>();
+
+        return services;
     }
 }

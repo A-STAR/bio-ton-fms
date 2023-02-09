@@ -1,23 +1,35 @@
-﻿using BioTonFMS.Infrastructure.MessageBus;
+﻿using System.Text;
+using System.Text.Json;
+using BioTonFMS.Domain;
+using BioTonFMS.Domain.Messaging;
+using BioTonFMS.Infrastructure.MessageBus;
+using BioTonFMS.Telematica.MessageParsing;
 using Microsoft.Extensions.Logging;
-using System.Text;
 
-namespace BioTonFMS.TrackerMessageHandler
+namespace BioTonFMS.TrackerMessageHandler;
+
+public class TrackerMessageHandler : IBusMessageHandler
 {
-    public class TrackerMessageHandler : IBusMessageHandler
+    private readonly ILogger<TrackerMessageHandler> _logger;
+    private readonly Func<TrackerTypeEnum, IMessageParser> _parserProvider;
+
+    public TrackerMessageHandler(ILogger<TrackerMessageHandler> logger,
+        Func<TrackerTypeEnum, IMessageParser> parserProvider)
     {
-        private readonly ILogger<TrackerMessageHandler> _logger;
+        _logger = logger;
+        _parserProvider = parserProvider;
+    }
 
-        public TrackerMessageHandler(ILogger<TrackerMessageHandler> logger)
-        {
-            _logger = logger;
-        }
+    public Task HandleAsync(byte[] message)
+    {
+        var messageText = Encoding.UTF8.GetString(message);
+        _logger.LogInformation("Получено сообщение {MessageText}", messageText);
 
-        public Task HandleAsync(byte[] message)
-        {
-            var messageText = Encoding.UTF8.GetString(message);
-            _logger.LogInformation("Получено сообщение {messageText}", messageText);
-            return Task.CompletedTask;
-        }
+        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
+                         ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", nameof(message));
+
+        _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage);
+            
+        return Task.CompletedTask;
     }
 }

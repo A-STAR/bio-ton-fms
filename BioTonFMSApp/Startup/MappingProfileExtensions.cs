@@ -4,13 +4,13 @@ namespace BioTonFMSApp.Startup
 {
     public static class MappingProfileExtensions
     {
-        public static WebApplicationBuilder AddMappingProfiles(this WebApplicationBuilder builder)
+        public static IServiceCollection AddMappingProfiles(this IServiceCollection services)
         {
-            builder.Services.AddAutoMapper(typeof(TrackerMappingProfile).Assembly);
-            builder.Services.AddAutoMapper(typeof(VehicleMappingProfile).Assembly);
-            builder.Services.AddAutoMapper(typeof(VehicleGroupMappingProfile).Assembly);
-            builder.Services.AddAutoMapper(typeof(FuelTypeMappingProfile).Assembly);
-            return builder;
+            services.AddAutoMapper(typeof(TrackerMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(VehicleMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(VehicleGroupMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(FuelTypeMappingProfile).Assembly);
+            return services;
         }
     }
 }
