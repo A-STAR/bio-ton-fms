@@ -11,6 +11,7 @@ using BioTonFMS.Infrastructure.RabbitMQ;
 using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("config/appsettings.json", true);
 
 var serverSettings = builder.Configuration.GetSection("ServerSettings").Get<ServerSettingsOptions>();
 
