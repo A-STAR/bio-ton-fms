@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatDialogTitle } from '@angular/material/dialog';
+import { MatTabGroupHarness } from '@angular/material/tabs/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -82,5 +87,19 @@ describe('SensorDialogComponent', () => {
 
     expect(validationTypeSpy)
       .toHaveBeenCalled();
+  });
+
+  it('should render dialog title', async () => {
+    const titleTextDe = fixture.debugElement.query(
+      By.directive(MatDialogTitle)
+    );
+
+    expect(titleTextDe)
+      .withContext('render dialog title element')
+      .not.toBeNull();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog title text')
+      .toBe('Новый датчик');
   });
 });

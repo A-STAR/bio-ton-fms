@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { forkJoin, map, Observable } from 'rxjs';
 
@@ -10,7 +11,10 @@ import { Tracker } from '../tracker.service';
 @Component({
   selector: 'bio-sensor-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatDialogModule
+  ],
   templateUrl: './sensor-dialog.component.html',
   styleUrls: ['./sensor-dialog.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
