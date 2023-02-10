@@ -163,7 +163,6 @@ export enum TrackerColumn {
   Sim = 'sim',
   IMEI = 'imei',
   Start = 'start',
-  Description = 'description',
   Vehicle = 'vehicle'
 }
 
@@ -202,10 +201,6 @@ export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
   {
     key: TrackerColumn.Start,
     value: 'Время&#10;начала'
-  },
-  {
-    key: TrackerColumn.Description,
-    value: 'Описание'
   },
   {
     key: TrackerColumn.Vehicle,

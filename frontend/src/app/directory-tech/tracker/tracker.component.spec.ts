@@ -235,14 +235,13 @@ describe('TrackerComponent', () => {
         sensorType: {
           value: type
         },
-        description,
         formula,
         unit: {
           value: unit
         }
       } = testSensors.sensors[index];
 
-      const sensorTexts = [name, type, unit, formula, description].map(value => value ?? '');
+      const sensorTexts = [name, type, unit, formula].map(value => value ?? '');
 
       expect(rowCellTexts)
         .withContext('render cells text')
@@ -255,13 +254,13 @@ describe('TrackerComponent', () => {
     const rows = await table.getRows();
 
     const cells = await parallel(() => rows.map(
-      row => row.getCells()
+      row => row.getCells({
+        columnName: SensorColumn.Visibility
+      })
     ));
 
     const slideToggles = await parallel(() => cells.map(
-      ({
-        6: actionCell
-      }, index) => actionCell.getHarnessOrNull(
+      ([visibilityCell], index) => visibilityCell.getHarnessOrNull(
         MatSlideToggleHarness.with({
           ancestor: '.mat-column-visibility',
           checked: testSensors.sensors[index].visibility,

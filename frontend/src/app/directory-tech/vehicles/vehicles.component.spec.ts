@@ -186,13 +186,13 @@ describe('VehiclesComponent', () => {
     const rows = await table.getRows();
 
     const cells = await parallel(() => rows.map(
-      row => row.getCells()
+      row => row.getCells({
+        columnName: VehicleColumn.Action
+      })
     ));
 
     const actionButtons = await parallel(() => cells.map(
-      ({
-        0: actionCell
-      }) => parallel(() => [
+      ([actionCell]) => parallel(() => [
         actionCell.getHarnessOrNull(MatButtonHarness.with({
           variant: 'icon',
           text: 'more_horiz'
@@ -306,7 +306,6 @@ describe('VehiclesComponent', () => {
         },
         manufacturingYear: year,
         registrationNumber,
-        description,
         tracker: {
           value: tracker
         } = {
@@ -318,19 +317,9 @@ describe('VehiclesComponent', () => {
         ?.split(' ')
         .join('');
 
-      const vehicleTexts = [
-        name,
-        make,
-        model,
-        type,
-        subtype,
-        group,
-        year,
-        fuel,
-        registration,
-        tracker,
-        description
-      ].map(value => value?.toString() ?? '');
+      const vehicleTexts = [name, make, model, type, subtype, group, year, fuel, registration, tracker].map(
+        value => value?.toString() ?? ''
+      );
 
       expect(rowCellTexts)
         .withContext('render cells text')

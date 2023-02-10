@@ -148,7 +148,7 @@ describe('TrackersComponent', () => {
       trackerColumns[3].value,
       trackerColumns[4].value,
       trackerColumns[6].value,
-      trackerColumns[8].value
+      trackerColumns[7].value
     ]
       .filter((value): value is string => value !== undefined)
       .map(
@@ -225,7 +225,6 @@ describe('TrackersComponent', () => {
           value: type
         },
         startDate,
-        description,
         vehicle: {
           value: vehicle
         } = {
@@ -236,7 +235,7 @@ describe('TrackersComponent', () => {
       const sim = simNumber ? `+${simNumber[0]} (${simNumber.slice(1, 4)}) ${simNumber.slice(4)}` : '';
       const start = formatDate(startDate, DATE_FORMAT, 'ru-RU');
 
-      const trackerTexts = [name, external, type, sim, imei, start, description, vehicle].map(
+      const trackerTexts = [name, external, type, sim, imei, start, vehicle].map(
         value => value?.toString() ?? ''
       );
 

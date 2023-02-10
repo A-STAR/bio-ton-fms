@@ -111,7 +111,6 @@ export enum SensorColumn {
   Type = 'type',
   Unit = 'unit',
   Formula = 'formula',
-  Description = 'description',
   Visibility = 'visibility'
 }
 
@@ -139,10 +138,6 @@ export const sensorColumns: KeyValue<SensorColumn, string | undefined>[] = [
   {
     key: SensorColumn.Formula,
     value: 'Параметр'
-  },
-  {
-    key: SensorColumn.Description,
-    value: 'Описание'
   },
   {
     key: SensorColumn.Visibility,

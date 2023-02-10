@@ -311,7 +311,6 @@ export enum VehicleColumn {
   Registration = 'registration',
   Inventory = 'inventory',
   Serial = 'serial',
-  Description = 'description',
   Tracker = 'tracker'
 }
 
@@ -369,10 +368,6 @@ export const vehicleColumns: KeyValue<VehicleColumn, string | undefined>[] = [
   {
     key: VehicleColumn.Tracker,
     value: 'GPS&#10;трекер'
-  },
-  {
-    key: VehicleColumn.Description,
-    value: 'Описание'
   }
 ];
 
