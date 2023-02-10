@@ -15,6 +15,10 @@ using Microsoft.Extensions.Options;
 using Serilog;
 
 IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureHostConfiguration(hostConfig =>
+    {
+        hostConfig.AddJsonFile("config/appsettings.json", true);
+    })
     .ConfigureServices((hostContext, services) =>
     {
         services.AddOptions();
