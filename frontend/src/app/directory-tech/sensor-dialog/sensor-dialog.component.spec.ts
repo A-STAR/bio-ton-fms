@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { Observable, of } from 'rxjs';
@@ -7,7 +8,7 @@ import { SensorGroup, SensorService, SensorType, Unit } from '../sensor.service'
 
 import { SensorDialogComponent } from './sensor-dialog.component';
 
-import { testSensorGroups, testSensorTypes, testUnits } from '../sensor.service.spec';
+import { testSensorDataTypeEnum, testSensorGroups, testSensorTypes, testUnits, testValidationTypeEnum } from '../sensor.service.spec';
 
 describe('SensorDialogComponent', () => {
   let component: SensorDialogComponent;
@@ -16,6 +17,8 @@ describe('SensorDialogComponent', () => {
   let sensorGroupsSpy: jasmine.Spy<(this: SensorService) => Observable<SensorGroup[]>>;
   let sensorTypesSpy: jasmine.Spy<(this: SensorService) => Observable<SensorType[]>>;
   let unitsSpy: jasmine.Spy<(this: SensorService) => Observable<Unit[]>>;
+  let sensorDataTypeSpy: jasmine.Spy<(this: SensorService) => Observable<KeyValue<string, string>[]>>;
+  let validationTypeSpy: jasmine.Spy<(this: SensorService) => Observable<KeyValue<string, string>[]>>;
 
   beforeEach(async () => {
     await TestBed
@@ -36,6 +39,8 @@ describe('SensorDialogComponent', () => {
     const sensorGroups$ = of(testSensorGroups);
     const sensorTypes$ = of(testSensorTypes);
     const units$ = of(testUnits);
+    const sensorDataType$ = of(testSensorDataTypeEnum);
+    const validationType$ = of(testValidationTypeEnum);
 
     sensorGroupsSpy = spyOnProperty(sensorService, 'sensorGroups$')
       .and.returnValue(sensorGroups$);
@@ -45,6 +50,12 @@ describe('SensorDialogComponent', () => {
 
     unitsSpy = spyOnProperty(sensorService, 'units$')
       .and.returnValue(units$);
+
+    sensorDataTypeSpy = spyOnProperty(sensorService, 'sensorDataType$')
+      .and.returnValue(sensorDataType$);
+
+    validationTypeSpy = spyOnProperty(sensorService, 'validationType$')
+      .and.returnValue(validationType$);
 
     fixture.detectChanges();
   });
@@ -62,6 +73,14 @@ describe('SensorDialogComponent', () => {
       .toHaveBeenCalled();
 
     expect(unitsSpy)
+      .toHaveBeenCalled();
+  });
+
+  it('should get sensor data type, validation enums', () => {
+    expect(sensorDataTypeSpy)
+      .toHaveBeenCalled();
+
+    expect(validationTypeSpy)
       .toHaveBeenCalled();
   });
 });

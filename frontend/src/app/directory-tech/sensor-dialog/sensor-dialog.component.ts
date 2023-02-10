@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 
 import { forkJoin, map, Observable } from 'rxjs';
 
@@ -20,6 +20,8 @@ export class SensorDialogComponent implements OnInit {
     groups: SensorGroup[];
     validators: SensorType[];
     units: Unit[];
+    dataType: KeyValue<string, string>[];
+    validation: KeyValue<string, string>[];
   }>;
 
   /**
@@ -30,9 +32,11 @@ export class SensorDialogComponent implements OnInit {
       this.sensorService.sensorGroups$,
       this.sensorService.sensorTypes$,
       this.sensorService.units$,
+      this.sensorService.sensorDataType$,
+      this.sensorService.validationType$
     ])
       .pipe(
-        map(([groups, validators, units]) => ({groups, validators, units}))
+        map(([groups, validators, units, dataType, validation]) => ({ groups, validators, units, dataType, validation }))
       );
   }
 

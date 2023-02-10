@@ -38,6 +38,24 @@ export class SensorService {
   }
 
   /**
+   * Get sensor data type enum.
+   *
+   * @returns An `Observable` of sensor data type enum stream.
+   */
+  get sensorDataType$() {
+    return this.httpClient.get<KeyValue<SensorDataTypeEnum, string>[]>('/api/telematica/enums/sensordatatypeenum');
+  }
+
+  /**
+   * Get validation type enum.
+   *
+   * @returns An `Observable` of validation type enum stream.
+   */
+  get validationType$() {
+    return this.httpClient.get<KeyValue<ValidationTypeEnum, string>[]>('/api/telematica/enums/validationtypeenum');
+  }
+
+  /**
    * Get sensors.
    *
    * @param fromObject Sensors params options.

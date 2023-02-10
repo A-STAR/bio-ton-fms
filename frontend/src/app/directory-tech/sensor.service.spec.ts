@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import {
@@ -142,7 +143,71 @@ describe('SensorService', () => {
 
     unitsRequest.flush(testUnits);
   });
+
+  it('should get sensor data type enum', (done: DoneFn) => {
+    service.sensorDataType$.subscribe(sensorDataType => {
+      expect(sensorDataType)
+        .withContext('emit sensor data type enum')
+        .toEqual(testSensorDataTypeEnum);
+
+      done();
+    });
+
+    const sensorDataTypeRequest = httpTestingController.expectOne(
+      '/api/telematica/enums/sensordatatypeenum',
+      'sensor data type enum request'
+    );
+
+    sensorDataTypeRequest.flush(testSensorDataTypeEnum);
+  });
+
+  it('should get validation type enum', (done: DoneFn) => {
+    service.validationType$.subscribe(validationType => {
+      expect(validationType)
+        .withContext('emit validation type enum')
+        .toEqual(testValidationTypeEnum);
+
+      done();
+    });
+
+    const validationTypeRequest = httpTestingController.expectOne(
+      '/api/telematica/enums/validationtypeenum',
+      'validation type enum request'
+    );
+
+    validationTypeRequest.flush(testValidationTypeEnum);
+  });
 });
+
+export const testSensorDataTypeEnum: KeyValue<SensorDataTypeEnum, string>[] = [
+  {
+    key: SensorDataTypeEnum.Boolean,
+    value: 'Булево'
+  },
+  {
+    key: SensorDataTypeEnum.String,
+    value: 'Строка'
+  },
+  {
+    key: SensorDataTypeEnum.Number,
+    value: 'Число'
+  }
+];
+
+export const testValidationTypeEnum: KeyValue<ValidationTypeEnum, string>[] = [
+  {
+    key: ValidationTypeEnum.LogicalAnd,
+    value: 'Тип валидации «Логическое И»'
+  },
+  {
+    key: ValidationTypeEnum.LogicalOr,
+    value: 'Тип валидации «Логическое ИЛИ»'
+  },
+  {
+    key: ValidationTypeEnum.ZeroTest,
+    value: 'Тип валидации «Проверка на неравенство нулю»'
+  }
+];
 
 export const testUnits: Unit[] = [
   {
