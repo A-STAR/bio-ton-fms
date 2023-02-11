@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BioTonFMS.Expressions\BioTonFMS.Expressions.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj" />
     <ProjectReference Include="..\..\TrackerMessages\BioTonFMS.TrackerTcpServer\BioTonFMS.TrackerTcpServer.csproj" />
   </ItemGroup>

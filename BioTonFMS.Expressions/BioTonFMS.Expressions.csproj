@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Pegasus" Version="4.2.0-alpha0003" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Expressions.peg.g" />
+      <PegGrammar Include="Expressions.peg.g" />
+    </ItemGroup>
+
+</Project>
