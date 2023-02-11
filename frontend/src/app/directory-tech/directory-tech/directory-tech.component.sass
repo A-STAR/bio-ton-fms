@@ -10,32 +10,20 @@ nav
   padding: 15px 30px
   background-color: $lighter-gray
 
-a,
-span
+a
   font-size: 13px
   font-weight: 500
 
-$navigation-item-height: 25px
-
-a
-
   &:not(:first-child)
+    margin-left: 20px
 
-    &,
-    & + span
-      margin-left: 20px
+  &.mat-mdc-unelevated-button
 
-  &.mat-mdc-unelevated-button.mat-mdc-button-base
-    height: $navigation-item-height
+    &:not(:disabled, :hover)
+      color: $dark-gray
 
-  &.mat-mdc-unelevated-button:not(:disabled, :hover)
-    color: $dark-gray
+      &.active
+        color: $green
 
-span
-  $mat-mdc-button: ('padding': 0 15px, 'border-radius': 4px)
-
-  padding: map.get($mat-mdc-button, 'padding')
-  background-color: $white
-  color: $green
-  border-radius: map.get($mat-mdc-button, 'border-radius')
-  line-height: $navigation-item-height
+    &.mat-mdc-button-base
+      height: 25px
