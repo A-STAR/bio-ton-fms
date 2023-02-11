@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
-using BioTonFMS.Telematica.Dtos;
+using BioTonFMS.Infrastructure.Extensions;
+using BioTonFMS.Telematica.Dtos.Tracker;
+using KeyValuePair = BioTonFMS.Infrastructure.Extensions.KeyValuePair;
 
 namespace BioTonFMS.Telematica.Mapping
 {
@@ -11,8 +13,16 @@ namespace BioTonFMS.Telematica.Mapping
         {
             CreateMap<TrackersRequest, TrackersFilter>();
             CreateMap<CreateTrackerDto, Tracker>();
-            CreateMap<UpdateTrackerDto, Tracker>(); 
-            CreateMap<Tracker, TrackerDto>();
+            CreateMap<UpdateTrackerDto, Tracker>();
+            CreateMap<Tracker, TrackerDto>()
+                .ForMember(dest => dest.TrackerType, opt => opt.MapFrom(src =>
+                    EnumExtension.GetKeyValuePair(src.TrackerType)))
+                .ForMember(dest => dest.Vehicle,
+                    opt =>
+                    {
+                        opt.PreCondition(src => src.Vehicle != null);
+                        opt.MapFrom(src => new ForeignKeyValue<int, string>(src.Vehicle!.Id, src.Vehicle.Name));
+                    });
         }
     }
 }

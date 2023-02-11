@@ -1,4 +1,4 @@
-﻿namespace BioTonFMS.Telematica.Dtos
+﻿namespace BioTonFMS.Telematica.Dtos.Tracker
 {
     /// <summary>
     /// Список трекеров с информацией о постраничном выводе

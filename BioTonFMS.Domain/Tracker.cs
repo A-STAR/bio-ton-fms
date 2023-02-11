@@ -55,11 +55,14 @@ namespace BioTonFMS.Domain
         [MaxLength(15)]
         public string Imei { get; set; } = "";
 
-        public virtual IEnumerable<Device> Devices { get; set; } = default!;
+        /// <summary>
+        /// Машина
+        /// </summary>
+        public Vehicle? Vehicle { get; set; }
 
         /// <summary>
         /// Датчики
         /// </summary>
-        public List<Sensor> Sensors;
+        public List<Sensor> Sensors { get; set; }
     }
 }

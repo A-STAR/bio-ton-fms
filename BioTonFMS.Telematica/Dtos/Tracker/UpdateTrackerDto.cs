@@ -1,30 +1,33 @@
 ﻿using BioTonFMS.Domain;
 using System.ComponentModel.DataAnnotations;
 
-namespace BioTonFMS.Telematica.Dtos
+namespace BioTonFMS.Telematica.Dtos.Tracker
 {
     /// <summary>
-    /// Модель создания трекера
+    /// Модель обновления трекера
     /// </summary>
-    public class CreateTrackerDto
+    public class UpdateTrackerDto
     {
         /// <summary>
         /// Идентификатор трекера во внешней системе
         /// </summary>
-        [Required]
         public int ExternalId { get; set; }
 
         /// <summary>
         /// Название трекера
         /// </summary>
         [Required]
-        public string Name { get; set; } = String.Empty;
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Номер sim – карты
         /// </summary>
-        [Required]
-        public string SimNumber { get; set; } = String.Empty;
+        public string SimNumber { get; set; } = string.Empty;
+
+        /// <summary>
+        /// IMEI трекера
+        /// </summary>
+        public string Imei { get; set; } = string.Empty;
 
         /// <summary>
         /// Тип устройства
@@ -40,6 +43,6 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Описание
         /// </summary>
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 }

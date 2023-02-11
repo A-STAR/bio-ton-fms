@@ -1,4 +1,4 @@
-﻿using BioTonFMS.Telematica.Dtos;
+﻿using BioTonFMS.Telematica.Dtos.Tracker;
 using FluentValidation;
 
 namespace BioTonFMS.Telematica.Validation

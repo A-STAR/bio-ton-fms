@@ -5,6 +5,7 @@ using BioTonFMS.Infrastructure.EF.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
+using BioTonFMS.Telematica.Dtos.Tracker;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;

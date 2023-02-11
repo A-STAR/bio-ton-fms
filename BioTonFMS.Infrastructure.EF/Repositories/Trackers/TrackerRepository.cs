@@ -54,7 +54,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
             if (trackersWithTheSameExternalId.Any())
             {
-                throw new ArgumentException($"Трекер с внешним идентификатором " +
+                throw new ArgumentException("Трекер с внешним идентификатором " +
                     $"{tracker.ExternalId} уже существует");
             }
 
@@ -64,7 +64,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при обновлении трекера {@id}", tracker.Id);
+                _logger.LogError(ex, "Ошибка при обновлении трекера {TrackerId}", tracker.Id);
                 throw;
             }
         }
@@ -77,8 +77,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             if (vehicle is not null)
             {
                 var regNum = vehicle.RegistrationNumber.Length > 0 ? vehicle.RegistrationNumber : "незаполнен";
-                _logger.LogError($"Нельзя удалить трекер (id - {tracker.Id}) " +
-                   $"привязанный к машине (id - {vehicle.Id})!");
+                _logger.LogError("Нельзя удалить трекер (id - {TrackerId}) привязанный к машине (id - {VehicleId})!",
+                    tracker.Id, vehicle.Id);
                 throw new ArgumentException($"Нельзя удалить трекер привязанный к машине (название - '{vehicle.Name}', регистрационный номер - {regNum})");
             }
 
@@ -95,7 +95,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
         public PagedResult<Tracker> GetTrackers(TrackersFilter filter)
         {
-            var linqProvider = QueryableProvider.Linq();
+            var linqProvider = QueryableProvider.Fetch(x => x.Vehicle).Linq();
 
             Expression<Func<Tracker, bool>>? trackerPredicate = null;
 
@@ -120,25 +120,23 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 trackerPredicate = SetPredicate(trackerPredicate, simNumberPredicate);
             }
 
-            var trackers = trackerPredicate != null ?
-                linqProvider.Where(trackerPredicate) :
-                linqProvider;
+            var trackers = trackerPredicate != null
+                ? linqProvider.Where(trackerPredicate)
+                : linqProvider;
 
-            if (filter.SortBy.HasValue && filter.SortBy == TrackerSortBy.StartDate)
+            trackers = filter.SortBy switch
             {
-                switch (filter.SortDirection)
-                {
-                    case SortDirection.Ascending:
-                        trackers = trackers.OrderBy(s => s.StartDate);
-                        break;
-                    case SortDirection.Descending:
-                        trackers = trackers.OrderByDescending(s => s.StartDate);
-                        break;
-                }
-            }
+                TrackerSortBy.Name => trackers.SetSortDirection(filter.SortDirection, x => x.Name),
+                TrackerSortBy.ExternalId => trackers.SetSortDirection(filter.SortDirection, x => x.ExternalId),
+                TrackerSortBy.Type => trackers.SetSortDirection(filter.SortDirection, x => x.TrackerType),
+                TrackerSortBy.SimNumber => trackers.SetSortDirection(filter.SortDirection, x => x.SimNumber),
+                TrackerSortBy.Vehicle => trackers.SetSortDirection(filter.SortDirection, x => x.Vehicle),
+                TrackerSortBy.StartDate => trackers.SetSortDirection(filter.SortDirection, x => x.StartDate),
+                _ => trackers
+            };
 
             return trackers.AsNoTracking().GetPagedQueryable(
-                 filter.PageNum, filter.PageSize);
+                filter.PageNum, filter.PageSize);
         }
 
         private static Expression<Func<Tracker, bool>>? SetPredicate(

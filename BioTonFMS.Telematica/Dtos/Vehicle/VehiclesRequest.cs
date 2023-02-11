@@ -2,7 +2,7 @@
 using BioTonFMS.Infrastructure.EF.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
 
-namespace BioTonFMS.Telematica.Dtos
+namespace BioTonFMS.Telematica.Dtos.Vehicle
 {
     /// <summary>
     /// Параметры выборки списка машин

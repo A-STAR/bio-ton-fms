@@ -8,6 +8,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
+using BioTonFMS.Telematica.Dtos.Vehicle;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
