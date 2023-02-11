@@ -1,4 +1,4 @@
-﻿namespace BioTonFMS.Telematica.Dtos
+﻿namespace BioTonFMS.Telematica.Dtos.Vehicle
 {
     /// <summary>
     /// Список машин с информацией о постраничном выводе

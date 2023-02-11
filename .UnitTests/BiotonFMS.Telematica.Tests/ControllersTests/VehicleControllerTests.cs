@@ -3,7 +3,6 @@ using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Controllers;
-using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Mapping;
 using BiotonFMS.Telematica.Tests.Mocks;
 using BioTonFMS.Telematica.Validation;
@@ -11,6 +10,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using BioTonFMS.Telematica.Dtos.Vehicle;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 

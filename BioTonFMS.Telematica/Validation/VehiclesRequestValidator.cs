@@ -1,4 +1,4 @@
-﻿using BioTonFMS.Telematica.Dtos;
+﻿using BioTonFMS.Telematica.Dtos.Vehicle;
 using FluentValidation;
 
 namespace BioTonFMS.Telematica.Validation

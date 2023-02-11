@@ -1,28 +1,28 @@
 ﻿using BioTonFMS.Domain;
 using System.ComponentModel.DataAnnotations;
 
-namespace BioTonFMS.Telematica.Dtos
+namespace BioTonFMS.Telematica.Dtos.Vehicle
 {
     /// <summary>
-    /// Модель обновления машины
+    /// Модель создания машины
     /// </summary>
-    public class UpdateVehicleDto
+    public class CreateVehicleDto
     {
         /// <summary>
         /// Наименование машины
         /// </summary>
-        public string Name { get; set; } = String.Empty;
-
-        /// <summary>
-        /// Id трекера, закреплённый за машиной
-        /// </summary>
-        public int? TrackerId { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Тип машины
         /// </summary>
         [EnumDataType(typeof(VehicleTypeEnum))]
         public VehicleTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// Id трекера, закреплённый за машиной
+        /// </summary>
+        public int? TrackerId { get; set; }
 
         /// <summary>
         /// Id группы машин
@@ -32,12 +32,12 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Бренд производителя машины
         /// </summary>
-        public string Make { get; set; } = String.Empty;
+        public string Make { get; set; } = string.Empty;
 
         /// <summary>
         /// Модель машины
         /// </summary>
-        public string Model { get; set; } = String.Empty;
+        public string Model { get; set; } = string.Empty;
 
         /// <summary>
         /// Подтип машины
@@ -58,21 +58,21 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Регистрационный номер
         /// </summary>
-        public string RegistrationNumber { get; set; } = String.Empty;
+        public string RegistrationNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Инвентарный номер
         /// </summary>
-        public string InventoryNumber { get; set; } = String.Empty;
+        public string InventoryNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Серийный номер
         /// </summary>
-        public string SerialNumber { get; set; } = String.Empty;
+        public string SerialNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Описание
         /// </summary>
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 }
