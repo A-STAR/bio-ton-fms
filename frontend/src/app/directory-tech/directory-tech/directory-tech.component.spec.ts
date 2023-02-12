@@ -12,6 +12,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import DirectoryTechComponent, { navigation } from './directory-tech.component';
 
 import routes from '../directory-tech.routes';
+import { TEST_TRACKER_ID } from '../sensor.service.spec';
 
 describe('DirectoryTechComponent', () => {
   let component: DirectoryTechComponent;
@@ -42,6 +43,51 @@ describe('DirectoryTechComponent', () => {
 
   it('should render navigation', async () => {
     const loader = TestbedHarnessEnvironment.loader(fixture);
+
+    const navigationDe = fixture.debugElement.query(
+      By.css('nav')
+    );
+
+    expect(navigationDe)
+      .withContext('render navigation element')
+      .not.toBeNull();
+
+    const buttons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: 'nav',
+        variant: 'flat',
+        selector: 'a'
+      })
+    );
+
+    expect(buttons.length)
+      .withContext(`render ${navigation.length} buttons`)
+      .toBe(navigation.length);
+
+    const navigationButtonTexts = await parallel(() => buttons.map(
+      button => button.getText()
+    ));
+
+    expect(navigationButtonTexts)
+      .withContext('render navigation button texts')
+      .toEqual(
+        navigation.map(({ title }) => title)
+      );
+
+    const navigationLinkDes = navigationDe.queryAll(
+      By.directive(RouterLink)
+    );
+
+    let navigationLinkAttributes = navigationLinkDes.map(
+      linkDe => linkDe.nativeElement.getAttribute('ng-reflect-router-link')
+    );
+
+    let testNavigation = navigation.map(({ link }) => link);
+
+    expect(navigationLinkAttributes)
+      .withContext('render navigation link attributes')
+      .toEqual(testNavigation);
+
     const ngZone = TestBed.inject(NgZone);
     const router = TestBed.inject(Router);
 
@@ -52,107 +98,40 @@ describe('DirectoryTechComponent', () => {
 
     fixture.detectChanges();
 
-    const navigationDe = fixture.debugElement.query(
-      By.css('nav')
-    );
-
-    expect(navigationDe)
-      .withContext('render navigation element')
-      .not.toBeNull();
-
-    let activeItemDe = fixture.debugElement.query(
-      By.css('nav > span')
-    );
-
-    expect(activeItemDe)
-      .withContext('render active item element')
-      .not.toBeNull();
-
-    let activeItemIndex = 0;
-
-    expect(activeItemDe.nativeElement.textContent)
-      .withContext('render vehicles active item text')
-      .toBe(navigation[activeItemIndex].title);
-
-    const anchors = await loader.getAllHarnesses(
+    let activeButton = await loader.getHarnessOrNull(
       MatButtonHarness.with({
         ancestor: 'nav',
         variant: 'flat',
-        selector: 'a'
+        selector: 'a.active',
+        text: navigation[0].title
       })
     );
 
-    expect(anchors.length)
-      .withContext(`render ${navigation.length} anchors`)
-      .toBe(navigation.length);
-
-    const navigationAnchorTitles = await parallel(() => anchors.map(
-      anchor => anchor.getText()
-    ));
-
-    expect(navigationAnchorTitles)
-      .withContext('render navigation anchor titles')
-      .toEqual(
-        navigation.map(({ title }) => title)
-      );
-
-    const navigationAnchorDes = navigationDe.queryAll(
-      By.directive(RouterLink)
-    );
-
-    let navigationAnchorAttributes = navigationAnchorDes.map(
-      anchorDe => [
-        anchorDe.nativeElement.getAttribute('ng-reflect-router-link'),
-        anchorDe.nativeElement.getAttribute('hidden')
-      ]
-    );
-
-    expect(navigationAnchorAttributes[activeItemIndex])
-      .withContext('render active navigation anchor link hidden')
-      .toEqual([navigation[activeItemIndex].link, '']);
-
-    let testNavigation = navigation
-      .slice()
-      .map(({ link }) => [link, null]);
-
-    navigationAnchorAttributes.splice(activeItemIndex, 1);
-    testNavigation.splice(activeItemIndex, 1);
-
-    expect(navigationAnchorAttributes)
-      .withContext('render navigation anchor links')
-      .toEqual(testNavigation);
-
-    const TRACKER_ID = 1;
+    expect(activeButton)
+      .withContext(`render active ${navigation[0].title} button`)
+      .not.toBeNull();
 
     // navigate to tracker
     await ngZone.run(async () => {
       await router.navigate([
         routes[0].children?.[2].path?.split('/')[0],
-        TRACKER_ID
+        TEST_TRACKER_ID
       ]);
     });
 
     fixture.detectChanges();
 
-    activeItemDe = fixture.debugElement.query(
-      By.css('nav > span')
+    activeButton = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        ancestor: 'nav',
+        variant: 'flat',
+        selector: 'a.active',
+        text: navigation[1].title
+      })
     );
 
-    expect(activeItemDe)
-      .withContext('render no active item element')
-      .toBeNull();
-
-    navigationAnchorAttributes = navigationAnchorDes.map(
-      anchorDe => [
-        anchorDe.nativeElement.getAttribute('ng-reflect-router-link'),
-        anchorDe.nativeElement.getAttribute('hidden')
-      ]
-    );
-
-    testNavigation = navigation.map(({ link }) => [link, null]);
-
-    expect(navigationAnchorAttributes)
-      .withContext('render navigation anchor links')
-      .toEqual(testNavigation);
+    expect(activeButton)
+      .withContext(`render active ${navigation[1].title} button`)
+      .not.toBeNull();
   });
 });
