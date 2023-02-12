@@ -17,21 +17,13 @@ try
     
     var stream = client.GetStream();
     stream.Write(data, 0, data.Length);
-
     Console.WriteLine("Sent: {0}", message);
 
-    data = new byte[256];
-
-    var reader = new StreamReader(stream);
-
-    while (!reader.EndOfStream)
-    {
-        var resp = reader.ReadLine();
-    }
-
-    var responseData = data.Select(x => x.ToString("X"));
+    byte[] respBuf = new byte[10];
+    int readCount = stream.Read(respBuf, 0, 10);
+    var responseData = respBuf.Take(readCount).Select(x => x.ToString("X")).Aggregate("", (current, next) => current + " " + next);
     
-    Console.WriteLine("Received: {0}", "resp");
+    Console.WriteLine("Received: {0}", responseData);
 }
 catch (ArgumentNullException e)
 {
