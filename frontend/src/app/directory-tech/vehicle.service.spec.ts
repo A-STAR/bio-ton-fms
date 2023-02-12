@@ -359,7 +359,7 @@ export const testVehicles: Vehicles = {
       model: 'Tucano 460',
       subType: testVehicleSubtypeEnum[4],
       fuelType: {
-        key: testFuels[1].id.toString(),
+        id: testFuels[1].id,
         value: testFuels[1].name
       },
       manufacturingYear: 2022,
@@ -368,7 +368,7 @@ export const testVehicles: Vehicles = {
       serialNumber: '202039293834',
       description: 'Марьевское',
       tracker: {
-        key: '1',
+        id: 1,
         value: '18-07-2539'
       }
     },
@@ -377,14 +377,14 @@ export const testVehicles: Vehicles = {
       name: 'Легковая машина',
       type: testVehicleTypeEnum[0],
       vehicleGroup: {
-        key: testVehicleGroups[2].id.toString(),
+        id: testVehicleGroups[2].id,
         value: testVehicleGroups[2].name
       },
       make: 'Ford',
       model: 'Focus',
       subType: testVehicleSubtypeEnum[5],
       fuelType: {
-        key: testFuels[0].id.toString(),
+        id: testFuels[0].id,
         value: testFuels[0].name
       },
       manufacturingYear: 2019,
@@ -398,18 +398,18 @@ export const testVehicles: Vehicles = {
       name: 'Кировец',
       type: testVehicleTypeEnum[1],
       vehicleGroup: {
-        key: testVehicleGroups[1].id.toString(),
+        id: testVehicleGroups[1].id,
         value: testVehicleGroups[1].name
       },
       make: 'Кировец',
       model: 'K-744',
       subType: testVehicleSubtypeEnum[7],
       fuelType: {
-        key: testFuels[1].id.toString(),
+        id: testFuels[1].id,
         value: testFuels[1].name
       },
       tracker: {
-        key: '2',
+        id: 2,
         value: '18-07-2557'
       }
     }
