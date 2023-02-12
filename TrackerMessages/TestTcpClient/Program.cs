@@ -1,11 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net.Sockets;
 
 var server = "localhost";
 var port = 6000;
-var message = "01 20 00 01 9A 02 18 03 38 36 31 32 33 30 30 34 33 39 30 37 36 32 36 04 32 00 FE 06 00 01 00 00 00 00 00 8F 29";
+var message = "01 1A 80 01 82 02 17 03 38 36 32 30 35 37 30 34 37 36 31 35 36 30 31 04 2C 07 48 0B 00 C9 0A";
 
 try
 {
@@ -20,17 +18,6 @@ try
 
     Console.WriteLine("Sent: {0}", message);
 
-    data = new byte[256];
-
-    var reader = new StreamReader(stream);
-
-    while (!reader.EndOfStream)
-    {
-        var resp = reader.ReadLine();
-    }
-
-    var responseData = data.Select(x => x.ToString("X"));
-    
     Console.WriteLine("Received: {0}", "resp");
 }
 catch (ArgumentNullException e)

@@ -5,7 +5,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using Microsoft.Extensions.Logging;
 
-namespace BioTonFMS.Telematica.MessageParsing;
+namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
 
 public class GalileoskyMessageParser : IMessageParser
 {
@@ -46,7 +46,8 @@ public class GalileoskyMessageParser : IMessageParser
         {
             if (!tags.TryGetValue(binaryPackage[i], out var tag))
             {
-                _logger.LogError($"Тег с кодом {binaryPackage[i]} не найден, позиция в сообщении {i}");
+                _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}",
+                    binaryPackage[i], i);
                 throw new ArgumentException($"Тег с кодом {binaryPackage[i]} не найден, позиция в сообщении {i}");
             }
 

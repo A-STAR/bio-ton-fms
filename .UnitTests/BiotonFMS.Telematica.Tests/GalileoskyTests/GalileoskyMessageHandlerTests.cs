@@ -37,8 +37,7 @@ public class GalileoskyMessageHandlerTests
             new object[]
             {
                 "[BIO-81] Расшифровка пакетов 2 легковые.docx",
-                "./GalileoskyTests/TestCases/4-message.txt",
-                false
+                "./GalileoskyTests/TestCases/4-message.txt"
             }
         };
     

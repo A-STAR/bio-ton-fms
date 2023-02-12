@@ -5,13 +5,12 @@ using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
-using BioTonFMS.Telematica.MessageParsing;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
+using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
-using BioTonFMS.Infrastructure.EF;
 
 namespace BiotonFMS.Telematica.Tests.GalileoskyTests;
 

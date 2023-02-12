@@ -4,9 +4,8 @@ using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.MessageBus;
 using BioTonFMS.Infrastructure.RabbitMQ;
 using BioTonFMS.Migrations;
-using BioTonFMS.Telematica.MessageParsing;
 using BioTonFMS.TrackerMessageHandler;
-using BioTonFMSApp.Startup;
+using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,12 +20,11 @@ IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddOptions();
         services.Configure<MessageBrokerSettingsOptions>(hostContext.Configuration.GetSection("MessageBrokerSettings"));
+        services.Configure<DbMigrationOptions>(hostContext.Configuration.GetSection("DbMigrationOptions"));
         services.AddTransient<TrackerMessageHandler>();
         services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
         services.AddHostedService<MessageHandlerWorker>();
-        services.AddOptions<DbMigrationOptions>("DbMigrationOptions");
 
         services.AddTransient<GalileoskyMessageParser>();
         services.AddTransient<Func<TrackerTypeEnum, IMessageParser>>(provider => key => key switch
@@ -51,8 +49,7 @@ IHost host = Host.CreateDefaultBuilder(args)
                 .UseSnakeCaseNamingConvention()
                 .EnableSensitiveDataLogging(hostContext.HostingEnvironment.IsDevelopment()));
         
-        services.AddMappingProfiles()
-            .RegisterInfrastructureComponents()
+        services.RegisterInfrastructureComponents()
             .RegisterDataAccess()
             .RegisterMessagesDataAccess();
     })
@@ -72,7 +69,9 @@ async Task Migrate(IHost h)
     using var scope = h.Services.CreateScope();
     var services = scope.ServiceProvider;
 
-    if (!services.GetRequiredService<IOptions<DbMigrationOptions>>().Value.ApplyMigrations)
+    var options = services.GetRequiredService<IOptions<DbMigrationOptions>>();
+
+    if (!options.Value.ApplyMigrations)
         return;
 
     var msgContext = services.GetRequiredService<MessagesDBContext>();

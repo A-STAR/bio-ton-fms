@@ -43,9 +43,9 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
         
         return new byte[]
         {
-            0x02, // Заголовок
-            bytes[0], // Контрольная сумма
-            bytes[1]  // полученного пакета 
+            0x02,
+            bytes[0],
+            bytes[1]
         };
     }
 

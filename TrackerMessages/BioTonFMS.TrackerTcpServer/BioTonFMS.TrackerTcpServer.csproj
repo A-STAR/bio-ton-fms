@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\BioTonFMS.Infrastructure.RabbitMQ\BioTonFMS.Infrastructure.RabbitMQ.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="logs" />
+  </ItemGroup>
+
 </Project>

@@ -26,26 +26,19 @@
     <ProjectReference Include="..\..\BioTonFMS.Domain\BioTonFMS.Domain.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.Infrastructure.RabbitMQ\BioTonFMS.Infrastructure.RabbitMQ.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj" />
-    <ProjectReference Include="..\..\BioTonFMSApp\BioTonFMSApp.csproj" />
     <ProjectReference Include="..\..\Migrations\BioTonFMS.MessagesMigrations\BioTonFMS.MessagesMigrations.csproj" />
+    <ProjectReference Include="..\..\Migrations\BioTonFMS.Migrations\BioTonFMS.Migrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.Development.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="appsettings.Production.json">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    <None Remove="config\appsettings.json" />
+    <Content Include="config\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="logs" />
   </ItemGroup>
 
 </Project>

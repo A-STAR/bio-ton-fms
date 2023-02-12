@@ -1,23 +1,21 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
-using BioTonFMS.Infrastructure;
-using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.EF.Providers;
-using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
-using BioTonFMS.Infrastructure.Persistence.Providers;
-using Microsoft.EntityFrameworkCore;
-using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
+using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
+using BioTonFMS.Infrastructure.Persistence.Providers;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace BioTonFMSApp.Startup;
+namespace BioTonFMS.Infrastructure.EF;
 
 public static class DependencyRegistrationExtensions
 {

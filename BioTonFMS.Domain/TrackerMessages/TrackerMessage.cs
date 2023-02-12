@@ -29,7 +29,7 @@ public class TrackerMessage : EntityBase, IAggregateRoot
     /// <summary>
     /// Дата и время регистрации сообщения на трекере
     /// </summary>
-    public DateTime TrackerDateTime { get; set; }
+    public DateTime? TrackerDateTime { get; set; }
     
     /// <summary>
     /// Широта
