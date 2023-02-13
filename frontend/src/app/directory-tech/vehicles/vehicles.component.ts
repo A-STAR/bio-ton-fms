@@ -140,16 +140,16 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       id,
       name,
       type: type.key,
-      vehicleGroupId: group ? Number(group.key) : undefined,
+      vehicleGroupId: group?.id,
       make,
       model,
       subType: subtype.key,
-      fuelTypeId: Number(fuel.key),
+      fuelTypeId: fuel.id,
       manufacturingYear: year,
       registrationNumber: registration,
       inventoryNumber: inventory,
       serialNumber: serial,
-      trackerId: tracker ? Number(tracker?.key) : undefined,
+      trackerId: tracker?.id,
       description
     };
 

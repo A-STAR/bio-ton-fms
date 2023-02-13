@@ -230,7 +230,7 @@ describe('VehiclesComponent', () => {
         expect(routerLink)
           .withContext('render GPS tracker anchor router link')
           .toBe(
-            ['../trackers', testVehicles.vehicles[index].tracker?.key].join()
+            ['../trackers', testVehicles.vehicles[index].tracker?.id].join()
           );
 
         trackerAnchor?.hasHarness(MatIconHarness.with({
