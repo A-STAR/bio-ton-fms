@@ -12,7 +12,9 @@ import {
   VehicleGroup,
   Vehicles,
   VehicleService,
-  VehiclesOptions
+  VehiclesOptions,
+  VehicleSubtype,
+  VehicleType
 } from './vehicle.service';
 
 import { testDataSource as testVehiclesDataSource } from './table.data-source.spec';
@@ -283,54 +285,51 @@ export const testFuels: Fuel[] = [
   }
 ];
 
-export const testVehicleTypeEnum: KeyValue<string, string>[] = [
+export const testVehicleTypeEnum: KeyValue<VehicleType, string>[] = [
   {
-    key: 'Transport',
+    key: VehicleType.Transport,
     value: 'Для перевозок'
   },
   {
-    key: 'Agro',
+    key: VehicleType.Argo,
     value: 'Для работы на полях'
   }
 ];
 
-export const testVehicleSubtypeEnum: KeyValue<string, string>[] = [
+export const testVehicleSubtypeEnum: KeyValue<VehicleSubtype, string>[] = [
   {
-    key: 'Telehandler',
-    value: 'Tелескопический погрузчик'
-  },
-  {
-    key: 'Tanker',
+    key: VehicleSubtype.Tanker,
     value: 'Бензовоз'
   },
   {
-    key: 'Truck',
+    key: VehicleSubtype.Truck,
     value: 'Грузовой автомобиль'
   },
   {
-    key: 'Other',
+    key: VehicleSubtype.Other,
     value: 'Другой транспорт'
   },
   {
-    key: 'Harvester',
+    key: VehicleSubtype.Harvester,
     value: 'Комбайн'
   },
   {
-    key: 'Car',
+    key: VehicleSubtype.Car,
     value: 'Легковой автомобиль'
   },
   {
-    key: 'Sprayer',
+    key: VehicleSubtype.Sprayer,
     value: 'Опрыскиватель'
   },
   {
-    key: 'Tractor',
+    key: VehicleSubtype.Telehandler,
+    value: 'Tелескопический погрузчик'
+  },
+  {
+    key: VehicleSubtype.Tractor,
     value: 'Трактор'
   }
 ];
-
-const groupId = testVehicleGroups[2].id.toString();
-const fuelId = testFuels[0].id.toString();
 
 export const testNewVehicle: NewVehicle = {
   id: 1,
@@ -338,10 +337,10 @@ export const testNewVehicle: NewVehicle = {
   make: 'Toyota',
   model: 'Tundra',
   manufacturingYear: 2015,
-  vehicleGroupId: Number(groupId),
-  type: testVehicleTypeEnum[0].key.toString(),
-  subType: testVehicleSubtypeEnum[2].key.toString(),
-  fuelTypeId: Number(fuelId),
+  vehicleGroupId: testVehicleGroups[2].id,
+  type: VehicleType.Transport,
+  subType: VehicleSubtype.Other,
+  fuelTypeId: testFuels[0].id,
   registrationNumber: '7777TT77',
   inventoryNumber: 'TT77',
   serialNumber: 'TT7777',
