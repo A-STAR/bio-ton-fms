@@ -181,6 +181,21 @@ public class SensorControllerTests
                 {
                     "*должно быть длиной * символов*"
                 }
+            },
+            new object[]
+            {
+                "[POSITIVE] Formula is too long",
+                new Sensor()
+                {
+                    Name = "Sensor", Formula = new String('a', 501), TrackerId = TrackerRepositoryMock.ExistentTrackerId,
+                    UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
+                    ValidatorId = SensorRepositoryMock.ExistentSensorId
+                },
+                "Formula",
+                new[]
+                {
+                    "*должно быть длиной * символов*"
+                }
             }
         };
 
