@@ -1,4 +1,4 @@
-using System.Text;
+п»їusing System.Text;
 using System.Text.Json;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Messaging;
@@ -36,11 +36,11 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 
     public int GetPacketLength(byte[] message)
     {
-        // Определяем длину данных. Она хранится во втором и третьем байте
-        var lenRaw = BitConverter.ToUInt16(message[1..3], 0); // чтобы получить длину пакета нужно замаскировать старший бит
+        // РћРїСЂРµРґРµР»СЏРµРј РґР»РёРЅСѓ РґР°РЅРЅС‹С…. РћРЅР° С…СЂР°РЅРёС‚СЃСЏ РІРѕ РІС‚РѕСЂРѕРј Рё С‚СЂРµС‚СЊРµРј Р±Р°Р№С‚Рµ
+        var lenRaw = BitConverter.ToUInt16(message[1..3], 0); // С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ РґР»РёРЅСѓ РїР°РєРµС‚Р° РЅСѓР¶РЅРѕ Р·Р°РјР°СЃРєРёСЂРѕРІР°С‚СЊ СЃС‚Р°СЂС€РёР№ Р±РёС‚
         var dataLen = lenRaw & 0x7FFF;
 
-        // общая длина пакета = 3 (заголовок) + длина данных + 2 (SRC)
+        // РѕР±С‰Р°СЏ РґР»РёРЅР° РїР°РєРµС‚Р° = 3 (Р·Р°РіРѕР»РѕРІРѕРє) + РґР»РёРЅР° РґР°РЅРЅС‹С… + 2 (SRC)
         return dataLen + 5;
     }
 
@@ -53,9 +53,9 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
         
         return new byte[]
         {
-            0x02, // Заголовок
-            bytes[0], // Контрольная сумма
-            bytes[1]  // полученного пакета 
+            0x02, // Р—Р°РіРѕР»РѕРІРѕРє
+            bytes[0], // РљРѕРЅС‚СЂРѕР»СЊРЅР°СЏ СЃСѓРјРјР°
+            bytes[1]  // РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ РїР°РєРµС‚Р° 
         };
     }
 
