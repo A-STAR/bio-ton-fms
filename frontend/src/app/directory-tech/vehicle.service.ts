@@ -120,6 +120,22 @@ export enum SortDirection {
   Descending = 'descending'
 }
 
+export enum VehicleType {
+  Transport = 'transport',
+  Argo = 'argo'
+}
+
+export enum VehicleSubtype {
+  Tanker = 'tanker',
+  Truck = 'truck',
+  Other = 'other',
+  Harvester = 'harvester',
+  Car = 'car',
+  Sprayer = 'sprayer',
+  Telehandler = 'telehandler',
+  Tractor = 'tractor'
+}
+
 export type VehiclesOptions = Partial<{
   pageNum: number;
   pageSize: number;
@@ -140,17 +156,26 @@ export type Fuel = {
 export type Vehicle = {
   id: number;
   name: string;
-  type: KeyValue<string, string>;
-  vehicleGroup?: KeyValue<string, string>;
+  type: KeyValue<VehicleType, string>;
+  vehicleGroup?: {
+    id: VehicleGroup['id'],
+    value: VehicleGroup['name']
+  };
   make: string;
   model: string;
-  subType: KeyValue<string, string>;
-  fuelType: KeyValue<string, string>;
+  subType: KeyValue<VehicleSubtype, string>;
+  fuelType: {
+    id: Fuel['id'],
+    value: Fuel['name']
+  };
   manufacturingYear?: number;
   registrationNumber?: string;
   inventoryNumber?: string;
   serialNumber?: string;
-  tracker?: KeyValue<string, string>;
+  tracker?: {
+    id: number,
+    value: string
+  };
   description?: string;
 }
 
@@ -159,8 +184,8 @@ export interface NewVehicle extends Partial<Pick<Vehicle, 'id'>>, Pick<
   'name' | 'make' | 'model' | 'manufacturingYear' | 'registrationNumber' | 'inventoryNumber' | 'serialNumber' | 'description'
 > {
   vehicleGroupId?: VehicleGroup['id'];
-  type: Vehicle['type']['key'];
-  subType: Vehicle['subType']['key'];
+  type: VehicleType;
+  subType: VehicleSubtype;
   fuelTypeId: Fuel['id'];
   trackerId?: number;
 }

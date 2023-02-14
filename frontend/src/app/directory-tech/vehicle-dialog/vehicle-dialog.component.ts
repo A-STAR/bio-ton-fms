@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
 
-import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
+import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 
@@ -124,8 +124,8 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
           Validators.pattern(YEAR_PATTERN)
         ]),
         group: this.fb.nonNullable.control<number | undefined>(this.data?.vehicleGroupId),
-        type: this.fb.nonNullable.control<string | undefined>(this.data?.type, Validators.required),
-        subtype: this.fb.nonNullable.control<string | undefined>(this.data?.subType, Validators.required),
+        type: this.fb.nonNullable.control<VehicleType | undefined>(this.data?.type, Validators.required),
+        subtype: this.fb.nonNullable.control<VehicleSubtype | undefined>(this.data?.subType, Validators.required),
         fuel: this.fb.nonNullable.control<number | undefined>(this.data?.fuelTypeId, Validators.required)
       }),
       registration: this.fb.group({
@@ -170,8 +170,8 @@ type VehicleForm = {
     model: FormControl<string | undefined>;
     year: FormControl<number | undefined>;
     group: FormControl<number | undefined>;
-    type: FormControl<string | undefined>;
-    subtype: FormControl<string | undefined>;
+    type: FormControl<VehicleType | undefined>;
+    subtype: FormControl<VehicleSubtype | undefined>;
     fuel: FormControl<number | undefined>;
   }>;
   registration: FormGroup<{

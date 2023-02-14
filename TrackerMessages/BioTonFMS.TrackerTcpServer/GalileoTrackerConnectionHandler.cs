@@ -35,14 +35,19 @@ namespace BioTonFMS.TrackerTcpServer
 
                 foreach (var segment in buffer)
                 {
-                    await connection.Transport.Output.WriteAsync(segment);
                     message.AddRange(segment.ToArray());
+                }
+                
+                int length = _handler.GetPacketLength(message.ToArray());
+                if (message.Count >= length)
+                {
+                    var resp = _handler.HandleMessage(message.ToArray());
+                    await connection.Transport.Output.WriteAsync(resp);
+                    break;
                 }
 
                 if (result.IsCompleted)
                 {
-                    var resp = _handler.HandleMessage(message.ToArray());
-                    await connection.Transport.Output.WriteAsync(resp);
                     break;
                 }
 

@@ -49,14 +49,14 @@ export const testDataSource: VehicleDataSource[] = [
     subtype: testVehicleSubtypeEnum[4],
     year: 2022,
     fuel: {
-      key: testFuels[1].id.toString(),
+      id: testFuels[1].id,
       value: testFuels[1].name
     },
     registration: '1200AM63',
     inventory: 'С293823729',
     serial: '202039293834',
     tracker: {
-      key: '1',
+      id: 1,
       value: '18-07-2539'
     },
     description: 'Марьевское'
@@ -69,12 +69,12 @@ export const testDataSource: VehicleDataSource[] = [
     type: testVehicleTypeEnum[0],
     subtype: testVehicleSubtypeEnum[5],
     group: {
-      key: testVehicleGroups[2].id.toString(),
+      id: testVehicleGroups[2].id,
       value: testVehicleGroups[2].name
     },
     year: 2019,
     fuel: {
-      key: testFuels[0].id.toString(),
+      id: testFuels[0].id,
       value: testFuels[0].name
     },
     registration: '1290AM63',
@@ -90,15 +90,15 @@ export const testDataSource: VehicleDataSource[] = [
     type: testVehicleTypeEnum[0],
     subtype: testVehicleSubtypeEnum[7],
     group: {
-      key: testVehicleGroups[1].id.toString(),
+      id: testVehicleGroups[1].id,
       value: testVehicleGroups[1].name
     },
     fuel: {
-      key: testFuels[1].id.toString(),
+      id: testFuels[1].id,
       value: testFuels[1].name
     },
     tracker: {
-      key: '2',
+      id: 2,
       value: '18-07-2557'
     },
     description: 'Кировское'

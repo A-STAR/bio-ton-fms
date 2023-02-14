@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 var server = "localhost";
 var port = 6000;
-var message = "01 1A 80 01 82 02 17 03 38 36 32 30 35 37 30 34 37 36 31 35 36 30 31 04 2C 07 48 0B 00 C9 0A";
+var message = "01 20 00 01 9A 02 18 03 38 36 31 32 33 30 30 34 33 39 30 37 36 32 36 04 32 00 FE 06 00 01 00 00 00 00 00 8F 29";
 
 try
 {
@@ -15,10 +15,13 @@ try
     
     var stream = client.GetStream();
     stream.Write(data, 0, data.Length);
-
     Console.WriteLine("Sent: {0}", message);
 
-    Console.WriteLine("Received: {0}", "resp");
+    byte[] respBuf = new byte[10];
+    int readCount = stream.Read(respBuf, 0, 10);
+    var responseData = respBuf.Take(readCount).Select(x => x.ToString("X")).Aggregate("", (current, next) => current + " " + next);
+    
+    Console.WriteLine("Received: {0}", responseData);
 }
 catch (ArgumentNullException e)
 {
