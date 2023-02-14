@@ -70,6 +70,19 @@ describe('TrackersComponent', () => {
       .toHaveBeenCalled();
   });
 
+  it('should render create tracker button', async () => {
+    const button = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        variant: 'stroked',
+        text: 'Добавить GPS-трекер'
+      })
+    );
+
+    expect(button)
+      .withContext('render an create tracker button')
+      .not.toBeNull();
+  });
+
   it('should render trackers table', async () => {
     const tables = await loader.getHarnessOrNull(MatTableHarness);
 
