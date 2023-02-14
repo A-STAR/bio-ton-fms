@@ -13,7 +13,7 @@ import { Sensor, Sensors, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 
-import { TableDataSource } from '../table.data-source';
+import { TableDataSource } from '../shared/table/table.data-source';
 
 @Component({
   selector: 'bio-tracker',
@@ -111,7 +111,6 @@ export enum SensorColumn {
   Type = 'type',
   Unit = 'unit',
   Formula = 'formula',
-  Description = 'description',
   Visibility = 'visibility'
 }
 
@@ -139,10 +138,6 @@ export const sensorColumns: KeyValue<SensorColumn, string | undefined>[] = [
   {
     key: SensorColumn.Formula,
     value: 'Параметр'
-  },
-  {
-    key: SensorColumn.Description,
-    value: 'Описание'
   },
   {
     key: SensorColumn.Visibility,

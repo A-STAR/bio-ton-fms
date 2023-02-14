@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 
+import { SortOptions } from './shared/sort';
 import { VehicleDataSource } from './vehicles/vehicles.component';
 
-export const pageNum = 1;
-export const pageSize = 50;
+import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from './shared/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -107,17 +107,12 @@ export class VehicleService {
   constructor(private httpClient: HttpClient) { }
 }
 
-export enum SortBy {
+export enum VehiclesSortBy {
   Name = 'name',
   Type = 'type',
   Subtype = 'subtype',
   Group = 'group',
   Fuel = 'fuelType'
-}
-
-export enum SortDirection {
-  Acending = 'ascending',
-  Descending = 'descending'
 }
 
 export enum VehicleType {
@@ -136,12 +131,7 @@ export enum VehicleSubtype {
   Tractor = 'tractor'
 }
 
-export type VehiclesOptions = Partial<{
-  pageNum: number;
-  pageSize: number;
-  sortBy: SortBy;
-  sortDirection: SortDirection;
-}>
+export type VehiclesOptions = PaginationOptions & SortOptions<VehiclesSortBy>
 
 export type VehicleGroup = {
   id: number;
@@ -190,12 +180,6 @@ export interface NewVehicle extends Partial<Pick<Vehicle, 'id'>>, Pick<
   trackerId?: number;
 }
 
-type Pagination = {
-  pageIndex: number;
-  total: number;
-}
-
-export type Vehicles = {
+export interface Vehicles extends Pagination {
   vehicles: Vehicle[];
-  pagination: Pagination;
 }

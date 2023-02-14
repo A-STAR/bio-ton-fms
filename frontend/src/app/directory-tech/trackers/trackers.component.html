@@ -1,0 +1,62 @@
+<mat-table matSort [dataSource]="trackersDataSource" *ngIf="trackers$ | async" (matSortChange)="onSortChange($event)">
+  <ng-container [matColumnDef]="column.key" *ngFor="let column of columns">
+    <ng-container [ngSwitch]="column.key">
+      <ng-container *ngSwitchCase="TrackerColumn.Action">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      </ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Name"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.External"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Type"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Sim"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Start"></ng-container>
+
+      <ng-container [ngTemplateOutlet]="sort" *ngSwitchCase="TrackerColumn.Vehicle"></ng-container>
+
+      <ng-container *ngSwitchDefault>
+        <mat-header-cell [innerHTML]="column.value" *matHeaderCellDef></mat-header-cell>
+      </ng-container>
+
+      <ng-template #sort>
+        <mat-header-cell mat-sort-header *matHeaderCellDef>
+          <div [innerHTML]="column.value"></div>
+        </mat-header-cell>
+      </ng-template>
+    </ng-container>
+
+    <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+      <ng-container *ngSwitchCase="TrackerColumn.Action">
+        <button mat-icon-button bioTableActionsTrigger>
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+      </ng-container>
+
+      <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="TrackerColumn.Type"></ng-container>
+
+      <ng-container *ngSwitchCase="TrackerColumn.Sim">
+        <ng-container *ngIf="element[column.key]">{{
+          '+' + element[column.key][0] + '&nbsp;(' + element[column.key].slice(1, 4) + ')&nbsp;'
+          + element[column.key].slice(4)
+          }}</ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="TrackerColumn.Start">
+        {{ element[column.key] | date:DATE_FORMAT }}
+      </ng-container>
+
+      <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="TrackerColumn.Vehicle"></ng-container>
+
+      <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+
+      <ng-template #value>{{ element[column.key]?.value }}</ng-template>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
+
+  <mat-row *matRowDef="let row; columns: columnKeys"></mat-row>
+</mat-table>

@@ -5,19 +5,19 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import {
   Fuel,
   NewVehicle,
-  pageNum,
-  pageSize,
-  SortBy,
-  SortDirection,
+  VehiclesSortBy,
   VehicleGroup,
   Vehicles,
   VehicleService,
   VehiclesOptions,
-  VehicleSubtype,
-  VehicleType
+  VehicleType,
+  VehicleSubtype
 } from './vehicle.service';
 
-import { testDataSource as testVehiclesDataSource } from './table.data-source.spec';
+import { SortDirection } from './shared/sort';
+
+import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
+import { testDataSource as testVehiclesDataSource } from './shared/table/table.data-source.spec';
 
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
@@ -53,7 +53,7 @@ describe('VehicleService', () => {
       });
 
     let vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'vehicles request'
     );
 
@@ -74,7 +74,7 @@ describe('VehicleService', () => {
       });
 
     vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'vehicles request'
     );
 
@@ -84,7 +84,7 @@ describe('VehicleService', () => {
   it('should get sorted vehicles', (done: DoneFn) => {
     let subscription = service
       .getVehicles({
-        sortBy: SortBy.Name,
+        sortBy: VehiclesSortBy.Name,
         sortDirection: SortDirection.Acending
       })
       .subscribe(vehicles => {
@@ -93,8 +93,10 @@ describe('VehicleService', () => {
           .toEqual(testVehicles);
       });
 
+    const URL = '/api/telematica/vehicles';
+
     let vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}&sortBy=${SortBy.Name}&sortDirection=${SortDirection.Acending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${VehiclesSortBy.Name}&sortDirection=${SortDirection.Acending}`,
       'sorted by name vehicles request'
     );
 
@@ -104,7 +106,7 @@ describe('VehicleService', () => {
 
     subscription = service
       .getVehicles({
-        sortBy: SortBy.Fuel,
+        sortBy: VehiclesSortBy.Fuel,
         sortDirection: SortDirection.Descending
       })
       .subscribe(vehicles => {
@@ -114,7 +116,7 @@ describe('VehicleService', () => {
       });
 
     vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}&sortBy=${SortBy.Fuel}&sortDirection=${SortDirection.Descending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${VehiclesSortBy.Fuel}&sortDirection=${SortDirection.Descending}`,
       'descendingly sorted by fuel vehicles request'
     );
 
@@ -124,7 +126,7 @@ describe('VehicleService', () => {
 
     service
       .getVehicles({
-        sortBy: SortBy.Name
+        sortBy: VehiclesSortBy.Name
       })
       .subscribe(vehicles => {
         expect(vehicles)
@@ -135,7 +137,7 @@ describe('VehicleService', () => {
       });
 
     vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${pageNum}&pageSize=${pageSize}`,
+      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
       'unsorted vehicles request'
     );
 

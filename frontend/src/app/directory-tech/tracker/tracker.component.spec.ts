@@ -9,6 +9,7 @@ import { MatCardHarness } from '@angular/material/card/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -17,13 +18,10 @@ import { Sensors, SensorService } from '../sensor.service';
 import TrackerComponent, { SensorColumn, sensorColumns } from './tracker.component';
 
 import { testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
-import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
   let fixture: ComponentFixture<TrackerComponent>;
-  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
   let sensorService: SensorService;
 
@@ -34,8 +32,7 @@ describe('TrackerComponent', () => {
       .configureTestingModule({
         imports: [
           TrackerComponent,
-          HttpClientTestingModule,
-          MatSlideToggleModule
+          HttpClientTestingModule
         ],
         providers: [
           {
@@ -47,7 +44,6 @@ describe('TrackerComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(TrackerComponent);
-    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
     sensorService = TestBed.inject(SensorService);
 
@@ -81,9 +77,11 @@ describe('TrackerComponent', () => {
   });
 
   it('should render sensors card', async () => {
-    const card = await loader.getHarness(MatCardHarness.with({
-      title: 'Дополнительные параметры'
-    }));
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
 
     expect(card)
       .withContext('render sensors card')
@@ -96,9 +94,11 @@ describe('TrackerComponent', () => {
   });
 
   it('should render tracker sensors table', async () => {
-    const card = await loader.getHarness(MatCardHarness.with({
-      title: 'Дополнительные параметры'
-    }));
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
 
     const table = await card.getHarnessOrNull(
       MatTableHarness.with({
@@ -112,9 +112,11 @@ describe('TrackerComponent', () => {
   });
 
   it('should render tracker sensor table rows', async () => {
-    const card = await loader.getHarness(MatCardHarness.with({
-      title: 'Дополнительные параметры'
-    }));
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
 
     const table = await card.getHarness(MatTableHarness);
     const headerRows = await table.getHeaderRows();
@@ -130,9 +132,11 @@ describe('TrackerComponent', () => {
   });
 
   it('should render tracker sensor table header cells', async () => {
-    const card = await loader.getHarness(MatCardHarness.with({
-      title: 'Дополнительные параметры'
-    }));
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
 
     const table = await card.getHarness(MatTableHarness);
     const headerRows = await table.getHeaderRows();
@@ -161,9 +165,11 @@ describe('TrackerComponent', () => {
   });
 
   it('should render sensors table action cells', async () => {
-    const card = await loader.getHarness(MatCardHarness.with({
-      title: 'Дополнительные параметры'
-    }));
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
 
     const table = await card.getHarness(MatTableHarness);
     const rows = await table.getRows();
@@ -195,9 +201,11 @@ describe('TrackerComponent', () => {
   });
 
   it('should render tracker sensor table cells', async () => {
-    const card = await loader.getHarness(MatCardHarness.with({
-      title: 'Дополнительные параметры'
-    }));
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
 
     const table = await card.getHarness(MatTableHarness);
     const rows = await table.getRows();
@@ -227,14 +235,13 @@ describe('TrackerComponent', () => {
         sensorType: {
           value: type
         },
-        description,
         formula,
         unit: {
           value: unit
         }
       } = testSensors.sensors[index];
 
-      const sensorTexts = [name, type, unit, formula, description].map(value => value?.toString() ?? '');
+      const sensorTexts = [name, type, unit, formula].map(value => value ?? '');
 
       expect(rowCellTexts)
         .withContext('render cells text')
@@ -247,13 +254,13 @@ describe('TrackerComponent', () => {
     const rows = await table.getRows();
 
     const cells = await parallel(() => rows.map(
-      row => row.getCells()
+      row => row.getCells({
+        columnName: SensorColumn.Visibility
+      })
     ));
 
     const slideToggles = await parallel(() => cells.map(
-      ({
-        6: actionCell
-      }, index) => actionCell.getHarnessOrNull(
+      ([visibilityCell], index) => visibilityCell.getHarnessOrNull(
         MatSlideToggleHarness.with({
           ancestor: '.mat-column-visibility',
           checked: testSensors.sensors[index].visibility,
