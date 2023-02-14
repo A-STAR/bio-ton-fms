@@ -1,10 +1,10 @@
 import { firstValueFrom } from 'rxjs';
 
-import { TableDataSource } from './shared/table/table.data-source';
+import { TableDataSource } from './table.data-source';
 
-import { VehicleDataSource } from './vehicles/vehicles.component';
+import { VehicleDataSource } from '../../vehicles/vehicles.component';
 
-import { testFuels, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from './vehicle.service.spec';
+import { testFuels, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from '../../vehicle.service.spec';
 
 describe('TableDataSource', () => {
   let tableDataSource: TableDataSource<VehicleDataSource>;

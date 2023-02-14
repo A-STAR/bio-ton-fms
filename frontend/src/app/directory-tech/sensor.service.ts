@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 
+import { Tracker } from './trackers.service';
+
+import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from './shared/pagination';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,16 +44,14 @@ export enum ValidationTypeEnum {
   ZeroTest = 'zeroTest'
 }
 
-export type SensorsOptions = Partial<{
-  pageNum: number;
-  pageSize: number;
+export type SensorsOptions = PaginationOptions & Partial<{
   trackerId: number;
 }>
 
 export type Sensor = {
   id: number;
-  tracker: KeyValue<number, string>;
-  name?: string;
+  tracker: KeyValue<Tracker['id'], Tracker['name']>;
+  name: string;
   dataType: SensorDataTypeEnum;
   sensorType: KeyValue<number, string>;
   description?: string;
@@ -62,15 +64,6 @@ export type Sensor = {
   visibility: boolean;
 }
 
-type Pagination = {
-  pageIndex: number;
-  total: number;
-}
-
-export type Sensors = {
+export interface Sensors extends Pagination {
   sensors: Sensor[];
-  pagination: Pagination;
 }
-
-export const pageNum = 1;
-export const pageSize = 50;
