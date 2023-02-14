@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { forkJoin, map, Observable } from 'rxjs';
 
@@ -13,7 +14,8 @@ import { Tracker } from '../tracker.service';
   standalone: true,
   imports: [
     CommonModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTabsModule
   ],
   templateUrl: './sensor-dialog.component.html',
   styleUrls: ['./sensor-dialog.component.sass'],

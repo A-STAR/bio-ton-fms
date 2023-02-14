@@ -1,3 +1,11 @@
 <h1 mat-dialog-title>Новый датчик</h1>
 
-<ng-container *ngIf="sensorData$ | async"></ng-container>
+<mat-dialog-content>
+  <form id="sensor-form">
+    <mat-tab-group mat-stretch-tabs="false">
+      <mat-tab label="Основные сведения">
+        <ng-container *ngIf="sensorData$ | async"></ng-container>
+      </mat-tab>
+    </mat-tab-group>
+  </form>
+</mat-dialog-content>

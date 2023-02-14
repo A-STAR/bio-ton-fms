@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
@@ -35,8 +36,9 @@ describe('TrackerComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
-          TrackerComponent,
-          HttpClientTestingModule
+          NoopAnimationsModule,
+          HttpClientTestingModule,
+          TrackerComponent
         ],
         providers: [
           {

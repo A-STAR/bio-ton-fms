@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
@@ -18,6 +19,7 @@ import { testSensorDataTypeEnum, testSensorGroups, testSensorTypes, testUnits, t
 describe('SensorDialogComponent', () => {
   let component: SensorDialogComponent;
   let fixture: ComponentFixture<SensorDialogComponent>;
+  let loader: HarnessLoader;
 
   let sensorGroupsSpy: jasmine.Spy<(this: SensorService) => Observable<SensorGroup[]>>;
   let sensorTypesSpy: jasmine.Spy<(this: SensorService) => Observable<SensorType[]>>;
@@ -29,6 +31,7 @@ describe('SensorDialogComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           HttpClientTestingModule,
           SensorDialogComponent
         ]
@@ -36,6 +39,7 @@ describe('SensorDialogComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(SensorDialogComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     const sensorService = TestBed.inject(SensorService);
 
@@ -101,5 +105,34 @@ describe('SensorDialogComponent', () => {
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog title text')
       .toBe('Новый датчик');
+  });
+
+  it('should render sensor form', async () => {
+    const sensorFormDe = fixture.debugElement.query(
+      By.css('form#sensor-form')
+    );
+
+    expect(sensorFormDe)
+      .withContext('render sensor form element')
+      .not.toBeNull();
+  });
+
+  it('should render tabs', async () => {
+    const tabGroup = await loader.getHarnessOrNull(
+      MatTabGroupHarness.with({
+        ancestor: 'form#sensor-form',
+        selectedTabLabel: 'Основные сведения',
+      })
+    );
+
+    expect(tabGroup)
+      .withContext('render tab group with basic tab selected')
+      .not.toBeNull();
+
+    const tabs = await tabGroup!.getTabs();
+
+    expect(tabs.length)
+      .withContext('should render tabs')
+      .toBe(1);
   });
 });
