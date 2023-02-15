@@ -4,12 +4,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
 import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService } from '../tracker.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
+import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import { SortDirection } from '../shared/sort';
 
@@ -24,6 +26,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
     MatSortModule,
     MatButtonModule,
     MatIconModule,
+    MatDialogModule,
     TableActionsTriggerDirective
   ],
   templateUrl: './trackers.component.html',
@@ -91,6 +94,13 @@ export default class TrackersComponent implements OnInit {
     this.#trackers$.next(trackersOptions);
   }
 
+  /**
+   * Add a new GPS-tracker to table.
+   */
+  protected onCreateTracker() {
+    this.dialog.open(TrackerDialogComponent);
+  }
+
   #trackers$ = new BehaviorSubject<TrackersOptions>({});
 
   /**
@@ -146,7 +156,7 @@ export default class TrackersComponent implements OnInit {
     this.columnKeys = this.columns.map(({ key }) => key);
   }
 
-  constructor(private trackerService: TrackerService) { }
+  constructor(private dialog: MatDialog, private trackerService: TrackerService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {

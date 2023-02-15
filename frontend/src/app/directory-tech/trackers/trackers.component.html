@@ -1,4 +1,4 @@
-<button mat-stroked-button color="accent">Добавить GPS-трекер</button>
+<button mat-stroked-button color="accent" (click)="onCreateTracker()">Добавить GPS-трекер</button>
 
 <mat-table matSort [dataSource]="trackersDataSource" *ngIf="trackers$ | async" (matSortChange)="onSortChange($event)">
   <ng-container [matColumnDef]="column.key" *ngFor="let column of columns">

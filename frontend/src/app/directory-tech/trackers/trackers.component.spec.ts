@@ -4,12 +4,14 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -22,6 +24,8 @@ import { testTrackers } from '../tracker.service.spec';
 describe('TrackersComponent', () => {
   let component: TrackersComponent;
   let fixture: ComponentFixture<TrackersComponent>;
+  let overlayContainer: OverlayContainer;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
 
   let trackersSpy: jasmine.Spy<() => Observable<Trackers>>;
@@ -46,7 +50,9 @@ describe('TrackersComponent', () => {
     registerLocaleData(localeRu, 'ru-RU');
 
     fixture = TestBed.createComponent(TrackersComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    overlayContainer = TestBed.inject(OverlayContainer);
 
     const trackerService = TestBed.inject(TrackerService);
 
@@ -333,5 +339,26 @@ describe('TrackersComponent', () => {
     expect(sortDirection)
       .withContext('render vehicle sort header unsorted')
       .toBe('');
+  });
+
+  it('should create tracker', async () => {
+    const createTrackerButton = await loader.getHarness(
+      MatButtonHarness.with({
+        variant: 'stroked',
+        text: 'Добавить GPS-трекер'
+      })
+    );
+
+    await createTrackerButton.click();
+
+    const trackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(trackerDialog)
+      .withContext('render a tracker dialog')
+      .not.toBeNull();
+
+    await trackerDialog!.close();
+
+    overlayContainer.ngOnDestroy();
   });
 });
