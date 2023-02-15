@@ -19,7 +19,7 @@ public static class Seeds
         var sensorId = -1;
         var sensors = new Faker<Sensor>()
             .RuleFor(v => v.Id, (f, v) => sensorId--)
-            .RuleFor(v => v.Name, (f, v) => f.Hacker.Noun())
+            .RuleFor(v => v.Name, (f, v) => f.Hacker.Noun() + -sensorId)
             .RuleFor(v => v.Formula, (f, v) => "someParam")
             .RuleFor(v => v.SensorTypeId, (f, v) => sensorTypeIds[f.Random.Int(0, sensorTypeIds.Length - 1)])
             .RuleFor(v => v.UnitId, (f, v) => unitIds[f.Random.Int(0, unitIds.Length - 1)]);
@@ -94,10 +94,6 @@ public class TestDataController : ValidationControllerBase
         foreach (var tracker in trackers)
         {
             _trackerRepository.Add(tracker);
-        }
-        foreach (var sensor in trackers.SelectMany(t => t.Sensors))
-        {
-            _sensorRepository.Add(sensor);
         }
         return Ok();
     }

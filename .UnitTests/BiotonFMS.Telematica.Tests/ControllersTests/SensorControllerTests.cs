@@ -65,7 +65,8 @@ public class SensorControllerTests
                 new Sensor()
                 {
                     Name = "Sensor", TrackerId = TrackerRepositoryMock.NonExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "TrackerId",
                 new[]
@@ -79,7 +80,8 @@ public class SensorControllerTests
                 new Sensor()
                 {
                     Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.NonExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "UnitId",
                 new[]
@@ -93,7 +95,8 @@ public class SensorControllerTests
                 new Sensor()
                 {
                     Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.NonExistentSensorId
+                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.NonExistentSensorId,
+                    FuelUse = 1
                 },
                 "ValidatorId",
                 new[]
@@ -107,7 +110,8 @@ public class SensorControllerTests
                 new Sensor()
                 {
                     Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.NonExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    SensorTypeId = SensorTypeRepositoryMock.NonExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "SensorTypeId",
                 new[]
@@ -121,7 +125,8 @@ public class SensorControllerTests
                 new Sensor()
                 {
                     Name = "", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "Name",
                 new[]
@@ -136,7 +141,8 @@ public class SensorControllerTests
                 {
                     Name = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901",
                     TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "Name",
                 new[]
@@ -150,7 +156,8 @@ public class SensorControllerTests
                 new Sensor()
                 {
                     Name = "Sensor", Description = "", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "Description",
                 Array.Empty<string>()
@@ -162,7 +169,8 @@ public class SensorControllerTests
                 {
                     Name = "Sensor", Description = null!, TrackerId = TrackerRepositoryMock.ExistentTrackerId,
                     UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                    ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "Description",
                 Array.Empty<string>()
@@ -174,7 +182,8 @@ public class SensorControllerTests
                 {
                     Name = "Sensor", Description = new String('a', 501), TrackerId = TrackerRepositoryMock.ExistentTrackerId,
                     UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                    ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "Description",
                 new[]
@@ -189,12 +198,29 @@ public class SensorControllerTests
                 {
                     Name = "Sensor", Formula = new String('a', 501), TrackerId = TrackerRepositoryMock.ExistentTrackerId,
                     UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                    ValidatorId = SensorRepositoryMock.ExistentSensorId
+                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 1
                 },
                 "Formula",
                 new[]
                 {
                     "*должно быть длиной * символов*"
+                }
+            },
+            new object[]
+            {
+                "[POSITIVE] Fuel Use is less or equal zero",
+                new Sensor()
+                {
+                    Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId,
+                    UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
+                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
+                    FuelUse = 0
+                },
+                "FuelUse",
+                new[]
+                {
+                    "*должно быть больше*"
                 }
             }
         };
