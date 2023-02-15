@@ -24,6 +24,7 @@ namespace BioTonFMS.Telematica.Validation
                 .WithMessage(x => $"Датчик с идентификатором {x.ValidatorId} не существует!"));
             RuleFor(x => x.SensorTypeId).Must(sensorTypeId => sensorTypeRepository[sensorTypeId] is not null)
                 .WithMessage(x => $"Тип датчиков с идентификатором {x.SensorTypeId} не существует!");
+            RuleFor(x => x.FuelUse).GreaterThan(0);
         }
     }
 }
