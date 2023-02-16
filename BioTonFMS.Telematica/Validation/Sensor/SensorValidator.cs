@@ -14,6 +14,7 @@ namespace BioTonFMS.Telematica.Validation
         {
             RuleFor(x => x.Name).NotEmpty().Length(1, 100);
             RuleFor(x => x.Description).Length(0, 500);
+            RuleFor(x => x.Formula).Length(0, 500);
             RuleFor(x => x.TrackerId).Must(trackerId => trackerRepository[trackerId] is not null)
                 .WithMessage(x => $"Трекер с идентификатором {x.TrackerId} не существует!");
             RuleFor(x => x.UnitId).Must(unitId => unitRepository[unitId] is not null)
@@ -23,6 +24,7 @@ namespace BioTonFMS.Telematica.Validation
                 .WithMessage(x => $"Датчик с идентификатором {x.ValidatorId} не существует!"));
             RuleFor(x => x.SensorTypeId).Must(sensorTypeId => sensorTypeRepository[sensorTypeId] is not null)
                 .WithMessage(x => $"Тип датчиков с идентификатором {x.SensorTypeId} не существует!");
+            RuleFor(x => x.FuelUse).GreaterThan(0);
         }
     }
 }

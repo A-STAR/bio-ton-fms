@@ -8,10 +8,10 @@ using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using Bogus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BioTonFMS.Telematica.Controllers;
 
-#if DEBUG
 public static class Seeds
 {
     public static List<Tracker> GenerateTrackers(int[] sensorTypeIds, int[] unitIds)
@@ -19,7 +19,7 @@ public static class Seeds
         var sensorId = -1;
         var sensors = new Faker<Sensor>()
             .RuleFor(v => v.Id, (f, v) => sensorId--)
-            .RuleFor(v => v.Name, (f, v) => f.Hacker.Noun())
+            .RuleFor(v => v.Name, (f, v) => f.Hacker.Noun() + -sensorId)
             .RuleFor(v => v.Formula, (f, v) => "someParam")
             .RuleFor(v => v.SensorTypeId, (f, v) => sensorTypeIds[f.Random.Int(0, sensorTypeIds.Length - 1)])
             .RuleFor(v => v.UnitId, (f, v) => unitIds[f.Random.Int(0, unitIds.Length - 1)]);
@@ -56,15 +56,19 @@ public class TestDataController : ValidationControllerBase
     private readonly ITrackerRepository _trackerRepository;
     private readonly ISensorTypeRepository _sensorTypeRepository;
     private readonly IUnitRepository _unitRepository;
+    private readonly IConfiguration _configuration;
+    
+    private bool ServiceEnabled => _configuration["TestDataEnabled"] == "True";
 
     public TestDataController(
-        ISensorRepository sensorRepository,
-        ITrackerRepository trackerRepository, ISensorTypeRepository sensorTypeRepository, IUnitRepository unitRepository)
+        ISensorRepository sensorRepository, ITrackerRepository trackerRepository, ISensorTypeRepository sensorTypeRepository,
+        IUnitRepository unitRepository, IConfiguration configuration)
     {
         _sensorRepository = sensorRepository;
         _trackerRepository = trackerRepository;
         _sensorTypeRepository = sensorTypeRepository;
         _unitRepository = unitRepository;
+        _configuration = configuration;
     }
 
 
@@ -79,16 +83,17 @@ public class TestDataController : ValidationControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult AddTestData()
     {
+        if (!ServiceEnabled)
+        {
+            return BadRequest("Test data service is not available!");
+        }
+        
         var sensorTypeIds = _sensorTypeRepository.GetSensorTypes().Select(v => v.Id);
         var unitIds = _unitRepository.GetUnits().Select(v => v.Id);
         var trackers = Seeds.GenerateTrackers(sensorTypeIds.ToArray(), unitIds.ToArray());
         foreach (var tracker in trackers)
         {
             _trackerRepository.Add(tracker);
-        }
-        foreach (var sensor in trackers.SelectMany(t => t.Sensors))
-        {
-            _sensorRepository.Add(sensor);
         }
         return Ok();
     }
@@ -106,7 +111,15 @@ public class TestDataController : ValidationControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult DeleteData()
     {
-        var trackers = _trackerRepository.GetTrackers(new TrackersFilter() { PageSize = 100000 });
+        if (!ServiceEnabled)
+        {
+            return BadRequest("Test data service is not available!");
+        }
+        
+        var trackers = _trackerRepository.GetTrackers(new TrackersFilter()
+        {
+            PageSize = 100000
+        });
         foreach (var tracker in trackers.Results)
         {
             if (tracker.Id >= 0)
@@ -116,5 +129,3 @@ public class TestDataController : ValidationControllerBase
         return Ok();
     }
 }
-
-#endif

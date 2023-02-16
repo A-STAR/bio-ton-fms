@@ -69,6 +69,11 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
 
         public override void Remove(Sensor sensor)
         {
+            if (QueryableProvider.Linq().Any(v => v.ValidatorId == sensor.Id))
+            {
+                throw new ArgumentException("Невозможно удалить датчик, так как он используется в качестве валидатора в других датчиках!");
+            }
+            
             try
             {
                 base.Remove(sensor);

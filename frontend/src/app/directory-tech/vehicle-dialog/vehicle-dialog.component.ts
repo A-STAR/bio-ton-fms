@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
 
-import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
+import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 
@@ -116,29 +116,29 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
-        name: this.fb.nonNullable.control<string | undefined>(this.data?.name, Validators.required),
-        make: this.fb.nonNullable.control<string | undefined>(this.data?.make, Validators.required),
-        model: this.fb.nonNullable.control<string | undefined>(this.data?.model, Validators.required),
-        year: this.fb.nonNullable.control<number | undefined>(this.data?.manufacturingYear, [
+        name: this.fb.nonNullable.control(this.data?.name, Validators.required),
+        make: this.fb.nonNullable.control(this.data?.make, Validators.required),
+        model: this.fb.nonNullable.control(this.data?.model, Validators.required),
+        year: this.fb.nonNullable.control(this.data?.manufacturingYear, [
           Validators.max(maxManufacturingYear),
           Validators.pattern(YEAR_PATTERN)
         ]),
-        group: this.fb.nonNullable.control<number | undefined>(this.data?.vehicleGroupId),
-        type: this.fb.nonNullable.control<VehicleType | undefined>(this.data?.type, Validators.required),
-        subtype: this.fb.nonNullable.control<VehicleSubtype | undefined>(this.data?.subType, Validators.required),
-        fuel: this.fb.nonNullable.control<number | undefined>(this.data?.fuelTypeId, Validators.required)
+        group: this.fb.nonNullable.control(this.data?.vehicleGroupId),
+        type: this.fb.nonNullable.control(this.data?.type, Validators.required),
+        subtype: this.fb.nonNullable.control(this.data?.subType, Validators.required),
+        fuel: this.fb.nonNullable.control(this.data?.fuelTypeId, Validators.required)
       }),
       registration: this.fb.group({
-        registration: this.fb.nonNullable.control<string | undefined>(
+        registration: this.fb.nonNullable.control(
           this.data?.registrationNumber,
           Validators.pattern(REGISTRATION_NUMBER_PATTERN)
         ),
-        inventory: this.fb.nonNullable.control<string | undefined>(this.data?.inventoryNumber),
-        serial: this.fb.nonNullable.control<string | undefined>(this.data?.serialNumber),
-        tracker: this.fb.nonNullable.control<number | undefined>(this.data?.trackerId)
+        inventory: this.fb.nonNullable.control(this.data?.inventoryNumber),
+        serial: this.fb.nonNullable.control(this.data?.serialNumber),
+        tracker: this.fb.nonNullable.control(this.data?.trackerId)
       }),
       additional: this.fb.group({
-        description: this.fb.nonNullable.control<string | undefined>(this.data?.description)
+        description: this.fb.nonNullable.control(this.data?.description)
       })
     });
   }
@@ -165,23 +165,23 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
 
 type VehicleForm = {
   basic: FormGroup<{
-    name: FormControl<string | undefined>;
-    make: FormControl<string | undefined>;
-    model: FormControl<string | undefined>;
-    year: FormControl<number | undefined>;
-    group: FormControl<number | undefined>;
-    type: FormControl<VehicleType | undefined>;
-    subtype: FormControl<VehicleSubtype | undefined>;
-    fuel: FormControl<number | undefined>;
+    name: FormControl<NewVehicle['name'] | undefined>;
+    make: FormControl<NewVehicle['make'] | undefined>;
+    model: FormControl<NewVehicle['model'] | undefined>;
+    year: FormControl<NewVehicle['manufacturingYear']>;
+    group: FormControl<NewVehicle['vehicleGroupId']>;
+    type: FormControl<NewVehicle['type'] | undefined>;
+    subtype: FormControl<NewVehicle['subType'] | undefined>;
+    fuel: FormControl<NewVehicle['fuelTypeId'] | undefined>;
   }>;
   registration: FormGroup<{
-    registration: FormControl<string | undefined>;
-    inventory: FormControl<string | undefined>;
-    serial: FormControl<string | undefined>;
-    tracker: FormControl<number | undefined>;
+    registration: FormControl<NewVehicle['registrationNumber']>;
+    inventory: FormControl<NewVehicle['inventoryNumber']>;
+    serial: FormControl<NewVehicle['serialNumber']>;
+    tracker: FormControl<NewVehicle['trackerId']>;
   }>;
   additional: FormGroup<{
-    description: FormControl<string | undefined>;
+    description: FormControl<NewVehicle['description'] | undefined>;
   }>;
 }
 
