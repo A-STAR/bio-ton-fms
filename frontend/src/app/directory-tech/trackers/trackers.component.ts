@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
 
-import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackersService } from '../trackers.service';
+import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService } from '../tracker.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 
@@ -132,7 +132,7 @@ export default class TrackersComponent implements OnInit {
    */
   #setTrackers() {
     this.trackers$ = this.#trackers$.pipe(
-      switchMap(vehiclesOptions => this.trackersService.getTrackers(vehiclesOptions)),
+      switchMap(trackersOptions => this.trackerService.getTrackers(trackersOptions)),
       tap(trackers => {
         this.#setTrackersDataSource(trackers);
       })
@@ -146,7 +146,7 @@ export default class TrackersComponent implements OnInit {
     this.columnKeys = this.columns.map(({ key }) => key);
   }
 
-  constructor(private trackersService: TrackersService) { }
+  constructor(private trackerService: TrackerService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {

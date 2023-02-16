@@ -13,11 +13,11 @@ import { MatIconHarness } from '@angular/material/icon/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { Trackers, TrackersService } from '../trackers.service';
+import { Trackers, TrackerService } from '../tracker.service';
 
 import TrackersComponent, { DATE_FORMAT, TrackerColumn, trackerColumns } from './trackers.component';
 
-import { testTrackers } from '../trackers.service.spec';
+import { testTrackers } from '../tracker.service.spec';
 
 describe('TrackersComponent', () => {
   let component: TrackersComponent;
@@ -48,13 +48,13 @@ describe('TrackersComponent', () => {
     fixture = TestBed.createComponent(TrackersComponent);
     loader = TestbedHarnessEnvironment.loader(fixture);
 
-    const trackersService = TestBed.inject(TrackersService);
+    const trackerService = TestBed.inject(TrackerService);
 
     component = fixture.componentInstance;
 
     const trackers$ = of(testTrackers);
 
-    trackersSpy = spyOn(trackersService, 'getTrackers')
+    trackersSpy = spyOn(trackerService, 'getTrackers')
       .and.returnValue(trackers$);
 
     fixture.detectChanges();

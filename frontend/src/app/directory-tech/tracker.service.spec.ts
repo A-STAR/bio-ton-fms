@@ -1,16 +1,16 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { Trackers, TrackersOptions, TrackersService, TrackersSortBy, TrackerTypeEnum } from './trackers.service';
+import { Trackers, TrackersOptions, TrackerService, TrackersSortBy, TrackerTypeEnum } from './tracker.service';
 
 import { SortDirection } from './shared/sort';
 
 import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
 import { testVehicles } from './vehicle.service.spec';
 
-describe('TrackersService', () => {
+describe('TrackerService', () => {
   let httpTestingController: HttpTestingController;
-  let service: TrackersService;
+  let service: TrackerService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -18,7 +18,7 @@ describe('TrackersService', () => {
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
-    service = TestBed.inject(TrackersService);
+    service = TestBed.inject(TrackerService);
   });
 
   afterEach(() => {
