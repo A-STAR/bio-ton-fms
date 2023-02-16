@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 
-import { Tracker } from './trackers.service';
+import { Tracker } from './tracker.service';
 
 import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from './shared/pagination';
 
