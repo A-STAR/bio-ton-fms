@@ -15,16 +15,8 @@ builder.Configuration.AddJsonFile("config/appsettings.json", true);
 
 var serverSettings = builder.Configuration.GetSection("ServerSettings").Get<ServerSettingsOptions>();
 
-builder.WebHost.UseKestrel(so =>
-{
-    so.Listen(new IPEndPoint(IPAddress.Parse(serverSettings.IpAddress), serverSettings.GalileoskyPort),
-      epo => epo.UseConnectionHandler<GalileoTrackerConnectionHandler>());
-});
-
-builder.Services.AddOptions();
 builder.Services.Configure<MessageBrokerSettingsOptions>(builder.Configuration.GetSection("MessageBrokerSettings"));
 builder.Services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
-
 builder.Services.AddTransient<GalileoskyProtocolMessageHandler>();
 builder.Services.AddTransient<Func<TrackerTypeEnum, IProtocolMessageHandler>>(provider => key => key switch
 {
@@ -35,6 +27,12 @@ builder.Services.AddTransient<Func<TrackerTypeEnum, IProtocolMessageHandler>>(pr
 });
 
 builder.ConfigureSerilog();
+
+builder.WebHost.UseKestrel(so =>
+{
+    so.Listen(new IPEndPoint(IPAddress.Parse(serverSettings.IpAddress), serverSettings.GalileoskyPort),
+        epo => epo.UseConnectionHandler<GalileoTrackerConnectionHandler>());
+});
 
 var app = builder.Build();
 
