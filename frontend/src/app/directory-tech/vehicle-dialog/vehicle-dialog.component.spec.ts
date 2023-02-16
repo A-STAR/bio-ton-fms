@@ -14,7 +14,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
+import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 import { VehicleDialogComponent, VEHICLE_CREATED, VEHICLE_UPDATED } from './vehicle-dialog.component';
@@ -32,8 +32,8 @@ describe('VehicleDialogComponent', () => {
 
   let vehicleGroupsSpy: jasmine.Spy<(this: VehicleService) => Observable<VehicleGroup[]>>;
   let fuelsSpy: jasmine.Spy<(this: VehicleService) => Observable<Fuel[]>>;
-  let vehicleTypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<string, string>[]>>;
-  let vehicleSubtypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<string, string>[]>>;
+  let vehicleTypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<VehicleType, string>[]>>;
+  let vehicleSubtypeSpy: jasmine.Spy<(this: VehicleService) => Observable<KeyValue<VehicleSubtype, string>[]>>;
 
   beforeEach(async () => {
     await TestBed

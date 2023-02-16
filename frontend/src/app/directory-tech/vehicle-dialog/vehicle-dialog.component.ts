@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
 
-import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
+import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 
@@ -35,8 +35,8 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   protected vehicleData$!: Observable<{
     groups: VehicleGroup[];
     fuels: Fuel[];
-    type: KeyValue<string, string>[];
-    subtype: KeyValue<string, string>[];
+    type: KeyValue<VehicleType, string>[];
+    subtype: KeyValue<VehicleSubtype, string>[];
   }>;
 
   protected vehicleForm!: FormGroup<VehicleForm>;

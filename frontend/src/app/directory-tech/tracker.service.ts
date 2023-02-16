@@ -13,6 +13,15 @@ import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptio
 })
 export class TrackerService {
   /**
+   * Get tracker type enum.
+   *
+   * @returns An `Observable' of tracker type enum stream.
+   */
+  get trackerType$() {
+    return this.httpClient.get<KeyValue<TrackerTypeEnum, string>[]>('/api/telematica/enums/trackertypeenum');
+  }
+
+  /**
    * Get trackers.
    *
    * @param fromObject Trackers params options.

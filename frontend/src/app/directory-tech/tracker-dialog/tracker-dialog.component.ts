@@ -1,5 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { CommonModule, KeyValue } from '@angular/common';
+
+import { Observable } from 'rxjs';
+
+import { TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 @Component({
   selector: 'bio-tracker-dialog',
@@ -9,4 +13,13 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./tracker-dialog.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TrackerDialogComponent { }
+export class TrackerDialogComponent implements OnInit {
+  protected trackerType$!: Observable<KeyValue<TrackerTypeEnum, string>[]>;
+
+  constructor(private trackerService: TrackerService) { }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnInit() {
+    this.trackerType$ = this.trackerService.trackerType$;
+  }
+}
