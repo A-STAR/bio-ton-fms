@@ -37,25 +37,26 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
     public int GetPacketLength(byte[] message)
     {
         // Определяем длину данных. Она хранится во втором и третьем байте
-        var lenRaw = BitConverter.ToUInt16(message[1..3], 0); // чтобы получить длину пакета нужно замаскировать старший бит
+        var lenRaw = BitConverter.ToUInt16(message[1..3], 0);
+        // Чтобы получить длину пакета нужно замаскировать старший бит
         var dataLen = lenRaw & 0x7FFF;
 
-        // общая длина пакета = 3 (заголовок) + длина данных + 2 (SRC)
+        // Общая длина пакета = 3 (заголовок) + длина данных + 2 (SRC)
         return dataLen + 5;
     }
 
     private static byte[] GetResponseForTracker(ushort crc)
     {
         var bytes = BitConverter.GetBytes(crc);
-        
+
         if (!BitConverter.IsLittleEndian)
             Array.Reverse(bytes);
-        
+
         return new byte[]
         {
             0x02, // Заголовок
             bytes[0], // Контрольная сумма
-            bytes[1]  // полученного пакета 
+            bytes[1] // полученного пакета 
         };
     }
 

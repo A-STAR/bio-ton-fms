@@ -1,5 +1,7 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Infrastructure;
+using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.EF.Providers;
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
@@ -13,9 +15,8 @@ using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Persistence.Providers;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace BioTonFMS.Infrastructure.EF;
+namespace BioTonFMSApp.Startup;
 
 public static class DependencyRegistrationExtensions
 {

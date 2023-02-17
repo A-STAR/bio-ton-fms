@@ -38,7 +38,7 @@ namespace BioTonFMS.TrackerTcpServer
                     message.AddRange(segment.ToArray());
                 }
                 
-                var length = _handler.GetPacketLength(message.ToArray());
+                int length = _handler.GetPacketLength(message.ToArray());
                 if (message.Count >= length)
                 {
                     var resp = _handler.HandleMessage(message.ToArray());

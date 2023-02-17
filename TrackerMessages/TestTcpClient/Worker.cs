@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net.Sockets;
+using System.Text.Json;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -29,6 +30,11 @@ public class Worker : BackgroundService
             foreach (var l in lines)
             {
                 var paths = l.Split(' ');
+                if (paths.Length != 2)
+                {
+                    _logger.LogWarning("Строка {Line} не соответствует формату", l);
+                    continue;
+                }
                 SendRequest(paths[0], paths[1], stream);
             }
 
@@ -45,7 +51,7 @@ public class Worker : BackgroundService
             return Task.CompletedTask;
         }
 
-        throw new Exception();
+        throw new Exception($"Ошибка в параметрах:\n{JsonSerializer.Serialize(_parameters)}");
     }
 
     private void SendRequest(string input, string output, Stream stream)
