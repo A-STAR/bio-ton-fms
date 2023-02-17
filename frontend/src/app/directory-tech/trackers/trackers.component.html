@@ -41,7 +41,7 @@
 
       <ng-container *ngSwitchCase="TrackerColumn.Sim">
         <ng-container *ngIf="element[column.key]">{{
-          '+' + element[column.key][0] + '&nbsp;(' + element[column.key].slice(1, 4) + ')&nbsp;'
+          element[column.key].slice(0, 2) + '&nbsp;(' + element[column.key].slice(2, 5) + ')&nbsp;'
           + element[column.key].slice(4)
           }}</ng-container>
       </ng-container>

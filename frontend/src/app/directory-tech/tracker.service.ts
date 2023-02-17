@@ -69,12 +69,17 @@ export type Tracker = {
   id: number;
   externalId: number;
   name: string;
-  simNumber?: string;
+  simNumber: string;
   imei: string;
   trackerType: KeyValue<TrackerTypeEnum, string>,
-  startDate: Date,
+  startDate: string,
   description?: string,
   vehicle?: KeyValue<Vehicle['id'], Vehicle['name']>;
+}
+
+export interface NewTracker extends Partial<Pick<Tracker, 'id' | 'startDate'>>,
+  Pick<Tracker, 'externalId' | 'name' | 'simNumber' | 'imei' | 'description'> {
+  trackerType: TrackerTypeEnum;
 }
 
 export interface Trackers extends Pagination {

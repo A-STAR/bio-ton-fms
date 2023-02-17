@@ -132,25 +132,33 @@ describe('VehicleDialogComponent', () => {
       .withContext('render Vehicle form element')
       .not.toBeNull();
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Наименование машины'
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Наименование машины'
+      })
+    );
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Производитель'
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Производитель'
+      })
+    );
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Модель'
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Модель'
+      })
+    );
 
-    const yearInput = await loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Год производства'
-    }));
+    const yearInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Год производства'
+      })
+    );
 
     await expectAsync(
       yearInput.getType()
@@ -158,53 +166,69 @@ describe('VehicleDialogComponent', () => {
       .withContext('render year input type')
       .toBeResolvedTo('number');
 
-    const [yearInputEl, trackerInputEl] = fixture.debugElement.queryAll(
+    const [yearInputDe, trackerInputDe] = fixture.debugElement.queryAll(
       By.directive(NumberOnlyInputDirective)
     );
 
-    expect(yearInputEl.nativeElement.placeholder)
+    expect(yearInputDe.nativeElement.placeholder)
       .withContext('render year input with `NumberOnlyDirective`')
       .toBe('Год производства');
 
-    loader.getHarness(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form',
-      selector: '[placeholder="Группа машин"]'
-    }));
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form',
+        selector: '[placeholder="Группа машин"]'
+      })
+    );
 
-    loader.getHarness(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form',
-      selector: '[placeholder="Тип машины"]'
-    }));
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form',
+        selector: '[placeholder="Тип машины"]'
+      })
+    );
 
-    loader.getHarness(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form',
-      selector: '[placeholder="Подтип машины'
-    }));
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form',
+        selector: '[placeholder="Подтип машины'
+      })
+    );
 
-    loader.getHarness(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form',
-      selector: '[placeholder="Тип топлива"]'
-    }));
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form',
+        selector: '[placeholder="Тип топлива"]'
+      })
+    );
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Регистрационный номер'
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Регистрационный номер'
+      })
+    );
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Инвентарный номер'
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Инвентарный номер'
+      })
+    );
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Серийный номер кузова'
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Серийный номер кузова'
+      })
+    );
 
-    const trackerInput = await loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'GPS трекер'
-    }));
+    const trackerInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'GPS-трекер'
+      })
+    );
 
     await expectAsync(
       trackerInput.getType()
@@ -212,14 +236,16 @@ describe('VehicleDialogComponent', () => {
       .withContext('render tracker input type')
       .toBeResolvedTo('number');
 
-    expect(trackerInputEl.nativeElement.placeholder)
+    expect(trackerInputDe.nativeElement.placeholder)
       .withContext('render tracker input with `NumberOnlyDirective`')
-      .toBe('GPS трекер');
+      .toBe('GPS-трекер');
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Описание'
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Описание'
+      })
+    );
   });
 
   it('should render update vehicle form', async () => {
@@ -235,28 +261,36 @@ describe('VehicleDialogComponent', () => {
       .withContext('render Vehicle form element')
       .not.toBeNull();
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Наименование машины',
-      value: testNewVehicle.name
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Наименование машины',
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Производитель',
-      value: testNewVehicle.make
-    }));
+        value: testNewVehicle.name
+      }));
 
-    loader.getHarness(MatInputHarness.with({
-      ancestor: 'form#vehicle-form',
-      placeholder: 'Модель',
-      value: testNewVehicle.model
-    }));
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Производитель',
 
-    const typeSelect = await loader.getHarness(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form',
-      selector: '[placeholder="Тип машины"]'
-    }));
+        value: testNewVehicle.make
+      }));
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form',
+        placeholder: 'Модель',
+
+        value: testNewVehicle.model
+      }));
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form',
+        selector: '[placeholder="Тип машины"]'
+      })
+    );
 
     await expectAsync(
       typeSelect.getValueText()
@@ -264,10 +298,12 @@ describe('VehicleDialogComponent', () => {
       .withContext('render type select text')
       .toBeResolvedTo(testVehicleTypeEnum[0].value);
 
-    const subtypeSelect = await loader.getHarness(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form',
-      selector: '[placeholder="Подтип машины"]'
-    }));
+    const subtypeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form',
+        selector: '[placeholder="Подтип машины"]'
+      })
+    );
 
     await expectAsync(
       subtypeSelect.getValueText()
@@ -275,10 +311,12 @@ describe('VehicleDialogComponent', () => {
       .withContext('render subtype select text')
       .toBeResolvedTo(testVehicleSubtypeEnum[2].value);
 
-    const fuelSelect = await loader.getHarness(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form',
-      selector: '[placeholder="Тип топлива"]'
-    }));
+    const fuelSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form',
+        selector: '[placeholder="Тип топлива"]'
+      })
+    );
 
     await expectAsync(
       fuelSelect.getValueText()
@@ -291,10 +329,12 @@ describe('VehicleDialogComponent', () => {
     spyOn(vehicleService, 'createVehicle')
       .and.callThrough();
 
-    const saveButton = await loader.getHarness(MatButtonHarness.with({
-      selector: '[form="vehicle-form"]',
-      text: 'Сохранить'
-    }));
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="vehicle-form"]',
+        text: 'Сохранить'
+      })
+    );
 
     await saveButton.click();
 
@@ -306,9 +346,11 @@ describe('VehicleDialogComponent', () => {
     spyOn(vehicleService, 'createVehicle')
       .and.callThrough();
 
-    const saveButton = await loader.getHarness(MatButtonHarness.with({
-      selector: '[form="vehicle-form"]'
-    }));
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="vehicle-form"]'
+      })
+    );
 
     await saveButton.click();
 
@@ -317,13 +359,17 @@ describe('VehicleDialogComponent', () => {
   });
 
   it('should submit create vehicle form', async () => {
-    const [nameInput, makeInput, modelInput] = await loader.getAllHarnesses(MatInputHarness.with({
-      ancestor: 'form#vehicle-form'
-    }));
+    const [nameInput, makeInput, modelInput] = await loader.getAllHarnesses(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form'
+      })
+    );
 
-    const [groupSelect, typeSelect, subtypeSelect, fuelSelect] = await loader.getAllHarnesses(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form'
-    }));
+    const [groupSelect, typeSelect, subtypeSelect, fuelSelect] = await loader.getAllHarnesses(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form'
+      })
+    );
 
     const { name, make, model } = testNewVehicle;
 
@@ -346,9 +392,11 @@ describe('VehicleDialogComponent', () => {
     spyOn(vehicleService, 'createVehicle')
       .and.callFake(() => of({}));
 
-    const saveButton = await loader.getHarness(MatButtonHarness.with({
-      selector: '[form="vehicle-form"]'
-    }));
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="vehicle-form"]'
+      })
+    );
 
     await saveButton.click();
 
@@ -414,13 +462,17 @@ describe('VehicleDialogComponent', () => {
       ,
       ,
       descriptionInput
-    ] = await loader.getAllHarnesses(MatInputHarness.with({
-      ancestor: 'form#vehicle-form'
-    }));
+    ] = await loader.getAllHarnesses(
+      MatInputHarness.with({
+        ancestor: 'form#vehicle-form'
+      })
+    );
 
-    const [, , , fuelSelect] = await loader.getAllHarnesses(MatSelectHarness.with({
-      ancestor: 'form#vehicle-form'
-    }));
+    const [, , , fuelSelect] = await loader.getAllHarnesses(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form'
+      })
+    );
 
     await fuelSelect.clickOptions({
       text: testFuels[1].name
@@ -449,9 +501,11 @@ describe('VehicleDialogComponent', () => {
     spyOn(vehicleService, 'updateVehicle')
       .and.callFake(() => of({}));
 
-    const saveButton = await loader.getHarness(MatButtonHarness.with({
-      selector: '[form="vehicle-form"]'
-    }));
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="vehicle-form"]'
+      })
+    );
 
     await saveButton.click();
 

@@ -251,7 +251,7 @@ describe('TrackersComponent', () => {
         }
       } = testTrackers.trackers[index];
 
-      const sim = simNumber ? `+${simNumber[0]} (${simNumber.slice(1, 4)}) ${simNumber.slice(4)}` : '';
+      const sim = simNumber ? `${simNumber.slice(0, 2)} (${simNumber.slice(2, 5)}) ${simNumber.slice(4)}` : '';
       const start = formatDate(startDate, DATE_FORMAT, 'ru-RU');
 
       const trackerTexts = [name, external, type, sim, imei, start, vehicle].map(

@@ -14,6 +14,7 @@ import { NewVehicle, VehiclesSortBy, Vehicle, Vehicles, VehicleService, Vehicles
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
+
 import {
   ConfirmationDialogData,
   ConfirmationDialogComponent,

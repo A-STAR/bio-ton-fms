@@ -230,11 +230,15 @@
         order: 1
         height: 0
 
-      &.full-two-thirds
+      &.full-two-thirds,
+      &.full-third
         flex-basis: 100%
 
-        mat-form-field
-          width: calc(2 * ($field-width - $field-gap) + $column-gap)
+      &.full-two-thirds mat-form-field
+        width: calc(2 * ($field-width - $field-gap) + $column-gap)
+
+      &.full-third mat-form-field
+        width: calc($field-width - $field-gap)
 
       &.two-thirds,
       &.two-thirds-half

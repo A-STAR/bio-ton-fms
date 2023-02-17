@@ -172,10 +172,10 @@ export const testTrackers: Trackers = {
       id: 1,
       externalId: 12,
       name: 'Galileo Sky',
-      simNumber: '79128371270',
+      simNumber: '+79128371270',
       imei: '497890037671157',
       trackerType: testTrackerTypeEnum[0],
-      startDate: new Date('2022-11-07T10:00:00.000Z'),
+      startDate: '2022-11-07T10:00:00.000Z',
       description: 'GPS комбайна',
       vehicle: {
         key: testVehicles.vehicles[2].id,
@@ -186,19 +186,20 @@ export const testTrackers: Trackers = {
       id: 2,
       externalId: 101,
       name: 'Передатчик уборки зерна',
+      simNumber: '+79705501161',
       imei: '010894332966088',
       trackerType: testTrackerTypeEnum[1],
-      startDate: new Date('2023-02-01T07:20:39.617Z'),
+      startDate: '2023-02-01T07:20:39.617Z',
       description: 'Ретранслятор'
     },
     {
       id: 3,
       externalId: 7,
       name: 'Wialon IPS',
-      simNumber: '72347732931',
+      simNumber: '+72347732931',
       imei: '527111404753054',
       trackerType: testTrackerTypeEnum[2],
-      startDate: new Date('2023-01-21T17:25:19.512Z'),
+      startDate: '2023-01-21T17:25:19.512Z',
       vehicle: {
         key: testVehicles.vehicles[0].id,
         value: testVehicles.vehicles[0].name

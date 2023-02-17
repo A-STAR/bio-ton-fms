@@ -1,3 +1,80 @@
 <h1 mat-dialog-title>Добавление GPS-трекера</h1>
 
-<ng-container *ngIf="trackerType$ | async"></ng-container>
+<mat-dialog-content>
+  <form id="tracker-form" [formGroup]="trackerForm">
+    <fieldset formGroupName="basic">
+      <legend>Основные сведения</legend>
+
+      <div class="full-two-thirds">
+        <label for="name">Наименование GPS-трекера</label>
+
+        <mat-form-field>
+          <input matInput id="name" placeholder="Наименование GPS-трекера" formControlName="name">
+        </mat-form-field>
+      </div>
+
+      <ng-container *ngIf="trackerType$ | async as trackerType">
+        <div>
+          <label>Тип устройства</label>
+
+          <mat-form-field>
+            <mat-select placeholder="Тип устройства" formControlName="type">
+              <mat-option>Тип устройства</mat-option>
+
+              <mat-option [value]="type.key" *ngFor="let type of trackerType">{{ type.value }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <div>
+        <label for="start">Время начала</label>
+
+        <mat-form-field>
+          <input matInput id="start" placeholder="Время начала" formControlName="start">
+        </mat-form-field>
+      </div>
+    </fieldset>
+
+    <fieldset formGroupName="registration">
+      <legend>Регистрационные данные</legend>
+
+      <div class="full-third">
+        <label for="external">Внешний ID</label>
+
+        <mat-form-field>
+          <input matInput bioNumberOnlyInput id="external" type="number" placeholder="Внешний ID"
+            formControlName="external">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="sim">Номер SIM-карты</label>
+
+        <mat-form-field>
+          <input matInput id="sim" type="tel" placeholder="Номер SIM-карты" formControlName="sim">
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="imei">IMEI номер</label>
+
+        <mat-form-field>
+          <input matInput id="imei" placeholder="IMEI номер" formControlName="imei">
+        </mat-form-field>
+      </div>
+    </fieldset>
+
+    <fieldset formGroupName="additional">
+      <legend>Дополнительные сведения</legend>
+
+      <div class="full-two-thirds">
+        <label for="description">Описание</label>
+
+        <mat-form-field>
+          <textarea matInput id="description" placeholder="Описание" formControlName="description"></textarea>
+        </mat-form-field>
+      </div>
+    </fieldset>
+  </form>
+</mat-dialog-content>
