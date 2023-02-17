@@ -11,7 +11,7 @@ import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptio
 @Injectable({
   providedIn: 'root'
 })
-export class TrackersService {
+export class TrackerService {
   /**
    * Get trackers.
    *
