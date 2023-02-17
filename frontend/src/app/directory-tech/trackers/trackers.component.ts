@@ -218,4 +218,4 @@ export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
   }
 ];
 
-export const DATE_FORMAT = 'd MMMM, y г., h:mm';
+export const DATE_FORMAT = 'd MMMM y, h:mm';

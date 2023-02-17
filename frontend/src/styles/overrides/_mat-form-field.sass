@@ -50,6 +50,16 @@ $mdc-text-field-padding-horizontal: 12px
   &.mdc-notched-outline__trailing
     border-width: 1px
 
+.mat-mdc-form-field-text-prefix,
+.mat-mdc-form-field-text-suffix
+  white-space: nowrap
+
+.mat-mdc-form-field-text-prefix
+  padding-right: 4px
+
+.mat-mdc-form-field-text-suffix
+  padding-left: 4px
+
 .mat-mdc-form-field-icon-prefix,
 .mat-mdc-form-field-icon-suffix
 
@@ -62,6 +72,9 @@ $mdc-text-field-padding-horizontal: 12px
   display: flex
   align-items: center
   min-height: $mat-mdc-form-field-infix-height
+
+  @at-root div#{&}
+    width: unset
 
   @at-root .mat-mdc-text-field-wrapper.mdc-text-field--outlined &
     $mat-mdc-text-field-height: 16.5px
@@ -100,6 +113,7 @@ mat-error
 
 mat-hint
   display: block
+  color: $gray
 
 .mat-mdc-form-field-hint-spacer
   display: none

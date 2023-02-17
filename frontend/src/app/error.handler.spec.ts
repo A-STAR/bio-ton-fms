@@ -100,7 +100,7 @@ describe('ErrorHandler', () => {
     const testErrorResponse = new HttpErrorResponse({
       error: {
         errors: {
-          manufacturingYear: ['Год производства должен быть меньше текущего', 'Год производства введён некорректно'],
+          manufacturingYear: ['Год производства должен быть не более текущего', 'Год производства введён некорректно'],
           trakerId: ['Трекер с ID 10 не найден']
         },
         message: 'Произошла ошибка валидации запроса'

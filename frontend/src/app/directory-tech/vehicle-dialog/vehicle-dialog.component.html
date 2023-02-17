@@ -13,7 +13,11 @@
         <mat-form-field>
           <input matInput id="name" placeholder="Наименование машины" formControlName="name">
 
-          <mat-error><strong>Наименование машины</strong> обязательное поле</mat-error>
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.name.errors?.['required']">Обязательное поле</mat-error>
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.name.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
         </mat-form-field>
       </div>
 
@@ -23,7 +27,11 @@
         <mat-form-field>
           <input matInput id="make" placeholder="Производитель" formControlName="make">
 
-          <mat-error><strong>Производитель</strong> обязательное поле</mat-error>
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.make.errors?.['required']">Обязательное поле</mat-error>
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.make.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
         </mat-form-field>
       </div>
 
@@ -33,7 +41,13 @@
         <mat-form-field>
           <input matInput id="model" placeholder="Модель" formControlName="model">
 
-          <mat-error><strong>Модель</strong> обязательное поле</mat-error>
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.model.errors?.['required']">
+            Обязательное поле
+          </mat-error>
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.model.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
         </mat-form-field>
       </div>
 
@@ -45,11 +59,11 @@
             formControlName="year" [max]="maxManufacturingYear">
 
           <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['max'] as error">
-            <strong>Год производства</strong> должен быть менее {{ error.max + 1 }}
+            Поле должно быть не более {{ error.max }}
           </mat-error>
 
           <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['pattern']">
-            <strong>Год производства</strong> введён некорректно
+            Поле введёно некорректно
           </mat-error>
         </mat-form-field>
       </div>
@@ -77,7 +91,7 @@
               <mat-option [value]="type.key" *ngFor="let type of vehicleData.type">{{ type.value }}</mat-option>
             </mat-select>
 
-            <mat-error><strong>Тип машины</strong> обязательное поле</mat-error>
+            <mat-error>Обязательное поле</mat-error>
           </mat-form-field>
         </div>
 
@@ -93,7 +107,7 @@
               </mat-option>
             </mat-select>
 
-            <mat-error><strong>Подтип машины</strong> обязательное поле</mat-error>
+            <mat-error>Обязательное поле</mat-error>
           </mat-form-field>
         </div>
 
@@ -107,7 +121,7 @@
               <mat-option [value]="fuel.id" *ngFor="let fuel of vehicleData.fuels">{{ fuel.name }}</mat-option>
             </mat-select>
 
-            <mat-error><strong>Тип топлива</strong> обязательное поле</mat-error>
+            <mat-error>Обязательное поле</mat-error>
           </mat-form-field>
         </div>
       </ng-container>
@@ -122,7 +136,16 @@
         <mat-form-field>
           <input matInput id="registration" placeholder="Регистрационный номер" formControlName="registration">
 
-          <mat-error><strong>Регистрационный номер</strong> состоит из букв и цифр</mat-error>
+          <mat-hint><em>1200АМ63</em></mat-hint>
+
+          <mat-error *ngIf="vehicleForm.controls.registration.controls.registration.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
+
+          <mat-error
+            *ngIf="!vehicleForm.controls.registration.controls.registration.errors?.['maxlength'] && vehicleForm.controls.registration.controls.registration.errors?.['pattern']">
+            Поле введено некорректно
+          </mat-error>
         </mat-form-field>
       </div>
 
@@ -131,6 +154,10 @@
 
         <mat-form-field>
           <input matInput id="inventory" placeholder="Инвентарный номер" formControlName="inventory">
+
+          <mat-error *ngIf="vehicleForm.controls.registration.controls.inventory.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
         </mat-form-field>
       </div>
 
@@ -139,6 +166,10 @@
 
         <mat-form-field>
           <input matInput id="serial" placeholder="Серийный номер кузова" formControlName="serial">
+
+          <mat-error *ngIf="vehicleForm.controls.registration.controls.serial.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
         </mat-form-field>
       </div>
 
@@ -160,6 +191,10 @@
 
         <mat-form-field>
           <textarea matInput id="description" placeholder="Описание" formControlName="description"></textarea>
+
+          <mat-error *ngIf="vehicleForm.controls.additional.controls.description.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
         </mat-form-field>
       </div>
     </fieldset>

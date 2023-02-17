@@ -116,9 +116,18 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
-        name: this.fb.nonNullable.control(this.data?.name, Validators.required),
-        make: this.fb.nonNullable.control(this.data?.make, Validators.required),
-        model: this.fb.nonNullable.control(this.data?.model, Validators.required),
+        name: this.fb.nonNullable.control(this.data?.name, [
+          Validators.required,
+          Validators.maxLength(100)
+        ]),
+        make: this.fb.nonNullable.control(this.data?.make, [
+          Validators.required,
+          Validators.maxLength(30)
+        ]),
+        model: this.fb.nonNullable.control(this.data?.model, [
+          Validators.required,
+          Validators.maxLength(30)
+        ]),
         year: this.fb.nonNullable.control(this.data?.manufacturingYear, [
           Validators.max(maxManufacturingYear),
           Validators.pattern(YEAR_PATTERN)
@@ -129,16 +138,26 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
         fuel: this.fb.nonNullable.control(this.data?.fuelTypeId, Validators.required)
       }),
       registration: this.fb.group({
-        registration: this.fb.nonNullable.control(
-          this.data?.registrationNumber,
+        registration: this.fb.nonNullable.control(this.data?.registrationNumber, [
+          Validators.maxLength(15),
           Validators.pattern(REGISTRATION_NUMBER_PATTERN)
+        ]
         ),
-        inventory: this.fb.nonNullable.control(this.data?.inventoryNumber),
-        serial: this.fb.nonNullable.control(this.data?.serialNumber),
+        inventory: this.fb.nonNullable.control(
+          this.data?.inventoryNumber,
+          Validators.maxLength(30)
+        ),
+        serial: this.fb.nonNullable.control(
+          this.data?.serialNumber,
+          Validators.maxLength(40)
+        ),
         tracker: this.fb.nonNullable.control(this.data?.trackerId)
       }),
       additional: this.fb.group({
-        description: this.fb.nonNullable.control(this.data?.description)
+        description: this.fb.nonNullable.control(
+          this.data?.description,
+          Validators.maxLength(500)
+        )
       })
     });
   }
