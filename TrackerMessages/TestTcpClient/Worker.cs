@@ -22,17 +22,17 @@ public class Worker : BackgroundService
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var client = new TcpClient(_options.Host, _options.Port);
-        var stream = client.GetStream();
+        NetworkStream stream = client.GetStream();
 
         if (_parameters.ScriptPath != null)
         {
             var lines = File.ReadAllLines(_parameters.ScriptPath);
-            foreach (var l in lines)
+            foreach (var line in lines)
             {
-                var paths = l.Split(' ');
+                var paths = line.Split(' ');
                 if (paths.Length != 2)
                 {
-                    _logger.LogWarning("Строка {Line} не соответствует формату", l);
+                    _logger.LogWarning("Строка {Line} не соответствует формату", line);
                     continue;
                 }
                 SendRequest(paths[0], paths[1], stream);
@@ -54,17 +54,17 @@ public class Worker : BackgroundService
         throw new Exception($"Ошибка в параметрах:\n{JsonSerializer.Serialize(_parameters)}");
     }
 
-    private void SendRequest(string input, string output, Stream stream)
+    private void SendRequest(string messageFile, string resultFile, Stream stream)
     {
-        if (!File.Exists(input))
+        if (!File.Exists(messageFile))
         {
-            _logger.LogWarning("Файл {Path} не существует", input);
+            _logger.LogWarning("Файл '{Path}' не существует", messageFile);
             return;
         }
 
         try
         {
-            var message = File.ReadAllText(input);
+            var message = File.ReadAllText(messageFile);
             var data = message.Split(' ', '\n')
                 .Select(x => byte.Parse(x, NumberStyles.HexNumber))
                 .ToArray();
@@ -75,7 +75,7 @@ public class Worker : BackgroundService
         catch (Exception e)
         {
             _logger.LogWarning("Ошибка {Exception} при парсинге или отправке сообщения из файла {Path}",
-                e.Message, input);
+                e.Message, messageFile);
         }
         
         var respBuf = new byte[10];
@@ -84,6 +84,6 @@ public class Worker : BackgroundService
             .Select(x => x.ToString("X")));
 
         _logger.LogInformation("Получено: {Response}", responseData);
-        File.WriteAllText(output, responseData);
+        File.WriteAllText(resultFile, responseData);
     }
 }
