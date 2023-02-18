@@ -2,6 +2,7 @@
   "profiles": {
     "TestTcpTrackerClient": {
       "commandName": "Project",
+      "commandLineArgs": "..\\..\\..\\TestData\\11-message.txt Result1.txt",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

@@ -3,16 +3,17 @@ using System.Net.Sockets;
 using System.Text.Json;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace TrackerEmulator;
 
 public class Worker : BackgroundService
 {
-    private readonly ClientOptions _options;
+    private readonly IOptions<ClientOptions> _options;
     private readonly ClientParams _parameters;
     private readonly ILogger<Worker> _logger;
 
-    public Worker(ClientOptions options, ClientParams parameters, ILogger<Worker> logger)
+    public Worker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<Worker> logger)
     {
         _options = options;
         _parameters = parameters;
@@ -21,7 +22,7 @@ public class Worker : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var client = new TcpClient(_options.Host, _options.Port);
+        using var client = new TcpClient(_options.Value.Host, _options.Value.Port);
         NetworkStream stream = client.GetStream();
 
         if (_parameters.ScriptPath != null)
