@@ -26,7 +26,7 @@ public class Worker : BackgroundService
 
         if (_parameters.ScriptPath != null)
         {
-            var lines = File.ReadAllLines(_parameters.ScriptPath);
+            string[] lines = File.ReadAllLines(_parameters.ScriptPath);
             foreach (var line in lines)
             {
                 var paths = line.Split(' ');
@@ -76,7 +76,7 @@ public class Worker : BackgroundService
         {
             _logger.LogError(e, "Ошибка при парсинге или отправке сообщения из файла {Path}", messageFile);
         }
-        
+
         var respBuf = new byte[10];
         int readCount = stream.Read(respBuf, 0, 10);
         string responseData = string.Join(' ', respBuf.Take(readCount)
