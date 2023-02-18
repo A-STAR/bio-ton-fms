@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using TestTcpTrackerClient;
+using TrackerEmulator;
 
 var host = Host.CreateDefaultBuilder()
     .ConfigureHostConfiguration(x => x.AddJsonFile("appsettings.json"))

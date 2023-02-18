@@ -1,4 +1,4 @@
-namespace TestTcpTrackerClient;
+namespace TrackerEmulator;
 
 public static class Constants
 {
