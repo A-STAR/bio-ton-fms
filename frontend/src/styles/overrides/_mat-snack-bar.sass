@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'variables' as *
 
 .mat-mdc-snack-bar-container
@@ -19,10 +20,10 @@
 
   .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled),
   .mat-mdc-button .mat-mdc-button-touch-target
-    height: $mat-icon-button-size
+    height: map.get($mat-icon-button, size)
 
   .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled)
-    width: $mat-icon-button-size
+    width: map.get($mat-icon-button, size)
     border-radius: 50%
 
   &.error .mdc-snackbar__surface
@@ -33,6 +34,6 @@
 
 .mdc-button.mat-mdc-snack-bar-action
   min-width: unset
-  padding-left: $mat-icon-button-padding
-  padding-right: $mat-icon-button-padding
-  font-size: $mat-icon-size
+  padding-left: map.get($mat-icon-button, padding)
+  padding-right: map.get($mat-icon-button, padding)
+  font-size: map.get($mat-icon-button, icon, font-size)

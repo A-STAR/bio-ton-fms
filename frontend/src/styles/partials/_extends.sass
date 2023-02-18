@@ -72,10 +72,10 @@
       position: absolute
       bottom: 0
       width: 100%
-      height: map.get($mat-mdc-form-field-subscript-wrapper, 'padding', 'vertical') + 2 * map.get($mat-mdc-form-field-subscript-wrapper, 'line-height')
-      padding-left: map.get($mat-mdc-form-field-subscript-wrapper, 'padding', 'horizontal')
-      padding-right: map.get($mat-mdc-form-field-subscript-wrapper, 'padding', 'horizontal')
-      font-size: $mat-form-field-font
+      height: map.get($mat-mdc-form-field, subscript-wrapper, padding, vertical) + 2 * map.get($mat-mdc-form-field, subscript-wrapper, line-height)
+      padding-left: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
+      padding-right: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
+      font-size: map.get($mat-mdc-form-field, font-size)
       animation: transitionmessages 300ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
 
       @keyframes transitionmessages
