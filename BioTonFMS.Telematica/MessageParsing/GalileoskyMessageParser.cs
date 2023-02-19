@@ -46,8 +46,9 @@ public class GalileoskyMessageParser : IMessageParser
         {
             if (!tags.TryGetValue(binaryPackage[i], out var tag))
             {
-                _logger.LogError($"Тег с кодом {binaryPackage[i]} не найден, позиция в сообщении {i}");
-                throw new ArgumentException($"Тег с кодом {binaryPackage[i]} не найден, позиция в сообщении {i}");
+                _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}",
+                    binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))));
+                return;
             }
 
             i++;
