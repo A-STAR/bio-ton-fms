@@ -1,4 +1,4 @@
-namespace BioTonFMS.Telematica.MessageParsing;
+namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
 
 public interface IMessageParser
 {

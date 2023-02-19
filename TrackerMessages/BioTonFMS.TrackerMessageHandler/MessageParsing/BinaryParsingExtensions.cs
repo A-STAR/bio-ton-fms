@@ -1,7 +1,7 @@
 using System.Text;
 using BioTonFMS.Domain.TrackerMessages;
 
-namespace BioTonFMS.Telematica.MessageParsing;
+namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
 
 internal static class BinaryParsingExtensions
 {

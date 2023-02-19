@@ -15,8 +15,9 @@ using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Persistence.Providers;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace BioTonFMSApp.Startup;
+namespace BioTonFMS.TrackerMessageHandler;
 
 public static class DependencyRegistrationExtensions
 {
@@ -51,38 +52,6 @@ public static class DependencyRegistrationExtensions
 
     public static IServiceCollection RegisterDataAccess(this IServiceCollection services)
     {
-        services.AddTransient<IKeyValueProvider<Tracker, int>, KeyValueProvider<Tracker, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<Tracker>, QueryableProvider<Tracker, BioTonDBContext>>();
-        services.AddTransient<ITrackerRepository, TrackerRepository>();
-
-        services.AddTransient<IKeyValueProvider<Vehicle, int>, KeyValueProvider<Vehicle, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<Vehicle>, QueryableProvider<Vehicle, BioTonDBContext>>();
-        services.AddTransient<IVehicleRepository, VehicleRepository>();
-
-        services.AddTransient<IKeyValueProvider<VehicleGroup, int>, KeyValueProvider<VehicleGroup, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<VehicleGroup>, QueryableProvider<VehicleGroup, BioTonDBContext>>();
-        services.AddTransient<IVehicleGroupRepository, VehicleGroupRepository>();
-
-        services.AddTransient<IKeyValueProvider<FuelType, int>, KeyValueProvider<FuelType, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<FuelType>, QueryableProvider<FuelType, BioTonDBContext>>();
-        services.AddTransient<IFuelTypeRepository, FuelTypeRepository>();
-
-        services.AddTransient<IKeyValueProvider<Sensor, int>, KeyValueProvider<Sensor, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<Sensor>, QueryableProvider<Sensor, BioTonDBContext>>();
-        services.AddTransient<ISensorRepository, SensorRepository>();
-
-        services.AddTransient<IKeyValueProvider<SensorType, int>, KeyValueProvider<SensorType, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<SensorType>, QueryableProvider<SensorType, BioTonDBContext>>();
-        services.AddTransient<ISensorTypeRepository, SensorTypeRepository>();
-
-        services.AddTransient<IKeyValueProvider<SensorGroup, int>, KeyValueProvider<SensorGroup, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<SensorGroup>, QueryableProvider<SensorGroup, BioTonDBContext>>();
-        services.AddTransient<ISensorGroupRepository, SensorGroupRepository>();
-
-        services.AddTransient<IKeyValueProvider<Unit, int>, KeyValueProvider<Unit, BioTonDBContext, int>>();
-        services.AddTransient<IQueryableProvider<Unit>, QueryableProvider<Unit, BioTonDBContext>>();
-        services.AddTransient<IUnitRepository, UnitRepository>();
-
         services.AddTransient<IKeyValueProvider<TrackerTag, int>, KeyValueProvider<TrackerTag, BioTonDBContext, int>>();
         services.AddTransient<IQueryableProvider<TrackerTag>, QueryableProvider<TrackerTag, BioTonDBContext>>();
         services.AddTransient<ITrackerTagRepository, TrackerTagRepository>();

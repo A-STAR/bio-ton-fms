@@ -3,7 +3,7 @@ using System.Text.Json;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Messaging;
 using BioTonFMS.Infrastructure.MessageBus;
-using BioTonFMS.Telematica.MessageParsing;
+using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using Microsoft.Extensions.Logging;
 
 namespace BioTonFMS.TrackerMessageHandler;

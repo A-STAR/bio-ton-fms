@@ -5,7 +5,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using Microsoft.Extensions.Logging;
 
-namespace BioTonFMS.Telematica.MessageParsing;
+namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
 
 public class GalileoskyMessageParser : IMessageParser
 {
