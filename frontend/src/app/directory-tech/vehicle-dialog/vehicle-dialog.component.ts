@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
+import { forkJoin, map, Observable, Subscription } from 'rxjs';
 
 import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
@@ -45,7 +45,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   /**
    * Submit Vehicle form, checking validation state.
    */
-  protected async submitVehicleForm() {
+  protected submitVehicleForm() {
     this.#subscription?.unsubscribe();
 
     const { invalid, value } = this.vehicleForm;
@@ -85,12 +85,12 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       ? this.vehicleService.updateVehicle(vehicle)
       : this.vehicleService.createVehicle(vehicle);
 
-    await firstValueFrom(vehicle$);
+    this.#subscription = vehicle$.subscribe(() => {
+      const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
 
-    const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
-
-    this.snackBar.open(message);
-    this.dialogRef.close(true);
+      this.snackBar.open(message);
+      this.dialogRef.close(true);
+    });
   }
 
   #subscription: Subscription | undefined;
@@ -164,8 +164,8 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
-    private snackBar: MatSnackBar,
     private fb: FormBuilder,
+    private snackBar: MatSnackBar,
     private dialogRef: MatDialogRef<VehicleDialogComponent, true | ''>,
     private vehicleService: VehicleService
   ) { }

@@ -76,7 +76,7 @@ export class VehicleService {
    *
    * @param vehicle A new vehicle.
    *
-   * @returns An `Observable' of adding vehicle.
+   * @returns An `Observable' of creating vehicle.
    */
   createVehicle(vehicle: NewVehicle) {
     return this.httpClient.post('/api/telematica/vehicle', vehicle);

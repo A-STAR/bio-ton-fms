@@ -45,6 +45,17 @@ export class TrackerService {
     return this.httpClient.get<Trackers>('/api/telematica/trackers', { params });
   }
 
+  /**
+   * Create a new tracker.
+   *
+   * @param tracker A new tracker.
+   *
+   * @returns An `Observable' of creating tracker.
+   */
+  createTracker(tracker: NewTracker) {
+    return this.httpClient.post('/api/telematica/tracker', tracker);
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 

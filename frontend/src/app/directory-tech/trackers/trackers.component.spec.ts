@@ -12,6 +12,7 @@ import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Observable, of } from 'rxjs';
 
@@ -36,12 +37,13 @@ describe('TrackersComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatSnackBarModule,
           TrackersComponent
         ],
         providers: [
           {
             provide: LOCALE_ID,
-            useValue: 'ru-Ru'
+            useValue: 'ru-RU'
           }
         ]
       })

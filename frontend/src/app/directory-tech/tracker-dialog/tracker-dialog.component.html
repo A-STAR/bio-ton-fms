@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>Добавление GPS-трекера</h1>
 
 <mat-dialog-content>
-  <form id="tracker-form" [formGroup]="trackerForm">
+  <form id="tracker-form" [formGroup]="trackerForm" (ngSubmit)="submitTrackerForm()">
     <fieldset formGroupName="basic">
       <legend>Основные сведения</legend>
 
@@ -125,3 +125,9 @@
     </fieldset>
   </form>
 </mat-dialog-content>
+
+<mat-dialog-actions fxLayoutAlign="space-between">
+  <button mat-stroked-button color="accent" mat-dialog-close>Отмена</button>
+
+  <button mat-flat-button type="submit" form="tracker-form" color="accent">Сохранить</button>
+</mat-dialog-actions>

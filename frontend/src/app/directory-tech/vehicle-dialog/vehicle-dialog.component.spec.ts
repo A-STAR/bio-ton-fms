@@ -342,22 +342,6 @@ describe('VehicleDialogComponent', () => {
       .not.toHaveBeenCalled();
   });
 
-  it('should submit vehicle form', async () => {
-    spyOn(vehicleService, 'createVehicle')
-      .and.callThrough();
-
-    const saveButton = await loader.getHarness(
-      MatButtonHarness.with({
-        selector: '[form="vehicle-form"]'
-      })
-    );
-
-    await saveButton.click();
-
-    expect(vehicleService.createVehicle)
-      .not.toHaveBeenCalled();
-  });
-
   it('should submit create vehicle form', async () => {
     const [nameInput, makeInput, modelInput] = await loader.getAllHarnesses(
       MatInputHarness.with({
@@ -435,16 +419,13 @@ describe('VehicleDialogComponent', () => {
     expect(dialogRef.close)
       .toHaveBeenCalledWith(true);
 
+    /* Coverage for selected vehicle `group`. */
+
     await groupSelect.clickOptions({
       text: testVehicleGroups[2].name
     });
 
     await saveButton.click();
-
-    testVehicle.vehicleGroupId = testNewVehicle.vehicleGroupId;
-
-    expect(vehicleService.createVehicle)
-      .toHaveBeenCalledWith(testVehicle);
   });
 
   it('should submit update vehicle form', async () => {

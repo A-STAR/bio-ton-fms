@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
@@ -22,15 +24,71 @@ import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/numbe
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatButtonModule,
     NumberOnlyInputDirective
   ],
   templateUrl: './tracker-dialog.component.html',
   styleUrls: ['./tracker-dialog.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TrackerDialogComponent implements OnInit {
+export class TrackerDialogComponent implements OnInit, OnDestroy {
   protected trackerType$!: Observable<KeyValue<TrackerTypeEnum, string>[]>;
   protected trackerForm!: FormGroup<TrackerForm>;
+
+  /**
+   * Submit Tracker form, checking validation state.
+   */
+  protected submitTrackerForm() {
+    this.#subscription?.unsubscribe();
+
+    const { invalid, value } = this.trackerForm;
+
+    if (invalid) {
+      return;
+    }
+
+    const {
+      basic,
+      registration: registrationGroup,
+      additional
+    } = value;
+
+    const { name, type, start } = basic!;
+    const { external, sim, imei } = registrationGroup!;
+    const { description } = additional!;
+
+    const tracker: NewTracker = {
+      externalId: external!,
+      name: name!,
+      simNumber: sim!,
+      imei: imei!,
+      trackerType: type!,
+      description: description ?? undefined
+    };
+
+    if (start) {
+      const [day, month, year, hours, minutes, seconds = 0] = start
+        .split(/[\.\s:]/)
+        .map(Number);
+
+      const monthIndex = month - 1;
+
+      const startDate = new Date(year, monthIndex, day, hours, minutes, seconds)
+        .toISOString();
+
+      tracker.startDate = startDate;
+    }
+
+    this.#subscription = this.trackerService
+      .createTracker(tracker)
+      .subscribe(() => {
+        this.snackBar.open(TRACKER_CREATED);
+
+        this.dialogRef.close(true);
+      });
+  }
+
+  #subscription: Subscription | undefined;
 
   /**
  * Initialize Vehicle form.
@@ -70,13 +128,23 @@ export class TrackerDialogComponent implements OnInit {
     });
   }
 
-  constructor(private fb: FormBuilder, private trackerService: TrackerService) { }
+  constructor(
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private dialogRef: MatDialogRef<TrackerDialogComponent, true | '' | undefined>,
+    private trackerService: TrackerService
+  ) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.trackerType$ = this.trackerService.trackerType$;
 
     this.#initTrackerForm();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
   }
 }
 
@@ -98,4 +166,6 @@ type TrackerForm = {
 
 const DATE_PATTERN = /^(0?[1-9]|[12]\d|3[01])\.(0?[1-9]|1[012])\.\d{4}\s(0?[0-9]|1\d|2[0-3])(:(0[0-9]|[1-5]\d)){1,2}$/;
 const SIM_PATTERN = /^\+7\d{10}$/;
-const IMEI_PATTERN = /^\d{15}$/ ;
+const IMEI_PATTERN = /^\d{15}$/;
+
+export const TRACKER_CREATED = 'GPS-трекер создан';

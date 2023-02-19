@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { Trackers, TrackersOptions, TrackerService, TrackersSortBy, TrackerTypeEnum } from './tracker.service';
+import { Trackers, TrackersOptions, TrackerService, TrackersSortBy, TrackerTypeEnum, NewTracker } from './tracker.service';
 
 import { SortDirection } from './shared/sort';
 
@@ -149,6 +149,25 @@ describe('TrackerService', () => {
 
     trackerTypeEnumRequest.flush(testTrackerTypeEnum);
   });
+
+  it('should create tracker', (done: DoneFn) => {
+    service
+      .createTracker(testNewTracker)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const createTrackerRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: '/api/telematica/tracker'
+    }, 'create tracker request');
+
+    createTrackerRequest.flush(null);
+  });
 });
 
 export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
@@ -165,6 +184,16 @@ export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
     value: 'Протокол Wialon'
   }
 ];
+
+export const testNewTracker: NewTracker = {
+  externalId: 102,
+  name: 'Galileo Sky v 5.0',
+  simNumber: '+78462777727',
+  imei: '542553718824116',
+  trackerType: testTrackerTypeEnum[0].key,
+  startDate: '2023-02-18T22:57:19.446Z',
+  description: 'GPS Ford Focus'
+};
 
 export const testTrackers: Trackers = {
   trackers: [
