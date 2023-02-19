@@ -23,7 +23,6 @@ Lint-frontend:
   script:             
     - npm run lint 
 
-
 Build-frontend:
   stage: build
   extends: .node-job
@@ -36,8 +35,7 @@ Build-frontend:
 
 Build-backend:
   stage: build
-  script:    
-    - docker system prune -af
+  script:        
     - mkdir dir
     - cd dir
     - git clone git@git.bioton-fms.ru:BioTon/fms.git .
@@ -47,14 +45,48 @@ Build-backend:
     - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
     - docker image push git.bioton-fms.ru:5050/bioton/fms/backend:latest
 
+Build-TrackerTcpServer:
+  stage: build  
+  script:        
+    - mkdir dir
+    - cd dir
+    - git clone git@git.bioton-fms.ru:BioTon/fms.git .
+    - git checkout ${CI_COMMIT_BRANCH}
+    - cp TrackerMessages/BioTonFMS.TrackerTcpServer/Dockerfile .
+    - docker build -t fms-tracker-tcp-server:$DOCKER_TAG .   
+    - docker image tag fms-tracker-tcp-server:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
+    - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - TrackerMessages/BioTonFMS.TrackerTcpServer/**/*
+    - when: manual
+  allow_failure: true
+
+Build-TrackerMessage:
+  stage: build  
+  script:        
+    - mkdir dir
+    - cd dir
+    - git clone git@git.bioton-fms.ru:BioTon/fms.git .
+    - git checkout ${CI_COMMIT_BRANCH}
+    - cp TrackerMessages/BioTonFMS.TrackerMessageHandler/Dockerfile .
+    - rm BioTonFMSApp/appsettings.Development.json BioTonFMSApp/appsettings.json
+    - docker build -t fms-tracker-message:$DOCKER_TAG .   
+    - docker image tag fms-tracker-message:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
+    - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-message:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - TrackerMessages/BioTonFMS.TrackerMessageHandler/**/*
+    - when: manual
+  allow_failure: true
+
 Test-backend:
   variables:
     GIT_DEPTH: 101
   stage: test
   script:
-    #- docker build --target=test -t fms-backend-test:$DOCKER_TAG .
-    #- docker run --rm fms-backend-test
-    #- docker image rm -f fms-backend-test
     - dotnet build -c release .tools/BioTonFMS.Version
     - cd .UnitTests/BiotonFMS.Telematica.Tests
     - dotnet test --logger:trx
@@ -75,6 +107,10 @@ Deploy-test.lan.bioton-fms-ru:
     - npm run build:test    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test.lan.bioton-fms-ru/* 
+    - docker rm -f fms-tracker-tcp-server-test || true
+    - docker run --name fms-tracker-tcp-server-test -p 8090:6000 -v /var/log/fms/tracker-tcp-server/test:/app/logs -v /etc/fms/tracker-tcp-server/test:/app/config --restart always  -d fms-tracker-tcp-server:$DOCKER_TAG
+    - docker rm -f fms-tracker-message-test || true
+    - docker run --name fms-tracker-message-test -p 8190:6000 -v /var/log/fms/tracker-message/test:/app/logs -v /etc/fms/tracker-message/test:/app/config --restart always  -d fms-tracker-message:$DOCKER_TAG
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
@@ -83,8 +119,6 @@ Deploy-test.lan.bioton-fms-ru:
     paths:
       - frontend/dist/  
   
-
-
 Deploy-test2.lan.bioton-fms-ru:
   stage: deploy
   extends: .node-job
@@ -93,7 +127,11 @@ Deploy-test2.lan.bioton-fms-ru:
     - docker run --name fms-backend-test2 -p 8081:80 -v /var/log/fms/test2:/app/logs -v /etc/fms/test2:/app/config --restart always  -d fms-back:$DOCKER_TAG      
     - npm run build:test2    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
-    - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/* 
+    - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/*
+    - docker rm -f fms-tracker-tcp-server-test2 || true
+    - docker run --name fms-tracker-tcp-server-test2 -p 8091:6000 -v /var/log/fms/tracker-tcp-server/test2:/app/logs -v /etc/fms/tracker-tcp-server/test2:/app/config --restart always  -d fms-tracker-tcp-server:$DOCKER_TAG 
+    - docker rm -f fms-tracker-message-test2 || true
+    - docker run --name fms-tracker-message-test2 -p 8191:6000 -v /var/log/fms/tracker-message/test2:/app/logs -v /etc/fms/tracker-message/test2:/app/config --restart always  -d fms-tracker-message:$DOCKER_TAG
   rules:
     - when: manual
   allow_failure: true
@@ -112,6 +150,10 @@ Deploy-test3.lan.bioton-fms-ru:
     - npm run build:test3        
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test3.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test3.lan.bioton-fms-ru/* 
+    - docker rm -f fms-tracker-tcp-server-test3 || true
+    - docker run --name fms-tracker-tcp-server-test3 -p 8092:6000 -v /var/log/fms/tracker-tcp-server/test3:/app/logs -v /etc/fms/tracker-tcp-server/test3:/app/config --restart always  -d fms-tracker-tcp-server:$DOCKER_TAG
+    - docker rm -f fms-tracker-message-test3 || true
+    - docker run --name fms-tracker-message-test3 -p 8192:6000 -v /var/log/fms/tracker-message/test3:/app/logs -v /etc/fms/tracker-message/test3:/app/config --restart always  -d fms-tracker-message:$DOCKER_TAG
   rules:    
     - when: manual    
   allow_failure: true
@@ -135,4 +177,4 @@ Deploy-stage.bioton-fms.ru:
   artifacts:
     expire_in: 1 hour
     paths:
-      - frontend/dist/  
+      - frontend/dist/
