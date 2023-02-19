@@ -66,7 +66,9 @@ public class Worker : BackgroundService
         try
         {
             string message = File.ReadAllText(messageFile);
-            byte[] data = message.Split(' ', '\n')
+            byte[] data = message.Replace("\r\n", "\n")
+                .Split(' ', '\n')
+                .Where(e => e.Length > 0)
                 .Select(x => byte.Parse(x, NumberStyles.HexNumber))
                 .ToArray();
 
