@@ -259,6 +259,9 @@ describe('TrackerDialogComponent', () => {
     )
       .toBeResolvedTo(false);
 
+    expect(dialogRef.close)
+      .toHaveBeenCalledWith(true);
+
     /* Coverage for `start` seconds default value. */
 
     testStart = `${testDate.toLocaleDateString('ru-RU')} ${testLocaleTime.slice(0, -3)}`;

@@ -11,6 +11,7 @@ import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
@@ -19,6 +20,7 @@ import { Observable, of } from 'rxjs';
 import { Trackers, TrackerService } from '../tracker.service';
 
 import TrackersComponent, { DATE_FORMAT, TrackerColumn, trackerColumns } from './trackers.component';
+import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import { testTrackers } from '../tracker.service.spec';
 
@@ -362,5 +364,16 @@ describe('TrackersComponent', () => {
     await trackerDialog!.close();
 
     overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating trackers. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<TrackerDialogComponent, true | '' | undefined>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await createTrackerButton.click();
   });
 });

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
-import { BehaviorSubject, switchMap, Observable, tap } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
 
 import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService } from '../tracker.service';
 
@@ -33,7 +33,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
   styleUrls: ['./trackers.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class TrackersComponent implements OnInit {
+export default class TrackersComponent implements OnInit, OnDestroy {
   protected trackers$!: Observable<Trackers>;
   protected trackersDataSource!: TableDataSource<TrackerDataSource>;
   protected columns = trackerColumns;
@@ -98,10 +98,29 @@ export default class TrackersComponent implements OnInit {
    * Add a new GPS-tracker to table.
    */
   protected onCreateTracker() {
-    this.dialog.open(TrackerDialogComponent);
+    this.#subscription?.unsubscribe();
+
+    const dialogRef = this.dialog.open<TrackerDialogComponent, any, true | '' | undefined>(TrackerDialogComponent);
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(() => {
+        this.#updateTrackers();
+      });
   }
 
   #trackers$ = new BehaviorSubject<TrackersOptions>({});
+  #subscription: Subscription | undefined;
+
+  /**
+   * Emit trackers update.
+   */
+  #updateTrackers() {
+    this.#trackers$.next(this.#trackers$.value);
+  }
 
   /**
    * Map trackers data source.
@@ -162,6 +181,11 @@ export default class TrackersComponent implements OnInit {
   ngOnInit() {
     this.#setTrackers();
     this.#setColumnKeys();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
   }
 }
 

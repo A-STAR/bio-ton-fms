@@ -166,7 +166,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private dialogRef: MatDialogRef<VehicleDialogComponent, true | ''>,
+    private dialogRef: MatDialogRef<VehicleDialogComponent, true | '' | undefined>,
     private vehicleService: VehicleService
   ) { }
 

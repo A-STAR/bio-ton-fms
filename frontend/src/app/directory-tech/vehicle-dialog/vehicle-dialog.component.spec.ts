@@ -28,7 +28,7 @@ describe('VehicleDialogComponent', () => {
   let loader: HarnessLoader;
   let vehicleService: VehicleService;
 
-  const dialogRef = jasmine.createSpyObj<MatDialogRef<VehicleDialogComponent, true | ''>>('MatDialogRef', ['close']);
+  const dialogRef = jasmine.createSpyObj<MatDialogRef<VehicleDialogComponent, true | '' | undefined>>('MatDialogRef', ['close']);
 
   let vehicleGroupsSpy: jasmine.Spy<(this: VehicleService) => Observable<VehicleGroup[]>>;
   let fuelsSpy: jasmine.Spy<(this: VehicleService) => Observable<Fuel[]>>;
