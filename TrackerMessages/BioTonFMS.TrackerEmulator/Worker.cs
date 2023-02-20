@@ -22,6 +22,7 @@ public class Worker : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _logger.LogInformation("Emulator started");
         using var client = new TcpClient(_options.Value.Host, _options.Value.Port);
         NetworkStream stream = client.GetStream();
 

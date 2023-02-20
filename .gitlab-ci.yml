@@ -129,9 +129,9 @@ Deploy-test2.lan.bioton-fms-ru:
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/*
     - docker rm -f fms-tracker-tcp-server-test2 || true
-    - docker run --name fms-tracker-tcp-server-test2 -p 8091:6000 -v /var/log/fms/tracker-tcp-server/test2:/app/logs -v /etc/fms/tracker-tcp-server/test2:/app/config --restart always  -d fms-tracker-tcp-server:$DOCKER_TAG 
+    - docker run --name fms-tracker-tcp-server-test2 -p 8091:6000 -v /var/log/fms/tracker-tcp-server/test2:/app/logs -v /etc/fms/tracker-tcp-server/test2:/app/config --restart always -d fms-tracker-tcp-server:$DOCKER_TAG
     - docker rm -f fms-tracker-message-test2 || true
-    - docker run --name fms-tracker-message-test2 -p 8191:6000 -v /var/log/fms/tracker-message/test2:/app/logs -v /etc/fms/tracker-message/test2:/app/config --restart always  -d fms-tracker-message:$DOCKER_TAG
+    - docker run --name fms-tracker-message-test2 -p 8191:6000 -v /var/log/fms/tracker-message/test2:/app/logs -v /etc/fms/tracker-message/test2:/app/config --restart always -d fms-tracker-message:$DOCKER_TAG
   rules:
     - when: manual
   allow_failure: true

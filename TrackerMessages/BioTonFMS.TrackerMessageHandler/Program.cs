@@ -14,9 +14,9 @@ using Microsoft.Extensions.Options;
 using Serilog;
 
 IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureHostConfiguration(hostConfig =>
+    .ConfigureAppConfiguration(hostConfig =>
     {
-        hostConfig.AddJsonFile("config/appsettings.json", true);
+        hostConfig.AddJsonFile("config/appsettings.json", false);
     })
     .ConfigureServices((hostContext, services) =>
     {
@@ -34,6 +34,9 @@ IHost host = Host.CreateDefaultBuilder(args)
             TrackerTypeEnum.WialonIPS => throw new NotImplementedException(),
             _ => throw new NotImplementedException()
         });
+
+        Console.WriteLine("MessageConnection =" + hostContext.Configuration.GetConnectionString("MessagesConnection"));
+        Console.WriteLine("DefaultConnection =" + hostContext.Configuration.GetConnectionString("DefaultConnection"));
 
         services.AddDbContext<MessagesDBContext>(
             options => options
