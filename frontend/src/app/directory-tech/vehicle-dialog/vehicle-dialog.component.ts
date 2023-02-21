@@ -8,9 +8,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { firstValueFrom, forkJoin, map, Observable, Subscription } from 'rxjs';
+import { forkJoin, map, Observable, Subscription } from 'rxjs';
 
-import { Fuel, NewVehicle, VehicleGroup, VehicleService } from '../vehicle.service';
+import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 
@@ -35,8 +35,8 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   protected vehicleData$!: Observable<{
     groups: VehicleGroup[];
     fuels: Fuel[];
-    type: KeyValue<string, string>[];
-    subtype: KeyValue<string, string>[];
+    type: KeyValue<VehicleType, string>[];
+    subtype: KeyValue<VehicleSubtype, string>[];
   }>;
 
   protected vehicleForm!: FormGroup<VehicleForm>;
@@ -45,7 +45,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   /**
    * Submit Vehicle form, checking validation state.
    */
-  protected async submitVehicleForm() {
+  protected submitVehicleForm() {
     this.#subscription?.unsubscribe();
 
     const { invalid, value } = this.vehicleForm;
@@ -85,12 +85,12 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       ? this.vehicleService.updateVehicle(vehicle)
       : this.vehicleService.createVehicle(vehicle);
 
-    await firstValueFrom(vehicle$);
+    this.#subscription = vehicle$.subscribe(() => {
+      const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
 
-    const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
-
-    this.snackBar.open(message);
-    this.dialogRef.close(true);
+      this.snackBar.open(message);
+      this.dialogRef.close(true);
+    });
   }
 
   #subscription: Subscription | undefined;
@@ -116,9 +116,18 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   #initVehicleForm() {
     this.vehicleForm = this.fb.group({
       basic: this.fb.group({
-        name: this.fb.nonNullable.control(this.data?.name, Validators.required),
-        make: this.fb.nonNullable.control(this.data?.make, Validators.required),
-        model: this.fb.nonNullable.control(this.data?.model, Validators.required),
+        name: this.fb.nonNullable.control(this.data?.name, [
+          Validators.required,
+          Validators.maxLength(100)
+        ]),
+        make: this.fb.nonNullable.control(this.data?.make, [
+          Validators.required,
+          Validators.maxLength(30)
+        ]),
+        model: this.fb.nonNullable.control(this.data?.model, [
+          Validators.required,
+          Validators.maxLength(30)
+        ]),
         year: this.fb.nonNullable.control(this.data?.manufacturingYear, [
           Validators.max(maxManufacturingYear),
           Validators.pattern(YEAR_PATTERN)
@@ -129,25 +138,35 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
         fuel: this.fb.nonNullable.control(this.data?.fuelTypeId, Validators.required)
       }),
       registration: this.fb.group({
-        registration: this.fb.nonNullable.control(
-          this.data?.registrationNumber,
+        registration: this.fb.nonNullable.control(this.data?.registrationNumber, [
+          Validators.maxLength(15),
           Validators.pattern(REGISTRATION_NUMBER_PATTERN)
+        ]
         ),
-        inventory: this.fb.nonNullable.control(this.data?.inventoryNumber),
-        serial: this.fb.nonNullable.control(this.data?.serialNumber),
+        inventory: this.fb.nonNullable.control(
+          this.data?.inventoryNumber,
+          Validators.maxLength(30)
+        ),
+        serial: this.fb.nonNullable.control(
+          this.data?.serialNumber,
+          Validators.maxLength(40)
+        ),
         tracker: this.fb.nonNullable.control(this.data?.trackerId)
       }),
       additional: this.fb.group({
-        description: this.fb.nonNullable.control(this.data?.description)
+        description: this.fb.nonNullable.control(
+          this.data?.description,
+          Validators.maxLength(500)
+        )
       })
     });
   }
 
   constructor(
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
-    private snackBar: MatSnackBar,
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<VehicleDialogComponent, true | ''>,
+    private snackBar: MatSnackBar,
+    private dialogRef: MatDialogRef<VehicleDialogComponent, true | '' | undefined>,
     private vehicleService: VehicleService
   ) { }
 

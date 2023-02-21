@@ -1,4 +1,12 @@
+@use 'sass:map'
 @use 'variables' as *
+
+.mdc-menu-surface
+  box-shadow: $box-shadow
+
+  @at-root div#{&}.mat-mdc-select-panel
+    padding-top: 5px
+    padding-bottom: 5px
 
 .mat-mdc-select-value-text
   color: $dark
@@ -14,3 +22,17 @@ div.mat-mdc-select-arrow-wrapper
 
 mat-select svg
   max-width: unset
+
+mat-option
+  font-size: map.get($mat-mdc-form-field, font-size)
+
+.mat-mdc-option
+
+  &:hover:not(.mdc-list-item--disabled),
+  &.mat-mdc-option-active
+    background-color: $light-gray
+
+  @at-root mat-option#{&}
+    min-height: map.get($mat-mdc-form-field, infix, height)
+    padding-left: map.get($mat-mdc-form-field, padding, horizontal)
+    padding-right: map.get($mat-mdc-form-field, padding, horizontal)

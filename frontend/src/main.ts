@@ -22,6 +22,8 @@ const snackBarOptions: MatSnackBarConfig = {
 };
 
 const dialogOptions: MatDialogConfig = {
+  width: '70vw',
+  maxHeight: '85vh',
   autoFocus: 'dialog',
   restoreFocus: false
 };

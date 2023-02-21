@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'sass:math'
 
 $black: #000000
@@ -21,12 +22,9 @@ $mat-card-padding: 20px !default
 
 $mat-dialog-content-padding-bottom: 2px !default
 
-$mat-form-field-font: 14px
-$mat-mdc-form-field-subscript-wrapper: ('padding': ('vertical': 5px, 'horizontal': 50px), 'line-height': 20px)
+$mat-mdc-form-field: (font-size: 14px, padding: (horizontal: 12px), infix: (height: 40px), subscript-wrapper: (padding: (vertical: 5px, horizontal: 50px), line-height: 20px))
 
-$mat-icon-button-size: 30px
-$mat-icon-size: 24px
-$mat-icon-button-padding: math.div($mat-icon-button-size - $mat-icon-size, 2)
+$mat-icon-button: (size: 30px, padding: math.div(30px - 24px, 2), icon: (font-size: 24px))
 
 $sidebar-width: 100px
 

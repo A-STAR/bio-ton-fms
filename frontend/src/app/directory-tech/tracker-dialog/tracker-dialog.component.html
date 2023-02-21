@@ -1,0 +1,133 @@
+<h1 mat-dialog-title>Добавление GPS-трекера</h1>
+
+<mat-dialog-content>
+  <form id="tracker-form" [formGroup]="trackerForm" (ngSubmit)="submitTrackerForm()">
+    <fieldset formGroupName="basic">
+      <legend>Основные сведения</legend>
+
+      <div class="full-two-thirds">
+        <label for="name">Наименование GPS-трекера</label>
+
+        <mat-form-field>
+          <input matInput id="name" placeholder="Наименование GPS-трекера" formControlName="name">
+
+          <mat-error *ngIf="trackerForm.controls.basic.controls.name.errors?.['required']">Обязательное поле</mat-error>
+
+          <mat-error *ngIf="trackerForm.controls.basic.controls.name.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <ng-container *ngIf="trackerType$ | async as trackerType">
+        <div>
+          <label>Тип устройства</label>
+
+          <mat-form-field>
+            <mat-select placeholder="Тип устройства" formControlName="type">
+              <mat-option>Тип устройства</mat-option>
+
+              <mat-option [value]="type.key" *ngFor="let type of trackerType">{{ type.value }}</mat-option>
+            </mat-select>
+
+            <mat-error>Обязательное поле</mat-error>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <div>
+        <label for="start">Время начала</label>
+
+        <mat-form-field>
+          <input matInput id="start" placeholder="Время начала" formControlName="start">
+
+          <mat-hint><em>31.12.2023 23:59:59</em></mat-hint>
+
+          <mat-error>Поле введено некорректно</mat-error>
+        </mat-form-field>
+      </div>
+    </fieldset>
+
+    <fieldset formGroupName="registration">
+      <legend>Регистрационные данные</legend>
+
+      <div class="full-third">
+        <label for="external">Внешний ID</label>
+
+        <mat-form-field>
+          <input matInput bioNumberOnlyInput id="external" type="number" placeholder="Внешний ID"
+            maxlength="99999999999" formControlName="external">
+
+          <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['required']">
+            Обязательное поле
+          </mat-error>
+
+          <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['max']">
+            Поле должно быть не более 10 символов
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="sim">Номер SIM-карты</label>
+
+        <mat-form-field>
+          <input matInput #sim id="sim" type="tel" placeholder="Номер SIM-карты" formControlName="sim">
+          <span matTextSuffix>{{ sim.value.length }} / 12</span>
+
+          <mat-hint><em>+78462777727</em></mat-hint>
+
+          <mat-error *ngIf="trackerForm.controls.registration.controls.sim.errors?.['required']">
+            Обязательное поле
+          </mat-error>
+
+          <mat-error *ngIf="trackerForm.controls.registration.controls.sim.errors?.['pattern']">
+            Поле введёно некорректно
+          </mat-error>
+
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="imei">IMEI номер</label>
+
+        <mat-form-field>
+          <input matInput #imei id="imei" placeholder="IMEI номер" formControlName="imei">
+          <span matTextSuffix>{{ imei.value.length }} / 15</span>
+
+          <mat-hint><em>527111404753054</em></mat-hint>
+
+          <mat-error *ngIf="trackerForm.controls.registration.controls.imei.errors?.['required']">
+            Обязательное поле
+          </mat-error>
+
+          <mat-error *ngIf="trackerForm.controls.registration.controls.imei.errors?.['pattern']">
+            Поле введено некорректно
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </fieldset>
+
+    <fieldset formGroupName="additional">
+      <legend>Дополнительные сведения</legend>
+
+      <div class="full-two-thirds">
+        <label for="description">Описание</label>
+
+        <mat-form-field>
+          <textarea matInput id="description" placeholder="Описание" formControlName="description"></textarea>
+
+          <mat-error *ngIf="trackerForm.controls.additional.controls.description.errors?.['maxlength'] as error">
+            Поле должно быть не более {{ error.requiredLength }} символов
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </fieldset>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayoutAlign="space-between">
+  <button mat-stroked-button color="accent" mat-dialog-close>Отмена</button>
+
+  <button mat-flat-button type="submit" form="tracker-form" color="accent">Сохранить</button>
+</mat-dialog-actions>
