@@ -32,8 +32,10 @@ public class GalileoskyMessageParser : IMessageParser
         _logger = logger;
     }
 
-    public void ParseMessage(byte[] binaryPackage)
+    public void ParseMessage(byte[] binaryPackage, Guid packageUID)
     {
+        if (_messageRepository.ExistsByUID(packageUID)) return;
+
         var i = 0;
         i += HeaderLength;
 

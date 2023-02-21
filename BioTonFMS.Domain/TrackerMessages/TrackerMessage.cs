@@ -11,6 +11,11 @@ public class TrackerMessage : EntityBase, IAggregateRoot
     public new long Id { get; set; }
     
     /// <summary>
+    /// Идентификатор пакета данных трекера
+    /// </summary>
+    public Guid PackageUID { get; set; }
+    
+    /// <summary>
     /// Уникальный идентификатор трекера
     /// </summary>
     public int TrId { get; set; }

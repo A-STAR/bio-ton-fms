@@ -9,13 +9,17 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 {
     public TrackerMessageRepository(IKeyValueProvider<TrackerMessage, int> keyValueProvider,
         IQueryableProvider<TrackerMessage> queryableProvider,
-        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory)
+        : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
     }
-    
+
     public override void Add(TrackerMessage entity)
     {
         entity.ServerDateTime = SystemTime.UtcNow;
         base.Add(entity);
     }
+
+    public bool ExistsByUID(Guid uid) =>
+        QueryableProvider.Linq().Any(x => x.PackageUID == uid);
 }

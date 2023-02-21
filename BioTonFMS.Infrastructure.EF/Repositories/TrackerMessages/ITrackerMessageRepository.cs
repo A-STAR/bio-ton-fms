@@ -5,5 +5,5 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
 public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 {
-    
+    bool ExistsByUID(Guid uid);
 }

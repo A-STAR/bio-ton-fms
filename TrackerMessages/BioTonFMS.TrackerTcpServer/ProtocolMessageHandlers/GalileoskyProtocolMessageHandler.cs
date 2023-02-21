@@ -26,7 +26,8 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
             var raw = new RawTrackerMessage
             {
                 RawMessage = message,
-                TrackerType = TrackerTypeEnum.GalileoSkyV50
+                TrackerType = TrackerTypeEnum.GalileoSkyV50,
+                PackageUID = Guid.NewGuid()
             };
             _messageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
         }
@@ -66,7 +67,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 
         for (var pos = 0; pos < len; pos++)
         {
-            crc ^= (ushort)buf[pos];
+            crc ^= buf[pos];
 
             for (var i = 8; i != 0; i--)
             {

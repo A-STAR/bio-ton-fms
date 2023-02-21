@@ -2,5 +2,5 @@ namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
 
 public interface IMessageParser
 {
-    void ParseMessage(byte[] binaryPackage);
+    void ParseMessage(byte[] binaryPackage, Guid packageUID);
 }

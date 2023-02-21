@@ -10,5 +10,10 @@ public class RawTrackerMessage
     /// <summary>
     /// сообщение от трекера
     /// </summary>
-    public byte[] RawMessage { get; set; } = null!; 
+    public byte[] RawMessage { get; set; } = null!;
+
+    /// <summary>
+    /// Идентификатор пакета данных трекера
+    /// </summary>
+    public Guid PackageUID { get; set; }
 }
