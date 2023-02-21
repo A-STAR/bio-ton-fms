@@ -197,21 +197,42 @@ describe('TrackersComponent', () => {
 
     const actionButtons = await parallel(() => cells.map(
       ([actionCell]) => parallel(() => [
-        actionCell.getHarnessOrNull(MatButtonHarness.with({
-          variant: 'icon',
-          text: 'more_horiz'
-        }))
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            variant: 'icon',
+            text: 'more_horiz'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'edit'
+          })
+        )
       ])
     ));
 
-    actionButtons.forEach(([actionButton]) => {
+    actionButtons.forEach(async ([actionButton, updateButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
 
-      actionButton?.hasHarness(MatIconHarness.with({
-        name: 'more_horiz'
-      }));
+      expect(updateButton)
+        .withContext('render update button')
+        .not.toBeNull();
+
+      actionButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'more_horiz'
+        })
+      );
+
+      updateButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'edit'
+        })
+      );
     });
   });
 

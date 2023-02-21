@@ -35,6 +35,12 @@
         <button mat-icon-button bioTableActionsTrigger>
           <mat-icon>more_horiz</mat-icon>
         </button>
+
+        <div class="actions">
+          <button mat-icon-button title="Редактировать" color="accent">
+            <mat-icon class="md-18">edit</mat-icon>
+          </button>
+        </div>
       </ng-container>
 
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="TrackerColumn.Type"></ng-container>
