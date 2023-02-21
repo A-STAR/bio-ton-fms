@@ -5,16 +5,27 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogTitle } from '@angular/material/dialog';
 import { MatTabGroupHarness } from '@angular/material/tabs/testing';
+import { MatInputHarness } from '@angular/material/input/testing';
+import { MatSelectHarness } from '@angular/material/select/testing';
+import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
 
 import { Observable, of } from 'rxjs';
 
 import { SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
 
-import { SensorDialogComponent } from './sensor-dialog.component';
+import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
+import { SensorDialogComponent, SensorDialogData } from './sensor-dialog.component';
 
-import { testSensorDataTypeEnum, testSensorGroups, testSensorTypes, testUnits, testValidationTypeEnum } from '../sensor.service.spec';
+import {
+  TEST_TRACKER_ID,
+  testSensorDataTypeEnum,
+  testSensorGroups,
+  testSensorTypes,
+  testUnits,
+  testValidationTypeEnum
+} from '../sensor.service.spec';
 
 describe('SensorDialogComponent', () => {
   let component: SensorDialogComponent;
@@ -34,6 +45,12 @@ describe('SensorDialogComponent', () => {
           NoopAnimationsModule,
           HttpClientTestingModule,
           SensorDialogComponent
+        ],
+        providers: [
+          {
+            provide: MAT_DIALOG_DATA,
+            useValue: testMatDialogData
+          }
         ]
       })
       .compileComponents();
@@ -135,4 +152,111 @@ describe('SensorDialogComponent', () => {
       .withContext('should render tabs')
       .toBe(1);
   });
+
+  it('should render sensor form', async () => {
+    const sensorFormDe = fixture.debugElement.query(
+      By.css('form#sensor-form')
+    );
+
+    expect(sensorFormDe)
+      .withContext('render sensor form element')
+      .not.toBeNull();
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Наименование датчика'
+      })
+    );
+
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Тип датчика"]'
+      })
+    );
+
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Тип данных"]'
+      })
+    );
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Формула'
+      })
+    );
+
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Единица измерения"]'
+      })
+    );
+
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Валидатор"]'
+      })
+    );
+
+    loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Тип валидации"]'
+      })
+    );
+
+    loader.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Последнее сообщение',
+        checked: false
+      })
+    );
+
+    loader.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Видимость',
+        checked: false
+      })
+    );
+
+    const fuelUseInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Расход л/ч'
+      })
+    );
+
+    await expectAsync(
+      fuelUseInput.getType()
+    )
+      .withContext('render fuel use input type')
+      .toBeResolvedTo('number');
+
+    const fuelUseInputDe = fixture.debugElement.query(
+      By.directive(NumberOnlyInputDirective)
+    );
+
+    expect(fuelUseInputDe.nativeElement.placeholder)
+      .withContext('render fuel use input with `NumberOnlyDirective`')
+      .toBe('Расход л/ч');
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Описание'
+      })
+    );
+  });
 });
+
+const testMatDialogData: SensorDialogData = {
+  trackerId: TEST_TRACKER_ID
+};

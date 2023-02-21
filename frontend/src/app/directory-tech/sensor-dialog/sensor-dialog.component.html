@@ -1,10 +1,116 @@
 <h1 mat-dialog-title>Новый датчик</h1>
 
 <mat-dialog-content>
-  <form id="sensor-form">
+  <form id="sensor-form" [formGroup]="sensorForm">
     <mat-tab-group mat-stretch-tabs="false">
       <mat-tab label="Основные сведения">
-        <ng-container *ngIf="sensorData$ | async"></ng-container>
+        <fieldset formGroupName="basic">
+          <div class="two-thirds">
+            <label for="name">Наименование датчика</label>
+
+            <mat-form-field class="full-width">
+              <input matInput id="name" placeholder="Наименование датчика" formControlName="name">
+            </mat-form-field>
+          </div>
+
+          <ng-container *ngIf="sensorData$ | async as sensorData$">
+            <div>
+              <label>Тип датчика</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Тип датчика" formControlName="type">
+                  <mat-option>Тип датчика</mat-option>
+
+                  <mat-optgroup *ngFor="let group of sensorData$.groups" [label]="group.name">
+                    <mat-option *ngFor="let type of group.sensorTypes" [value]="type.id">{{type.name}}</mat-option>
+                  </mat-optgroup>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Тип данных</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Тип данных" formControlName="dataType">
+                  <mat-option>Тип данных</mat-option>
+
+                  <mat-option [value]="type.key" *ngFor="let type of sensorData$.dataType">{{ type.value }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="two-thirds">
+              <label for="formula">Формула</label>
+
+              <mat-form-field class="full-width">
+                <input matInput id="formula" placeholder="Формула" formControlName="formula">
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Единица измерения</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Единица измерения" formControlName="unit">
+                  <mat-option>Единица измерения</mat-option>
+
+                  <mat-option [value]="unit.id" *ngFor="let unit of sensorData$.units">{{ unit.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Валидатор</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Валидатор" formControlName="validator">
+                  <mat-option>Валидатор</mat-option>
+
+                  <mat-option [value]="type.id" *ngFor="let type of sensorData$.validators">{{ type.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Тип валидации</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Тип валидации" formControlName="validationType">
+                  <mat-option>Тип валидации</mat-option>
+
+                  <mat-option [value]="validation.key" *ngFor="let validation of sensorData$.validation">
+                    {{ validation.value }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <div>
+            <mat-slide-toggle formControlName="lastReceived">Последнее сообщение</mat-slide-toggle>
+          </div>
+
+          <div>
+            <mat-slide-toggle formControlName="visibility">Видимость</mat-slide-toggle>
+          </div>
+
+          <div>
+            <label for="fuelUse">Расход л/ч</label>
+
+            <mat-form-field>
+              <input matInput bioNumberOnlyInput id="fuelUse" type="number" placeholder="Расход л/ч" formControlName="fuelUse">
+            </mat-form-field>
+          </div>
+
+          <div class="full-two-thirds">
+            <label for="description">Описание</label>
+
+            <mat-form-field>
+              <textarea matInput id="description" placeholder="Описание" formControlName="description"></textarea>
+            </mat-form-field>
+          </div>
+        </fieldset>
       </mat-tab>
     </mat-tab-group>
   </form>

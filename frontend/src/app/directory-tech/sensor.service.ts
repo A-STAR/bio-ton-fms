@@ -134,12 +134,22 @@ export type Sensor = {
   formula?: string;
   unit: KeyValue<Unit['id'], Unit['name']>;
   useLastReceived: boolean;
-  validator: KeyValue<number, string>;
-  validationType: ValidationTypeEnum;
-  fuelUse: number;
-  visibility: boolean;
+  validator?: KeyValue<number, string>;
+  validationType?: ValidationTypeEnum;
+  fuelUse?: number;
+  visibility?: boolean;
 }
 
 export interface Sensors extends Pagination {
   sensors: Sensor[];
+}
+
+export interface NewSensor extends Partial<Pick<Sensor, 'id'>>, Pick<
+  Sensor,
+  'name' | 'dataType' | 'formula' | 'validationType' | 'useLastReceived' | 'visibility' | 'fuelUse' | 'description'
+> {
+  trackerId: Tracker['id'];
+  sensorTypeId: SensorType['id'];
+  unitId: Unit['id'];
+  validatorId?: number;
 }

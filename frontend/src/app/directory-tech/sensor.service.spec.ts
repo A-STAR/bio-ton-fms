@@ -391,7 +391,6 @@ export const testSensors: Sensors = {
         key: 2,
         value: 'Валидатор пробега'
       },
-      validationType: ValidationTypeEnum.LogicalAnd,
       fuelUse: 8
     },
     {
@@ -417,8 +416,7 @@ export const testSensors: Sensors = {
         key: 1,
         value: 'Валидатор разгона'
       },
-      validationType: ValidationTypeEnum.ZeroTest,
-      fuelUse: 6
+      validationType: ValidationTypeEnum.ZeroTest
     },
     {
       id: 3,
@@ -439,11 +437,6 @@ export const testSensors: Sensors = {
         value: 'мАч'
       },
       useLastReceived: true,
-      validator: {
-        key: 1,
-        value: 'Валидатор скорости'
-      },
-      validationType: ValidationTypeEnum.LogicalOr,
       fuelUse: 7
     }
   ],
