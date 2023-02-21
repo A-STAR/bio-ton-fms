@@ -9,14 +9,28 @@ using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMS.Infrastructure.MessageBus;
 using BioTonFMS.Infrastructure.RabbitMQ;
 using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("config/appsettings.json", true);
 
 var serverSettings = builder.Configuration.GetSection("ServerSettings").Get<ServerSettingsOptions>();
 
-builder.Services.Configure<MessageBrokerSettingsOptions>(builder.Configuration.GetSection("MessageBrokerSettings"));
-builder.Services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
+builder.Services.Configure<MessageBrokerSettingsOptions>("Primary",
+    builder.Configuration.GetSection("PrimaryMessageBrokerSettings"));
+builder.Services.Configure<MessageBrokerSettingsOptions>("Secondary",
+    builder.Configuration.GetSection("SecondaryMessageBrokerSettings"));
+builder.Services.AddSingleton<IMessageBus>(provider =>
+{
+    var snapshot = provider.GetRequiredService<IOptionsSnapshot<MessageBrokerSettingsOptions>>();
+    var primary = new RabbitMQMessageBus(
+        provider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+        provider, Options.Create(snapshot.Get("Primary")));
+    var secondary = new RabbitMQMessageBus(
+        provider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+        provider, Options.Create(snapshot.Get("Secondary")));
+    return new MessageBusMux(primary, secondary);
+});
 builder.Services.AddTransient<GalileoskyProtocolMessageHandler>();
 builder.Services.AddTransient<Func<TrackerTypeEnum, IProtocolMessageHandler>>(provider => key => key switch
 {

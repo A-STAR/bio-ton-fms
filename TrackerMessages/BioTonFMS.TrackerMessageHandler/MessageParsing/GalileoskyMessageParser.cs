@@ -42,7 +42,10 @@ public class GalileoskyMessageParser : IMessageParser
         var tags = _protocolTagRepository.GetTagsForTrackerType(TrackerTypeEnum.GalileoSkyV50)
             .ToDictionary(x => x.ProtocolTagCode);
 
-        var message = new TrackerMessage();
+        var message = new TrackerMessage
+        {
+            PackageUID = packageUID
+        };
 
         while (i < binaryPackage.Length - CheckSumLength)
         {
@@ -61,7 +64,10 @@ public class GalileoskyMessageParser : IMessageParser
                     if (!string.IsNullOrEmpty(message.Imei))
                     {
                         _messageRepository.Add(message);
-                        message = new TrackerMessage();
+                        message = new TrackerMessage
+                        {
+                            PackageUID = packageUID
+                        };
                     }
 
                     message.Imei = binaryPackage[i..(i + tag.Size)].ParseToString();
@@ -70,7 +76,10 @@ public class GalileoskyMessageParser : IMessageParser
                     if (message.TrId != 0)
                     {
                         _messageRepository.Add(message);
-                        message = new TrackerMessage();
+                        message = new TrackerMessage
+                        {
+                            PackageUID = packageUID
+                        };
                     }
 
                     message.TrId = binaryPackage[i..(i + tag.Size)].ParseToInt();
