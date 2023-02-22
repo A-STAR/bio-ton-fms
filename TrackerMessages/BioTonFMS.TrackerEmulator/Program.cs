@@ -1,15 +1,30 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BioTonFMS.TrackerEmulator;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using TrackerEmulator;
+
+if (args.Length == 0)
+{
+    Console.WriteLine(Constants.Instruction);
+    return;
+}
 
 var host = Host.CreateDefaultBuilder()
-    .ConfigureHostConfiguration(x => x.AddJsonFile("appsettings.json"))
+    .ConfigureHostConfiguration(x =>
+    {
+        x.AddCommandLine(args, new Dictionary<string, string>
+        {
+            {"-r", "repeat"},
+            {"-i", "message"},
+            {"-o", "result"},
+            {"-s", "script"},
+        }).Build();
+    })
     .ConfigureServices((context, services) =>
     {
         services.Configure<ClientOptions>(context.Configuration.GetSection("ClientOptions"));
-        AddClientParams(services, args);
+        AddClientParams(services, context.Configuration);
         services.AddHostedService<Worker>();
     })
     .UseSerilog((context, config) => config
@@ -20,25 +35,15 @@ var host = Host.CreateDefaultBuilder()
 
 await host.RunAsync();
 
-void AddClientParams(IServiceCollection services, string[] args)
+void AddClientParams(IServiceCollection services, IConfiguration config)
 {
-    services.AddSingleton(args.Length switch
+    if (!int.TryParse(config["repeat"], out int repeatCnt)) repeatCnt = 1;
+
+    services.AddSingleton(new ClientParams
     {
-        1 => new ClientParams
-        {
-            ScriptPath = args[0]
-        },
-        2 => new ClientParams
-        {
-            InputPath = args[0],
-            OutputPath = args[1]
-        },
-        3 => new ClientParams
-        {
-            InputPath = args[0],
-            OutputPath = args[1],
-            RepeatCount = int.Parse(args[3])
-        },
-        _ => throw new Exception(Constants.Instruction)
+        MessagePath = config["message"],
+        RepeatPath = config["result"],
+        RepeatCount = repeatCnt,
+        ScriptPath = config["script"]
     });
 }

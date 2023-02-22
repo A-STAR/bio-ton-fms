@@ -5,88 +5,165 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace TrackerEmulator;
+namespace BioTonFMS.TrackerEmulator;
 
 public class Worker : BackgroundService
 {
-    private readonly IOptions<ClientOptions> _options;
+    private readonly ClientOptions _options;
     private readonly ClientParams _parameters;
     private readonly ILogger<Worker> _logger;
 
     public Worker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<Worker> logger)
     {
-        _options = options;
+        _options = options.Value;
         _parameters = parameters;
         _logger = logger;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Emulator started");
-        using var client = new TcpClient(_options.Value.Host, _options.Value.Port);
+        _logger.LogInformation("Эмулятор запущен");
+        ValidateParams();
+
+        _logger.LogInformation("Параметры корректны");
+
+        using var client = new TcpClient();
+
+        try
+        {
+            client.Connect(_options.Host, _options.Port);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Ошибка при открытии соединения по адресу {Host}:{Port} - {Message}",
+                _options.Host, _options.Port, e.Message);
+            client.Dispose();
+            Environment.Exit(1);
+        }
+
         NetworkStream stream = client.GetStream();
 
         if (_parameters.ScriptPath != null)
         {
-            string[] lines = File.ReadAllLines(_parameters.ScriptPath);
-            foreach (var line in lines)
+            foreach (var line in File.ReadAllLines(_parameters.ScriptPath))
             {
                 var paths = line.Split(' ');
-                if (paths.Length != 2)
-                {
-                    _logger.LogError("Строка '{Line}' не соответствует формату", line);
-                    continue;
-                }
                 SendRequest(paths[0], paths[1], stream);
             }
 
             return Task.CompletedTask;
         }
 
-        if (_parameters is { InputPath: { }, OutputPath: { } })
+        if (_parameters is { MessagePath: { }, RepeatPath: { } })
         {
             for (var i = 0; i < _parameters.RepeatCount; i++)
             {
-                SendRequest(_parameters.InputPath, _parameters.OutputPath, stream);
+                SendRequest(_parameters.MessagePath, _parameters.RepeatPath, stream);
             }
 
             return Task.CompletedTask;
         }
 
-        throw new Exception($"Ошибка в параметрах:\n{JsonSerializer.Serialize(_parameters)}");
+        return Task.CompletedTask;
     }
 
     private void SendRequest(string messageFile, string resultFile, Stream stream)
     {
-        if (!File.Exists(messageFile))
+        try
         {
-            _logger.LogError("Файл '{Path}' не существует", messageFile);
+            byte[] data = ReadMessageFromFile(messageFile);
+
+            stream.Write(data, 0, data.Length);
+            _logger.LogInformation("Отправлено: '{Message}'",
+                string.Join(' ', data.Select(x => x.ToString("X"))));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Ошибка при отправке сообщения из файла {Path}: {Message}",
+                messageFile, e.Message);
+            return;
+        }
+
+        string responseData;
+
+        try
+        {
+            var respBuf = new byte[10];
+            int readCount = stream.Read(respBuf, 0, 10);
+            responseData = string.Join(' ', respBuf.Take(readCount)
+                .Select(x => x.ToString("X")));
+
+            _logger.LogInformation("Получено: {Response}", responseData);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Ошибка при получении ответа на сообщение из файла {Path}: {Message}",
+                messageFile, e.Message);
             return;
         }
 
         try
         {
-            string message = File.ReadAllText(messageFile);
-            byte[] data = message.Replace("\r\n", "\n")
-                .Split(' ', '\n')
-                .Where(e => e.Length > 0)
-                .Select(x => byte.Parse(x, NumberStyles.HexNumber))
-                .ToArray();
-
-            stream.Write(data, 0, data.Length);
-            _logger.LogInformation("Отправлено: '{Message}'", message);
+            File.WriteAllText(resultFile, responseData);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Ошибка при парсинге или отправке сообщения из файла {Path}", messageFile);
+            _logger.LogError("Ошибка при записи ответа на сообщение в файла {Path}: {Message}",
+                resultFile, e.Message);
+        }
+    }
+
+    private void ValidateParams()
+    {
+        if (File.Exists(_parameters.ScriptPath))
+        {
+            foreach (string l in File.ReadAllLines(_parameters.ScriptPath))
+            {
+                string[] paths = l.Split(' ');
+                if (paths.Length != 2 ||
+                    !File.Exists(paths[0]) ||
+                    string.IsNullOrWhiteSpace(paths[1]))
+                {
+                    _logger.LogError("Ошибка в строке {Line}", l);
+                    Environment.Exit(1);
+                }
+
+                ValidateInput(paths[0]);
+            }
+
+            return;
         }
 
-        var respBuf = new byte[10];
-        int readCount = stream.Read(respBuf, 0, 10);
-        string responseData = string.Join(' ', respBuf.Take(readCount)
-            .Select(x => x.ToString("X")));
+        if (File.Exists(_parameters.MessagePath) &&
+            !string.IsNullOrWhiteSpace(_parameters.RepeatPath))
+        {
+            ValidateInput(_parameters.MessagePath);
+            return;
+        }
 
-        _logger.LogInformation("Получено: {Response}", responseData);
-        File.WriteAllText(resultFile, responseData);
+        _logger.LogError("Ошибка в параметрах:\n{Params}", JsonSerializer.Serialize(_parameters));
+        Environment.Exit(1);
     }
+
+    private void ValidateInput(string inputPath)
+    {
+        try
+        {
+            ReadMessageFromFile(inputPath);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Ошибка при разборе сообщения из файла {Path}", inputPath);
+            Environment.Exit(1);
+        }
+    }
+
+    private static byte[] ReadMessageFromFile(string path) =>
+        new FileInfo(path).Extension == ".txt"
+            ? File.ReadAllText(path).Replace("\r\n", "\n")
+                .Split(' ', '\n')
+                .Where(e => e.Length > 0)
+                .Select(x => byte.Parse(x, NumberStyles.HexNumber))
+                .ToArray()
+            : File.ReadAllBytes(path);
 }
