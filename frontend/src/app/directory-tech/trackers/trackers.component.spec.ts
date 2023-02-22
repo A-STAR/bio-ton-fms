@@ -384,6 +384,9 @@ describe('TrackersComponent', () => {
 
     await trackerDialog!.close();
 
+    expect(trackersSpy)
+      .toHaveBeenCalled();
+
     overlayContainer.ngOnDestroy();
 
     /* Coverage for updating trackers. */
@@ -396,5 +399,27 @@ describe('TrackersComponent', () => {
       .and.returnValue(dialogRef);
 
     await createTrackerButton.click();
+  });
+
+  it('should update tracker', async () => {
+    const updateTrackerButtons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        selector: '[mat-icon-button]',
+        text: 'edit'
+      })
+    );
+
+    await updateTrackerButtons[0].click();
+
+    const trackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(trackerDialog)
+      .withContext('render a tracker dialog')
+      .toBeDefined();
+
+    await trackerDialog!.close();
+
+    overlayContainer.ngOnDestroy();
   });
 });

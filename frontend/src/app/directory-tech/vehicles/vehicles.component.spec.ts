@@ -418,12 +418,14 @@ describe('VehiclesComponent', () => {
       .withContext('render a vehicle dialog')
       .toBeDefined();
 
-    await vehicleDialog?.close();
+    await vehicleDialog!.close();
 
     expect(vehiclesSpy)
       .toHaveBeenCalled();
 
     overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating vehicles. */
 
     const dialogRef = {
       afterClosed: () => of(true)
@@ -444,19 +446,13 @@ describe('VehiclesComponent', () => {
 
     await updateVehicleButtons[0].click();
 
-    let vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+    const vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
     expect(vehicleDialog)
       .withContext('render a vehicle dialog')
       .toBeDefined();
 
-    await vehicleDialog?.close();
-
-    await updateVehicleButtons[0].click();
-
-    vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
-
-    await vehicleDialog?.close();
+    await vehicleDialog!.close();
 
     expect(vehiclesSpy)
       .toHaveBeenCalled();
