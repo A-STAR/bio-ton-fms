@@ -1,7 +1,7 @@
-﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Models;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
+﻿using System.Linq.Expressions;
+using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Paging.Extensions;
 using BioTonFMS.Infrastructure.Persistence;
@@ -9,7 +9,6 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 {
@@ -130,7 +129,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 TrackerSortBy.ExternalId => trackers.SetSortDirection(filter.SortDirection, x => x.ExternalId),
                 TrackerSortBy.Type => trackers.SetSortDirection(filter.SortDirection, x => x.TrackerType),
                 TrackerSortBy.SimNumber => trackers.SetSortDirection(filter.SortDirection, x => x.SimNumber),
-                TrackerSortBy.Vehicle => trackers.SetSortDirection(filter.SortDirection, x => x.Vehicle),
+                TrackerSortBy.Vehicle => trackers.SetSortDirection(filter.SortDirection,
+                    x => x.Vehicle == null ? "" : x.Vehicle.Name),
                 TrackerSortBy.StartDate => trackers.SetSortDirection(filter.SortDirection, x => x.StartDate),
                 _ => trackers
             };
