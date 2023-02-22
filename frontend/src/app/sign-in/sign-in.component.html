@@ -23,16 +23,14 @@
       <mat-form-field>
         <input matInput id="username" placeholder="Логин" formControlName="username">
 
-        <mat-error *ngIf="signInForm.controls.username.errors?.['required']">
-          <strong>Логин</strong> обязательное поле
-        </mat-error>
+        <mat-error *ngIf="signInForm.controls.username.errors?.['required']">Обязательное поле</mat-error>
 
         <mat-error *ngIf="signInForm.controls.username.errors?.['minlength'] as error">
-          <strong>Логин</strong> должен быть более {{ error.requiredLength - 1 }} символов
+          Поле должно быть не менее {{ error.requiredLength }} символов
         </mat-error>
 
         <mat-error *ngIf="signInForm.controls.username.errors?.['maxlength'] as error">
-          <strong>Логин</strong> должен быть менее {{ error.requiredLength + 1 }} символов
+          Поле должно быть не более {{ error.requiredLength }} символов
         </mat-error>
       </mat-form-field>
 
@@ -47,7 +45,7 @@
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
 
-        <mat-error><strong>Пароль</strong> обязательное поле</mat-error>
+        <mat-error>Обязательное поле</mat-error>
       </mat-form-field>
 
       <mat-error *ngIf="(signInForm.statusChanges | async) && signInForm.errors?.['serverError'] as error">

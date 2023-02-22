@@ -35,7 +35,7 @@ export class VehicleService {
    * @returns An `Observable' of vehicle type enum stream.
    */
   get vehicleType$() {
-    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleTypeEnum');
+    return this.httpClient.get<KeyValue<VehicleType, string>[]>('/api/telematica/enums/vehicletypeenum');
   }
 
   /**
@@ -44,7 +44,7 @@ export class VehicleService {
    * @returns An `Observable' of vehicle sub type enum stream.
    */
   get vehicleSubtype$() {
-    return this.httpClient.get<KeyValue<string, string>[]>('/api/telematica/enums/VehicleSubTypeEnum');
+    return this.httpClient.get<KeyValue<VehicleSubtype, string>[]>('/api/telematica/enums/vehiclesubtypeenum');
   }
 
   /**
@@ -76,7 +76,7 @@ export class VehicleService {
    *
    * @param vehicle A new vehicle.
    *
-   * @returns An `Observable' of adding vehicle.
+   * @returns An `Observable' of creating vehicle.
    */
   createVehicle(vehicle: NewVehicle) {
     return this.httpClient.post('/api/telematica/vehicle', vehicle);

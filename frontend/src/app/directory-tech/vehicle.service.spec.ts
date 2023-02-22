@@ -181,7 +181,7 @@ describe('VehicleService', () => {
       done();
     });
 
-    const vehicleTypeEnumRequest = httpTestingController.expectOne('/api/telematica/enums/VehicleTypeEnum', 'vehicle type enum request');
+    const vehicleTypeEnumRequest = httpTestingController.expectOne('/api/telematica/enums/vehicletypeenum', 'vehicle type enum request');
 
     vehicleTypeEnumRequest.flush(testVehicleTypeEnum);
   });
@@ -196,7 +196,7 @@ describe('VehicleService', () => {
     });
 
     const vehicleSubTypeEnumRequest = httpTestingController.expectOne(
-      '/api/telematica/enums/VehicleSubTypeEnum',
+      '/api/telematica/enums/vehiclesubtypeenum',
       'vehicle sub type enum request'
     );
 

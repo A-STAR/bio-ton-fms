@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'variables' as *
 
 .mat-mdc-unelevated-button,
@@ -80,11 +81,11 @@
     opacity: 0
 
   &.mat-mdc-button-base
-    width: $mat-icon-button-size
-    height: $mat-icon-button-size
+    width: map.get($mat-icon-button, size)
+    height: map.get($mat-icon-button, size)
 
   &.mat-mdc-button-base
-    padding: $mat-icon-button-padding
+    padding: map.get($mat-icon-button, padding)
 
   &.mat-accent,
   &.mat-warn
