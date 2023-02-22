@@ -412,7 +412,7 @@ describe('VehiclesComponent', () => {
 
     const dialogRef = {
       afterClosed: () => of(true)
-    } as MatDialogRef<VehicleDialogComponent, true | ''>;
+    } as MatDialogRef<VehicleDialogComponent, true | '' | undefined>;
 
     spyOn(component['dialog'], 'open')
       .and.returnValue(dialogRef);
@@ -448,9 +448,11 @@ describe('VehiclesComponent', () => {
 
     overlayContainer.ngOnDestroy();
 
+    /* Coverage for updating vehicles. */
+
     const dialogRef = {
       afterClosed: () => of(true)
-    } as MatDialogRef<VehicleDialogComponent, true | ''>;
+    } as MatDialogRef<VehicleDialogComponent, true | '' | undefined>;
 
     spyOn(component['dialog'], 'open')
       .and.returnValue(dialogRef);

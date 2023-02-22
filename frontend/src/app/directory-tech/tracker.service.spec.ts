@@ -1,7 +1,8 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { KeyValue } from '@angular/common';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { Trackers, TrackersOptions, TrackerService, TrackersSortBy, TrackerTypeEnum } from './tracker.service';
+import { Trackers, TrackersOptions, TrackerService, TrackersSortBy, TrackerTypeEnum, NewTracker } from './tracker.service';
 
 import { SortDirection } from './shared/sort';
 
@@ -132,7 +133,67 @@ describe('TrackerService', () => {
 
     trackersRequest.flush(testTrackers);
   });
+
+  it('should get tracker type enum', (done: DoneFn) => {
+    const httpTestingController = TestBed.inject(HttpTestingController);
+
+    service.trackerType$.subscribe(trackerType => {
+      expect(trackerType)
+        .withContext('emit tracker type enum')
+        .toEqual(testTrackerTypeEnum);
+
+      done();
+    });
+
+    const trackerTypeEnumRequest = httpTestingController.expectOne('/api/telematica/enums/trackertypeenum', 'tracker type enum request');
+
+    trackerTypeEnumRequest.flush(testTrackerTypeEnum);
+  });
+
+  it('should create tracker', (done: DoneFn) => {
+    service
+      .createTracker(testNewTracker)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const createTrackerRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: '/api/telematica/tracker'
+    }, 'create tracker request');
+
+    createTrackerRequest.flush(null);
+  });
 });
+
+export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
+  {
+    key: TrackerTypeEnum.GalileoSkyV50,
+    value: 'Протокол GalileoSkyV50'
+  },
+  {
+    key: TrackerTypeEnum.Retranslator,
+    value: 'Протокол Wialon Retranslator'
+  },
+  {
+    key: TrackerTypeEnum.WialonIPS,
+    value: 'Протокол Wialon'
+  }
+];
+
+export const testNewTracker: NewTracker = {
+  externalId: 102,
+  name: 'Galileo Sky v 5.0',
+  simNumber: '+78462777727',
+  imei: '542553718824116',
+  trackerType: testTrackerTypeEnum[0].key,
+  startDate: '2023-02-18T22:57:19.446Z',
+  description: 'GPS Ford Focus'
+};
 
 export const testTrackers: Trackers = {
   trackers: [
@@ -140,13 +201,10 @@ export const testTrackers: Trackers = {
       id: 1,
       externalId: 12,
       name: 'Galileo Sky',
-      simNumber: '79128371270',
+      simNumber: '+79128371270',
       imei: '497890037671157',
-      trackerType: {
-        key: TrackerTypeEnum.GalileoSkyV50,
-        value: 'GalileoSky v.5.0'
-      },
-      startDate: new Date('2022-11-07T10:00:00.000Z'),
+      trackerType: testTrackerTypeEnum[0],
+      startDate: '2022-11-07T10:00:00.000Z',
       description: 'GPS комбайна',
       vehicle: {
         key: testVehicles.vehicles[2].id,
@@ -157,25 +215,20 @@ export const testTrackers: Trackers = {
       id: 2,
       externalId: 101,
       name: 'Передатчик уборки зерна',
+      simNumber: '+79705501161',
       imei: '010894332966088',
-      trackerType: {
-        key: TrackerTypeEnum.Retranslator,
-        value: 'Ретранслятор'
-      },
-      startDate: new Date('2023-02-01T07:20:39.617Z'),
+      trackerType: testTrackerTypeEnum[1],
+      startDate: '2023-02-01T07:20:39.617Z',
       description: 'Ретранслятор'
     },
     {
       id: 3,
       externalId: 7,
       name: 'Wialon IPS',
-      simNumber: '72347732931',
+      simNumber: '+72347732931',
       imei: '527111404753054',
-      trackerType: {
-        key: TrackerTypeEnum.WialonIPS,
-        value: 'Wialon IPS'
-      },
-      startDate: new Date('2023-01-21T17:25:19.512Z'),
+      trackerType: testTrackerTypeEnum[2],
+      startDate: '2023-01-21T17:25:19.512Z',
       vehicle: {
         key: testVehicles.vehicles[0].id,
         value: testVehicles.vehicles[0].name

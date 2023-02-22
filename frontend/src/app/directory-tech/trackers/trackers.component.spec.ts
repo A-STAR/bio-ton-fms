@@ -4,24 +4,31 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Observable, of } from 'rxjs';
 
 import { Trackers, TrackerService } from '../tracker.service';
 
 import TrackersComponent, { DATE_FORMAT, TrackerColumn, trackerColumns } from './trackers.component';
+import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import { testTrackers } from '../tracker.service.spec';
 
 describe('TrackersComponent', () => {
   let component: TrackersComponent;
   let fixture: ComponentFixture<TrackersComponent>;
+  let overlayContainer: OverlayContainer;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
 
   let trackersSpy: jasmine.Spy<() => Observable<Trackers>>;
@@ -32,12 +39,13 @@ describe('TrackersComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatSnackBarModule,
           TrackersComponent
         ],
         providers: [
           {
             provide: LOCALE_ID,
-            useValue: 'ru-Ru'
+            useValue: 'ru-RU'
           }
         ]
       })
@@ -46,7 +54,9 @@ describe('TrackersComponent', () => {
     registerLocaleData(localeRu, 'ru-RU');
 
     fixture = TestBed.createComponent(TrackersComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    overlayContainer = TestBed.inject(OverlayContainer);
 
     const trackerService = TestBed.inject(TrackerService);
 
@@ -68,6 +78,19 @@ describe('TrackersComponent', () => {
   it('should get trackers', () => {
     expect(trackersSpy)
       .toHaveBeenCalled();
+  });
+
+  it('should render create tracker button', async () => {
+    const button = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        variant: 'stroked',
+        text: 'Добавить GPS-трекер'
+      })
+    );
+
+    expect(button)
+      .withContext('render an create tracker button')
+      .not.toBeNull();
   });
 
   it('should render trackers table', async () => {
@@ -232,7 +255,7 @@ describe('TrackersComponent', () => {
         }
       } = testTrackers.trackers[index];
 
-      const sim = simNumber ? `+${simNumber[0]} (${simNumber.slice(1, 4)}) ${simNumber.slice(4)}` : '';
+      const sim = simNumber ? `${simNumber.slice(0, 2)} (${simNumber.slice(2, 5)}) ${simNumber.slice(4)}` : '';
       const start = formatDate(startDate, DATE_FORMAT, 'ru-RU');
 
       const trackerTexts = [name, external, type, sim, imei, start, vehicle].map(
@@ -320,5 +343,37 @@ describe('TrackersComponent', () => {
     expect(sortDirection)
       .withContext('render vehicle sort header unsorted')
       .toBe('');
+  });
+
+  it('should create tracker', async () => {
+    const createTrackerButton = await loader.getHarness(
+      MatButtonHarness.with({
+        variant: 'stroked',
+        text: 'Добавить GPS-трекер'
+      })
+    );
+
+    await createTrackerButton.click();
+
+    const trackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(trackerDialog)
+      .withContext('render a tracker dialog')
+      .not.toBeNull();
+
+    await trackerDialog!.close();
+
+    overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating trackers. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<TrackerDialogComponent, true | '' | undefined>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await createTrackerButton.click();
   });
 });
