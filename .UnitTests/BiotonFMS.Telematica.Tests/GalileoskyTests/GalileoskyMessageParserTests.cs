@@ -279,12 +279,12 @@ public class GalileoskyMessageParserTests
                 "./GalileoskyTests/TestCases/3-message.txt",
                 "./GalileoskyTests/TestCases/3-result.json"
             },
-            /*new object[]
+            new object[]
             {
                 "[BIO-81] Расшифровка пакетов 2 легковые.docx",
                 "./GalileoskyTests/TestCases/4-message.txt",
                 "./GalileoskyTests/TestCases/4-result.json"
-            }*/
+            }
         };
 
     [Theory, MemberData(nameof(Files))]
@@ -311,10 +311,10 @@ public class GalileoskyMessageParserTests
             Converters = new List<JsonConverter> { new BitArrayConverter() }
         };
 
-        //var str = JsonConvert.SerializeObject(results, settings);
-        //File.WriteAllText(expectedPath, str);
+        var str = JsonConvert.SerializeObject(results, settings);
+        File.WriteAllText(expectedPath, str);
 
-        var str = File.ReadAllText(expectedPath);
+        //var str = File.ReadAllText(expectedPath);
         var expected = JsonConvert.DeserializeObject<List<TrackerMessage>>(str, settings);
 
         Assert.NotNull(expected);

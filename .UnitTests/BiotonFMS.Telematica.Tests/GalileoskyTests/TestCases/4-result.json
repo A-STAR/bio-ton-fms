@@ -6,8 +6,7 @@
       "Id": 0,
       "TrId": 1836,
       "Imei": "862057047615601",
-      "ServerDateTime": "2023-01-24T09:38:57.867539Z",
-      "TrackerDateTime": "0001-01-01T00:00:00",
+      "ServerDateTime": "2023-02-20T09:34:48.503754Z",
       "Tags": {
         "$type": "System.Collections.Generic.List`1[[BioTonFMS.Domain.TrackerMessages.MessageTag, BioTonFMS.Domain]], System.Private.CoreLib",
         "$values": [
@@ -16,21 +15,24 @@
             "Value": 130,
             "Id": 0,
             "TrackerMessageId": 0,
-            "TrackerTagId": 1
+            "TrackerTagId": 1,
+            "TagType": 0
           },
           {
             "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagInteger, BioTonFMS.Domain",
             "Value": 23,
             "Id": 0,
             "TrackerMessageId": 0,
-            "TrackerTagId": 2
+            "TrackerTagId": 2,
+            "TagType": 0
           },
           {
             "$type": "BioTonFMS.Domain.TrackerMessages.MessageTagBits, BioTonFMS.Domain",
             "Value": "\u000b\u0000\u0000",
             "Id": 0,
             "TrackerMessageId": 0,
-            "TrackerTagId": 40
+            "TrackerTagId": 40,
+            "TagType": 0
           }
         ]
       }

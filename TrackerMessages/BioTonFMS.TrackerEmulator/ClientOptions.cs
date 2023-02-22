@@ -1,4 +1,4 @@
-namespace TrackerEmulator;
+namespace BioTonFMS.TrackerEmulator;
 
 public class ClientOptions
 {
