@@ -137,7 +137,7 @@ public class TrackerRepositoryTests
         List<Tracker> expected, bool considerOrder = false)
     {
         _testOutputHelper.WriteLine(testName);
-            
+
         var results = CreateTrackerRepository(SampleTrackers, SampleVehicles).GetTrackers(filter).Results;
 
         Assert.Equal(results.Count, expected.Count);
@@ -179,7 +179,7 @@ public class TrackerRepositoryTests
         repo.Invoking(r => r.Add(tracker)).Should().Throw<ArgumentException>()
             .WithMessage($"Трекер с внешним идентификатором {tracker.ExternalId} уже существует");
     }
-        
+
     [Fact]
     public void UpdateTracker_TrackerWithSuchExternalIdExists_ShouldThrowException()
     {
@@ -193,7 +193,7 @@ public class TrackerRepositoryTests
             SimNumber = "88005553535",
             StartDate = DateTime.UtcNow
         };
-        
+
         var updating = new Tracker
         {
             Id = 2,
@@ -213,7 +213,51 @@ public class TrackerRepositoryTests
             .WithMessage($"Трекер с внешним идентификатором {existing.ExternalId} уже существует");
     }
 
-    private static TrackerRepository CreateTrackerRepository(ICollection<Tracker> trackers, ICollection<Vehicle> vehicles)
+    [Fact]
+    public void RemoveTracker_TrackerRelatedToVehicle_ShouldThrowException()
+    {
+        var tracker = new Tracker
+        {
+            Id = 1,
+            Name = "Трекер",
+            Description = "Описание 1",
+            Imei = "1234",
+            ExternalId = 420,
+            SimNumber = "88005553535",
+            StartDate = DateTime.UtcNow
+        };
+
+        var vehicle = new Vehicle
+        {
+            Id = 1,
+            Name = "Машина",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 2",
+            Make = "Ford",
+            Model = "Fiesta",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 189",
+            InventoryNumber = "1235",
+            Tracker = tracker,
+            TrackerId = 1
+        };
+
+        tracker.Vehicle = vehicle;
+
+        var repo = CreateTrackerRepository(
+            new List<Tracker> { tracker },
+            new List<Vehicle> { vehicle });
+
+        repo.Invoking(r => r.Remove(tracker)).Should().Throw<ArgumentException>()
+            .WithMessage($"Нельзя удалить трекер привязанный к машине (название - '{vehicle.Name}', " +
+                         $"регистрационный номер - {vehicle.RegistrationNumber})");
+    }
+
+    private static TrackerRepository CreateTrackerRepository(ICollection<Tracker> trackers,
+        ICollection<Vehicle> vehicles)
     {
         IKeyValueProvider<Tracker, int> keyValueProviderMock = new KeyValueProviderMock<Tracker, int>(trackers);
         IQueryableProvider<Tracker> trackerQueryProviderMock = new QueryableProviderMock<Tracker>(trackers);
@@ -221,7 +265,8 @@ public class TrackerRepositoryTests
         UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactoryMock = new BioTonDBContextUnitOfWorkFactoryMock();
         var loggerMock = new Mock<ILogger<TrackerRepository>>().Object;
 
-        var repo = new TrackerRepository(loggerMock, vehicleQueryProviderMock, keyValueProviderMock, trackerQueryProviderMock, unitOfWorkFactoryMock);
+        var repo = new TrackerRepository(loggerMock, vehicleQueryProviderMock, keyValueProviderMock,
+            trackerQueryProviderMock, unitOfWorkFactoryMock);
         return repo;
     }
 
@@ -277,7 +322,7 @@ public class TrackerRepositoryTests
             InventoryNumber = "1236",
         }
     };
-    
+
     private static IList<Tracker> SampleTrackers => new List<Tracker>
     {
         new()
