@@ -28,6 +28,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             _logger = logger;
         }
 
+        public new Tracker? this[int key] => QueryableProvider.Fetch(x => x.Vehicle)
+            .Linq().FirstOrDefault(x => x.Id == key);
+
         public override void Add(Tracker tracker)
         {
             var trackersWithTheSameExternalId = QueryableProvider.Linq().Where(t => t.ExternalId == tracker.ExternalId);
