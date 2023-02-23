@@ -41,7 +41,7 @@ namespace BioTonFMS.Telematica.Dtos.Tracker
         /// <summary>
         /// Дата и время начала действия трекера на данной машине
         /// </summary>
-        public DateTime StartDate { get; set; } = DateTime.UtcNow;
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         /// Описание

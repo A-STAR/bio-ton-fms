@@ -1,4 +1,5 @@
-﻿using BioTonFMS.Infrastructure.Extensions;
+﻿using System.ComponentModel.DataAnnotations;
+using BioTonFMS.Infrastructure.Extensions;
 using KeyValuePair = BioTonFMS.Infrastructure.Extensions.KeyValuePair;
 
 namespace BioTonFMS.Telematica.Dtos.Tracker;
@@ -11,26 +12,31 @@ public class TrackerDto
     /// <summary>
     /// Id трекера
     /// </summary>
+    [Required]
     public int Id { get; set; }
 
     /// <summary>
     /// Идентификатор трекера во внешней системе
     /// </summary>
+    [Required]
     public int ExternalId { get; set; }
 
     /// <summary>
     /// Название трекера
     /// </summary>
+    [Required]
     public string Name { get; set; } = "";
 
     /// <summary>
     /// Номер sim – карты
     /// </summary>
+    [Required]
     public string SimNumber { get; set; } = "";
 
     /// <summary>
     /// IMEI трекера
     /// </summary>
+    [Required]
     public string Imei { get; set; } = "";
 
     /// <summary>
