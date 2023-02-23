@@ -5,7 +5,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogTitle, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -42,6 +42,10 @@ describe('TrackerDialogComponent', () => {
           TrackerDialogComponent
         ],
         providers: [
+          {
+            provide: MAT_DIALOG_DATA,
+            useValue: undefined
+          },
           {
             provide: MatDialogRef,
             useValue: dialogRef
@@ -87,6 +91,14 @@ describe('TrackerDialogComponent', () => {
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog title text')
       .toBe('Добавление GPS-трекера');
+
+    component['data'] = testNewTracker;
+
+    fixture.detectChanges();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog title text')
+      .toBe('Сводная информация о GPS-трекере');
   });
 
   it('should render tracker form', async () => {

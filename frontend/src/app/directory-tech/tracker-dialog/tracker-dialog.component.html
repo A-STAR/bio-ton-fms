@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Добавление GPS-трекера</h1>
+<h1 mat-dialog-title>{{ this.data ? 'Сводная информация о GPS-трекере' : 'Добавление GPS-трекера' }}</h1>
 
 <mat-dialog-content>
   <form id="tracker-form" [formGroup]="trackerForm" (ngSubmit)="submitTrackerForm()">
