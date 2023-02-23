@@ -1,9 +1,15 @@
-﻿using BioTonFMS.Expressions.AST;
+﻿using System.Diagnostics;
+using BioTonFMS.Expressions.AST;
 
 namespace BioTonFMS.Expressions;
 
 public static class Parser
 {
+    public static AstNode? ParseWithHandler(string expressionString, Func<Func<AstNode?>, AstNode?> executionHandler)
+    {
+        return executionHandler(() => Parse(expressionString));
+    }
+    
     public static AstNode Parse(string expressionString)
     {
         if (string.IsNullOrEmpty(expressionString))

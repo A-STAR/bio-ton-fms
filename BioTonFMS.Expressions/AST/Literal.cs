@@ -38,4 +38,10 @@ public class Literal : AstNode, IEquatable<Literal>
     {
         return !Equals(left, right);
     }
+    
+    public override string ToString()
+    {
+        return Value;
+    }
+
 }

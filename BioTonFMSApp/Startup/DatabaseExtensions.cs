@@ -31,5 +31,16 @@ public static class DatabaseExtensions
             var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "Ошибка при создании базы данных");
         }
+
+        try
+        {
+            var context = services.GetRequiredService<MessagesDBContext>();
+            await context.Database.MigrateAsync();
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "Ошибка при создании базы данных");
+        }
     }
 }

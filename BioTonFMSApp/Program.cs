@@ -33,10 +33,18 @@ builder.Services.AddDbContext<BioTonDBContext>(
                     .UseSnakeCaseNamingConvention()
                     .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
+builder.Services.AddDbContext<MessagesDBContext>(
+    options => options
+        .UseNpgsql(builder.Configuration.GetConnectionString("MessagesConnection"),
+            x => x.MigrationsAssembly("BioTonFMS.MessagesMigrations"))
+        .UseSnakeCaseNamingConvention()
+        .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
+
 builder.Services
     .AddMappingProfiles()
     .RegisterInfrastructureComponents()
-    .RegisterDataAccess();
+    .RegisterDataAccess()
+    .RegisterMessagesDataAccess();
 
 builder.AddAuth();
 builder.AddValidation();

@@ -40,4 +40,9 @@ public class BinaryOperation : AstNode, IEquatable<BinaryOperation>
     {
         return !Equals(left, right);
     }
+
+    public override string ToString()
+    {
+        return $"({LeftNode} {Operation} {RightNode})";
+    }
 }

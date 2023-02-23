@@ -38,4 +38,9 @@ public class Variable : AstNode, IEquatable<Variable>
     {
         return !Equals(left, right);
     }
+    public override string ToString()
+    {
+        return Name;
+    }
+
 }

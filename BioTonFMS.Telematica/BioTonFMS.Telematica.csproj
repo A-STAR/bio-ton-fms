@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BioTonFMS.Domain\BioTonFMS.Domain.csproj" />
+    <ProjectReference Include="..\BioTonFMS.Expressions\BioTonFMS.Expressions.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure.EF\BioTonFMS.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
   </ItemGroup>

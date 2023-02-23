@@ -4,6 +4,7 @@ using System.Collections;
 using BioTonFMS.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMS.MessagesMigrations.Migrations
 {
     [DbContext(typeof(MessagesDBContext))]
-    partial class MessagesDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230222022754_SensorTags")]
+    partial class SensorTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,7 +128,7 @@ namespace BioTonFMS.MessagesMigrations.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("tr_id");
 
-                    b.Property<DateTime?>("TrackerDateTime")
+                    b.Property<DateTime>("TrackerDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("tracker_date_time");
 
