@@ -31,6 +31,7 @@
     <ProjectReference Include="..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
     <ProjectReference Include="..\BioTonFMS.Security\BioTonFMS.Security.csproj" />
     <ProjectReference Include="..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj" />
+    <ProjectReference Include="..\Migrations\BioTonFMS.MessagesMigrations\BioTonFMS.MessagesMigrations.csproj" />
     <ProjectReference Include="..\Migrations\BioTonFMS.Migrations\BioTonFMS.Migrations.csproj" />
   </ItemGroup>
 

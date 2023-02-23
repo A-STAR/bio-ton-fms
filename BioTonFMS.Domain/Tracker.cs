@@ -1,7 +1,5 @@
 ﻿using BioTonFMS.Infrastructure.Models;
 using System.ComponentModel.DataAnnotations;
-// ReSharper disable UnassignedField.Global
-#pragma warning disable CS8618
 
 namespace BioTonFMS.Domain
 {
@@ -63,6 +61,6 @@ namespace BioTonFMS.Domain
         /// <summary>
         /// Датчики
         /// </summary>
-        public List<Sensor> Sensors { get; set; }
+        public List<Sensor> Sensors { get; set; } = new();
     }
 }
