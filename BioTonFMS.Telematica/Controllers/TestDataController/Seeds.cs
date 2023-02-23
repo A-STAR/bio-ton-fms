@@ -39,7 +39,6 @@ public static class Seeds
                 TrackerTagId = t.Id, SensorId = null, Value = f.Random.Double(-100, 100), IsFallback = false,
             }).ToList());
 
-
         var trackerId = -1;
         var tracker = new Faker<Tracker>()
             .RuleFor(v => v.Id, (_, _) => trackerId--)
@@ -53,7 +52,10 @@ public static class Seeds
                 });
                 return result;
             })
-            .RuleFor(v => v.ExternalId, (_, v) => v.Id);
+            .RuleFor(v => v.ExternalId, (_, v) => v.Id)
+            .RuleFor(v => v.TrackerType, (f, _) => f.Random.Enum<TrackerTypeEnum>())
+            .RuleFor(v => v.SimNumber, (f, _) => f.Random.ReplaceNumbers("############"))
+            .RuleFor(v => v.Imei, (f, _) => f.Random.ReplaceNumbers("###############"));
 
 
         var trackerData = new Faker<TrackerData>()
