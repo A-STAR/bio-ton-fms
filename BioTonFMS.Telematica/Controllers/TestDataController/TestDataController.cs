@@ -138,7 +138,7 @@ public class TestDataController : ValidationControllerBase
         }
 
         var messages = _messageRepository.GetMessagesForUpdate();
-        var trackers = _trackerRepository.GetTrackers(new TrackersFilter
+        var pageWithTrackers = _trackerRepository.GetTrackers(new TrackersFilter
         {
             PageSize = 10000
         });
@@ -149,7 +149,7 @@ public class TestDataController : ValidationControllerBase
         }
         var trackerTags = _trackerTagRepository.GetTags().ToArray();
         var executionHandler = new ExecutionHandler(_logger);
-        messages.UpdateSensorTags(trackers.Results, trackerTags, executionHandler);
+        messages.UpdateSensorTags(pageWithTrackers.Results, trackerTags, executionHandler);
         foreach (var message in messages)
         {
             _messageRepository.Update(message);

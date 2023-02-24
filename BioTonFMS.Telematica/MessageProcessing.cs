@@ -21,6 +21,7 @@ public static class MessageProcessing
         var previousTags = previousMessage.Tags
             .Where(t => t is { TrackerTagId: { }, TagType: 4 })
             .ToDictionary(previousTag => previousTag.TrackerTagId!.Value);
+        // удаляем из previousTags теги, которые есть в тегах текущего сообщения (для них не нужно FallBackValue)
         foreach (var tag in message.Tags)
         {
             if (!tag.TrackerTagId.HasValue || !previousTags.ContainsKey(tag.TrackerTagId.Value))
@@ -70,19 +71,19 @@ public static class MessageProcessing
     /// </summary>
     /// <param name="sensorExpressions">Sorted sequence of previously compiled mutually dependent sensor expressions</param>
     /// <param name="messageTags">Set of message tags used as arguments of expressions</param>
-    /// <param name="tagNameById">Dictionary which maps tracker tag ids to respective tag names</param>
+    /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
     /// <returns>Sequence of calculation results paired with sensor names (for the moment
     /// sensor ids are used as names): (name1, value1), (name2, value2)...</returns>
     public static IEnumerable<(string, object?)> CalculateSensors(this IEnumerable<(string, Expression?)> sensorExpressions,
-        IEnumerable<MessageTag> messageTags, IDictionary<int, string> tagNameById)
+        IEnumerable<MessageTag> messageTags, IDictionary<int, string> tagNameByIdDict)
     {
         var arguments = messageTags
             .Where(tag =>
                 tag is MessageTagDouble or MessageTagInteger or MessageTagByte /* For the moment we can process doubles only */ &&
                 tag.TrackerTagId is not null &&
-                tagNameById.ContainsKey(tag.TrackerTagId!.Value))
+                tagNameByIdDict.ContainsKey(tag.TrackerTagId!.Value))
             .ToDictionary(
-                tag => tagNameById[tag.TrackerTagId!.Value],
+                tag => tagNameByIdDict[tag.TrackerTagId!.Value],
                 new Func<MessageTag, object?>(tag => new TagData<double>(
                     tag switch
                     {
@@ -123,13 +124,13 @@ public static class MessageProcessing
     /// <param name="message">Message which contains sensor expression arguments and which will be
     /// modified by adding tags with calculated sensor values</param>
     /// <param name="builtSensors">Previously built sensor expressions</param>
-    /// <param name="tagNameById">Dictionary which maps tracker tag ids to respective tag names</param>
-    private static void UpdateSensorTags(TrackerMessage message, IDictionary<int, (string, Expression?)[]> builtSensors,
-        IDictionary<int, string> tagNameById)
+    /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
+    private static void UpdateSensorTags(this TrackerMessage message, IDictionary<int, (string, Expression?)[]> builtSensors,
+        IDictionary<int, string> tagNameByIdDict)
     {
         var builtTrackerSensors = builtSensors[message.TrId];
         var newTags = builtTrackerSensors
-            .CalculateSensors(message.Tags, tagNameById)
+            .CalculateSensors(message.Tags, tagNameByIdDict)
             .ConvertSensorValuesToTags(message);
         var newTagList = message.Tags.Where(tag => !tag.SensorId.HasValue).ToList();
         newTagList.AddRange(newTags);
@@ -160,7 +161,7 @@ public static class MessageProcessing
 
         foreach (var message in messages)
         {
-            UpdateSensorTags(message, builtSensors, tagNameById);
+            message.UpdateSensorTags(builtSensors, tagNameById);
         }
     }
 }
