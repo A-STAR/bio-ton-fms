@@ -255,17 +255,10 @@ describe('VehicleDialogComponent', () => {
 
     fixture.detectChanges();
 
-    const vehicleFormDe = fixture.debugElement.query(By.css('form#vehicle-form'));
-
-    expect(vehicleFormDe)
-      .withContext('render Vehicle form element')
-      .not.toBeNull();
-
     loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#vehicle-form',
         placeholder: 'Наименование машины',
-
         value: testNewVehicle.name
       }));
 
@@ -273,7 +266,6 @@ describe('VehicleDialogComponent', () => {
       MatInputHarness.with({
         ancestor: 'form#vehicle-form',
         placeholder: 'Производитель',
-
         value: testNewVehicle.make
       }));
 
@@ -281,7 +273,6 @@ describe('VehicleDialogComponent', () => {
       MatInputHarness.with({
         ancestor: 'form#vehicle-form',
         placeholder: 'Модель',
-
         value: testNewVehicle.model
       }));
 

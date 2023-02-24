@@ -1,7 +1,9 @@
+import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { KeyValue } from '@angular/common';
+import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -17,7 +19,7 @@ import { Observable, of } from 'rxjs';
 import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
-import { TrackerDialogComponent, TRACKER_CREATED } from './tracker-dialog.component';
+import { DATE_PATTERN, TrackerDialogComponent, TRACKER_CREATED } from './tracker-dialog.component';
 
 import { testNewTracker, testTrackerTypeEnum } from '../tracker.service.spec';
 
@@ -43,6 +45,10 @@ describe('TrackerDialogComponent', () => {
         ],
         providers: [
           {
+            provide: LOCALE_ID,
+            useValue: 'ru-RU'
+          },
+          {
             provide: MAT_DIALOG_DATA,
             useValue: undefined
           },
@@ -53,6 +59,8 @@ describe('TrackerDialogComponent', () => {
         ]
       })
       .compileComponents();
+
+    registerLocaleData(localeRu, 'ru-RU');
 
     fixture = TestBed.createComponent(TrackerDialogComponent);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
@@ -107,7 +115,7 @@ describe('TrackerDialogComponent', () => {
     );
 
     expect(trackerFormDe)
-      .withContext('render Tracker form element')
+      .withContext('render tracker form element')
       .not.toBeNull();
 
     loader.getHarness(
@@ -175,6 +183,78 @@ describe('TrackerDialogComponent', () => {
     );
   });
 
+  it('should render update tracker form', async () => {
+    component['data'] = testNewTracker;
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#tracker-form',
+        placeholder: 'Наименование GPS-трекера',
+        value: testNewTracker.name
+      })
+    );
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#tracker-form',
+        selector: '[placeholder="Тип устройства"]'
+      })
+    );
+
+    await expectAsync(
+      typeSelect.getValueText()
+    )
+      .withContext('render type select text')
+      .toBeResolvedTo(testTrackerTypeEnum[0].value);
+
+    const start = formatDate(testNewTracker.startDate!, 'dd.MM.YYYY HH:mm', 'ru-RU');
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#tracker-form',
+        placeholder: 'Время начала',
+        value: start
+      })
+    );
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#tracker-form',
+        placeholder: 'Внешний ID',
+        value: testNewTracker.externalId.toString()
+      })
+    );
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#tracker-form',
+        selector: '[type="tel"]',
+        placeholder: 'Номер SIM-карты',
+        value: testNewTracker.simNumber
+      })
+    );
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#tracker-form',
+        placeholder: 'IMEI номер',
+        value: testNewTracker.imei
+      })
+    );
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#tracker-form',
+        placeholder: 'Описание',
+        value: testNewTracker.description
+      })
+    );
+  });
+
   it('should submit invalid vehicle form', async () => {
     spyOn(trackerService, 'createTracker')
       .and.callThrough();
@@ -216,7 +296,7 @@ describe('TrackerDialogComponent', () => {
     const testDate = new Date();
     const testLocaleTime = testDate.toLocaleTimeString('ru-RU');
 
-    let testStart = `${testDate.toLocaleDateString('ru-RU')} ${testLocaleTime}`;
+    let testStart = `${testDate.toLocaleDateString('ru-RU')} ${testLocaleTime.slice(0, -3)}`;
 
     await startInput.setValue(testStart);
 
@@ -237,13 +317,21 @@ describe('TrackerDialogComponent', () => {
 
     await saveButton.click();
 
-    const [day, month, year, hours, minutes, seconds = 0] = testStart
-      .split(/[\.\s:]/)
+    const [
+      ,
+      day,
+      month,
+      year,
+      ,
+      hours,
+      minutes
+    ] = testStart
+      .match(DATE_PATTERN)!
       .map(Number);
 
     const monthIndex = month - 1;
 
-    const startDate = new Date(year, monthIndex, day, hours, minutes, seconds)
+    const startDate = new Date(year, monthIndex, day, hours, minutes)
       .toISOString();
 
     const testTracker: NewTracker = {
@@ -273,13 +361,5 @@ describe('TrackerDialogComponent', () => {
 
     expect(dialogRef.close)
       .toHaveBeenCalledWith(true);
-
-    /* Coverage for `start` seconds default value. */
-
-    testStart = `${testDate.toLocaleDateString('ru-RU')} ${testLocaleTime.slice(0, -3)}`;
-
-    await startInput.setValue(testStart);
-
-    await saveButton.click();
   });
 });
