@@ -19,7 +19,7 @@ import { Observable, of } from 'rxjs';
 import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
-import { DATE_PATTERN, TrackerDialogComponent, TRACKER_CREATED } from './tracker-dialog.component';
+import { DATE_PATTERN, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
 
 import { testNewTracker, testTrackerTypeEnum } from '../tracker.service.spec';
 
@@ -335,6 +335,7 @@ describe('TrackerDialogComponent', () => {
       .toISOString();
 
     const testTracker: NewTracker = {
+      id: undefined,
       externalId: testNewTracker.externalId,
       name: testNewTracker.name,
       simNumber: testNewTracker.simNumber,
@@ -353,6 +354,107 @@ describe('TrackerDialogComponent', () => {
       snackBar.getMessage()
     )
       .toBeResolvedTo(TRACKER_CREATED);
+
+    await expectAsync(
+      snackBar.hasAction()
+    )
+      .toBeResolvedTo(false);
+
+    expect(dialogRef.close)
+      .toHaveBeenCalledWith(true);
+  });
+
+  it('should submit update tracker form', async () => {
+    component['data'] = testNewTracker;
+
+    component.ngOnInit();
+
+    const [nameInput, startInput, externalInput, simInput, imeiInput, descriptionInput] = await loader.getAllHarnesses(
+      MatInputHarness.with({
+        ancestor: 'form#tracker-form'
+      })
+    );
+
+    const updatedName = 'Galileo Sky';
+
+    await nameInput.setValue(updatedName);
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#tracker-form'
+      })
+    );
+
+    await typeSelect.clickOptions({
+      text: testTrackerTypeEnum[0].value
+    });
+
+    const updatedStart = '28.02.2023 12:00';
+
+    await startInput.setValue(updatedStart);
+
+    const updatedExternal = '11';
+
+    await externalInput.setValue(updatedExternal);
+
+    const updatedSIM = '+78462777728';
+
+    await simInput.setValue(updatedSIM);
+
+    const updatedIMEI = '501248140768770';
+
+    await imeiInput.setValue(updatedIMEI);
+
+    const updatedDescription = 'Патруль';
+
+    await descriptionInput.setValue(updatedDescription);
+
+    spyOn(trackerService, 'updateTracker')
+      .and.callFake(() => of({}));
+
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="tracker-form"]'
+      })
+    );
+
+    await saveButton.click();
+
+    const [
+      ,
+      day,
+      month,
+      year,
+      ,
+      hours,
+      minutes
+    ] = updatedStart
+      .match(DATE_PATTERN)!
+      .map(Number);
+
+    const monthIndex = month - 1;
+
+    const startDate = new Date(year, monthIndex, day, hours, minutes)
+      .toISOString();
+
+    expect(trackerService.updateTracker)
+      .toHaveBeenCalledWith({
+        ...testNewTracker,
+        externalId: Number(updatedExternal),
+        name: updatedName,
+        simNumber: updatedSIM,
+        imei: updatedIMEI,
+        trackerType: testTrackerTypeEnum[0].key,
+        startDate,
+        description: updatedDescription
+      });
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(TRACKER_UPDATED);
 
     await expectAsync(
       snackBar.hasAction()

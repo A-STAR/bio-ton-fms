@@ -440,16 +440,6 @@ describe('VehicleDialogComponent', () => {
       })
     );
 
-    const [, , , fuelSelect] = await loader.getAllHarnesses(
-      MatSelectHarness.with({
-        ancestor: 'form#vehicle-form'
-      })
-    );
-
-    await fuelSelect.clickOptions({
-      text: testFuels[1].name
-    });
-
     const updatedModel = 'Hilux';
     const updatedName = `${testNewVehicle.make} ${updatedModel}`;
 
@@ -461,6 +451,16 @@ describe('VehicleDialogComponent', () => {
     const year = updatedYear?.toString();
 
     await yearInput.setValue(year);
+
+    const [, , , fuelSelect] = await loader.getAllHarnesses(
+      MatSelectHarness.with({
+        ancestor: 'form#vehicle-form'
+      })
+    );
+
+    await fuelSelect.clickOptions({
+      text: testFuels[1].name
+    });
 
     const updatedRegistrationNumber = '8888TH88';
 

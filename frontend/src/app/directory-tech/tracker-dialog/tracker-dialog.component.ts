@@ -58,6 +58,7 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
     const { description } = additional!;
 
     const tracker: NewTracker = {
+      id: this.data?.id,
       externalId: external!,
       name: name!,
       simNumber: sim!,
@@ -87,13 +88,17 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
       tracker.startDate = startDate;
     }
 
-    this.#subscription = this.trackerService
-      .createTracker(tracker)
-      .subscribe(() => {
-        this.snackBar.open(TRACKER_CREATED);
+    const tracker$ = this.data
+      ? this.trackerService.updateTracker(tracker)
+      : this.trackerService.createTracker(tracker);
 
-        this.dialogRef.close(true);
-      });
+    this.#subscription = tracker$.subscribe(() => {
+      const message = this.data ? TRACKER_UPDATED : TRACKER_CREATED;
+
+      this.snackBar.open(message);
+
+      this.dialogRef.close(true);
+    });
   }
 
   #subscription: Subscription | undefined;
@@ -188,3 +193,4 @@ const SIM_PATTERN = /^\+7\d{10}$/;
 const IMEI_PATTERN = /^\d{15}$/;
 
 export const TRACKER_CREATED = 'GPS-трекер создан';
+export const TRACKER_UPDATED = 'GPS-трекер обновлён';
