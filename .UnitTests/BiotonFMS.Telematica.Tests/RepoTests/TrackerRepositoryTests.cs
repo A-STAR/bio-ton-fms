@@ -16,6 +16,7 @@ namespace BiotonFMS.Telematica.Tests.RepoTests;
 
 public class TrackerRepositoryTests
 {
+    private const int ExistentExternalId = 111;
     private readonly ITestOutputHelper _testOutputHelper;
 
     public TrackerRepositoryTests(ITestOutputHelper testOutputHelper)
@@ -31,8 +32,8 @@ public class TrackerRepositoryTests
             new object[]
             {
                 "ExternalId filter",
-                new TrackersFilter { ExternalId = 111 },
-                SampleTrackers.Where(x => x.ExternalId == 111).ToList()
+                new TrackersFilter { ExternalId = ExistentExternalId },
+                SampleTrackers.Where(x => x.ExternalId == ExistentExternalId).ToList()
             },
             new object[]
             {
@@ -331,7 +332,7 @@ public class TrackerRepositoryTests
             Name = "трекер GalileoSky",
             Description = "Описание 1",
             Imei = "12341",
-            ExternalId = 111,
+            ExternalId = ExistentExternalId,
             StartDate = DateTime.MinValue,
             TrackerType = TrackerTypeEnum.GalileoSkyV50,
             SimNumber = "905518101010",
