@@ -2,5 +2,5 @@ namespace BioTonFMS.TrackerTcpServer;
 
 public class RetryOptions
 {
-    public uint[] Timeouts { get; set; }
+    public uint[] TimeoutsInMs { get; set; } = null!;
 }

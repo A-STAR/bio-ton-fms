@@ -23,17 +23,23 @@ builder.Services.Configure<MessageBrokerSettingsOptions>("Secondary",
     builder.Configuration.GetSection("SecondaryMessageBrokerSettings"));
 builder.Services.Configure<RetryOptions>(
     builder.Configuration.GetSection("RetryOptions"));
-builder.Services.AddSingleton<IMessageBus>(provider =>
+builder.Services.AddSingleton<IMessageBus>(serviceProvider =>
 {
-    var timeouts = provider.GetRequiredService<IOptions<RetryOptions>>()
-        .Value.Timeouts.Select(x => TimeSpan.FromSeconds(x));
-    var monitor = provider.GetRequiredService<IOptionsMonitor<MessageBrokerSettingsOptions>>();
+    var timeouts = serviceProvider.GetRequiredService<IOptions<RetryOptions>>()
+        .Value.TimeoutsInMs.Select(x => TimeSpan.FromSeconds(x));
+    var monitor = serviceProvider.GetRequiredService<IOptionsMonitor<MessageBrokerSettingsOptions>>();
     var primary = new RabbitMQMessageBus(
-        provider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-        provider, Options.Create(monitor.Get("Primary")));
-    var secondary = new RabbitMQMessageBus(
-        provider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-        provider, Options.Create(monitor.Get("Secondary")));
+        serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+        serviceProvider, Options.Create(monitor.Get("Primary")));
+
+    var secondaryOptions = Options.Create(monitor.Get("Secondary"));
+    RabbitMQMessageBus? secondary = null;
+    if (secondaryOptions != null)
+    {
+        secondary = new RabbitMQMessageBus(
+            serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+            serviceProvider, secondaryOptions);
+    }
     return new MessageBusMux(primary, secondary, Policy.Handle<Exception>().WaitAndRetry(timeouts));
 });
 builder.Services.AddTransient<GalileoskyProtocolMessageHandler>();

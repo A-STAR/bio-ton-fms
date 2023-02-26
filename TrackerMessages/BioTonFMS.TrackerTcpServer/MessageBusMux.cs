@@ -5,21 +5,24 @@ namespace BioTonFMS.TrackerTcpServer;
 
 internal class MessageBusMux : IMessageBus
 {
-    private readonly IMessageBus _primary;
-    private readonly IMessageBus _secondary;
-    private readonly Policy _policy;
+    private readonly IMessageBus _primaryBus;
+    private readonly IMessageBus? _secondaryBus;
+    private readonly Policy _retryPolicy;
 
-    public MessageBusMux(IMessageBus secondary, IMessageBus primary, Policy policy)
+    public MessageBusMux(IMessageBus primaryBus, IMessageBus? secondaryBus, Policy retryPolicy)
     {
-        _secondary = secondary;
-        _primary = primary;
-        _policy = policy;
+        _primaryBus = primaryBus;
+        _secondaryBus = secondaryBus;
+        _retryPolicy = retryPolicy;
     }
 
     public void Publish(byte[] message)
     {
-        _primary.Publish(message);
-        _policy.Execute(() => _secondary.Publish(message));
+        _primaryBus.Publish(message);
+        if (_secondaryBus != null)
+        {
+            _retryPolicy.Execute(() => _secondaryBus.Publish(message));
+        }
     }
 
     public void Subscribe<TBusMessageHandler>()
