@@ -421,5 +421,16 @@ describe('TrackersComponent', () => {
     await trackerDialog!.close();
 
     overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating trackers. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<TrackerDialogComponent, true | ''>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await updateTrackerButtons[0].click();
   });
 });

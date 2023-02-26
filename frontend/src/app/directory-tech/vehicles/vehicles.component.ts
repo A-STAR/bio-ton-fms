@@ -104,8 +104,6 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    * Create a new vehicle in table.
    */
   protected onCreateVehicle() {
-    this.#subscription?.unsubscribe();
-
     const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | '' | undefined>(VehicleDialogComponent, dialogConfig);
 
     this.#subscription = dialogRef

@@ -98,8 +98,6 @@ export default class TrackersComponent implements OnInit, OnDestroy {
    * Add a new GPS-tracker to table.
    */
   protected onCreateTracker() {
-    this.#subscription?.unsubscribe();
-
     const dialogRef = this.dialog.open<TrackerDialogComponent, any, true | '' | undefined>(TrackerDialogComponent);
 
     this.#subscription = dialogRef
@@ -129,7 +127,16 @@ export default class TrackersComponent implements OnInit, OnDestroy {
       description
     };
 
-    this.dialog.open<TrackerDialogComponent, NewTracker, true | '' | undefined>(TrackerDialogComponent, { data });
+    const dialogRef = this.dialog.open<TrackerDialogComponent, NewTracker, true | '' | undefined>(TrackerDialogComponent, { data });
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(() => {
+        this.#updateTrackers();
+      });
   }
 
   #trackers$ = new BehaviorSubject<TrackersOptions>({});
