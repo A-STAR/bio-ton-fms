@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { forkJoin, map, Observable } from 'rxjs';
@@ -35,6 +35,12 @@ import { Tracker } from '../tracker.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SensorDialogComponent implements OnInit {
+  protected get hiddenFuelUse() {
+    const type = this.sensorForm.get('basic.type')?.value;
+
+    return !(type && this.fuelUseTypeIds.includes(type));
+  }
+
   protected sensorData$!: Observable<{
     groups: SensorGroup[];
     validators: SensorType[];
@@ -44,6 +50,21 @@ export class SensorDialogComponent implements OnInit {
   }>;
 
   protected sensorForm!: FormGroup<SensorForm>;
+  protected fuelUseTypeIds: SensorGroup['id'][] = [3, 13, 14];
+
+  /**
+   * Toggle control disabled state on selection change conditionally.
+   *
+   * @param event `MatSelectionChange` event.
+   * @param path Control path.
+   */
+  protected onControlSelectionChange({ value }: MatSelectChange, path: string | readonly (string | number)[]) {
+    const control = this.sensorForm.get(path);
+
+    (path === 'basic.validationType' && value === undefined) || (path === 'basic.fuelUse' && this.hiddenFuelUse)
+      ? control?.disable()
+      : control?.enable();
+  }
 
   /**
    * Get sensor groups, sensor types, units. Set sensor data.
@@ -67,18 +88,33 @@ export class SensorDialogComponent implements OnInit {
   #initSensorForm() {
     this.sensorForm = this.fb.group({
       basic: this.fb.group({
-        tracker: this.fb.nonNullable.control<NewSensor['trackerId'] | undefined>(this.data.trackerId!),
-        name: this.fb.nonNullable.control<NewSensor['name'] | undefined>(undefined),
-        type: this.fb.nonNullable.control<NewSensor['sensorTypeId'] | undefined>(undefined),
-        dataType: this.fb.nonNullable.control<NewSensor['dataType'] | undefined>(undefined),
-        formula: this.fb.nonNullable.control<NewSensor['formula'] | undefined>(undefined),
-        unit: this.fb.nonNullable.control<NewSensor['unitId'] | undefined>(undefined),
+        tracker: this.fb.nonNullable.control<NewSensor['trackerId'] | undefined>(this.data.trackerId!, Validators.required),
+        name: this.fb.nonNullable.control<NewSensor['name'] | undefined>(undefined, [
+          Validators.required,
+          Validators.maxLength(100)
+        ]),
+        type: this.fb.nonNullable.control<NewSensor['sensorTypeId'] | undefined>(undefined, Validators.required),
+        dataType: this.fb.nonNullable.control<NewSensor['dataType'] | undefined>(undefined, Validators.required),
+        formula: this.fb.nonNullable.control<NewSensor['formula'] | undefined>(undefined, Validators.required),
+        unit: this.fb.nonNullable.control<NewSensor['unitId'] | undefined>(undefined, Validators.required),
         validator: this.fb.nonNullable.control<NewSensor['validatorId'] | undefined>(undefined),
-        validationType: this.fb.nonNullable.control<NewSensor['validationType'] | undefined>(undefined),
+        validationType: this.fb.nonNullable.control<NewSensor['validationType'] | undefined>({
+          value: undefined,
+          disabled: true
+        }, Validators.required),
         lastReceived: this.fb.nonNullable.control<NewSensor['useLastReceived'] | undefined>(undefined),
         visibility: this.fb.nonNullable.control<NewSensor['visibility'] | undefined>(undefined),
-        fuelUse: this.fb.nonNullable.control<NewSensor['fuelUse'] | undefined>(undefined),
-        description: this.fb.nonNullable.control<NewSensor['description'] | undefined>(undefined)
+        fuelUse: this.fb.nonNullable.control<NewSensor['fuelUse'] | undefined>(
+          {
+            value: undefined,
+            disabled: true
+          },
+          Validators.pattern(FUEL_USE_PATTERN)
+        ),
+        description: this.fb.nonNullable.control<NewSensor['description'] | undefined>(
+          undefined,
+          Validators.maxLength(500)
+        )
       })
     });
   }
@@ -112,3 +148,5 @@ type SensorForm = {
     description: FormControl<NewSensor['description'] | undefined>;
   }>;
 }
+
+const FUEL_USE_PATTERN = /^\d+(?:\.\d{1,2})?$/;

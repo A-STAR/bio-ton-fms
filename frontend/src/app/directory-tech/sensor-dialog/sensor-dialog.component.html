@@ -10,6 +10,14 @@
 
             <mat-form-field class="full-width">
               <input matInput id="name" placeholder="Наименование датчика" formControlName="name">
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">
+                Обязательное поле
+              </mat-error>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['maxlength'] as error">
+                Поле должно быть не более {{ error.requiredLength }} символов
+              </mat-error>
             </mat-form-field>
           </div>
 
@@ -18,13 +26,16 @@
               <label>Тип датчика</label>
 
               <mat-form-field>
-                <mat-select placeholder="Тип датчика" formControlName="type">
+                <mat-select placeholder="Тип датчика" formControlName="type"
+                  (selectionChange)="onControlSelectionChange($event, 'basic.fuelUse')">
                   <mat-option>Тип датчика</mat-option>
 
                   <mat-optgroup *ngFor="let group of sensorData$.groups" [label]="group.name">
                     <mat-option *ngFor="let type of group.sensorTypes" [value]="type.id">{{type.name}}</mat-option>
                   </mat-optgroup>
                 </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
               </mat-form-field>
             </div>
 
@@ -37,6 +48,8 @@
 
                   <mat-option [value]="type.key" *ngFor="let type of sensorData$.dataType">{{ type.value }}</mat-option>
                 </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
               </mat-form-field>
             </div>
 
@@ -45,6 +58,8 @@
 
               <mat-form-field class="full-width">
                 <input matInput id="formula" placeholder="Формула" formControlName="formula">
+
+                <mat-error>Обязательное поле</mat-error>
               </mat-form-field>
             </div>
 
@@ -57,6 +72,8 @@
 
                   <mat-option [value]="unit.id" *ngFor="let unit of sensorData$.units">{{ unit.name }}</mat-option>
                 </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
               </mat-form-field>
             </div>
 
@@ -64,11 +81,14 @@
               <label>Валидатор</label>
 
               <mat-form-field>
-                <mat-select placeholder="Валидатор" formControlName="validator">
+                <mat-select placeholder="Валидатор" formControlName="validator"
+                  (selectionChange)="onControlSelectionChange($event, 'basic.validationType')">
                   <mat-option>Валидатор</mat-option>
 
                   <mat-option [value]="type.id" *ngFor="let type of sensorData$.validators">{{ type.name }}</mat-option>
                 </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
               </mat-form-field>
             </div>
 
@@ -83,6 +103,8 @@
                     {{ validation.value }}
                   </mat-option>
                 </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
               </mat-form-field>
             </div>
           </ng-container>
@@ -95,11 +117,20 @@
             <mat-slide-toggle formControlName="visibility">Видимость</mat-slide-toggle>
           </div>
 
-          <div>
+          <div [hidden]="hiddenFuelUse">
             <label for="fuelUse">Расход л/ч</label>
 
             <mat-form-field>
-              <input matInput bioNumberOnlyInput id="fuelUse" type="number" placeholder="Расход л/ч" formControlName="fuelUse">
+              <input matInput bioNumberOnlyInput id="fuelUse" type="number" placeholder="Расход л/ч" step="0.01"
+                formControlName="fuelUse">
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['required']">
+                Обязательное поле
+              </mat-error>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['pattern']">
+                Должно быть максимум 2 числа после запятой
+              </mat-error>
             </mat-form-field>
           </div>
 
@@ -108,6 +139,10 @@
 
             <mat-form-field>
               <textarea matInput id="description" placeholder="Описание" formControlName="description"></textarea>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.description.errors?.['maxlength'] as error">
+                Поле должно быть не более {{ error.requiredLength }} символов
+              </mat-error>
             </mat-form-field>
           </div>
         </fieldset>

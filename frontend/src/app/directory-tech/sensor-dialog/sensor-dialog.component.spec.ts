@@ -169,7 +169,7 @@ describe('SensorDialogComponent', () => {
       })
     );
 
-    loader.getHarness(
+    const type = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#sensor-form',
         selector: '[placeholder="Тип датчика"]'
@@ -197,19 +197,35 @@ describe('SensorDialogComponent', () => {
       })
     );
 
-    loader.getHarness(
+    const validator = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#sensor-form',
         selector: '[placeholder="Валидатор"]'
       })
     );
 
-    loader.getHarness(
+    const validatorType = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#sensor-form',
         selector: '[placeholder="Тип валидации"]'
       })
     );
+
+    await expectAsync(
+      validatorType.isDisabled()
+    )
+      .withContext('render validation type control disabled')
+      .toBeResolvedTo(true);
+
+    await validator.clickOptions({
+      text: testSensorTypes[0].name
+    });
+
+    await expectAsync(
+      validatorType.isDisabled()
+    )
+      .withContext('render validation type control enabled')
+      .toBeResolvedTo(false);
 
     loader.getHarness(
       MatSlideToggleHarness.with({
@@ -235,6 +251,22 @@ describe('SensorDialogComponent', () => {
     );
 
     await expectAsync(
+      fuelUseInput.isDisabled()
+    )
+      .withContext('render fuel use control disabled')
+      .toBeResolvedTo(true);
+
+    await type.clickOptions({
+      text: testSensorGroups[1].sensorTypes![0].name
+    });
+
+    await expectAsync(
+      fuelUseInput.isDisabled()
+    )
+      .withContext('render fuel use control enabled')
+      .toBeResolvedTo(false);
+
+    await expectAsync(
       fuelUseInput.getType()
     )
       .withContext('render fuel use input type')
@@ -254,6 +286,10 @@ describe('SensorDialogComponent', () => {
         placeholder: 'Описание'
       })
     );
+
+    /* Coverage for `onControlSelectionChange` control disabled state. */
+
+    await type.clickOptions();
   });
 });
 
