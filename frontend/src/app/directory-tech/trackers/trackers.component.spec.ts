@@ -209,17 +209,28 @@ describe('TrackersComponent', () => {
             variant: 'icon',
             text: 'edit'
           })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'delete'
+          })
         )
       ])
     ));
 
-    actionButtons.forEach(async ([actionButton, updateButton]) => {
+    actionButtons.forEach(async ([actionButton, updateButton, deleteButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
 
       expect(updateButton)
         .withContext('render update button')
+        .not.toBeNull();
+
+      expect(deleteButton)
+        .withContext('render delete button')
         .not.toBeNull();
 
       actionButton!.hasHarness(
@@ -231,6 +242,12 @@ describe('TrackersComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
+        })
+      );
+
+      deleteButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'delete'
         })
       );
     });
