@@ -182,10 +182,12 @@ describe('TrackerComponent', () => {
       ({
         0: actionCell
       }) => parallel(() => [
-        actionCell.getHarnessOrNull(MatButtonHarness.with({
-          variant: 'icon',
-          text: 'more_horiz'
-        }))
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            variant: 'icon',
+            text: 'more_horiz'
+          })
+        )
       ])
     ));
 
@@ -194,9 +196,11 @@ describe('TrackerComponent', () => {
         .withContext('render action button')
         .not.toBeNull();
 
-      actionButton?.hasHarness(MatIconHarness.with({
-        name: 'more_horiz'
-      }));
+      actionButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'more_horiz'
+        })
+      );
     });
   });
 

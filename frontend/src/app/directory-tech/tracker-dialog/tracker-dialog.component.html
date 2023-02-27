@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Добавление GPS-трекера</h1>
+<h1 mat-dialog-title>{{ this.data ? 'Сводная информация о GPS-трекере' : 'Добавление GPS-трекера' }}</h1>
 
 <mat-dialog-content>
   <form id="tracker-form" [formGroup]="trackerForm" (ngSubmit)="submitTrackerForm()">
@@ -41,9 +41,15 @@
         <mat-form-field>
           <input matInput id="start" placeholder="Время начала" formControlName="start">
 
-          <mat-hint><em>31.12.2023 23:59:59</em></mat-hint>
+          <mat-hint><em>31.12.2023 23:59</em></mat-hint>
 
-          <mat-error>Поле введено некорректно</mat-error>
+          <mat-error *ngIf="trackerForm.controls.basic.controls.start.errors?.['required']">
+            Обязательное поле
+          </mat-error>
+
+          <mat-error *ngIf="trackerForm.controls.basic.controls.start.errors?.['pattern']">
+            Поле введено некорректно
+          </mat-error>
         </mat-form-field>
       </div>
     </fieldset>

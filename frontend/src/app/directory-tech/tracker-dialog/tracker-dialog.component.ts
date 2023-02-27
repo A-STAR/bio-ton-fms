@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule, KeyValue } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule, formatDate, KeyValue } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -58,6 +58,7 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
     const { description } = additional!;
 
     const tracker: NewTracker = {
+      id: this.data?.id,
       externalId: external!,
       name: name!,
       simNumber: sim!,
@@ -67,61 +68,83 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
     };
 
     if (start) {
-      const [day, month, year, hours, minutes, seconds = 0] = start
-        .split(/[\.\s:]/)
+      const [
+        ,
+        day,
+        month,
+        year,
+        ,
+        hours,
+        minutes
+      ] = start
+        .match(DATE_PATTERN)!
         .map(Number);
 
       const monthIndex = month - 1;
 
-      const startDate = new Date(year, monthIndex, day, hours, minutes, seconds)
+      const startDate = new Date(year, monthIndex, day, hours, minutes)
         .toISOString();
 
       tracker.startDate = startDate;
     }
 
-    this.#subscription = this.trackerService
-      .createTracker(tracker)
-      .subscribe(() => {
-        this.snackBar.open(TRACKER_CREATED);
+    const tracker$ = this.data
+      ? this.trackerService.updateTracker(tracker)
+      : this.trackerService.createTracker(tracker);
 
-        this.dialogRef.close(true);
-      });
+    this.#subscription = tracker$.subscribe(() => {
+      const message = this.data ? TRACKER_UPDATED : TRACKER_CREATED;
+
+      this.snackBar.open(message);
+
+      this.dialogRef.close(true);
+    });
   }
 
   #subscription: Subscription | undefined;
 
   /**
- * Initialize Vehicle form.
+ * Initialize Tracker form.
  */
   #initTrackerForm() {
+    const startValidators = [
+      Validators.pattern(DATE_PATTERN)
+    ];
+
+    let start: string | undefined;
+
+    if (this.data) {
+      start = formatDate(this.data.startDate!, 'dd.MM.YYYY HH:mm', 'ru-RU');
+
+      startValidators.push(Validators.required);
+    }
+
     this.trackerForm = this.fb.group({
       basic: this.fb.group({
-        name: this.fb.nonNullable.control<NewTracker['name'] | undefined>(undefined, [
+        name: this.fb.nonNullable.control(this.data?.name, [
           Validators.required,
           Validators.maxLength(100)
         ]),
-        type: this.fb.nonNullable.control<NewTracker['trackerType'] | undefined>(undefined, Validators.required),
-        start: this.fb.nonNullable.control<string | undefined>(undefined, [
-          Validators.pattern(DATE_PATTERN)
-        ])
+        type: this.fb.nonNullable.control(this.data?.trackerType, Validators.required),
+        start: this.fb.nonNullable.control(start, startValidators)
       }),
       registration: this.fb.group({
-        external: this.fb.nonNullable.control<NewTracker['externalId'] | undefined>(undefined, [
+        external: this.fb.nonNullable.control(this.data?.externalId, [
           Validators.required,
           Validators.max(99999999999)
         ]),
-        sim: this.fb.nonNullable.control<NewTracker['simNumber'] | undefined>(undefined, [
+        sim: this.fb.nonNullable.control(this.data?.simNumber, [
           Validators.required,
           Validators.pattern(SIM_PATTERN)
         ]),
-        imei: this.fb.nonNullable.control<NewTracker['imei'] | undefined>(undefined, [
+        imei: this.fb.nonNullable.control(this.data?.imei, [
           Validators.required,
           Validators.pattern(IMEI_PATTERN)
         ])
       }),
       additional: this.fb.group({
-        description: this.fb.nonNullable.control<NewTracker['description'] | undefined>(
-          undefined,
+        description: this.fb.nonNullable.control(
+          this.data?.description,
           Validators.maxLength(500)
         )
       })
@@ -130,8 +153,9 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) protected data: NewTracker | undefined,
     private dialogRef: MatDialogRef<TrackerDialogComponent, true | '' | undefined>,
+    private snackBar: MatSnackBar,
     private trackerService: TrackerService
   ) { }
 
@@ -164,8 +188,9 @@ type TrackerForm = {
   }>;
 }
 
-const DATE_PATTERN = /^(0?[1-9]|[12]\d|3[01])\.(0?[1-9]|1[012])\.\d{4}\s(0?[0-9]|1\d|2[0-3])(:(0[0-9]|[1-5]\d)){1,2}$/;
+export const DATE_PATTERN = /^(0?[1-9]|[12]\d|3[01])\.(0?[1-9]|1[012])\.(\d{4})(\s(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d))?$/;
 const SIM_PATTERN = /^\+7\d{10}$/;
 const IMEI_PATTERN = /^\d{15}$/;
 
 export const TRACKER_CREATED = 'GPS-трекер создан';
+export const TRACKER_UPDATED = 'GPS-трекер обновлён';

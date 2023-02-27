@@ -163,10 +163,10 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
     private dialogRef: MatDialogRef<VehicleDialogComponent, true | '' | undefined>,
+    private snackBar: MatSnackBar,
     private vehicleService: VehicleService
   ) { }
 

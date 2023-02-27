@@ -197,21 +197,42 @@ describe('TrackersComponent', () => {
 
     const actionButtons = await parallel(() => cells.map(
       ([actionCell]) => parallel(() => [
-        actionCell.getHarnessOrNull(MatButtonHarness.with({
-          variant: 'icon',
-          text: 'more_horiz'
-        }))
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            variant: 'icon',
+            text: 'more_horiz'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'edit'
+          })
+        )
       ])
     ));
 
-    actionButtons.forEach(([actionButton]) => {
+    actionButtons.forEach(async ([actionButton, updateButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
 
-      actionButton?.hasHarness(MatIconHarness.with({
-        name: 'more_horiz'
-      }));
+      expect(updateButton)
+        .withContext('render update button')
+        .not.toBeNull();
+
+      actionButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'more_horiz'
+        })
+      );
+
+      updateButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'edit'
+        })
+      );
     });
   });
 
@@ -363,6 +384,9 @@ describe('TrackersComponent', () => {
 
     await trackerDialog!.close();
 
+    expect(trackersSpy)
+      .toHaveBeenCalled();
+
     overlayContainer.ngOnDestroy();
 
     /* Coverage for updating trackers. */
@@ -375,5 +399,38 @@ describe('TrackersComponent', () => {
       .and.returnValue(dialogRef);
 
     await createTrackerButton.click();
+  });
+
+  it('should update tracker', async () => {
+    const updateTrackerButtons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        selector: '[mat-icon-button]',
+        text: 'edit'
+      })
+    );
+
+    await updateTrackerButtons[0].click();
+
+    const trackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(trackerDialog)
+      .withContext('render a tracker dialog')
+      .toBeDefined();
+
+    await trackerDialog!.close();
+
+    overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating trackers. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<TrackerDialogComponent, true | ''>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await updateTrackerButtons[0].click();
   });
 });

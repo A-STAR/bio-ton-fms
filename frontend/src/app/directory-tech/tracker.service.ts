@@ -56,6 +56,17 @@ export class TrackerService {
     return this.httpClient.post('/api/telematica/tracker', tracker);
   }
 
+  /**
+   * Update a tracker.
+   *
+   * @param tracker An updated tracker.
+   *
+   * @returns An `Observable' of updating tracker.
+   */
+  updateTracker(tracker: NewTracker) {
+    return this.httpClient.put(`/api/telematica/tracker/${tracker.id}`, tracker);
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 
