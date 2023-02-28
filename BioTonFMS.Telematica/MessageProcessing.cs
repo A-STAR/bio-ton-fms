@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
@@ -18,16 +19,21 @@ public static class MessageProcessing
     {
         if (previousMessage is null)
             return;
+        
+        // Собираем трекерные теги из предыдущего сообщения в словарь. 
         var previousTags = previousMessage.Tags
-            .Where(t => t is { TrackerTagId: { }, TagType: 4 })
+            .Where(t => t.TrackerTagId.HasValue)
             .ToDictionary(previousTag => previousTag.TrackerTagId!.Value);
-        // удаляем из previousTags теги, которые есть в тегах текущего сообщения (для них не нужно FallBackValue)
+
+        // Удаляем из previousTags теги, которые есть в тегах текущего сообщения (для них не нужно FallBackValue)
         foreach (var tag in message.Tags)
         {
             if (!tag.TrackerTagId.HasValue || !previousTags.ContainsKey(tag.TrackerTagId.Value))
                 continue;
             previousTags.Remove(tag.TrackerTagId.Value);
         }
+
+        // Добавляет оставшиеся тэги в сообщение
         foreach (var previousTag in previousTags)
         {
             if (previousTag.Value is not MessageTagDouble doubleTag)
@@ -112,7 +118,7 @@ public static class MessageProcessing
         var messageTags = sensorValues
             .Select(pair => new MessageTagDouble() /* For the moment we can process doubles only */
             {
-                TagType = 4, SensorId = int.Parse(pair.Item1), TrackerTagId = null, TrackerMessageId = message.Id,
+                TagType = TagDataTypeEnum.Double, SensorId = int.Parse(pair.Item1), TrackerTagId = null, TrackerMessageId = message.Id,
                 TrackerMessage = message, IsFallback = false, Value = pair.Item2 as double? ?? double.NaN
             });
         return messageTags;
