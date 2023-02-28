@@ -25,17 +25,16 @@ public static class Helpers
     /// <param name="expressions">Sequence of pairs of expressions and their names: (name1, expression1), (name2, expression2),...
     /// Expressions may reference other expressions by their names</param>
     /// <param name="parameters">Types of parameters of the expressions by name</param>
-    /// <param name="executionHandler">Object which executes different parts of formula calculation process.
-    /// May be used for exception handling.</param>
+    /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
     /// <returns>Set of compiled expressions with their names: (name1, expression1), (name2, expression2),...</returns>
     public static IEnumerable<(string, Expression?)> SortAndBuild(
         this IEnumerable<(string Name, (string Formula, bool UseFallbacks) Descr)> expressions,
-        IDictionary<string, Type> parameters, IExecutionHandler? executionHandler = null)
+        IDictionary<string, Type> parameters, IExceptionHandler? exceptionHandler = null)
     {
-        executionHandler ??= new DefaultExecutionHandler();
+        exceptionHandler ??= new DefaultExceptionHandler();
 
         var astByName = expressions.ToDictionary(e => e.Name,
-            e => (Ast: Parser.ParseWithHandler(e.Descr.Formula, executionHandler.ExecuteParsing), e.Descr.UseFallbacks));
+            e => (Ast: Parser.ParseWithHandler(e.Descr.Formula, exceptionHandler), e.Descr.UseFallbacks));
 
         var graph = astByName.ToDictionary<KeyValuePair<string, (AstNode? Ast, bool)>, string, ICollection<string>>(a => a.Key,
             a => a.Value.Ast is null ? Array.Empty<string>() : a.Value.Ast.GetVariables().ToArray());
@@ -49,7 +48,7 @@ public static class Helpers
             {
                 UseFallbacks = astTuple.UseFallbacks
             });
-            var compiledExpression = astTuple.Ast?.CompileWithHandler(compiler, allParameters, executionHandler.ExecuteCompilation);
+            var compiledExpression = astTuple.Ast?.CompileWithHandler(compiler, allParameters, exceptionHandler);
             if (compiledExpression is not null) allParameters.Add(name, compiledExpression.Type);
             return (p: name, compiledExpression);
         });

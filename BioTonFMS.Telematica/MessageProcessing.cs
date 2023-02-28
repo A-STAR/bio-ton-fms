@@ -51,14 +51,14 @@ public static class MessageProcessing
     /// </summary>
     /// <param name="trackers">Trackers for which sensor expressions are built</param>
     /// <param name="trackerTags">Set of tracker tags which are used as parameters for sensor formulas</param>
-    /// <param name="executionHandler">Object which executes different parts of formula calculation process.
+    /// <param name="exceptionHandler">Object which executes different parts of formula calculation process.
     /// May be used for exception handling.</param>
     /// <remarks>This static method parses sensor formulas, sorts them by their dependencies and compiles their
     /// ASTs to sorted sequences of runnable lambda expressions. Resulting sequences are paired with ids of their
     /// trackers</remarks>
     /// <returns>One set of compiled sensor formulas per tracker: (tracker1, {(name1, expression1), ...}), (tracker2, {}), ...</returns>
     public static IEnumerable<(int TrackerId, (string Name, Expression? Expression)[])> BuildSensors(this IEnumerable<Tracker> trackers,
-        IEnumerable<TrackerTag> trackerTags, IExecutionHandler? executionHandler = null)
+        IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         var parameters = trackerTags.Where(t =>
                 t.DataType is TagDataTypeEnum.Double or TagDataTypeEnum.Integer
@@ -68,7 +68,7 @@ public static class MessageProcessing
             t.Id,
             t.Sensors
                 .Select(s => (s.Id.ToString(), (s.Formula, UseFallbacks: s.UseLastReceived)))
-                .SortAndBuild(parameters, executionHandler)
+                .SortAndBuild(parameters, exceptionHandler)
                 .ToArray()));
     }
 
@@ -151,13 +151,13 @@ public static class MessageProcessing
     /// <param name="trackers">Trackers for messages. Should contain all trackers which are
     /// referenced by the messages</param>
     /// <param name="trackerTags">Tracker tags used to determine names, types and values of sensor parameters</param>
-    /// <param name="executionHandler">Object which executes different parts of formula calculation process.
+    /// <param name="exceptionHandler">Object which executes different parts of formula calculation process.
     /// May be used for exception handling.</param>
     public static void UpdateSensorTags(this IEnumerable<TrackerMessage> messages, IEnumerable<Tracker> trackers,
-        ICollection<TrackerTag> trackerTags, IExecutionHandler? executionHandler = null)
+        ICollection<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         var builtSensors = trackers
-            .BuildSensors(trackerTags, executionHandler)
+            .BuildSensors(trackerTags, exceptionHandler)
             .ToDictionary(t => t.Item1 /* Tracker id */, t => t.Item2);
 
         var tagNameById = trackerTags

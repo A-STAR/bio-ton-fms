@@ -4,11 +4,20 @@ namespace BioTonFMS.Expressions;
 
 public static class Parser
 {
-    public static AstNode? ParseWithHandler(string expressionString, Func<Func<AstNode?>, AstNode?> executionHandler)
+    public static AstNode? ParseWithHandler(string expressionString, IExceptionHandler exceptionHandler)
     {
-        return executionHandler(() => Parse(expressionString));
+        try
+        {
+            return Parse(expressionString);
+        }
+        catch( Exception e )
+        {
+            if (!exceptionHandler.Handle(e, OperationTypeEnum.Parsing))
+                throw;
+        }
+        return null;
     }
-    
+
     public static AstNode Parse(string expressionString)
     {
         if (string.IsNullOrEmpty(expressionString))

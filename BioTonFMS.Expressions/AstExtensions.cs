@@ -30,9 +30,17 @@ static internal class AstExtensions
         }
     }
 
-    public static Expression? CompileWithHandler(this AstNode node, Compiler compiler, IDictionary<string, Type> parameters,
-        Func<Func<Expression?>, Expression?> executionHandler)
+    public static Expression? CompileWithHandler(this AstNode node, Compiler compiler, IDictionary<string, Type> parameters, IExceptionHandler exceptionHandler)
     {
-        return executionHandler(() => compiler.Compile(node, parameters));
+        try
+        {
+            return compiler.Compile(node, parameters);
+        }
+        catch( Exception e )
+        {
+            if (!exceptionHandler.Handle(e, OperationTypeEnum.Parsing))
+                throw;
+        }
+        return null;
     }
 }
