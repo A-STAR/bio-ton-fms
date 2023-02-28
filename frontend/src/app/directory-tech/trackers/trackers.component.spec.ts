@@ -450,4 +450,24 @@ describe('TrackersComponent', () => {
 
     await updateTrackerButtons[0].click();
   });
+
+  it('should delete tracker', async () => {
+    let deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        variant: 'icon',
+        text: 'delete'
+      })
+    );
+
+    await deleteButton.click();
+
+    let confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+
+    overlayContainer.ngOnDestroy();
+  });
 });

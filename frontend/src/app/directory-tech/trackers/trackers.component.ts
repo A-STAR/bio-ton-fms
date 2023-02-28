@@ -13,6 +13,13 @@ import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, New
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
+import {
+  ConfirmationDialogComponent,
+  confirmationDialogConfig,
+  ConfirmationDialogData,
+  getConfirmationDialogContent
+} from '../../shared/confirmation-dialog/confirmation-dialog.component';
+
 import { SortDirection } from '../shared/sort';
 
 import { TableDataSource } from '../shared/table/table.data-source';
@@ -111,7 +118,7 @@ export default class TrackersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Update a tracker in table.
+   * Update a GPS-tracker in table.
    *
    * @param trackerDataSource Tracker data source.
    */
@@ -137,6 +144,22 @@ export default class TrackersComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.#updateTrackers();
       });
+  }
+
+  /**
+   * Delete a GPS-tracker in table.
+   *
+   * @param vehicleDataSource Tracker data source.
+   */
+  protected async onDeleteTracker({ name }: TrackerDataSource) {
+    const data: ConfirmationDialogData = {
+      content: getConfirmationDialogContent(name)
+    };
+
+    this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
+      ConfirmationDialogComponent,
+      { ...confirmationDialogConfig, data }
+    );
   }
 
   #trackers$ = new BehaviorSubject<TrackersOptions>({});
