@@ -10,7 +10,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 {
     public TrackerMessageRepository(IKeyValueProvider<TrackerMessage, int> keyValueProvider,
         IQueryableProvider<TrackerMessage> queryableProvider,
-        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider,
+        unitOfWorkFactory)
     {
     }
 
@@ -29,10 +30,40 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .ThenBy(m => m.Id);
         return linqProvider.ToList();
     }
-    
+
     public IList<TrackerMessage> GetMessages()
     {
         var linqProvider = QueryableProvider.Fetch(m => m.Tags).Linq().AsNoTracking().OrderBy(m => m.Id);
         return linqProvider.ToList();
+    }
+
+    public TrackerStandardParameters GetParameters(int id)
+    {
+        var prs = new TrackerStandardParameters();
+        var last = QueryableProvider.Linq()
+            .Where(x => x.TrId == id)
+            .MaxBy(x => x.ServerDateTime);
+
+        if (last == null) return prs;
+
+        prs.Time = last.ServerDateTime;
+        
+        prs.Long = last.Longitude ?? QueryableProvider.Linq()
+            .Where(x => x.Longitude != null && x.TrId == id)
+            .MaxBy(x => x.ServerDateTime)?.Longitude;
+
+        prs.Lat = last.Latitude ?? QueryableProvider.Linq()
+            .Where(x => x.Latitude != null && x.TrId == id)
+            .MaxBy(x => x.ServerDateTime)?.Latitude;
+
+        prs.Speed = last.Speed ?? QueryableProvider.Linq()
+            .Where(x => x.Speed != null && x.TrId == id)
+            .MaxBy(x => x.ServerDateTime)?.Speed;
+
+        prs.Alt = last.Height ?? QueryableProvider.Linq()
+            .Where(x => x.Height != null && x.TrId == id)
+            .MaxBy(x => x.ServerDateTime)?.Height;
+
+        return prs;
     }
 }
