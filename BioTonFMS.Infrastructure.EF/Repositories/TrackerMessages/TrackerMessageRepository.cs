@@ -37,33 +37,33 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return linqProvider.ToList();
     }
 
-    public TrackerStandardParameters GetParameters(int id)
+    public TrackerStandardParameters GetParameters(int trackerId)
     {
-        var prs = new TrackerStandardParameters();
+        var stdParams = new TrackerStandardParameters();
         var last = QueryableProvider.Linq()
-            .Where(x => x.TrId == id)
+            .Where(x => x.TrId == trackerId)
             .MaxBy(x => x.ServerDateTime);
 
-        if (last == null) return prs;
+        if (last == null) return stdParams;
 
-        prs.Time = last.ServerDateTime;
+        stdParams.Time = last.ServerDateTime;
         
-        prs.Long = last.Longitude ?? QueryableProvider.Linq()
-            .Where(x => x.Longitude != null && x.TrId == id)
+        stdParams.Long = last.Longitude ?? QueryableProvider.Linq()
+            .Where(x => x.Longitude != null && x.TrId == trackerId)
             .MaxBy(x => x.ServerDateTime)?.Longitude;
 
-        prs.Lat = last.Latitude ?? QueryableProvider.Linq()
-            .Where(x => x.Latitude != null && x.TrId == id)
+        stdParams.Lat = last.Latitude ?? QueryableProvider.Linq()
+            .Where(x => x.Latitude != null && x.TrId == trackerId)
             .MaxBy(x => x.ServerDateTime)?.Latitude;
 
-        prs.Speed = last.Speed ?? QueryableProvider.Linq()
-            .Where(x => x.Speed != null && x.TrId == id)
+        stdParams.Speed = last.Speed ?? QueryableProvider.Linq()
+            .Where(x => x.Speed != null && x.TrId == trackerId)
             .MaxBy(x => x.ServerDateTime)?.Speed;
 
-        prs.Alt = last.Height ?? QueryableProvider.Linq()
-            .Where(x => x.Height != null && x.TrId == id)
+        stdParams.Alt = last.Height ?? QueryableProvider.Linq()
+            .Where(x => x.Height != null && x.TrId == trackerId)
             .MaxBy(x => x.ServerDateTime)?.Height;
 
-        return prs;
+        return stdParams;
     }
 }

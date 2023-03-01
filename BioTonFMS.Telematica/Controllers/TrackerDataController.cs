@@ -20,9 +20,9 @@ public class TrackerDataController : ValidationControllerBase
         _messageRepository = messageRepository;
     }
 
-    [HttpGet("tracker/standardparameters/{id:int}")]
-    public ICollection<TrackerStandardParameter> GetStandardParameters(int id)
+    [HttpGet("tracker/standardparameters/{trackerId:int}")]
+    public ICollection<TrackerStandardParameter> GetStandardParameters(int trackerId)
     {
-        return _messageRepository.GetParameters(id).GetArray();
+        return _messageRepository.GetParameters(trackerId).GetArray();
     }
 }
