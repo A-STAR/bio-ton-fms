@@ -35,7 +35,7 @@ public static class Seeds
             .RuleFor(v => v.Id, () => messageId--)
             .RuleFor(v => v.Tags, (f, v) => trackerTags.Select<TrackerTag, MessageTag>(t => new MessageTagDouble()
             {
-                Id = tagId--, TrackerMessageId = v.Id, TrackerMessage = v, TagType = 4,
+                Id = tagId--, TrackerMessageId = v.Id, TrackerMessage = v, TagType = TagDataTypeEnum.Double,
                 TrackerTagId = t.Id, SensorId = null, Value = f.Random.Double(-100, 100), IsFallback = false,
             }).ToList());
 

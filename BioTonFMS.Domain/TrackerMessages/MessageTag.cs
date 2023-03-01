@@ -36,7 +36,7 @@ public abstract class MessageTag : EntityBase
     /// <summary>
     /// Дискриминатор
     /// </summary>
-    public byte TagType { get; set; }
+    public TagDataTypeEnum TagType { get; set; }
     
     /// <summary>
     /// Является ли значение значением взятым из прошлых сообщений
