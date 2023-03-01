@@ -14,9 +14,48 @@ public static class Helpers
     /// <returns>Topologically sorted list of graph nodes</returns>
     private static IEnumerable<string> TopologicalSort(this IDictionary<string, ICollection<string>> graph)
     {
-        // Here we should do a topological sorting of expressions but since we do not have expressions which depend on each
-        // other for the moment, it wasn't implemented.
-        return graph.Keys;
+        var inDegrees = new Dictionary<string, int>();
+        foreach (var node in graph.Keys)
+        {
+            inDegrees[node] = 0;
+        }
+
+        foreach (var adjList in graph.Values)
+        {
+            foreach (var node in adjList)
+            {
+                if (inDegrees.ContainsKey(node))
+                    inDegrees[node]++;
+            }
+        }
+
+        var queue = new Queue<string>();
+        foreach (var node in inDegrees.Keys.Where(node => inDegrees[node] == 0))
+        {
+            queue.Enqueue(node);
+        }
+
+        var sorted = new List<string>();
+        while (queue.Count > 0)
+        {
+            var node = queue.Dequeue();
+            sorted.Add(node);
+            
+            foreach (var adjNode in graph[node])
+            {
+                if (!inDegrees.ContainsKey(adjNode))
+                    continue;
+                
+                inDegrees[adjNode]--;
+
+                if (inDegrees[adjNode] == 0)
+                {
+                    queue.Enqueue(adjNode);
+                }
+            }
+        }
+        
+        return sorted;
     }
 
     /// <summary>
@@ -41,17 +80,19 @@ public static class Helpers
 
         var allParameters = new Dictionary<string, Type>(parameters);
 
-        return graph.TopologicalSort().Select(name =>
-        {
-            var astTuple = astByName[name];
-            var compiler = new Compiler(new CompilerOptions
+        return graph
+            .TopologicalSort()
+            .Select(name =>
             {
-                UseFallbacks = astTuple.UseFallbacks
+                var astTuple = astByName[name];
+                var compiler = new Compiler(new CompilerOptions
+                {
+                    UseFallbacks = astTuple.UseFallbacks
+                });
+                var compiledExpression = astTuple.Ast?.CompileWithHandler(compiler, allParameters, exceptionHandler);
+                if (compiledExpression is not null) allParameters.Add(name, compiledExpression.Type);
+                return (p: name, compiledExpression);
             });
-            var compiledExpression = astTuple.Ast?.CompileWithHandler(compiler, allParameters, exceptionHandler);
-            if (compiledExpression is not null) allParameters.Add(name, compiledExpression.Type);
-            return (p: name, compiledExpression);
-        });
     }
 
     /// <summary>

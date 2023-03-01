@@ -3,7 +3,6 @@ using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.Extensions;
 using BioTonFMS.Telematica.Dtos.Vehicle;
-using KeyValuePair = BioTonFMS.Infrastructure.Extensions.KeyValuePair;
 
 namespace BioTonFMS.Telematica.Mapping
 {

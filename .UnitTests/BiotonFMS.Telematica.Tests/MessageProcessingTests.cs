@@ -12,29 +12,29 @@ public class MessageProcessingTests
     [Fact]
     public void CalculateFallBackValues()
     {
-        var message = new TrackerMessage()
+        var message = new TrackerMessage
         {
-            Id = 1, Tags = new List<MessageTag>()
+            Id = 1, Tags = new List<MessageTag>
             {
-                new MessageTagDouble()
+                new MessageTagDouble
                 {
                     TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 1, Value = 22
                 }
             }
         };
-        var previousMessage = new TrackerMessage()
+        var previousMessage = new TrackerMessage
         {
-            Id = 1, Tags = new List<MessageTag>()
+            Id = 1, Tags = new List<MessageTag>
             {
-                new MessageTagDouble()
+                new MessageTagDouble
                 {
                     TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 1, Value = 11
                 },
-                new MessageTagDouble()
+                new MessageTagDouble
                 {
                     TagType = TagDataTypeEnum.Double, IsFallback = true, TrackerTagId = 2, Value = 111
                 },
-                new MessageTagDouble()
+                new MessageTagDouble
                 {
                     TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 3, Value = 1111
                 }
@@ -68,11 +68,15 @@ public class MessageProcessingTests
         {
             new()
             {
-                Id = 111, Sensors = new List<Sensor>()
+                Id = 111, Sensors = new List<Sensor>
                 {
                     new()
                     {
                         Id = 222, Formula = "a"
+                    },
+                    new()
+                    {
+                        Id = 361, Formula = "a"
                     }
                 }
             }
@@ -127,11 +131,11 @@ public class MessageProcessingTests
         };
         var messageTags = new MessageTag[]
         {
-            new MessageTagDouble()
+            new MessageTagDouble
             {
                 TrackerTagId = 123, TagType = TagDataTypeEnum.Double, IsFallback = false, Value = 345
             },
-            new MessageTagDouble()
+            new MessageTagDouble
             {
                 TrackerTagId = 124, TagType = TagDataTypeEnum.Double, IsFallback = true, Value = 543
             }
@@ -172,15 +176,15 @@ public class MessageProcessingTests
     {
         var messages = new[]
         {
-            new TrackerMessage()
+            new TrackerMessage
             {
-                TrId = 111, Tags = new List<MessageTag>()
+                TrId = 111, Tags = new List<MessageTag>
                 {
-                    new MessageTagDouble()
+                    new MessageTagDouble
                     {
                         TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 123, Value = 22
                     },
-                    new MessageTagDouble()
+                    new MessageTagDouble
                     {
                         TagType = TagDataTypeEnum.Double, IsFallback = false, SensorId = 12332, Value = 2345
                     }
@@ -191,7 +195,7 @@ public class MessageProcessingTests
         {
             new()
             {
-                Id = 111, Sensors = new List<Sensor>()
+                Id = 111, Sensors = new List<Sensor>
                 {
                     new()
                     {
