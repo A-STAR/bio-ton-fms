@@ -20,6 +20,11 @@ public class TrackerDataController : ValidationControllerBase
         _messageRepository = messageRepository;
     }
 
+    /// <summary>
+    /// Возвращает список последних полученных стандартных параметров трекера
+    /// </summary>
+    /// <param name="trackerId">Id трекера</param>
+    /// <response code="200">Список стандартных успешно возвращен</response>
     [HttpGet("tracker/standardparameters/{trackerId:int}")]
     public ICollection<TrackerStandardParameter> GetStandardParameters(int trackerId)
     {
