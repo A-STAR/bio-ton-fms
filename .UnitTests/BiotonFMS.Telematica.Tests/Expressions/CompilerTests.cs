@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using System.Linq.Expressions;
-using System.Text;
 using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.AST;
 using FluentAssertions;
@@ -254,12 +252,11 @@ public class CompilerTests
         {
             UseFallbacks = false
         });
-        var lambda = compiler.Compile(node, parameters) as LambdaExpression;
+        var lambda = compiler.Compile(node, parameters);
         lambda.Should().NotBeNull();
-        lambda?.Body.ToString().Should().Be(expression);
-        if (lambda is not null)
-        {
-            Helpers.Execute(lambda, arguments).Should().Be(calculationResults[calculationResultIndex]);
-        }
+        TestUtil.ExtractUnwrappedExpression(lambda)?.ToString().Should().Be(expression);
+        var executionResult = Helpers.Execute(lambda, arguments);
+        var value = ((object?)((TagData<double>?)executionResult)?.Value);
+        value?.Should().Be(calculationResults[calculationResultIndex]);
     }
 }

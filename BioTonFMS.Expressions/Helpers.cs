@@ -12,7 +12,7 @@ public static class Helpers
     /// <param name="graph">Directed graph represented by dictionary where every key is a node and value is a list of outgoing edges.
     /// Lists of edges may contain references to nonexistent nodes in this case those references should be ignored</param>
     /// <returns>Topologically sorted list of graph nodes</returns>
-    private static IEnumerable<string> TopologicalSort(this IDictionary<string, ICollection<string>> graph)
+    private static List<string> TopologicalSort<TData>(this IDictionary<string, (ICollection<string> Edges, TData Data)> graph)
     {
         var inDegrees = new Dictionary<string, int>();
         foreach (var node in graph.Keys)
@@ -20,12 +20,12 @@ public static class Helpers
             inDegrees[node] = 0;
         }
 
-        foreach (var adjList in graph.Values)
+        foreach (var node in graph.Values)
         {
-            foreach (var node in adjList)
+            foreach (var nodeName in node.Edges)
             {
-                if (inDegrees.ContainsKey(node))
-                    inDegrees[node]++;
+                if (inDegrees.ContainsKey(nodeName))
+                    inDegrees[nodeName]++;
             }
         }
 
@@ -40,12 +40,12 @@ public static class Helpers
         {
             var node = queue.Dequeue();
             sorted.Add(node);
-            
-            foreach (var adjNode in graph[node])
+
+            foreach (var adjNode in graph[node].Edges)
             {
                 if (!inDegrees.ContainsKey(adjNode))
                     continue;
-                
+
                 inDegrees[adjNode]--;
 
                 if (inDegrees[adjNode] == 0)
@@ -54,8 +54,14 @@ public static class Helpers
                 }
             }
         }
-        
         return sorted;
+    }
+
+    public interface IExpressionProperties
+    {
+        string Name { get; }
+        string Formula { get; }
+        bool UseFallbacks { get; }
     }
 
     /// <summary>
@@ -66,32 +72,39 @@ public static class Helpers
     /// <param name="parameters">Types of parameters of the expressions by name</param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
     /// <returns>Set of compiled expressions with their names: (name1, expression1), (name2, expression2),...</returns>
-    public static IEnumerable<(string, Expression?)> SortAndBuild(
-        this IEnumerable<(string Name, (string Formula, bool UseFallbacks) Descr)> expressions,
-        IDictionary<string, Type> parameters, IExceptionHandler? exceptionHandler = null)
+    public static IEnumerable<CompiledExpression<TExpressionProperties>> SortAndBuild<TExpressionProperties>(
+        this IEnumerable<TExpressionProperties> expressions, IDictionary<string, Type> parameters,
+        IExceptionHandler? exceptionHandler = null)
+        where TExpressionProperties : IExpressionProperties
     {
         exceptionHandler ??= new DefaultExceptionHandler();
 
-        var astByName = expressions.ToDictionary(e => e.Name,
-            e => (Ast: Parser.ParseWithHandler(e.Descr.Formula, exceptionHandler), e.Descr.UseFallbacks));
-
-        var graph = astByName.ToDictionary<KeyValuePair<string, (AstNode? Ast, bool)>, string, ICollection<string>>(a => a.Key,
-            a => a.Value.Ast is null ? Array.Empty<string>() : a.Value.Ast.GetVariables().ToArray());
+        var graph = expressions
+            .ToDictionary(
+                keySelector: e => e.Name,
+                elementSelector: e =>
+                {
+                    var ast = Parser.ParseWithHandler(e.Formula, exceptionHandler);
+                    return (
+                        Edges: ast is null ? Array.Empty<string>() : (ICollection<string>)ast.GetVariables().ToArray(),
+                        Data: (Ast: ast, Props: e));
+                });
 
         var allParameters = new Dictionary<string, Type>(parameters);
 
-        return graph
-            .TopologicalSort()
+        var sortedExpressionNames = graph.TopologicalSort();
+        sortedExpressionNames.Reverse();
+        return sortedExpressionNames
             .Select(name =>
             {
-                var astTuple = astByName[name];
+                var node = graph[name];
                 var compiler = new Compiler(new CompilerOptions
                 {
-                    UseFallbacks = astTuple.UseFallbacks
+                    UseFallbacks = node.Data.Props.UseFallbacks
                 });
-                var compiledExpression = astTuple.Ast?.CompileWithHandler(compiler, allParameters, exceptionHandler);
-                if (compiledExpression is not null) allParameters.Add(name, compiledExpression.Type);
-                return (p: name, compiledExpression);
+                var compiledExpression = node.Data.Ast?.CompileWithHandler(compiler, allParameters, exceptionHandler);
+                if (compiledExpression is not null) allParameters.Add(name, compiledExpression.ReturnType);
+                return new CompiledExpression<TExpressionProperties>(node.Data.Props, compiledExpression);
             });
     }
 
@@ -114,9 +127,11 @@ public static class Helpers
     /// <param name="compiledExpressions">Sorted sequence of expressions and their names: (name1, expression1), (name2, expression2)... </param>
     /// <param name="arguments">Dictionary of argument values for the expressions</param>
     /// <returns>Sequence of calculated expressions and their names: (name1, value1), (name2, value2)...</returns>
-    public static IEnumerable<(string, object?)> Execute(this IEnumerable<(string, Expression?)> compiledExpressions,
+    public static IEnumerable<(TExpressionProperties, object?)> Execute<TExpressionProperties>(
+        this IEnumerable<CompiledExpression<TExpressionProperties>> compiledExpressions,
         IDictionary<string, object?> arguments)
+        where TExpressionProperties : Helpers.IExpressionProperties
     {
-        return compiledExpressions.Select(e => (e.Item1, e.Item2 is LambdaExpression item2 ? Execute(item2, arguments) : null));
+        return compiledExpressions.Select(e => (e.Properties, e.ExpressionTree is { } expTree ? Execute(expTree, arguments) : null));
     }
 }

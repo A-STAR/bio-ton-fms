@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using BioTonFMS.Expressions.AST;
 
 namespace BioTonFMS.Expressions;
@@ -43,7 +42,7 @@ static internal class AstExtensions
     /// <param name="parameters">Names and types of available input parameters.</param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
     /// <returns>Expression tree which is the result of compilation of AST</returns>
-    public static Expression? CompileWithHandler(this AstNode node, Compiler compiler, IDictionary<string, Type> parameters, IExceptionHandler exceptionHandler)
+    public static LambdaExpression? CompileWithHandler(this AstNode node, Compiler compiler, IDictionary<string, Type> parameters, IExceptionHandler exceptionHandler)
     {
         try
         {

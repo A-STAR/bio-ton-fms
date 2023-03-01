@@ -3,6 +3,7 @@ using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
 using BioTonFMS.Telematica;
+using BiotonFMS.Telematica.Tests.Expressions;
 using FluentAssertions;
 
 namespace BiotonFMS.Telematica.Tests;
@@ -72,11 +73,11 @@ public class MessageProcessingTests
                 {
                     new()
                     {
-                        Id = 222, Formula = "a"
+                        Id = 222, Formula = "a", Name = "b"
                     },
                     new()
                     {
-                        Id = 361, Formula = "a"
+                        Id = 361, Formula = "b", Name = "c"
                     }
                 }
             }
@@ -91,10 +92,15 @@ public class MessageProcessingTests
         var result = trackers.BuildSensors(trackerTags).ToArray();
         result.Length.Should().Be(1);
         result[0].Item1.Should().Be(111);
-        result[0].Item2.Length.Should().Be(1);
-        result[0].Item2[0].Item1.Should().Be(222.ToString());
-        result[0].Item2[0].Item2.Should().NotBeNull();
-        result[0].Item2[0].Item2!.ToString().Should().Be("a => IIF(a.IsFallback, null, a.Value)");
+        result[0].Item2.Length.Should().Be(2);
+
+        result[0].Item2[0].Properties.Name.Should().Be("b");
+        result[0].Item2[0].ExpressionTree.Should().NotBeNull();
+        TestUtil.ExtractUnwrappedExpression(result[0].Item2[0].ExpressionTree)!.ToString().Should().Be("IIF(a.IsFallback, null, a.Value)");
+
+        result[0].Item2[1].Properties.Name.Should().Be("c");
+        result[0].Item2[1].ExpressionTree.Should().NotBeNull();
+        TestUtil.ExtractUnwrappedExpression(result[0].Item2[1].ExpressionTree)!.ToString().Should().Be("IIF(b.IsFallback, null, b.Value)");
     }
 
     [Fact]
@@ -110,24 +116,36 @@ public class MessageProcessingTests
         {
             parameterD
         };
-        var sensorExpressions = new List<(string, Expression?)>
+        var sensorExpressions = new List<CompiledExpression<ExpressionProperties>>
         {
-            (
-                "b",
+            new(
+                new ExpressionProperties(new Sensor()
+                {
+                    Name = "b"
+                }),
                 Expression.Lambda(Expression.Property(parameterA, "Value"), parametersA)
-            ),
-            (
-                "c",
+                ),
+            new(
+                new ExpressionProperties(new Sensor()
+                {
+                    Name = "c"
+                }),
                 Expression.Lambda(Expression.Property(parameterA, "IsFallback"), parametersA)
-            ),
-            (
-                "e",
+                ),
+            new(
+                new ExpressionProperties(new Sensor()
+                {
+                    Name = "e"
+                }),
                 Expression.Lambda(Expression.Property(parameterD, "Value"), parametersD)
-            ),
-            (
-                "f",
+                ),
+            new(
+                new ExpressionProperties(new Sensor()
+                {
+                    Name = "f"
+                }),
                 Expression.Lambda(Expression.Property(parameterD, "IsFallback"), parametersD)
-            )
+                )
         };
         var messageTags = new MessageTag[]
         {
@@ -154,19 +172,19 @@ public class MessageProcessingTests
 
         result.Length.Should().Be(4);
 
-        result[0].Item1.Should().Be("b");
+        result[0].Item1.Name.Should().Be("b");
         result[0].Item2.Should().NotBeNull();
         result[0].Item2!.Should().Be(345);
 
-        result[1].Item1.Should().Be("c");
+        result[1].Item1.Name.Should().Be("c");
         result[1].Item2.Should().NotBeNull();
         result[1].Item2!.Should().Be(false);
 
-        result[2].Item1.Should().Be("e");
+        result[2].Item1.Name.Should().Be("e");
         result[2].Item2.Should().NotBeNull();
         result[2].Item2!.Should().Be(543);
 
-        result[3].Item1.Should().Be("f");
+        result[3].Item1.Name.Should().Be("f");
         result[3].Item2.Should().NotBeNull();
         result[3].Item2!.Should().Be(true);
     }
