@@ -20,12 +20,12 @@ public static class MessageProcessing
         if (previousMessage is null)
             return;
         
-        // Собираем трекерные теги из предыдущего сообщения в словарь. 
+        // Puts tracker tags from the previous message into dictionary
         var previousTags = previousMessage.Tags
             .Where(t => t.TrackerTagId.HasValue)
             .ToDictionary(previousTag => previousTag.TrackerTagId!.Value);
 
-        // Удаляем из previousTags теги, которые есть в тегах текущего сообщения (для них не нужно FallBackValue)
+        // Delete tags which exist in current message from previous because they do not need fallbacks
         foreach (var tag in message.Tags)
         {
             if (!tag.TrackerTagId.HasValue || !previousTags.ContainsKey(tag.TrackerTagId.Value))
@@ -33,7 +33,7 @@ public static class MessageProcessing
             previousTags.Remove(tag.TrackerTagId.Value);
         }
 
-        // Добавляет оставшиеся тэги в сообщение
+        // Adds remaining tags to the current message
         foreach (var previousTag in previousTags)
         {
             if (previousTag.Value is not MessageTagDouble doubleTag)
@@ -59,16 +59,29 @@ public static class MessageProcessing
     public static IEnumerable<(int TrackerId, (string Name, Expression? Expression)[])> BuildSensors(this IEnumerable<Tracker> trackers,
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
-        var parameters = trackerTags.Where(t =>
-                t.DataType is TagDataTypeEnum.Double or TagDataTypeEnum.Integer
-                    or TagDataTypeEnum.Byte /* For the moment we can process doubles only */)
-            .ToDictionary(t => t.Name, _ => typeof( TagData<double> ) /* For the moment we can process doubles only */);
+        Dictionary<string, Type> parameterTypesDictionary = BuildParameterDictionaryByTags(trackerTags);
+        
         return trackers.Select(t => (
             t.Id,
             t.Sensors
                 .Select(s => (s.Id.ToString(), (s.Formula, UseFallbacks: s.UseLastReceived)))
-                .SortAndBuild(parameters, exceptionHandler)
+                .SortAndBuild(parameterTypesDictionary, exceptionHandler)
                 .ToArray()));
+    }
+    
+    /// <summary>
+    /// Builds parameter dictionary by tags
+    /// </summary>
+    /// <param name="trackerTags">Tags</param>
+    /// <returns>Parameter dictionary (name -> type)</returns>
+    private static Dictionary<string, Type> BuildParameterDictionaryByTags(IEnumerable<TrackerTag> trackerTags)
+    {
+
+        var parameters = trackerTags.Where(t =>
+                t.DataType is TagDataTypeEnum.Double or TagDataTypeEnum.Integer
+                    or TagDataTypeEnum.Byte /* For the moment we can process doubles only */)
+            .ToDictionary(t => t.Name, _ => typeof( TagData<double> ) /* For the moment we can process doubles only */);
+        return parameters;
     }
 
     /// <summary>
@@ -82,6 +95,22 @@ public static class MessageProcessing
     public static IEnumerable<(string, object?)> CalculateSensors(this IEnumerable<(string, Expression?)> sensorExpressions,
         IEnumerable<MessageTag> messageTags, IDictionary<int, string> tagNameByIdDict)
     {
+        Dictionary<string, object?> argumentsByNames = BuildArgumentsDictionaryByMessageTags(messageTags, tagNameByIdDict);
+
+        var calculatedSensors = sensorExpressions.Execute(argumentsByNames);
+
+        return calculatedSensors;
+    }
+    
+    /// <summary>
+    /// Builds arguments dictionary by message tags
+    /// </summary>
+    /// <param name="messageTags">Message tags</param>
+    /// <param name="tagNameByIdDict">Dictionary which maps tag ids to tag names (id -> name)</param>
+    /// <returns>Dictionary which maps argument names to argument values</returns>
+    private static Dictionary<string, object?> BuildArgumentsDictionaryByMessageTags(IEnumerable<MessageTag> messageTags, IDictionary<int, string> tagNameByIdDict)
+    {
+
         var arguments = messageTags
             .Where(tag =>
                 tag is MessageTagDouble or MessageTagInteger or MessageTagByte /* For the moment we can process doubles only */ &&
@@ -97,10 +126,7 @@ public static class MessageProcessing
                         MessageTagInteger v => v.Value,
                         _ => throw new Exception("This type of tags is not supported for the moment!")
                     }, tag.IsFallback)));
-
-        var calculatedSensors = sensorExpressions.Execute(arguments);
-
-        return calculatedSensors;
+        return arguments;
     }
 
     /// <summary>
@@ -127,26 +153,34 @@ public static class MessageProcessing
     /// Calculates sensor bound message tags and adds them to their message 
     /// </summary>
     /// <param name="message">Message which contains sensor expression arguments and which will be
-    /// modified by adding tags with calculated sensor values</param>
+    /// modified by removing old sensor tags and then adding sensor tags with new sensor values</param>
     /// <param name="builtSensors">Previously built sensor expressions</param>
     /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
     private static void UpdateSensorTags(this TrackerMessage message, IDictionary<int, (string, Expression?)[]> builtSensors,
         IDictionary<int, string> tagNameByIdDict)
     {
-        var builtTrackerSensors = builtSensors[message.TrId];
+        // Get sequence of built sensors for tracker 
+        (string, Expression?)[] builtTrackerSensors = builtSensors[message.TrId];
+        
+        // Calculate sensor values and put the values to message tags
         var newTags = builtTrackerSensors
             .CalculateSensors(message.Tags, tagNameByIdDict)
             .ConvertSensorValuesToTags(message);
-        var newTagList = message.Tags.Where(tag => !tag.SensorId.HasValue).ToList();
-        newTagList.AddRange(newTags);
-        message.Tags = newTagList;
+        
+        // Create new tag list then fill it with existing message tags and
+        // add message tags for sensors 
+        var newListOfTags = message.Tags.Where(tag => !tag.SensorId.HasValue).ToList();
+        newListOfTags.AddRange(newTags);
+        
+        // Set new list instead of old list
+        message.Tags = newListOfTags;
     }
 
     /// <summary>
     /// Builds sensor expressions and uses them to calculate sensor values for a set of messages
     /// </summary>
-    /// <param name="messages">Messages for which sensor values will be calculates. They will be
-    /// modified by adding tags with those sensor values</param>
+    /// <param name="messages">Sequence of messages for which sensor values will be calculated. They will be
+    /// modified by removing old sensor tags and then adding tags with new sensor values</param>
     /// <param name="trackers">Trackers for messages. Should contain all trackers which are
     /// referenced by the messages</param>
     /// <param name="trackerTags">Tracker tags used to determine names, types and values of sensor parameters</param>
@@ -154,18 +188,21 @@ public static class MessageProcessing
     public static void UpdateSensorTags(this IEnumerable<TrackerMessage> messages, IEnumerable<Tracker> trackers,
         ICollection<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
-        var builtSensors = trackers
+        // Build sensors
+        Dictionary<int, (string Name, Expression? Expression)[]> builtSensorsByName = trackers
             .BuildSensors(trackerTags, exceptionHandler)
             .ToDictionary(t => t.Item1 /* Tracker id */, t => t.Item2);
 
-        var tagNameById = trackerTags
+        // Build dictionary which maps tad ids to tag names
+        Dictionary<int, string> tagNameById = trackerTags
             .Where(tag => tag.DataType is TagDataTypeEnum.Double or TagDataTypeEnum.Byte
                 or TagDataTypeEnum.Integer /* For the moment we can process doubles only */)
             .ToDictionary(tag => tag.Id, tag => tag.Name);
 
+        // Update sensor tags for all messages in sequence
         foreach (var message in messages)
         {
-            message.UpdateSensorTags(builtSensors, tagNameById);
+            message.UpdateSensorTags(builtSensorsByName, tagNameById);
         }
     }
 }
