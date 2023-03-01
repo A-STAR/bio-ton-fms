@@ -1,12 +1,13 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
+import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
 
 import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, NewTracker } from '../tracker.service';
 
@@ -151,15 +152,34 @@ export default class TrackersComponent implements OnInit, OnDestroy {
    *
    * @param vehicleDataSource Tracker data source.
    */
-  protected async onDeleteTracker({ name }: TrackerDataSource) {
+  protected async onDeleteTracker({ id, name }: TrackerDataSource) {
     const data: ConfirmationDialogData = {
       content: getConfirmationDialogContent(name)
     };
 
-    this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
       ConfirmationDialogComponent,
       { ...confirmationDialogConfig, data }
     );
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        mergeMap(() => this.trackerService.deleteTracker(id))
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open(TRACKER_DELETED);
+
+          this.#updateTrackers();
+        },
+        error: error => {
+          this.errorHandler.handleError(error);
+
+          this.#updateTrackers();
+        }
+      });
   }
 
   #trackers$ = new BehaviorSubject<TrackersOptions>({});
@@ -225,7 +245,12 @@ export default class TrackersComponent implements OnInit, OnDestroy {
     this.columnKeys = this.columns.map(({ key }) => key);
   }
 
-  constructor(private dialog: MatDialog, private trackerService: TrackerService) { }
+  constructor(
+    private errorHandler: ErrorHandler,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private trackerService: TrackerService
+  ) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
@@ -250,7 +275,7 @@ export enum TrackerColumn {
   Vehicle = 'vehicle'
 }
 
-interface TrackerDataSource extends Pick<Tracker, 'id' | 'name' | 'imei' | 'description' | 'vehicle'> {
+export interface TrackerDataSource extends Pick<Tracker, 'id' | 'name' | 'imei' | 'description' | 'vehicle'> {
   external: Tracker['externalId'],
   type: Tracker['trackerType'],
   sim: Tracker['simNumber'],
@@ -293,3 +318,4 @@ export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
 ];
 
 export const DATE_FORMAT = 'd MMMM y, h:mm';
+export const TRACKER_DELETED = 'GPS-трекер удален';
