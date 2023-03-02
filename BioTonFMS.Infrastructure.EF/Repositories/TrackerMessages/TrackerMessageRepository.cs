@@ -12,8 +12,6 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 {
     public TrackerMessageRepository(IKeyValueProvider<TrackerMessage, int> keyValueProvider,
         IQueryableProvider<TrackerMessage> queryableProvider,
-        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider,
-        unitOfWorkFactory)
         UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory)
         : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
