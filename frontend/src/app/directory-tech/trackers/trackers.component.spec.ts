@@ -1,8 +1,9 @@
-import { LOCALE_ID } from '@angular/core';
+import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
@@ -14,14 +15,16 @@ import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { Trackers, TrackerService } from '../tracker.service';
 
-import TrackersComponent, { DATE_FORMAT, TrackerColumn, trackerColumns } from './trackers.component';
+import TrackersComponent, { DATE_FORMAT, TrackerColumn, trackerColumns, TRACKER_DELETED } from './trackers.component';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
+import { environment } from '../../../environments/environment';
 import { testTrackers } from '../tracker.service.spec';
 
 describe('TrackersComponent', () => {
@@ -30,6 +33,7 @@ describe('TrackersComponent', () => {
   let overlayContainer: OverlayContainer;
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
+  let trackerService: TrackerService;
 
   let trackersSpy: jasmine.Spy<() => Observable<Trackers>>;
 
@@ -58,7 +62,7 @@ describe('TrackersComponent', () => {
     loader = TestbedHarnessEnvironment.loader(fixture);
     overlayContainer = TestBed.inject(OverlayContainer);
 
-    const trackerService = TestBed.inject(TrackerService);
+    trackerService = TestBed.inject(TrackerService);
 
     component = fixture.componentInstance;
 
@@ -209,17 +213,28 @@ describe('TrackersComponent', () => {
             variant: 'icon',
             text: 'edit'
           })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'delete'
+          })
         )
       ])
     ));
 
-    actionButtons.forEach(async ([actionButton, updateButton]) => {
+    actionButtons.forEach(async ([actionButton, updateButton, deleteButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
 
       expect(updateButton)
         .withContext('render update button')
+        .not.toBeNull();
+
+      expect(deleteButton)
+        .withContext('render delete button')
         .not.toBeNull();
 
       actionButton!.hasHarness(
@@ -231,6 +246,12 @@ describe('TrackersComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
+        })
+      );
+
+      deleteButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'delete'
         })
       );
     });
@@ -432,5 +453,103 @@ describe('TrackersComponent', () => {
       .and.returnValue(dialogRef);
 
     await updateTrackerButtons[0].click();
+  });
+
+  it('should delete tracker', async () => {
+    const deleteTrackerSpy = spyOn(trackerService, 'deleteTracker')
+      .and.callFake(() => of({}));
+
+    let deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        variant: 'icon',
+        text: 'delete'
+      })
+    );
+
+    await deleteButton.click();
+
+    let confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+
+    let confirmButton = await confirmationDialog!.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await confirmButton.click();
+
+    expect(trackerService.deleteTracker)
+      .toHaveBeenCalledWith(testTrackers.trackers[0].id);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(TRACKER_DELETED);
+
+    expect(trackersSpy)
+      .toHaveBeenCalled();
+
+    deleteTrackerSpy.calls.reset();
+
+    /* Handle an error although update trackers anyway. */
+
+    const testURL = `${environment.api}/api/telematica/tracker/${testTrackers.trackers[1].id}`;
+
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        message: `Http failure response for ${testURL}: 500 Internal Server Error`
+      },
+      status: 500,
+      statusText: 'Internal Server Error',
+      url: testURL
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    spyOn(errorHandler, 'handleError');
+    deleteTrackerSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    [, deleteButton] = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        variant: 'icon',
+        text: 'delete'
+      })
+    );
+
+    await deleteButton.click();
+
+    confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    confirmButton = await confirmationDialog!.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await confirmButton.click();
+
+    expect(trackerService.deleteTracker)
+      .toHaveBeenCalledWith(testTrackers.trackers[1].id);
+
+    expect(errorHandler.handleError)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    expect(trackersSpy)
+      .toHaveBeenCalled();
+
+    overlayContainer.ngOnDestroy();
   });
 });
