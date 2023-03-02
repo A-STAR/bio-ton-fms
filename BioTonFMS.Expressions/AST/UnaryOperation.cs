@@ -1,8 +1,18 @@
 ﻿namespace BioTonFMS.Expressions.AST;
 
+/// <summary>
+/// Type of AST nodes representing unary operations, e.g., "-", "()"
+/// </summary>
 public class UnaryOperation : AstNode, IEquatable<UnaryOperation>
 {
+    /// <summary>
+    /// Operand of unary operation
+    /// </summary>
     public AstNode Operand { get; }
+    
+    /// <summary>
+    /// Type of unary operation
+    /// </summary>
     public UnaryOperationEnum Operation { get; }
 
     public UnaryOperation(AstNode operand, UnaryOperationEnum operation)

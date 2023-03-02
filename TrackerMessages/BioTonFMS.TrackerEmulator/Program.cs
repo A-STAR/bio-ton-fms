@@ -42,7 +42,7 @@ void AddClientParams(IServiceCollection services, IConfiguration config)
     services.AddSingleton(new ClientParams
     {
         MessagePath = config["message"],
-        RepeatPath = config["result"],
+        ResultPath = config["result"],
         RepeatCount = repeatCnt,
         ScriptPath = config["script"]
     });

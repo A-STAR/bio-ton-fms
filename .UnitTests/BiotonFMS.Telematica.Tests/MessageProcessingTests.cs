@@ -18,7 +18,7 @@ public class MessageProcessingTests
             {
                 new MessageTagDouble()
                 {
-                    TagType = 4, IsFallback = false, TrackerTagId = 1, Value = 22
+                    TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 1, Value = 22
                 }
             }
         };
@@ -28,15 +28,15 @@ public class MessageProcessingTests
             {
                 new MessageTagDouble()
                 {
-                    TagType = 4, IsFallback = false, TrackerTagId = 1, Value = 11
+                    TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 1, Value = 11
                 },
                 new MessageTagDouble()
                 {
-                    TagType = 4, IsFallback = true, TrackerTagId = 2, Value = 111
+                    TagType = TagDataTypeEnum.Double, IsFallback = true, TrackerTagId = 2, Value = 111
                 },
                 new MessageTagDouble()
                 {
-                    TagType = 4, IsFallback = false, TrackerTagId = 3, Value = 1111
+                    TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 3, Value = 1111
                 }
             }
         };
@@ -45,19 +45,19 @@ public class MessageProcessingTests
         var tags1 = message.Tags.Where(t => t.TrackerTagId == 1).ToArray();
         tags1.Length.Should().Be(1);
         tags1[0].IsFallback.Should().BeFalse();
-        tags1[0].TagType.Should().Be(4);
+        tags1[0].TagType.Should().Be(TagDataTypeEnum.Double);
         (tags1[0] as MessageTagDouble)!.Value.Should().Be(22);
 
         var tags2 = message.Tags.Where(t => t.TrackerTagId == 2).ToArray();
         tags2.Length.Should().Be(1);
         tags2[0].IsFallback.Should().BeTrue();
-        tags2[0].TagType.Should().Be(4);
+        tags2[0].TagType.Should().Be(TagDataTypeEnum.Double);
         (tags2[0] as MessageTagDouble)!.Value.Should().Be(111);
 
         var tags3 = message.Tags.Where(t => t.TrackerTagId == 3).ToArray();
         tags3.Length.Should().Be(1);
         tags3[0].IsFallback.Should().BeTrue();
-        tags3[0].TagType.Should().Be(4);
+        tags3[0].TagType.Should().Be(TagDataTypeEnum.Double);
         (tags3[0] as MessageTagDouble)!.Value.Should().Be(1111);
     }
 
@@ -129,11 +129,11 @@ public class MessageProcessingTests
         {
             new MessageTagDouble()
             {
-                TrackerTagId = 123, TagType = 4, IsFallback = false, Value = 345
+                TrackerTagId = 123, TagType = TagDataTypeEnum.Double, IsFallback = false, Value = 345
             },
             new MessageTagDouble()
             {
-                TrackerTagId = 124, TagType = 4, IsFallback = true, Value = 543
+                TrackerTagId = 124, TagType = TagDataTypeEnum.Double, IsFallback = true, Value = 543
             }
         };
         var tagNameById = new Dictionary<int, string>
@@ -178,11 +178,11 @@ public class MessageProcessingTests
                 {
                     new MessageTagDouble()
                     {
-                        TagType = 4, IsFallback = false, TrackerTagId = 123, Value = 22
+                        TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 123, Value = 22
                     },
                     new MessageTagDouble()
                     {
-                        TagType = 4, IsFallback = false, SensorId = 12332, Value = 2345
+                        TagType = TagDataTypeEnum.Double, IsFallback = false, SensorId = 12332, Value = 2345
                     }
                 }
             }

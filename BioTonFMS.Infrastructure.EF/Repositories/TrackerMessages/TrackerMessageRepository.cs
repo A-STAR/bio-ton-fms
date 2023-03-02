@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Infrastructure.EF.Providers;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         IQueryableProvider<TrackerMessage> queryableProvider,
         UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider,
         unitOfWorkFactory)
+        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory)
+        : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
     }
 
@@ -37,6 +40,9 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var linqProvider = QueryableProvider.Fetch(m => m.Tags).Linq().AsNoTracking().OrderBy(m => m.Id);
         return linqProvider.ToList();
     }
+
+    public bool ExistsByUID(Guid uid) =>
+        QueryableProvider.Linq().Any(x => x.PackageUID == uid);
 
     public TrackerStandardParameters GetParameters(int externalId, string imei)
     {

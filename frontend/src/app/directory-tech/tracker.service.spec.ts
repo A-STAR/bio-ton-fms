@@ -187,6 +187,25 @@ describe('TrackerService', () => {
 
     updateTrackerRequest.flush(null);
   });
+
+  it('should delete tracker', (done: DoneFn) => {
+    service
+      .deleteTracker(testTrackers.trackers[0].id)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const deleteTrackerRequest = httpTestingController.expectOne({
+      method: 'DELETE',
+      url: `/api/telematica/tracker/${testNewTracker.id}`
+    }, 'delete tracker request');
+
+    deleteTrackerRequest.flush(null);
+  });
 });
 
 export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [

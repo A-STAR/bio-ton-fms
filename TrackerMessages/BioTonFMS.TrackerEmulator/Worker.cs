@@ -54,11 +54,11 @@ public class Worker : BackgroundService
             return Task.CompletedTask;
         }
 
-        if (_parameters is { MessagePath: { }, RepeatPath: { } })
+        if (_parameters is { MessagePath: { }, ResultPath: { } })
         {
             for (var i = 0; i < _parameters.RepeatCount; i++)
             {
-                SendRequest(_parameters.MessagePath, _parameters.RepeatPath, stream);
+                SendRequest(_parameters.MessagePath, _parameters.ResultPath, stream);
             }
 
             return Task.CompletedTask;
@@ -135,7 +135,7 @@ public class Worker : BackgroundService
         }
 
         if (File.Exists(_parameters.MessagePath) &&
-            !string.IsNullOrWhiteSpace(_parameters.RepeatPath))
+            !string.IsNullOrWhiteSpace(_parameters.ResultPath))
         {
             ValidateInput(_parameters.MessagePath);
             return;

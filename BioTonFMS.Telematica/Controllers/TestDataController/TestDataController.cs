@@ -1,5 +1,6 @@
 ﻿using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
@@ -148,8 +149,8 @@ public class TestDataController : ValidationControllerBase
             MessageProcessing.CalculateFallBackValues(message, i > 0 ? messages[i - 1] : null);
         }
         var trackerTags = _trackerTagRepository.GetTags().ToArray();
-        var executionHandler = new ExecutionHandler(_logger);
-        messages.UpdateSensorTags(pageWithTrackers.Results, trackerTags, executionHandler);
+        var exceptionHandler = new ExceptionHandler(_logger);
+        messages.UpdateSensorTags(pageWithTrackers.Results, trackerTags, exceptionHandler);
         foreach (var message in messages)
         {
             _messageRepository.Update(message);

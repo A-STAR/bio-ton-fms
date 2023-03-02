@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Controllers;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
