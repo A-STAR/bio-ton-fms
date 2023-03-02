@@ -1,5 +1,5 @@
 ﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Persistence;
 

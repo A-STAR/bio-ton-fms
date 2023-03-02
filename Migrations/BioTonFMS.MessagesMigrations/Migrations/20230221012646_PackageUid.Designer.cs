@@ -4,6 +4,7 @@ using System.Collections;
 using BioTonFMS.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMS.MessagesMigrations.Migrations
 {
     [DbContext(typeof(MessagesDBContext))]
-    partial class MessagesDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230221012646_PackageUid")]
+    partial class PackageUid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,14 +34,6 @@ namespace BioTonFMS.MessagesMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("IsFallback")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_fallback");
-
-                    b.Property<int?>("SensorId")
-                        .HasColumnType("integer")
-                        .HasColumnName("sensor_id");
-
                     b.Property<byte>("TagType")
                         .HasColumnType("smallint")
                         .HasColumnName("tag_type");
@@ -48,7 +42,7 @@ namespace BioTonFMS.MessagesMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("tracker_message_id");
 
-                    b.Property<int?>("TrackerTagId")
+                    b.Property<int>("TrackerTagId")
                         .HasColumnType("integer")
                         .HasColumnName("tracker_tag_id");
 
