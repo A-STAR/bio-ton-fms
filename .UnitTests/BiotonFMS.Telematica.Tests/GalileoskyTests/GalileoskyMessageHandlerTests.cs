@@ -1,7 +1,10 @@
 using System.Globalization;
 using BiotonFMS.Telematica.Tests.Mocks;
+using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit.Abstractions;
 
 namespace BiotonFMS.Telematica.Tests.GalileoskyTests;
@@ -45,10 +48,12 @@ public class GalileoskyMessageHandlerTests
     public void HandleMessage_ValidCheckSumFromFile_ShouldPublishMessage(
         string title, string messagePath, bool shouldPublish = true)
     {
+        var logStub = new Mock<ILogger<GalileoskyProtocolMessageHandler>>();
+
         _testOutputHelper.WriteLine(title);
 
         var busMock = new MessageBusMock();
-        var handler = new GalileoskyProtocolMessageHandler(busMock);
+        var handler = new GalileoskyProtocolMessageHandler(busMock, logStub.Object);
 
         var bytes = File.ReadAllLines(messagePath)
             .SelectMany(x => x.Split())
