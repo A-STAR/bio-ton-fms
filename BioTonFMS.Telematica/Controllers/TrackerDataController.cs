@@ -28,7 +28,7 @@ public class TrackerDataController : ValidationControllerBase
     /// Возвращает список последних полученных стандартных параметров трекера
     /// </summary>
     /// <param name="trackerId">Id трекера</param>
-    /// <response code="200">Список стандартных успешно возвращен</response>
+    /// <response code="200">Список стандартных параметров успешно возвращен</response>
     /// <response code="404">Трекера не существует</response>
     [HttpGet("tracker/standardparameters/{trackerId:int}")]
     public IActionResult GetStandardParameters(int trackerId)
