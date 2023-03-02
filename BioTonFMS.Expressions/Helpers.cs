@@ -1,59 +1,52 @@
-﻿namespace BioTonFMS.Expressions;
+﻿using System.Linq.Expressions;
+using BioTonFMS.Expressions.AST;
+
+namespace BioTonFMS.Expressions;
 
 public static class Helpers
 {
     /// <summary>
-    /// Sorts graph nodes topologically
+    /// Executes parsing while using exception handler object to handle exceptions 
     /// </summary>
-    /// <remarks>Graph may contain loops. In this case algorithm doesn't add nodes reachable from looped nodes to the result</remarks>
-    /// <param name="graph">Directed graph represented by dictionary where every key is a node and value is a list of outgoing edges.
-    /// Lists of edges may contain references to nonexistent nodes in this case those references should be ignored</param>
-    /// <returns>Topologically sorted list of graph nodes</returns>
-    private static List<string> TopologicalSort<TData>(this IDictionary<string, (ICollection<string> Edges, TData Data)> graph)
+    /// <param name="expressionString">String which represents parsed expression</param>
+    /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
+    /// <returns>AST representing parsed expression</returns>
+    private static AstNode? ParseWithHandler(string expressionString, IExceptionHandler exceptionHandler)
     {
-        var inDegrees = new Dictionary<string, int>();
-        foreach (var node in graph.Keys)
+        try
         {
-            inDegrees[node] = 0;
+            return Parser.Parse(expressionString);
         }
-
-        foreach (var node in graph.Values)
+        catch( Exception e )
         {
-            foreach (var nodeName in node.Edges)
-            {
-                if (inDegrees.ContainsKey(nodeName))
-                    inDegrees[nodeName]++;
-            }
+            if (!exceptionHandler.Handle(e, OperationTypeEnum.Parsing))
+                throw;
         }
-
-        var queue = new Queue<string>();
-        foreach (var node in inDegrees.Keys.Where(node => inDegrees[node] == 0))
-        {
-            queue.Enqueue(node);
-        }
-
-        var sorted = new List<string>();
-        while (queue.Count > 0)
-        {
-            var node = queue.Dequeue();
-            sorted.Add(node);
-
-            foreach (var adjNode in graph[node].Edges)
-            {
-                if (!inDegrees.ContainsKey(adjNode))
-                    continue;
-
-                inDegrees[adjNode]--;
-
-                if (inDegrees[adjNode] == 0)
-                {
-                    queue.Enqueue(adjNode);
-                }
-            }
-        }
-        return sorted;
+        return null;
     }
-
+    
+    /// <summary>
+    /// Compiles expression while using passed exception handler to handle exceptions
+    /// </summary>
+    /// <param name="node">Root of AST to compile</param>
+    /// <param name="parameters">Names and types of available input parameters.</param>
+    /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
+    /// <param name="options">CompilationOptions</param>
+    /// <returns>Expression tree which is the result of compilation of AST</returns>
+    private static LambdaExpression? CompileWithHandler(this AstNode node, IDictionary<string, Type> parameters, IExceptionHandler exceptionHandler, CompilationOptions options)
+    {
+        try
+        {
+            return Compiler.Compile(node, parameters, options);
+        }
+        catch( Exception e )
+        {
+            if (!exceptionHandler.Handle(e, OperationTypeEnum.Parsing))
+                throw;
+        }
+        return null;
+    }    
+    
     /// <summary>
     /// Builds set of mutually dependent expressions
     /// </summary>
@@ -74,7 +67,7 @@ public static class Helpers
                 keySelector: e => e.Name,
                 elementSelector: e =>
                 {
-                    var ast = Parser.ParseWithHandler(e.Formula, exceptionHandler);
+                    var ast = ParseWithHandler(e.Formula, exceptionHandler);
                     return (
                         Edges: ast is null ? Array.Empty<string>() : (ICollection<string>)ast.GetVariables().ToArray(),
                         Data: (Ast: ast, Props: e));
