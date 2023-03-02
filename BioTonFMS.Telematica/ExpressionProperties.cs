@@ -3,7 +3,7 @@ using BioTonFMS.Expressions;
 
 namespace BioTonFMS.Telematica;
 
-public readonly struct ExpressionProperties : Helpers.IExpressionProperties
+public readonly struct ExpressionProperties : IExpressionProperties
 {
     public readonly Sensor Sensor;
 

@@ -255,7 +255,9 @@ public class CompilerTests
         var lambda = compiler.Compile(node, parameters);
         lambda.Should().NotBeNull();
         TestUtil.ExtractUnwrappedExpression(lambda)?.ToString().Should().Be(expression);
-        var executionResult = Helpers.Execute(lambda, arguments);
+
+        var compiledExpression = new CompiledExpression<TestExpressionProperties>(new TestExpressionProperties(), lambda);
+        var executionResult = Helpers.Execute(compiledExpression, arguments);
         var value = ((object?)((TagData<double>?)executionResult)?.Value);
         value?.Should().Be(calculationResults[calculationResultIndex]);
     }

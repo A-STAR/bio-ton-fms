@@ -1,7 +1,4 @@
-﻿using System.Linq.Expressions;
-using BioTonFMS.Expressions.AST;
-
-namespace BioTonFMS.Expressions;
+﻿namespace BioTonFMS.Expressions;
 
 public static class Helpers
 {
@@ -57,13 +54,6 @@ public static class Helpers
         return sorted;
     }
 
-    public interface IExpressionProperties
-    {
-        string Name { get; }
-        string Formula { get; }
-        bool UseFallbacks { get; }
-    }
-
     /// <summary>
     /// Builds set of mutually dependent expressions
     /// </summary>
@@ -111,13 +101,16 @@ public static class Helpers
     /// <summary>
     /// Executes lambda expression with specified arguments
     /// </summary>
-    /// <param name="lambda">Compiled lambda expression. Has a set of named parameters which are bound to supplied arguments by name</param>
+    /// <param name="compiledExpression">Compiled lambda expression</param>
     /// <param name="arguments">Dictionary of named arguments for lambda. It may contain more arguments than required by the lambda</param>
     /// <returns>Result of execution of the lambda expression</returns>
-    public static object? Execute(LambdaExpression lambda, IDictionary<string, object?> arguments)
+    public static object? Execute<TExpressionProperties>(CompiledExpression<TExpressionProperties> compiledExpression, IDictionary<string, object?> arguments)
+        where TExpressionProperties : IExpressionProperties
     {
-        var args = lambda.Parameters.Select(p => arguments[p.Name!]);
-        return lambda.Compile().DynamicInvoke(args.ToArray());
+        if (compiledExpression.ExpressionTree == null)
+            return null;
+        var args = compiledExpression.ExpressionTree.Parameters.Select(p => arguments[p.Name!]);
+        return compiledExpression.Compile()?.DynamicInvoke(args.ToArray());
     }
 
     /// <summary>
@@ -130,8 +123,14 @@ public static class Helpers
     public static IEnumerable<(TExpressionProperties, object?)> Execute<TExpressionProperties>(
         this IEnumerable<CompiledExpression<TExpressionProperties>> compiledExpressions,
         IDictionary<string, object?> arguments)
-        where TExpressionProperties : Helpers.IExpressionProperties
+        where TExpressionProperties : IExpressionProperties
     {
-        return compiledExpressions.Select(e => (e.Properties, e.ExpressionTree is { } expTree ? Execute(expTree, arguments) : null));
+        var allArguments = new Dictionary<string, object?>(arguments);
+        return compiledExpressions.Select(e =>
+        {
+            var result = Execute(e, allArguments);
+            allArguments[e.Properties.Name] = result;
+            return (e.Properties, result);
+        });
     }
 }
