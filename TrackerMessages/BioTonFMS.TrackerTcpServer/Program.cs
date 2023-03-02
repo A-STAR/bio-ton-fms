@@ -34,7 +34,7 @@ builder.Services.AddSingleton<IMessageBus>(serviceProvider =>
 
     var secondaryOptions = Options.Create(monitor.Get("Secondary"));
     RabbitMQMessageBus? secondary = null;
-    if (secondaryOptions != null)
+    if (secondaryOptions.Value.Enabled)
     {
         secondary = new RabbitMQMessageBus(
             serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),

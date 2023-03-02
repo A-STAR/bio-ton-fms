@@ -9,14 +9,19 @@ namespace BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 {
     private readonly IMessageBus _messageBus;
+    private readonly ILogger<GalileoskyProtocolMessageHandler> _logger;
 
-    public GalileoskyProtocolMessageHandler(IMessageBus messageBus)
+    public GalileoskyProtocolMessageHandler(
+        IMessageBus messageBus,
+         ILogger<GalileoskyProtocolMessageHandler> logger)
     {
         _messageBus = messageBus;
+        _logger = logger;
     }
 
     public byte[] HandleMessage(byte[] message)
     {
+        _logger.LogInformation("Получено сообщение. Len = {Length}", message.Length);
         var counted = GetCrc(message[..^2], message.Length - 2);
 
         var received = BitConverter.ToUInt16(message[^2..], 0);
@@ -30,6 +35,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
                 PackageUID = Guid.NewGuid()
             };
             _messageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
+            _logger.LogInformation("Сообщение опубликовано. Len = {Length}", message.Length);
         }
 
         return GetResponseForTracker(counted);
