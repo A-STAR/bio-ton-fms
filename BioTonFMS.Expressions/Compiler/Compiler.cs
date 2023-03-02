@@ -111,7 +111,7 @@ public class Compiler
                     typeof( double? )),
                 _ => throw new ArgumentException("Invalid AST: Invalid type of literal!", nameof(v.Type))
             },
-            Variable v => ExpressionExtensions.WrapParameter(_parameterExpressions![v.Name], _options.UseFallbacks),
+            Variable v => ExpressionBuilder.WrapParameter(_parameterExpressions![v.Name], _options.UseFallbacks),
             _ => throw new ArgumentException("Invalid AST: Unknown type of node!")
         };
     }

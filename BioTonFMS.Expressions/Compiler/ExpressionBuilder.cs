@@ -2,7 +2,7 @@
 
 namespace BioTonFMS.Expressions;
 
-public static class ExpressionExtensions
+public static class ExpressionBuilder
 {
     /// <summary>
     /// Adjusts binary operations in a way which allows us to process null operands gracefully.
