@@ -28,6 +28,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             _logger = logger;
         }
 
+        public new Tracker? this[int key] => QueryableProvider.Fetch(x => x.Vehicle)
+            .Linq().FirstOrDefault(x => x.Id == key);
+
         public override void Add(Tracker tracker)
         {
             var trackersWithTheSameExternalId = QueryableProvider.Linq().Where(t => t.ExternalId == tracker.ExternalId);
@@ -39,7 +42,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             {
                 base.Add(tracker);
             }
-            catch (Exception ex)
+            catch( Exception ex )
             {
                 _logger.LogError(ex, "Ошибка при добавлении трекера {@Tracker}", tracker);
                 throw;
@@ -61,7 +64,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             {
                 base.Update(tracker);
             }
-            catch (Exception ex)
+            catch( Exception ex )
             {
                 _logger.LogError(ex, "Ошибка при обновлении трекера {TrackerId}", tracker.Id);
                 throw;
@@ -70,8 +73,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
         public override void Remove(Tracker tracker)
         {
-            var vehicle = _vehicleQueryableProvider
-                .Linq().Where(v => v.TrackerId == tracker.Id).FirstOrDefault();
+            var vehicle = _vehicleQueryableProvider.Linq().FirstOrDefault(v => v.TrackerId == tracker.Id);
 
             if (vehicle is not null)
             {
@@ -88,7 +90,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             {
                 base.Remove(tracker);
             }
-            catch (Exception ex)
+            catch( Exception ex )
             {
                 _logger.LogError(ex, "Ошибка при удалении трекера {@id}", tracker.Id);
                 throw;
@@ -97,7 +99,10 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
         public PagedResult<Tracker> GetTrackers(TrackersFilter filter)
         {
-            var linqProvider = QueryableProvider.Fetch(x => x.Vehicle).Linq();
+            var linqProvider = QueryableProvider
+                .Fetch(x => x.Vehicle)
+                .Fetch(x => x.Sensors)
+                .Linq();
 
             Expression<Func<Tracker, bool>>? trackerPredicate = null;
 
@@ -108,7 +113,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
             if (filter.Type.HasValue)
             {
-                Expression<Func<Tracker, bool>>? typePredicate =
+                Expression<Func<Tracker, bool>> typePredicate =
                     tracker => tracker.TrackerType == filter.Type;
 
                 trackerPredicate = SetPredicate(trackerPredicate, typePredicate);
@@ -116,8 +121,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
             if (!string.IsNullOrEmpty(filter.SimNumber))
             {
-                Expression<Func<Tracker, bool>>? simNumberPredicate =
-                   tracker => tracker.SimNumber == filter.SimNumber;
+                Expression<Func<Tracker, bool>> simNumberPredicate =
+                    tracker => tracker.SimNumber == filter.SimNumber;
 
                 trackerPredicate = SetPredicate(trackerPredicate, simNumberPredicate);
             }
@@ -142,18 +147,11 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 filter.PageNum, filter.PageSize);
         }
 
-        private static Expression<Func<Tracker, bool>>? SetPredicate(
+        private static Expression<Func<Tracker, bool>> SetPredicate(
             Expression<Func<Tracker, bool>>? trackerPredicate,
             Expression<Func<Tracker, bool>> customPredicate)
         {
-            if (trackerPredicate == null)
-            {
-                trackerPredicate = customPredicate;
-            }
-            else
-            {
-                trackerPredicate = trackerPredicate?.And(customPredicate);
-            }
+            trackerPredicate = trackerPredicate == null ? customPredicate : trackerPredicate.And(customPredicate);
 
             return trackerPredicate;
         }

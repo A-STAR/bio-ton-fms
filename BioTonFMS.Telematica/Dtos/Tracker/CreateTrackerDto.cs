@@ -29,6 +29,7 @@ namespace BioTonFMS.Telematica.Dtos.Tracker
         /// <summary>
         /// IMEI трекера
         /// </summary>
+        [Required]
         public string Imei { get; set; } = string.Empty;
 
         /// <summary>
@@ -40,7 +41,7 @@ namespace BioTonFMS.Telematica.Dtos.Tracker
         /// <summary>
         /// Дата и время начала действия трекера на данной машине
         /// </summary>
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         /// Описание

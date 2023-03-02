@@ -121,6 +121,8 @@ public class TrackerController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
+        createTrackerDto.StartDate ??= DateTime.UtcNow;
+
         var newTracker = _mapper.Map<Tracker>(createTrackerDto);
         try
         {

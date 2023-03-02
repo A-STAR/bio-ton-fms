@@ -1,13 +1,23 @@
 ﻿namespace BioTonFMS.Expressions.AST;
 
+/// <summary>
+/// Type of AST nodes representing unary operations, e.g., "-", "()"
+/// </summary>
 public class UnaryOperation : AstNode, IEquatable<UnaryOperation>
 {
-    public AstNode Node { get; }
+    /// <summary>
+    /// Operand of unary operation
+    /// </summary>
+    public AstNode Operand { get; }
+    
+    /// <summary>
+    /// Type of unary operation
+    /// </summary>
     public UnaryOperationEnum Operation { get; }
 
-    public UnaryOperation(AstNode node, UnaryOperationEnum operation)
+    public UnaryOperation(AstNode operand, UnaryOperationEnum operation)
     {
-        Node = node;
+        Operand = operand;
         Operation = operation;
     }
     public bool Equals(UnaryOperation? other)
@@ -16,7 +26,7 @@ public class UnaryOperation : AstNode, IEquatable<UnaryOperation>
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        return Node.Equals(other.Node) && Operation == other.Operation;
+        return Operand.Equals(other.Operand) && Operation == other.Operation;
     }
     public override bool Equals(object? obj)
     {
@@ -28,7 +38,7 @@ public class UnaryOperation : AstNode, IEquatable<UnaryOperation>
     }
     public override int GetHashCode()
     {
-        return HashCode.Combine(Node, (int)Operation);
+        return HashCode.Combine(Operand, (int)Operation);
     }
     public static bool operator ==(UnaryOperation? left, UnaryOperation? right)
     {
@@ -37,5 +47,10 @@ public class UnaryOperation : AstNode, IEquatable<UnaryOperation>
     public static bool operator !=(UnaryOperation? left, UnaryOperation? right)
     {
         return !Equals(left, right);
+    }
+    
+    public override string ToString()
+    {
+        return $"{Operation} {Operand}";
     }
 }

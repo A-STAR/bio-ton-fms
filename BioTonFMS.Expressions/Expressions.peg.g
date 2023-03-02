@@ -18,7 +18,7 @@ multiplicative <AstNode> -memoize
     / left:multiplicative _ "/" _ right:primary { new BinaryOperation(left, right, BinaryOperationEnum.Division) }
     / primary
 
-primary <AstNode> -memoize
+primary <AstNode>
     = var
     / "-" _ primary:primary { new UnaryOperation(primary, UnaryOperationEnum.Negation) }
     / "(" _ additive:additive _ ")" { new UnaryOperation(additive, UnaryOperationEnum.Parentheses) }

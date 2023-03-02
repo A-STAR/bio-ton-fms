@@ -32,6 +32,14 @@ namespace BioTonFMS.MessagesMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<bool>("IsFallback")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_fallback");
+
+                    b.Property<int?>("SensorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sensor_id");
+
                     b.Property<byte>("TagType")
                         .HasColumnType("smallint")
                         .HasColumnName("tag_type");
@@ -40,7 +48,7 @@ namespace BioTonFMS.MessagesMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("tracker_message_id");
 
-                    b.Property<int>("TrackerTagId")
+                    b.Property<int?>("TrackerTagId")
                         .HasColumnType("integer")
                         .HasColumnName("tracker_tag_id");
 

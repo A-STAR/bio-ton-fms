@@ -193,26 +193,34 @@ describe('VehiclesComponent', () => {
 
     const actionButtons = await parallel(() => cells.map(
       ([actionCell]) => parallel(() => [
-        actionCell.getHarnessOrNull(MatButtonHarness.with({
-          variant: 'icon',
-          text: 'more_horiz'
-        })),
-        actionCell.getHarnessOrNull(MatButtonHarness.with({
-          ancestor: '.actions',
-          variant: 'icon',
-          text: 'edit'
-        })),
-        actionCell.getHarnessOrNull(MatButtonHarness.with({
-          ancestor: '.actions',
-          selector: 'a',
-          variant: 'icon',
-          text: 'location_on'
-        })),
-        actionCell.getHarnessOrNull(MatButtonHarness.with({
-          ancestor: '.actions',
-          variant: 'icon',
-          text: 'delete'
-        }))
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            variant: 'icon',
+            text: 'more_horiz'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'edit'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            selector: 'a',
+            variant: 'icon',
+            text: 'location_on'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'delete'
+          })
+        )
       ])
     ));
 
@@ -239,26 +247,33 @@ describe('VehiclesComponent', () => {
             ['../trackers', testVehicles.vehicles[index].tracker?.id].join()
           );
 
-        trackerAnchor?.hasHarness(MatIconHarness.with({
-          name: 'location_on'
-        }));
+        trackerAnchor!.hasHarness(
+          MatIconHarness.with({
+            name: 'location_on'
+          })
+        );
       }
 
       expect(deleteButton)
         .withContext('render delete button')
         .not.toBeNull();
 
-      actionButton?.hasHarness(MatIconHarness.with({
-        name: 'more_horiz'
-      }));
+      actionButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'more_horiz'
+        })
+      );
 
-      updateButton?.hasHarness(MatIconHarness.with({
-        name: 'edit'
-      }));
+      updateButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'edit'
+        }));
 
-      deleteButton?.hasHarness(MatIconHarness.with({
-        name: 'delete'
-      }));
+      deleteButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'delete'
+        })
+      );
     });
   });
 
@@ -403,12 +418,14 @@ describe('VehiclesComponent', () => {
       .withContext('render a vehicle dialog')
       .toBeDefined();
 
-    await vehicleDialog?.close();
+    await vehicleDialog!.close();
 
     expect(vehiclesSpy)
       .toHaveBeenCalled();
 
     overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating vehicles. */
 
     const dialogRef = {
       afterClosed: () => of(true)
@@ -429,19 +446,13 @@ describe('VehiclesComponent', () => {
 
     await updateVehicleButtons[0].click();
 
-    let vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+    const vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
     expect(vehicleDialog)
       .withContext('render a vehicle dialog')
       .toBeDefined();
 
-    await vehicleDialog?.close();
-
-    await updateVehicleButtons[0].click();
-
-    vehicleDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
-
-    await vehicleDialog?.close();
+    await vehicleDialog!.close();
 
     expect(vehiclesSpy)
       .toHaveBeenCalled();

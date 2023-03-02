@@ -168,6 +168,25 @@ describe('TrackerService', () => {
 
     createTrackerRequest.flush(null);
   });
+
+  it('should update tracker', (done: DoneFn) => {
+    service
+      .updateTracker(testNewTracker)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const updateTrackerRequest = httpTestingController.expectOne({
+      method: 'PUT',
+      url: `/api/telematica/tracker/${testNewTracker.id}`
+    }, 'update tracker request');
+
+    updateTrackerRequest.flush(null);
+  });
 });
 
 export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
@@ -186,6 +205,7 @@ export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
 ];
 
 export const testNewTracker: NewTracker = {
+  id: 1,
   externalId: 102,
   name: 'Galileo Sky v 5.0',
   simNumber: '+78462777727',

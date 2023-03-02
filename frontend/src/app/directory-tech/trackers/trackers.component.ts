@@ -8,7 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter } from 'rxjs';
 
-import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService } from '../tracker.service';
+import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, NewTracker } from '../tracker.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
@@ -98,9 +98,36 @@ export default class TrackersComponent implements OnInit, OnDestroy {
    * Add a new GPS-tracker to table.
    */
   protected onCreateTracker() {
-    this.#subscription?.unsubscribe();
-
     const dialogRef = this.dialog.open<TrackerDialogComponent, any, true | '' | undefined>(TrackerDialogComponent);
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(() => {
+        this.#updateTrackers();
+      });
+  }
+
+  /**
+   * Update a tracker in table.
+   *
+   * @param trackerDataSource Tracker data source.
+   */
+  protected onUpdateTracker({ id, external, name, sim, imei, type, start, description }: TrackerDataSource) {
+    const data: NewTracker = {
+      id,
+      externalId: external,
+      name,
+      simNumber: sim,
+      imei,
+      trackerType: type.key,
+      startDate: start,
+      description
+    };
+
+    const dialogRef = this.dialog.open<TrackerDialogComponent, NewTracker, true | '' | undefined>(TrackerDialogComponent, { data });
 
     this.#subscription = dialogRef
       .afterClosed()

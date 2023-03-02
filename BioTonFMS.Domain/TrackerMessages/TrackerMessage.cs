@@ -90,5 +90,5 @@ public class TrackerMessage : EntityBase, IAggregateRoot
     /// <summary>
     /// Набор тегов для сообщения
     /// </summary>
-    public ICollection<MessageTag> Tags { get; set; } = new List<MessageTag>();
+    public IList<MessageTag> Tags { get; set; } = new List<MessageTag>();
 }

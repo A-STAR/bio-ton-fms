@@ -11,7 +11,7 @@ using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;
 using Xunit.Abstractions;
 
-namespace BiotonFMS.Telematica.Tests.RepoTests;
+namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
 public class SensorRepositoryTests
 {

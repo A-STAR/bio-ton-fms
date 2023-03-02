@@ -1,3 +1,4 @@
+using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,13 +18,13 @@ public class MessagesDBContext : DbContext
     {
         modelBuilder.Entity<MessageTag>()
             .HasDiscriminator(x => x.TagType)
-            .HasValue<MessageTagInteger>(1)
-            .HasValue<MessageTagBits>(2)
-            .HasValue<MessageTagByte>(3)
-            .HasValue<MessageTagDouble>(4)
-            .HasValue<MessageTagBoolean>(5)
-            .HasValue<MessageTagString>(6)
-            .HasValue<MessageTagDateTime>(7);
+            .HasValue<MessageTagInteger>(TagDataTypeEnum.Integer)
+            .HasValue<MessageTagBits>(TagDataTypeEnum.Bits)
+            .HasValue<MessageTagByte>(TagDataTypeEnum.Byte)
+            .HasValue<MessageTagDouble>(TagDataTypeEnum.Double)
+            .HasValue<MessageTagBoolean>(TagDataTypeEnum.Boolean)
+            .HasValue<MessageTagString>(TagDataTypeEnum.String)
+            .HasValue<MessageTagDateTime>(TagDataTypeEnum.DateTime);
         
         base.OnModelCreating(modelBuilder);
     }

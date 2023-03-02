@@ -1,13 +1,23 @@
 ﻿namespace BioTonFMS.Expressions.AST;
 
+/// <summary>
+/// Type of AST nodes representing different types of literals
+/// </summary>
 public class Literal : AstNode, IEquatable<Literal>
 {
-    public string Value { get; }
+    /// <summary>
+    /// String representation of literal
+    /// </summary>
+    public string LiteralString { get; }
+    
+    /// <summary>
+    /// Type of literal
+    /// </summary>
     public LiteralEnum Type { get; }
 
-    public Literal(string value, LiteralEnum type)
+    public Literal(string literalString, LiteralEnum type)
     {
-        Value = value;
+        LiteralString = literalString;
         Type = type;
     }
     public bool Equals(Literal? other)
@@ -16,7 +26,7 @@ public class Literal : AstNode, IEquatable<Literal>
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        return Value == other.Value && Type == other.Type;
+        return LiteralString == other.LiteralString && Type == other.Type;
     }
     public override bool Equals(object? obj)
     {
@@ -28,7 +38,7 @@ public class Literal : AstNode, IEquatable<Literal>
     }
     public override int GetHashCode()
     {
-        return HashCode.Combine(Value, (int)Type);
+        return HashCode.Combine(LiteralString, (int)Type);
     }
     public static bool operator ==(Literal? left, Literal? right)
     {
@@ -38,4 +48,10 @@ public class Literal : AstNode, IEquatable<Literal>
     {
         return !Equals(left, right);
     }
+    
+    public override string ToString()
+    {
+        return LiteralString;
+    }
+
 }

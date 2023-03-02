@@ -1,7 +1,13 @@
 ﻿using BioTonFMS.Expressions.AST;
 
+/// <summary>
+/// Type of AST nodes which represents reference to tracker tag or other sensor 
+/// </summary>
 public class Variable : AstNode, IEquatable<Variable>
 {
+    /// <summary>
+    /// Name of referenced tracker tag of sensor  
+    /// </summary>
     public string Name { get; }
     
     public Variable(string name)
@@ -38,4 +44,9 @@ public class Variable : AstNode, IEquatable<Variable>
     {
         return !Equals(left, right);
     }
+    public override string ToString()
+    {
+        return Name;
+    }
+
 }

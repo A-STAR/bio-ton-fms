@@ -12,6 +12,14 @@ public class TrackerTagRepository : Repository<TrackerTag, BioTonDBContext>, ITr
     {
     }
 
+    public IEnumerable<TrackerTag> GetTags()
+    {
+        var tags = QueryableProvider
+            .Linq()
+            .ToList();
+        
+        return tags;
+    }
     public IEnumerable<TrackerTag> GetTagsForTrackerType(TrackerTypeEnum trackerType)
     {
         var tags = QueryableProvider

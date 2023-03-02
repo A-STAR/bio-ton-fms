@@ -11,6 +11,7 @@ namespace BioTonFMS.Telematica.Dtos.Tracker
         /// <summary>
         /// Идентификатор трекера во внешней системе
         /// </summary>
+        [Required]
         public int ExternalId { get; set; }
 
         /// <summary>
@@ -22,11 +23,13 @@ namespace BioTonFMS.Telematica.Dtos.Tracker
         /// <summary>
         /// Номер sim – карты
         /// </summary>
+        [Required]
         public string SimNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// IMEI трекера
         /// </summary>
+        [Required]
         public string Imei { get; set; } = string.Empty;
 
         /// <summary>
@@ -38,6 +41,7 @@ namespace BioTonFMS.Telematica.Dtos.Tracker
         /// <summary>
         /// Дата и время начала действия трекера на данной машине
         /// </summary>
+        [Required]
         public DateTime StartDate { get; set; }
 
         /// <summary>

@@ -16,3 +16,4 @@ StyleCop.Cache
 /TrackerMessages/BioTonFMS.TrackerMessageHandler/logs/*.*
 /TrackerMessages/BioTonFMS.TrackerTcpServer/logs/*.*
 /GlobalAssemblyInfo.cs
+/**/logs/

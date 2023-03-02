@@ -1,6 +1,8 @@
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using BioTonFMS.Infrastructure.Models;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 
 namespace BioTonFMS.Domain.TrackerMessages;
 
@@ -24,12 +26,23 @@ public abstract class MessageTag : EntityBase
     /// <summary>
     /// Идентификатор тега
     /// </summary>
-    public int TrackerTagId { get; set; }
+    public int? TrackerTagId { get; set; }
+    
+    /// <summary>
+    /// Идентификатор датчика
+    /// </summary>
+    public int? SensorId { get; set; }
 
     /// <summary>
     /// Дискриминатор
     /// </summary>
-    public byte TagType { get; set; }
+    public TagDataTypeEnum TagType { get; set; }
+    
+    /// <summary>
+    /// Является ли значение значением взятым из прошлых сообщений
+    /// </summary>
+    [Required]
+    public bool IsFallback { get; set; }
 }
 
 public class MessageTagInteger : MessageTag
