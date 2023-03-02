@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,6 +31,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatTableModule,
     MatSortModule,
     MatButtonModule,
