@@ -38,15 +38,15 @@ static internal class AstExtensions
     /// Compiles expression while using passed exception handler to handle exceptions
     /// </summary>
     /// <param name="node">Root of AST to compile</param>
-    /// <param name="compiler">Compiler used to compile the AST</param>
     /// <param name="parameters">Names and types of available input parameters.</param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
+    /// <param name="options">CompilationOptions</param>
     /// <returns>Expression tree which is the result of compilation of AST</returns>
-    public static LambdaExpression? CompileWithHandler(this AstNode node, Compiler compiler, IDictionary<string, Type> parameters, IExceptionHandler exceptionHandler)
+    public static LambdaExpression? CompileWithHandler(this AstNode node, IDictionary<string, Type> parameters, IExceptionHandler exceptionHandler, CompilationOptions options)
     {
         try
         {
-            return compiler.Compile(node, parameters);
+            return Compiler.Compile(node, parameters, options);
         }
         catch( Exception e )
         {

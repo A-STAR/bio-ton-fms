@@ -247,12 +247,12 @@ public class CompilerTests
         var parameters = arguments.ToDictionary(a => a.Key, a => a.Value!.GetType());
         
         _outputHelper.WriteLine($"Params:\n{parameters.Aggregate("", (a, p) => a + $"{p.Key}: {p.Value}\n")}");
-        
-        var compiler = new Compiler(new CompilerOptions()
+
+        var options = new CompilationOptions()
         {
             UseFallbacks = false
-        });
-        var lambda = compiler.Compile(node, parameters);
+        };
+        var lambda = Compiler.Compile(node, parameters, options);
         lambda.Should().NotBeNull();
         TestUtil.ExtractUnwrappedExpression(lambda)?.ToString().Should().Be(expression);
 

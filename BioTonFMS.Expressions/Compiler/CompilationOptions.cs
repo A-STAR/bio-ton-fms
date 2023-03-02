@@ -3,7 +3,7 @@
 /// <summary>
 /// Options of compilation
 /// </summary>
-public class CompilerOptions
+public class CompilationOptions
 {
     /// <summary>
     /// If it is true then in cases when arguments passed to the executed expression represent fallback values

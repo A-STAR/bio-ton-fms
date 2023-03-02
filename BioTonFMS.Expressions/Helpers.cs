@@ -88,11 +88,11 @@ public static class Helpers
             .Select(name =>
             {
                 var node = graph[name];
-                var compiler = new Compiler(new CompilerOptions
+                var options = new CompilationOptions
                 {
                     UseFallbacks = node.Data.Props.UseFallbacks
-                });
-                var compiledExpression = node.Data.Ast?.CompileWithHandler(compiler, allParameters, exceptionHandler);
+                };
+                var compiledExpression = node.Data.Ast?.CompileWithHandler(allParameters, exceptionHandler, options);
                 if (compiledExpression is not null) allParameters.Add(name, compiledExpression.ReturnType);
                 return new CompiledExpression<TExpressionProperties>(node.Data.Props, compiledExpression);
             });

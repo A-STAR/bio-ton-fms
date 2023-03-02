@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using BioTonFMS.Domain;
+﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
 
@@ -58,13 +57,17 @@ public static class MessageProcessing
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         Dictionary<string, Type> parameterTypesDictionary = BuildParameterDictionaryByTags(trackerTags);
-
-        return trackers.Select(t => (
-            t.Id,
-            t.Sensors
-                .Select(s => new ExpressionProperties(s))
-                .SortAndBuild(parameterTypesDictionary, exceptionHandler)
-                .ToArray()));
+        
+        return trackers.Select(t =>
+        {
+            var sensorNameById = t.Sensors.ToDictionary(s => s.Id, s => s.Name);
+            return (
+                t.Id,
+                t.Sensors
+                    .Select(s => new ExpressionProperties(s, s.ValidatorId == null ? null : sensorNameById[s.ValidatorId.Value]))
+                    .SortAndBuild(parameterTypesDictionary, exceptionHandler)
+                    .ToArray());
+        });
     }
 
     /// <summary>

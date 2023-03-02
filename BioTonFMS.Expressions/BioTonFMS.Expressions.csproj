@@ -12,7 +12,10 @@
 
     <ItemGroup>
       <None Remove="Expressions.peg.g" />
-      <PegGrammar Include="Expressions.peg.g" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PegGrammar Include="Parser\Expressions.peg.g" />
     </ItemGroup>
 
 </Project>
