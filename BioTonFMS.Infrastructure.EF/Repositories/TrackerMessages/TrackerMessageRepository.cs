@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Persistence;
@@ -37,12 +38,12 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return linqProvider.ToList();
     }
 
-    public TrackerStandardParameters GetParameters(int trackerId)
+    public TrackerStandardParameters GetParameters(int externalId, string imei)
     {
         var stdParams = new TrackerStandardParameters();
 
         var last = QueryableProvider.Linq()
-            .Where(x => x.TrId == trackerId)
+            .Where(x => x.TrId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault();
 
@@ -51,22 +52,22 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         stdParams.Time = last.ServerDateTime;
 
         stdParams.Long = last.Longitude ?? QueryableProvider.Linq()
-            .Where(x => x.Longitude != null && x.TrId == trackerId)
+            .Where(x => x.Longitude != null && x.TrId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Longitude;
 
         stdParams.Lat = last.Latitude ?? QueryableProvider.Linq()
-            .Where(x => x.Latitude != null && x.TrId == trackerId)
+            .Where(x => x.Latitude != null && x.TrId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Latitude;
 
         stdParams.Speed = last.Speed ?? QueryableProvider.Linq()
-            .Where(x => x.Speed != null && x.TrId == trackerId)
+            .Where(x => x.Speed != null && x.TrId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Speed;
 
         stdParams.Alt = last.Height ?? QueryableProvider.Linq()
-            .Where(x => x.Height != null && x.TrId == trackerId)
+            .Where(x => x.Height != null && x.TrId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Height;
 

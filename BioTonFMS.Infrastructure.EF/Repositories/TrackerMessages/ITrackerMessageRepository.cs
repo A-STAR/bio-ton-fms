@@ -7,5 +7,5 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 {
     IList<TrackerMessage> GetMessagesForUpdate();
     IList<TrackerMessage> GetMessages();
-    TrackerStandardParameters GetParameters(int id);
+    TrackerStandardParameters GetParameters(int externalId, string imei);
 }
