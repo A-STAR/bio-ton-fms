@@ -8,4 +8,5 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     bool ExistsByUID(Guid uid);
     IList<TrackerMessage> GetMessagesForUpdate();
     IList<TrackerMessage> GetMessages();
+    TrackerStandardParameters GetParameters(int externalId, string imei);
 }
