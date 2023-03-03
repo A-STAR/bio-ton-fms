@@ -1,6 +1,6 @@
 ﻿using BioTonFMS.Expressions.Ast;
 
-namespace BioTonFMS.Expressions;
+namespace BioTonFMS.Expressions.Compilation;
 
 internal static class CompilerAstExtensions
 {

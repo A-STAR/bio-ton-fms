@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using BioTonFMS.Expressions.Ast;
+using BioTonFMS.Expressions.Compilation;
 using BioTonFMS.Expressions.Parsing;
 
 namespace BioTonFMS.Expressions;

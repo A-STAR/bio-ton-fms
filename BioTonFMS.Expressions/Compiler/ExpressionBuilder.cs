@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace BioTonFMS.Expressions;
+namespace BioTonFMS.Expressions.Compilation;
 
 public static class ExpressionBuilder
 {

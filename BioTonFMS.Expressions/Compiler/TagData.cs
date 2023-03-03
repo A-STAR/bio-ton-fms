@@ -1,5 +1,5 @@
 ﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
-namespace BioTonFMS.Expressions;
+namespace BioTonFMS.Expressions.Compilation;
 
 /// <summary>
 /// Represents arguments which are passed to expressions. Apart from main value also contains flag which

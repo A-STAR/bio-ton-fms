@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using BioTonFMS.Expressions;
+using BioTonFMS.Expressions.Compilation;
 using FluentAssertions;
 
 namespace BiotonFMS.Telematica.Tests.Expressions;

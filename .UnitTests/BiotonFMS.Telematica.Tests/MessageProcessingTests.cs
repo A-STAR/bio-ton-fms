@@ -2,6 +2,7 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
+using BioTonFMS.Expressions.Compilation;
 using BioTonFMS.Telematica;
 using BiotonFMS.Telematica.Tests.Expressions;
 using FluentAssertions;

@@ -1,6 +1,7 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
+using BioTonFMS.Expressions.Compilation;
 
 namespace BioTonFMS.Telematica;
 

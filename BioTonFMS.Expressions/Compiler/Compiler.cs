@@ -1,9 +1,8 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
 using BioTonFMS.Expressions.Ast;
-using BioTonFMS.Expressions.Compilation;
 
-namespace BioTonFMS.Expressions;
+namespace BioTonFMS.Expressions.Compilation;
 
 public class Compiler
 {

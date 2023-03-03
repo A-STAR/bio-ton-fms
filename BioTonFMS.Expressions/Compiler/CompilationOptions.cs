@@ -1,4 +1,4 @@
-﻿namespace BioTonFMS.Expressions;
+﻿namespace BioTonFMS.Expressions.Compilation;
 
 /// <summary>
 /// Options of compilation
