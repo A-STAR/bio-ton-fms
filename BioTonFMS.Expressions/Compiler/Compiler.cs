@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
-using BioTonFMS.Expressions.AST;
+using BioTonFMS.Expressions.Ast;
+using BioTonFMS.Expressions.Compilation;
 
 namespace BioTonFMS.Expressions;
 
@@ -55,20 +56,22 @@ public class Compiler
     {
         var variables = node.GetVariables();
         var result = new Dictionary<string, ParameterExpression>(8);
-        foreach (var name in variables)
+        var errors = new List<CompilationError>();
+        foreach (var variable in variables)
         {
-            if (_parameterTypes.TryGetValue(name, out var type))
+            if (_parameterTypes.TryGetValue(variable.Name, out var type))
             {
                 if (type != typeof( TagData<double> ))
-                    throw new ArgumentException($"Type {type} is not supported! Only TagData<double> is supported at the moment.",
-                        nameof(_parameterTypes));
-                result.Add(name, Expression.Parameter(type, name));
+                    errors.Add(new CompilationError(ErrorType.UnsupportedTypeOfParameter, variable, type));
+                result.Add(variable.Name, Expression.Parameter(type, variable.Name));
             }
             else
-            {
-                throw new ArgumentException($"Variable with name {name} doesn't exist!", nameof(node));
-            }
+                errors.Add(new CompilationError(ErrorType.ParameterDoesNotExist, variable, null));
         }
+        
+        if (errors.Count > 0)
+            throw new CompilationException($"Compilation errors!", errors);
+
         return result;
     }
 
@@ -96,23 +99,23 @@ public class Compiler
                 BinaryOperationEnum.Division =>
                     Expression.Divide(CompileRec(v.LeftOperand), CompileRec(v.RightOperand))
                         .Adjust(),
-                _ => throw new ArgumentException("Invalid AST: Invalid type of binary operation!", nameof(node))
+                _ => throw new Exception("Invalid AST: Invalid type of binary operation!")
             },
             UnaryOperation v => v.Operation switch
             {
                 UnaryOperationEnum.Negation => Expression.Negate(CompileRec(v.Operand)).Adjust(),
                 UnaryOperationEnum.Parentheses => CompileRec(v.Operand),
-                _ => throw new ArgumentException("Invalid AST: Invalid type of unary operation!", nameof(v.Operation))
+                _ => throw new Exception("Invalid AST: Invalid type of unary operation!")
             },
             Literal v => v.Type switch
             {
                 LiteralEnum.Decimal => Expression.Constant(
                     double.Parse(v.LiteralString, NumberStyles.Float, NumberFormatInfo.InvariantInfo),
                     typeof( double? )),
-                _ => throw new ArgumentException("Invalid AST: Invalid type of literal!", nameof(v.Type))
+                _ => throw new Exception("Invalid AST: Invalid type of literal!")
             },
             Variable v => ExpressionBuilder.WrapParameter(_parameterExpressions![v.Name], _options.UseFallbacks),
-            _ => throw new ArgumentException("Invalid AST: Unknown type of node!")
+            _ => throw new Exception("Invalid AST: Unknown type of node!")
         };
     }
 }

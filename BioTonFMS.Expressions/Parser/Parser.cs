@@ -1,6 +1,7 @@
-﻿using BioTonFMS.Expressions.AST;
+﻿using BioTonFMS.Expressions.Ast;
+using Pegasus.Common;
 
-namespace BioTonFMS.Expressions;
+namespace BioTonFMS.Expressions.Parsing;
 
 public static class Parser
 {
@@ -12,9 +13,18 @@ public static class Parser
     public static AstNode Parse(string expressionString)
     {
         if (string.IsNullOrEmpty(expressionString))
-            throw new ArgumentException("Expression shouldn't be empty!");
+            throw new ParsingException("Expression shouldn't be empty!", new Location(0), ErrorType.EmptyExpression);
         var parser = new ExpressionParser();
-        var result = parser.Parse(expressionString);
-        return result;
+        try
+        {
+            var result = parser.Parse(expressionString);
+            return result;
+        }
+        catch( FormatException e )
+        {
+            var cursor = e.Data["cursor"] as Cursor;
+            var location = cursor == null ? new Location(0) : new Location(cursor.Location);
+            throw new ParsingException(e.Message, location, ErrorType.UnexpectedSymbol);
+        }
     }
 }

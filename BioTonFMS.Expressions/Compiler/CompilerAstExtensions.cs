@@ -1,4 +1,4 @@
-﻿using BioTonFMS.Expressions.AST;
+﻿using BioTonFMS.Expressions.Ast;
 
 namespace BioTonFMS.Expressions;
 
@@ -9,7 +9,7 @@ internal static class CompilerAstExtensions
     /// </summary>
     /// <param name="node">AST root</param>
     /// <returns>Set of variable names</returns>
-    public static IEnumerable<string> GetVariables(this AstNode node)
+    public static IEnumerable<Variable> GetVariables(this AstNode node)
     {
         var stack = new Stack<AstNode>(8);
         while (true)
@@ -24,7 +24,7 @@ internal static class CompilerAstExtensions
                     node = v.Operand;
                     continue;
                 case Variable v:
-                    yield return v.Name;
+                    yield return v;
                     break;
             }
             if (stack.Count == 0)

@@ -1,4 +1,4 @@
-﻿namespace BioTonFMS.Expressions.AST;
+﻿namespace BioTonFMS.Expressions.Ast;
 
 /// <summary>
 /// Unary arithmetic operations

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
-using BioTonFMS.Expressions.AST;
+using BioTonFMS.Expressions.Ast;
+using BioTonFMS.Expressions.Parsing;
 
 namespace BioTonFMS.Expressions;
 
@@ -24,7 +25,7 @@ public static class Helpers
         }
         return null;
     }
-    
+
     /// <summary>
     /// Compiles expression while using passed exception handler to handle exceptions
     /// </summary>
@@ -33,7 +34,8 @@ public static class Helpers
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
     /// <param name="options">CompilationOptions</param>
     /// <returns>Expression tree which is the result of compilation of AST</returns>
-    private static LambdaExpression? CompileWithHandler(this AstNode node, IDictionary<string, Type> parameters, IExceptionHandler exceptionHandler, CompilationOptions options)
+    private static LambdaExpression? CompileWithHandler(this AstNode node, IDictionary<string, Type> parameters,
+        IExceptionHandler exceptionHandler, CompilationOptions options)
     {
         try
         {
@@ -45,8 +47,8 @@ public static class Helpers
                 throw;
         }
         return null;
-    }    
-    
+    }
+
     /// <summary>
     /// Builds set of mutually dependent expressions
     /// </summary>
@@ -69,7 +71,9 @@ public static class Helpers
                 {
                     var ast = ParseWithHandler(e.Formula, exceptionHandler);
                     return (
-                        Edges: ast is null ? Array.Empty<string>() : (ICollection<string>)ast.GetVariables().ToArray(),
+                        Edges: ast is null
+                            ? Array.Empty<string>()
+                            : (ICollection<string>)ast.GetVariables().Select(v => v.Name).ToArray(),
                         Data: (Ast: ast, Props: e));
                 });
 
@@ -97,7 +101,8 @@ public static class Helpers
     /// <param name="compiledExpression">Compiled lambda expression</param>
     /// <param name="arguments">Dictionary of named arguments for lambda. It may contain more arguments than required by the lambda</param>
     /// <returns>Result of execution of the lambda expression</returns>
-    public static object? Execute<TExpressionProperties>(CompiledExpression<TExpressionProperties> compiledExpression, IDictionary<string, object?> arguments)
+    public static object? Execute<TExpressionProperties>(CompiledExpression<TExpressionProperties> compiledExpression,
+        IDictionary<string, object?> arguments)
         where TExpressionProperties : IExpressionProperties
     {
         if (compiledExpression.ExpressionTree == null)

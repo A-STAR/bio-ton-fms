@@ -1,4 +1,4 @@
-﻿namespace BioTonFMS.Expressions.AST;
+﻿namespace BioTonFMS.Expressions.Ast;
 
 /// <summary>
 /// Type of AST nodes of binary arithmetic operation 
@@ -9,12 +9,12 @@ public class BinaryOperation : AstNode, IEquatable<BinaryOperation>
     /// Left operand of binary operation
     /// </summary>
     public AstNode LeftOperand { get; }
-    
+
     /// <summary>
     /// Right operand of binary operation
     /// </summary>
     public AstNode RightOperand { get; }
-    
+
     /// <summary>
     /// Type of binary operation
     /// </summary>

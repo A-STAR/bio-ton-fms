@@ -1,12 +1,16 @@
-@namespace BioTonFMS.Expressions
+@namespace BioTonFMS.Expressions.Parsing
 @classname ExpressionParser
-@using BioTonFMS.Expressions.AST
+@using BioTonFMS.Expressions.Ast
 
 expression <AstNode>
-    = a:additive (unparsed / "") { a }
+    = _ a:additive _ (unparsed / "") { a }
     
 unparsed
-    = . #error{ "Couldn't parse expression to the end!" } 
+    = cont:(.<1, 10>) #{
+        var c = string.Join("", cont);
+        var location = new Location(state.Location - c.Length, c.Length);
+        throw new ParsingException($"Unexpected continuation \"{c}\"!", location, ErrorType.UnexpectedSymbol); 
+    }
 
 additive <AstNode> -memoize
     = left:additive _ "+" _ right:multiplicative { new BinaryOperation(left, right, BinaryOperationEnum.Addition) }
