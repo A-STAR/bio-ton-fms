@@ -2,7 +2,9 @@ using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
+using BioTonFMS.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioTonFMS.Telematica.Controllers;
@@ -30,7 +32,9 @@ public class TrackerDataController : ValidationControllerBase
     /// <param name="trackerId">Id трекера</param>
     /// <response code="200">Список стандартных параметров успешно возвращен</response>
     /// <response code="404">Трекера не существует</response>
-    [HttpGet("tracker/standardparameters/{trackerId:int}")]
+    [HttpGet("tracker/standard-parameters/{trackerId:int}")]
+    [ProducesResponseType(typeof(TrackerStandardParameter[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetStandardParameters(int trackerId)
     {
         var tracker = _trackerRepository[trackerId];

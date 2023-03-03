@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+
 namespace BioTonFMS.Domain.TrackerMessages;
 
 public class TrackerStandardParameter
@@ -5,11 +8,13 @@ public class TrackerStandardParameter
     /// <summary>
     /// Название параметра
     /// </summary>
-    public string Name { get; set; }
+    [Required]
+    public string Name { get; set; } = string.Empty;
     /// <summary>
     /// Имя параметра
     /// </summary>
-    public string ParamName { get; set; }
+    [Required]
+    public string ParamName { get; set; } = string.Empty;
     /// <summary>
     /// Последнее значение дата и время
     /// </summary>
