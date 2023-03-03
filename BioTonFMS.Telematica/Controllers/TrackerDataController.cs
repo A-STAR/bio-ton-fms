@@ -30,7 +30,7 @@ public class TrackerDataController : ValidationControllerBase
     /// <param name="trackerId">Id трекера</param>
     /// <response code="200">Список стандартных параметров успешно возвращен</response>
     /// <response code="404">Трекера не существует</response>
-    [HttpGet("tracker/standardparameters/{trackerId:int}")]
+    [HttpGet("tracker/standard-parameters/{trackerId:int}")]
     public IActionResult GetStandardParameters(int trackerId)
     {
         var tracker = _trackerRepository[trackerId];
