@@ -108,15 +108,9 @@ public class MessageProcessingTests
     public void CalculateSensors()
     {
         var parameterA = Expression.Parameter(typeof( TagData<double> ), "a");
-        var parametersA = new[]
-        {
-            parameterA
-        };
+        var parameterB = Expression.Parameter(typeof( TagData<double> ), "b");
         var parameterD = Expression.Parameter(typeof( TagData<double> ), "d");
-        var parametersD = new[]
-        {
-            parameterD
-        };
+        var parameterSharpA = Expression.Parameter(typeof( TagData<double> ), "#a");
         var sensorExpressions = new List<CompiledExpression<ExpressionProperties>>
         {
             new(
@@ -124,40 +118,66 @@ public class MessageProcessingTests
                 {
                     Name = "b"
                 }),
-                Expression.Lambda(Expression.Property(parameterA, "Value"), parametersA)
+                Expression.Lambda(
+                    Expression.New(typeof( TagData<double> ).GetConstructors()[0],
+                        Expression.Property(parameterA, "Value"),
+                        Expression.Constant(false)),
+                    parameterA)
                 ),
             new(
                 new ExpressionProperties(new Sensor()
                 {
                     Name = "c"
                 }),
-                Expression.Lambda(Expression.Property(parameterA, "IsFallback"), parametersA)
+                Expression.Lambda(Expression.Property(parameterA, "IsFallback"), parameterA)
                 ),
             new(
                 new ExpressionProperties(new Sensor()
                 {
                     Name = "e"
                 }),
-                Expression.Lambda(Expression.Property(parameterD, "Value"), parametersD)
+                Expression.Lambda(Expression.Property(parameterD, "Value"), parameterD)
                 ),
             new(
                 new ExpressionProperties(new Sensor()
                 {
                     Name = "f"
                 }),
-                Expression.Lambda(Expression.Property(parameterD, "IsFallback"), parametersD)
+                Expression.Lambda(Expression.Property(parameterD, "IsFallback"), parameterD)
+                ),
+            new(
+                new ExpressionProperties(new Sensor()
+                {
+                    Name = "g"
+                }),
+                Expression.Lambda(Expression.Negate(Expression.Property(parameterB, "Value")), parameterB)
+                ),
+            new(
+                new ExpressionProperties(new Sensor()
+                {
+                    Name = "h"
+                }),
+                Expression.Lambda(Expression.Property(parameterSharpA, "Value"), parameterSharpA)
                 )
+
         };
         var messageTags = new MessageTag[]
         {
             new MessageTagDouble
             {
-                TrackerTagId = 123, TagType = TagDataTypeEnum.Double, IsFallback = false, Value = 345
+                TrackerTagId = 123, TagType = TagDataTypeEnum.Double, IsFallback = false, Value = 345 // Name = "a"
             },
             new MessageTagDouble
             {
-                TrackerTagId = 124, TagType = TagDataTypeEnum.Double, IsFallback = true, Value = 543
+                TrackerTagId = 124, TagType = TagDataTypeEnum.Double, IsFallback = true, Value = 543 // Name = "d"
             }
+        };
+        var previousMessageTags = new MessageTag[]
+        {
+            new MessageTagDouble
+            {
+                TrackerTagId = 123, TagType = TagDataTypeEnum.Double, IsFallback = false, Value = 999
+            },
         };
         var tagNameById = new Dictionary<int, string>
         {
@@ -169,13 +189,13 @@ public class MessageProcessingTests
             }
         };
 
-        var result = sensorExpressions.CalculateSensors(messageTags, tagNameById).ToArray();
+        var result = sensorExpressions.CalculateSensors(messageTags, previousMessageTags, tagNameById).ToArray();
 
-        result.Length.Should().Be(4);
+        result.Length.Should().Be(6);
 
         result[0].Item1.Name.Should().Be("b");
         result[0].Item2.Should().NotBeNull();
-        result[0].Item2!.Should().Be(345);
+        result[0].Item2!.Should().Be(new TagData<double>(345));
 
         result[1].Item1.Name.Should().Be("c");
         result[1].Item2.Should().NotBeNull();
@@ -188,6 +208,14 @@ public class MessageProcessingTests
         result[3].Item1.Name.Should().Be("f");
         result[3].Item2.Should().NotBeNull();
         result[3].Item2!.Should().Be(true);
+
+        result[4].Item1.Name.Should().Be("g");
+        result[4].Item2.Should().NotBeNull();
+        result[4].Item2!.Should().Be(-345);
+
+        result[5].Item1.Name.Should().Be("h");
+        result[5].Item2.Should().NotBeNull();
+        result[5].Item2!.Should().Be(999);
     }
 
     [Fact]
