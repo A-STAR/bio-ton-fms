@@ -1,18 +1,23 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
 using BioTonFMS.Expressions.Ast;
+using BioTonFMS.Expressions.Compilation;
 
-namespace BioTonFMS.Expressions.Compilation;
+namespace BiotonFMS.Telematica.Tests.Expressions;
 
-public class ExpressionBuilder : IExpressionBuilder
+class ExpressionBuilderMock : IExpressionBuilder
 {
-    private readonly IExpressionProperties? _expressionProperties;
-
-    public ExpressionBuilder(IExpressionProperties? expressionProperties = null)
+    public Expression BuildUnary(UnaryOperationEnum operation, Expression operand)
     {
-        _expressionProperties = expressionProperties;
+        var expression = operation switch
+        {
+            UnaryOperationEnum.Negation => Expression.Negate(operand),
+            UnaryOperationEnum.Parentheses => operand,
+            _ => throw new Exception("Invalid AST: Invalid type of unary operation!")
+        };
+        return expression;
     }
-
+    
     public Expression BuildBinary(BinaryOperationEnum operation, Expression leftOperand, Expression rightOperand)
     {
         var expression = operation switch
@@ -23,20 +28,9 @@ public class ExpressionBuilder : IExpressionBuilder
             BinaryOperationEnum.Division => Expression.Divide(leftOperand, rightOperand),
             _ => throw new ArgumentException("Invalid AST: Invalid type of binary operation!", nameof(operation))
         };
-        return expression.WrapWithNullHandler();
-    }
-
-    public Expression BuildUnary(UnaryOperationEnum operation, Expression operand)
-    {
-        var expression = operation switch
-        {
-            UnaryOperationEnum.Negation => Expression.Negate(operand).WrapWithNullHandler(),
-            UnaryOperationEnum.Parentheses => operand,
-            _ => throw new Exception("Invalid AST: Invalid type of unary operation!")
-        };
         return expression;
     }
-
+    
     public Expression BuildConstant(LiteralEnum type, string literalString)
     {
         var expression = type switch
@@ -47,17 +41,17 @@ public class ExpressionBuilder : IExpressionBuilder
         };
         return expression;
     }
-
+    
     public Expression WrapParameter(ParameterExpression parameterExpression)
     {
-        return _expressionProperties is not { UseFallbacks: true } ? parameterExpression.Current() : parameterExpression.Latest();
+        return parameterExpression;
     }
-
+    
     public bool IsParameterTypeSupported(Type type)
     {
-        return type == typeof( TagData<double> );
+        return true;
     }
-
+    
     public ParameterExpression BuildParameter(string name, Type type)
     {
         return Expression.Parameter(type, name);
@@ -67,9 +61,9 @@ public class ExpressionBuilder : IExpressionBuilder
     {
         return Expression.Lambda(body, parameters);
     }
-    
+
     public Expression WrapExpression(Expression expression)
     {
-        return Expression.New(typeof( TagData<double> ).GetConstructors()[0], expression, Expression.Constant(false));
+        return expression;
     }
 }

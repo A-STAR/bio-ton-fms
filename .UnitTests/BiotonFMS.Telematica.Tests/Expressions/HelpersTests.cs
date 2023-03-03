@@ -14,8 +14,8 @@ public class HelpersTests
         var result =
             new[]
             {
-                new TestExpressionProperties(name: "c", formula: "d", useFallbacks: false),
-                new TestExpressionProperties(name: "d", formula: "b", useFallbacks: false),
+                new ExpressionPropertiesMock(name: "c", formula: "d", useFallbacks: false),
+                new ExpressionPropertiesMock(name: "d", formula: "b", useFallbacks: false),
             }.SortAndBuild(new Dictionary<string, Type>()
             {
                 {
@@ -55,7 +55,7 @@ public class HelpersTests
             }
         };
         var lambda = Expression.Lambda(param, parameters);
-        var compiledExpression = new CompiledExpression<TestExpressionProperties>(new TestExpressionProperties(), lambda);
+        var compiledExpression = new CompiledExpression<ExpressionPropertiesMock>(new ExpressionPropertiesMock(), lambda);
         var result = Helpers.Execute(compiledExpression, arguments);
         result.Should().BeOfType(typeof( double ));
         result.Should().Be(222.33);
@@ -74,11 +74,11 @@ public class HelpersTests
             }
         };
 
-        var lambdas = new List<CompiledExpression<TestExpressionProperties>>
+        var lambdas = new List<CompiledExpression<ExpressionPropertiesMock>>
         {
-            new(new TestExpressionProperties("b", "a + 2" /* not used */, false),
+            new(new ExpressionPropertiesMock("b", "a + 2" /* not used */, false),
                 Expression.Lambda(Expression.Add(parameterA, Expression.Constant(2d)), parameterA)),
-            new(new TestExpressionProperties("c", "b + 3" /* not used */, true),
+            new(new ExpressionPropertiesMock("c", "b + 3" /* not used */, true),
                 Expression.Lambda(Expression.Add(parameterB, Expression.Constant(3d)), parameterB)),
         };
 

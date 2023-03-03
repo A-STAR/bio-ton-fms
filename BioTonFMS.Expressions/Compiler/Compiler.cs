@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using BioTonFMS.Expressions.Ast;
 
 namespace BioTonFMS.Expressions.Compilation;
@@ -7,13 +6,16 @@ namespace BioTonFMS.Expressions.Compilation;
 public class Compiler
 {
     private readonly IDictionary<string, Type> _parameterTypes;
-    private readonly CompilationOptions _options;
+    private readonly IExpressionBuilder _expressionBuilder;
     private IDictionary<string, ParameterExpression>? _parameterExpressions;
 
-    private Compiler(CompilationOptions options, IDictionary<string, Type> parameterTypes)
+    public Compiler(IDictionary<string, Type> parameterTypes,
+        CompilationOptions? options = null, IExpressionProperties? expressionProperties = null)
     {
-        _options = options;
         _parameterTypes = parameterTypes;
+        _expressionBuilder = options?.ExpressionBuilderFactory == null
+            ? new ExpressionBuilder(expressionProperties)
+            : options.ExpressionBuilderFactory.Create(expressionProperties);
     }
 
     /// <summary>
@@ -22,9 +24,11 @@ public class Compiler
     /// <param name="node">The root of AST to compile</param>
     /// <param name="parameters">Names and types of available input parameters (variables).</param>
     /// <param name="options">Compilation options</param>
-    public static LambdaExpression Compile(AstNode node, IDictionary<string, Type> parameters, CompilationOptions options)
+    /// <param name="expressionProperties"></param>
+    public static LambdaExpression Compile(AstNode node, IDictionary<string, Type> parameters, CompilationOptions? options = null,
+        IExpressionProperties? expressionProperties = null)
     {
-        var compiler = new Compiler(options, parameters);
+        var compiler = new Compiler(parameters, options, expressionProperties);
         return compiler.Compile(node);
     }
 
@@ -33,12 +37,12 @@ public class Compiler
     /// </summary>
     /// <param name="node">The root of AST to compile</param>
     /// <returns>Expression tree which is the result of compilation of AST</returns>
-    private LambdaExpression Compile(AstNode node)
+    public LambdaExpression Compile(AstNode node)
     {
         _parameterExpressions = BuildParameterExpressions(node);
         var expression = CompileRec(node);
-        var wrappedExpression = Expression.New(typeof( TagData<double> ).GetConstructors()[0], expression, Expression.Constant(false));
-        var lambda = Expression.Lambda(wrappedExpression, _parameterExpressions.Values);
+        var wrappedExpression = _expressionBuilder.WrapExpression(expression);
+        var lambda = _expressionBuilder.BuildLambda(wrappedExpression, _parameterExpressions.Values);
         return lambda;
     }
 
@@ -60,14 +64,15 @@ public class Compiler
         {
             if (_parameterTypes.TryGetValue(variable.Name, out var type))
             {
-                if (type != typeof( TagData<double> ))
+                if (!_expressionBuilder.IsParameterTypeSupported(type))
                     errors.Add(new CompilationError(ErrorType.UnsupportedTypeOfParameter, variable, type));
-                result.Add(variable.Name, Expression.Parameter(type, variable.Name));
+                
+                result.Add(variable.Name, _expressionBuilder.BuildParameter(variable.Name, type));
             }
             else
                 errors.Add(new CompilationError(ErrorType.ParameterDoesNotExist, variable, null));
         }
-        
+
         if (errors.Count > 0)
             throw new CompilationException($"Compilation errors!", errors);
 
@@ -84,36 +89,10 @@ public class Compiler
     {
         return node switch
         {
-            BinaryOperation v => v.Operation switch
-            {
-                BinaryOperationEnum.Addition =>
-                    Expression.Add(CompileRec(v.LeftOperand), CompileRec(v.RightOperand))
-                        .Adjust(),
-                BinaryOperationEnum.Subtraction =>
-                    Expression.Subtract(CompileRec(v.LeftOperand), CompileRec(v.RightOperand))
-                        .Adjust(),
-                BinaryOperationEnum.Multiplication =>
-                    Expression.Multiply(CompileRec(v.LeftOperand), CompileRec(v.RightOperand))
-                        .Adjust(),
-                BinaryOperationEnum.Division =>
-                    Expression.Divide(CompileRec(v.LeftOperand), CompileRec(v.RightOperand))
-                        .Adjust(),
-                _ => throw new Exception("Invalid AST: Invalid type of binary operation!")
-            },
-            UnaryOperation v => v.Operation switch
-            {
-                UnaryOperationEnum.Negation => Expression.Negate(CompileRec(v.Operand)).Adjust(),
-                UnaryOperationEnum.Parentheses => CompileRec(v.Operand),
-                _ => throw new Exception("Invalid AST: Invalid type of unary operation!")
-            },
-            Literal v => v.Type switch
-            {
-                LiteralEnum.Decimal => Expression.Constant(
-                    double.Parse(v.LiteralString, NumberStyles.Float, NumberFormatInfo.InvariantInfo),
-                    typeof( double? )),
-                _ => throw new Exception("Invalid AST: Invalid type of literal!")
-            },
-            Variable v => ExpressionBuilder.WrapParameter(_parameterExpressions![v.Name], _options.UseFallbacks),
+            BinaryOperation v => _expressionBuilder.BuildBinary(v.Operation, CompileRec(v.LeftOperand), CompileRec(v.RightOperand)),
+            UnaryOperation v => _expressionBuilder.BuildUnary(v.Operation, CompileRec(v.Operand)),
+            Literal v => _expressionBuilder.BuildConstant(v.Type, v.LiteralString),
+            Variable v => _expressionBuilder.WrapParameter(_parameterExpressions![v.Name]),
             _ => throw new Exception("Invalid AST: Unknown type of node!")
         };
     }

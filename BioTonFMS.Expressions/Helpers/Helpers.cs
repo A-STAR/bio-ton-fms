@@ -31,16 +31,14 @@ public static class Helpers
     /// Compiles expression while using passed exception handler to handle exceptions
     /// </summary>
     /// <param name="node">Root of AST to compile</param>
-    /// <param name="parameters">Names and types of available input parameters.</param>
+    /// <param name="compiler">Compiler to use for compilation</param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
-    /// <param name="options">CompilationOptions</param>
     /// <returns>Expression tree which is the result of compilation of AST</returns>
-    private static LambdaExpression? CompileWithHandler(this AstNode node, IDictionary<string, Type> parameters,
-        IExceptionHandler exceptionHandler, CompilationOptions options)
+    private static LambdaExpression? CompileWithHandler(this AstNode node, Compiler compiler, IExceptionHandler exceptionHandler)
     {
         try
         {
-            return Compiler.Compile(node, parameters, options);
+            return compiler.Compile(node);
         }
         catch( Exception e )
         {
@@ -86,11 +84,8 @@ public static class Helpers
             .Select(name =>
             {
                 var node = graph[name];
-                var options = new CompilationOptions
-                {
-                    UseFallbacks = node.Data.Props.UseFallbacks
-                };
-                var compiledExpression = node.Data.Ast?.CompileWithHandler(allParameters, exceptionHandler, options);
+                var compiler = new Compiler(allParameters);
+                var compiledExpression = node.Data.Ast?.CompileWithHandler(compiler, exceptionHandler);
                 if (compiledExpression is not null) allParameters.Add(name, compiledExpression.ReturnType);
                 return new CompiledExpression<TExpressionProperties>(node.Data.Props, compiledExpression);
             });

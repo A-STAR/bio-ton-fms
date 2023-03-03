@@ -9,7 +9,7 @@ namespace BiotonFMS.Telematica.Tests.Expressions;
 
 public class CompilerTests
 {
-    private ITestOutputHelper _outputHelper;
+    private readonly ITestOutputHelper _outputHelper;
 
     public CompilerTests(ITestOutputHelper outputHelper)
     {
@@ -71,7 +71,7 @@ public class CompilerTests
                 new Literal("1", LiteralEnum.Decimal),
                 BinaryOperationEnum.Addition
                 ),
-            "IIF((1.HasValue And 1.HasValue), ConvertChecked((1 + 1), Nullable`1), null)",
+            "(1 + 1)",
             new object[]
             {
                 2, 2, 2
@@ -84,7 +84,7 @@ public class CompilerTests
                 new Literal("1", LiteralEnum.Decimal),
                 BinaryOperationEnum.Subtraction
                 ),
-            "IIF((1.HasValue And 1.HasValue), ConvertChecked((1 - 1), Nullable`1), null)",
+            "(1 - 1)",
             new object[]
             {
                 0, 0, 0
@@ -97,7 +97,7 @@ public class CompilerTests
                 new Literal("3", LiteralEnum.Decimal),
                 BinaryOperationEnum.Multiplication
                 ),
-            "IIF((2.HasValue And 3.HasValue), ConvertChecked((2 * 3), Nullable`1), null)",
+            "(2 * 3)",
             new object[]
             {
                 6, 6, 6
@@ -110,7 +110,7 @@ public class CompilerTests
                 new Literal("100", LiteralEnum.Decimal),
                 BinaryOperationEnum.Division
                 ),
-            "IIF((1.HasValue And 100.HasValue), ConvertChecked((1 / 100), Nullable`1), null)",
+            "(1 / 100)",
             new object[]
             {
                 0.01, 0.01, 0.01
@@ -122,7 +122,7 @@ public class CompilerTests
                 new Literal("1", LiteralEnum.Decimal),
                 UnaryOperationEnum.Negation
                 ),
-            "IIF(1.HasValue, ConvertChecked(-1, Nullable`1), null)",
+            "-1",
             new object[]
             {
                 -1, -1, -1
@@ -134,7 +134,7 @@ public class CompilerTests
                 new Literal("-1", LiteralEnum.Decimal),
                 UnaryOperationEnum.Negation
                 ),
-            "IIF(-1.HasValue, ConvertChecked(--1, Nullable`1), null)",
+            "--1",
             new object[]
             {
                 1, 1, 1
@@ -155,7 +155,7 @@ public class CompilerTests
         new object[]
         {
             new Variable("a"),
-            "IIF(a.IsFallback, null, a.Value)",
+            "a",
             new object?[]
             {
                 1, null, 1
@@ -164,7 +164,7 @@ public class CompilerTests
         new object[]
         {
             new Variable("b"),
-            "IIF(b.IsFallback, null, b.Value)",
+            "b",
             new object?[]
             {
                 2, null, null
@@ -173,7 +173,7 @@ public class CompilerTests
         new object[]
         {
             new Variable("c"),
-            "IIF(c.IsFallback, null, c.Value)",
+            "c",
             new object?[]
             {
                 4, null, null
@@ -188,7 +188,7 @@ public class CompilerTests
                     BinaryOperationEnum.Addition),
                 new Variable("c"),
                 BinaryOperationEnum.Addition),
-            "IIF((IIF((IIF(a.IsFallback, null, a.Value).HasValue And IIF(b.IsFallback, null, b.Value).HasValue), ConvertChecked((IIF(a.IsFallback, null, a.Value) + IIF(b.IsFallback, null, b.Value)), Nullable`1), null).HasValue And IIF(c.IsFallback, null, c.Value).HasValue), ConvertChecked((IIF((IIF(a.IsFallback, null, a.Value).HasValue And IIF(b.IsFallback, null, b.Value).HasValue), ConvertChecked((IIF(a.IsFallback, null, a.Value) + IIF(b.IsFallback, null, b.Value)), Nullable`1), null) + IIF(c.IsFallback, null, c.Value)), Nullable`1), null)",
+            "((a + b) + c)",
             new object?[]
             {
                 7, null, null
@@ -205,7 +205,7 @@ public class CompilerTests
                         BinaryOperationEnum.Addition),
                     UnaryOperationEnum.Parentheses),
                 BinaryOperationEnum.Addition),
-            "IIF((IIF(a.IsFallback, null, a.Value).HasValue And IIF((IIF(b.IsFallback, null, b.Value).HasValue And IIF(c.IsFallback, null, c.Value).HasValue), ConvertChecked((IIF(b.IsFallback, null, b.Value) + IIF(c.IsFallback, null, c.Value)), Nullable`1), null).HasValue), ConvertChecked((IIF(a.IsFallback, null, a.Value) + IIF((IIF(b.IsFallback, null, b.Value).HasValue And IIF(c.IsFallback, null, c.Value).HasValue), ConvertChecked((IIF(b.IsFallback, null, b.Value) + IIF(c.IsFallback, null, c.Value)), Nullable`1), null)), Nullable`1), null)",
+            "(a + (b + c))",
             new object?[]
             {
                 7, null, null
@@ -220,7 +220,7 @@ public class CompilerTests
                     BinaryOperationEnum.Multiplication),
                 new Variable("c"),
                 BinaryOperationEnum.Multiplication),
-            "IIF((IIF((IIF(a.IsFallback, null, a.Value).HasValue And IIF(b.IsFallback, null, b.Value).HasValue), ConvertChecked((IIF(a.IsFallback, null, a.Value) * IIF(b.IsFallback, null, b.Value)), Nullable`1), null).HasValue And IIF(c.IsFallback, null, c.Value).HasValue), ConvertChecked((IIF((IIF(a.IsFallback, null, a.Value).HasValue And IIF(b.IsFallback, null, b.Value).HasValue), ConvertChecked((IIF(a.IsFallback, null, a.Value) * IIF(b.IsFallback, null, b.Value)), Nullable`1), null) * IIF(c.IsFallback, null, c.Value)), Nullable`1), null)",
+            "((a * b) * c)",
             new object?[]
             {
                 8, null, null
@@ -232,7 +232,7 @@ public class CompilerTests
                 new Variable("a"),
                 new Variable("b"),
                 BinaryOperationEnum.Addition),
-            "IIF((IIF(a.IsFallback, null, a.Value).HasValue And IIF(b.IsFallback, null, b.Value).HasValue), ConvertChecked((IIF(a.IsFallback, null, a.Value) + IIF(b.IsFallback, null, b.Value)), Nullable`1), null)",
+            "(a + b)",
             new object?[]
             {
                 3, null, null
@@ -247,49 +247,17 @@ public class CompilerTests
             new Dictionary<string, object?>
             {
                 {
-                    "a", new TagData<double>(1)
+                    "a", 1d
                 },
                 {
-                    "b", new TagData<double>(2)
+                    "b", 2d
                 },
                 {
-                    "c", new TagData<double>(4)
+                    "c", 4d
                 }
             },
             0
         },
-        new object[]
-        {
-            new Dictionary<string, object?>
-            {
-                {
-                    "a", new TagData<double>(1, true)
-                },
-                {
-                    "b", new TagData<double>(2, true)
-                },
-                {
-                    "c", new TagData<double>(4, true)
-                }
-            },
-            1
-        },
-        new object[]
-        {
-            new Dictionary<string, object?>
-            {
-                {
-                    "a", new TagData<double>(1)
-                },
-                {
-                    "b", new TagData<double>(2, true)
-                },
-                {
-                    "c", new TagData<double>(4, true)
-                }
-            },
-            2
-        }
     };
 
     public static IEnumerable<object[]> AstArgumentsSamples
@@ -316,27 +284,21 @@ public class CompilerTests
     {
         _outputHelper.WriteLine($"Ast: {node}");
         _outputHelper.WriteLine($"Expr: {expression}");
-        _outputHelper.WriteLine($"Args: {arguments}");
+        _outputHelper.WriteLine($"Args: {string.Join(", ", arguments)}");
         _outputHelper.WriteLine($"Result: {calculationResults[calculationResultIndex]}");
 
         var parameters = arguments.ToDictionary(a => a.Key, a => a.Value!.GetType());
 
         _outputHelper.WriteLine($"Params:\n{parameters.Aggregate("", (a, p) => a + $"{p.Key}: {p.Value}\n")}");
 
-        var options = new CompilationOptions()
-        {
-            UseFallbacks = false
-        };
-        var lambda = Compiler.Compile(node, parameters, options);
+        var lambda = Compiler.Compile(node, parameters, new CompilationOptions() { ExpressionBuilderFactory = new ExpressionBuilderFactoryMock() });
         lambda.Should().NotBeNull();
         TestUtil.ExtractUnwrappedExpression(lambda)?.ToString().Should().Be(expression);
 
-        var compiledExpression = new CompiledExpression<TestExpressionProperties>(new TestExpressionProperties(), lambda);
+        var compiledExpression = new CompiledExpression<ExpressionPropertiesMock>(new ExpressionPropertiesMock(), lambda);
         var executionResult = Helpers.Execute(compiledExpression, arguments);
-        var value = ((object?)((TagData<double>?)executionResult)?.Value);
-        value?.Should().Be(calculationResults[calculationResultIndex]);
+        executionResult?.Should().Be(calculationResults[calculationResultIndex]);
     }
-
 
     [Fact]
     public void Compile_BadParameters_ThrowsCompilationException()
@@ -348,22 +310,37 @@ public class CompilerTests
                 "a", unsupportedType
             }
         };
-        var options = new CompilationOptions()
-        {
-            UseFallbacks = false
-        };
         var leftOperand = new Variable("a");
         var rightOperand = new Variable("b");
         var ast = new BinaryOperation(leftOperand, rightOperand, BinaryOperationEnum.Addition);
 
-        Action action = () => Compiler.Compile(ast, parameters, options);
+        Action action = () => Compiler.Compile(ast, parameters);
 
         action.Should()
             .Throw<CompilationException>()
             .And.CompilationErrors.Should().Contain(new CompilationError[]
             {
-                new(ErrorType.ParameterDoesNotExist, rightOperand, null), new(ErrorType.UnsupportedTypeOfParameter, leftOperand,
+                new(ErrorType.ParameterDoesNotExist, rightOperand, null),
+                new(ErrorType.UnsupportedTypeOfParameter, leftOperand,
                     unsupportedType),
             });
     }
+
+    [Fact]
+    public void Compile_PassesExpressionPropertiesToExpressionBuilderFactory()
+    {
+        var parameters = new Dictionary<string, Type>();
+        var expressionBuilderFactoryMock = new ExpressionBuilderFactoryMock();
+
+        var _ = new Compiler(parameters,
+            new CompilationOptions()
+            {
+                ExpressionBuilderFactory = expressionBuilderFactoryMock
+            },
+            new ExpressionPropertiesMock("mock1", string.Empty, true));
+
+        expressionBuilderFactoryMock.ExpressionProperties?.Name.Should().Be("mock1");
+        expressionBuilderFactoryMock.ExpressionProperties?.UseFallbacks.Should().BeTrue();
+    }
 }
+

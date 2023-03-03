@@ -14,4 +14,9 @@ public struct CompilationError
         AffectedAstNode = affectedAstNode;
         ParameterType = parameterType;
     }
+
+    public override string ToString()
+    {
+        return (ErrorType, AffectedAstNode, ParameterType).ToString();
+    }
 }
