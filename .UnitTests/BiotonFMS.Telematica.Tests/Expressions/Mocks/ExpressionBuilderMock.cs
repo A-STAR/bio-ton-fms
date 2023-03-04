@@ -31,6 +31,11 @@ class ExpressionBuilderMock : IExpressionBuilder
         return expression;
     }
     
+    public Expression BuildFunction(string name, IEnumerable<Expression> arguments)
+    {
+        throw new Exception("Is not implemented in the mock");
+    }
+    
     public Expression BuildConstant(LiteralEnum type, string literalString)
     {
         var expression = type switch

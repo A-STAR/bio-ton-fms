@@ -37,6 +37,11 @@ public class ExpressionBuilder : IExpressionBuilder
         return expression;
     }
 
+    public Expression BuildFunction(string name, IEnumerable<Expression> arguments)
+    {
+        throw new Exception($"There is no function with name {name}!");
+    }
+
     public Expression BuildConstant(LiteralEnum type, string literalString)
     {
         var expression = type switch

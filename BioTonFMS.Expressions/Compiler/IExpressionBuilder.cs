@@ -23,6 +23,14 @@ public interface IExpressionBuilder
     Expression BuildBinary(BinaryOperationEnum operation, Expression leftOperand, Expression rightOperand);
     
     /// <summary>
+    /// Builds function with given name and arguments
+    /// </summary>
+    /// <param name="name">Name of function to build</param>
+    /// <param name="arguments">Arguments of the function</param>
+    /// <returns>Expression tree of built function</returns>
+    Expression BuildFunction(string name, IEnumerable<Expression> arguments);
+    
+    /// <summary>
     /// Builds constant of specified type
     /// </summary>
     /// <param name="type">Type of literal for which we build constant</param>
