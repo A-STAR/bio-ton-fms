@@ -232,20 +232,23 @@ describe('TrackersComponent', () => {
       ([actionCell]) => parallel(() => [
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            selector: '[bioTableActionsTrigger][bioStopClickPropagation]',
             variant: 'icon',
             text: 'more_horiz'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
-            ancestor: '.actions',
+            selector: '[bioStopClickPropagation]',
+            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'edit'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
-            ancestor: '.actions',
+            selector: '[bioStopClickPropagation]',
+            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'delete'
           })

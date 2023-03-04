@@ -13,6 +13,7 @@ import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, merg
 import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, NewTracker } from '../tracker.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
+import { StopClickPropagationDirective } from 'src/app/shared/stop-click-propagation/stop-click-propagation.directive';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import {
@@ -37,7 +38,8 @@ import { TableDataSource } from '../shared/table/table.data-source';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    TableActionsTriggerDirective
+    TableActionsTriggerDirective,
+    StopClickPropagationDirective
   ],
   templateUrl: './trackers.component.html',
   styleUrls: ['./trackers.component.sass'],
