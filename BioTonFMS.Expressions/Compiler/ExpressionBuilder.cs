@@ -30,7 +30,7 @@ public class ExpressionBuilder : IExpressionBuilder
         return expression;
     }
 
-    public Expression BuildFunction(string name, IEnumerable<Expression> arguments)
+    public Expression BuildFunction(string name, Expression[] arguments)
     {
         throw new Exception($"There is no function with name {name}!");
     }

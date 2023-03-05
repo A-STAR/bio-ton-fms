@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace BioTonFMS.Expressions.Ast;
+﻿namespace BioTonFMS.Expressions.Ast;
 
 public class FunctionCall : AstNode, IEquatable<FunctionCall>
 {
@@ -14,7 +12,7 @@ public class FunctionCall : AstNode, IEquatable<FunctionCall>
     /// </summary>
     public AstNode[] Arguments { get; }
 
-    public FunctionCall(string name, AstNode[] arguments)
+    public FunctionCall(string name, params AstNode[] arguments)
     {
         Name = name;
         Arguments = arguments;

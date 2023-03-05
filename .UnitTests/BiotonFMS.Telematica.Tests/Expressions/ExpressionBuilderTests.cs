@@ -62,7 +62,7 @@ public class ExpressionBuilderTests
     {
         var expressionBuilder = new ExpressionBuilder() as IExpressionBuilder;
         expressionBuilder
-            .Invoking(b => b.BuildFunction("SomeFunction", ArraySegment<Expression>.Empty))
+            .Invoking(b => b.BuildFunction("SomeFunction", Array.Empty<Expression>()))
             .Should().Throw<Exception>().WithMessage("*no function*");
     }
 

@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using BioTonFMS.Expressions;
-using BioTonFMS.Expressions.Compilation;
 using FluentAssertions;
 
 namespace BiotonFMS.Telematica.Tests.Expressions;
@@ -24,7 +23,7 @@ public class HelpersTests
                 {
                     "b", typeof( double? )
                 },
-            }).ToArray();
+            }, (ast, _) => ast).ToArray();
         result.Length.Should().Be(2);
 
         result[0].Properties.Name.Should().Be("d");

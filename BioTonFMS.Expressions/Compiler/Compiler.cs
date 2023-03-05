@@ -89,7 +89,7 @@ public class Compiler
     {
         return node switch
         {
-            FunctionCall v => _expressionBuilder.BuildFunction(v.Name, v.Arguments.Select(CompileRec)),
+            FunctionCall v => _expressionBuilder.BuildFunction(v.Name, v.Arguments.Select(CompileRec).ToArray()),
             BinaryOperation v => _expressionBuilder.BuildBinary(v.Operation, CompileRec(v.LeftOperand), CompileRec(v.RightOperand)),
             UnaryOperation v => _expressionBuilder.BuildUnary(v.Operation, CompileRec(v.Operand)),
             Literal v => _expressionBuilder.BuildConstant(v.Type, v.LiteralString),

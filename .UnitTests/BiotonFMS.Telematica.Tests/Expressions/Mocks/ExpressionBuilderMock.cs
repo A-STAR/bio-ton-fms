@@ -31,7 +31,7 @@ class ExpressionBuilderMock : IExpressionBuilder
         return expression;
     }
     
-    public Expression BuildFunction(string name, IEnumerable<Expression> arguments)
+    public Expression BuildFunction(string name, Expression[] arguments)
     {
         throw new Exception("Is not implemented in the mock");
     }

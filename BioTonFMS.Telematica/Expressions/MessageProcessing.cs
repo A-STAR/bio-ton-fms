@@ -1,6 +1,7 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
+using BioTonFMS.Expressions.Ast;
 using BioTonFMS.Expressions.Compilation;
 using BioTonFMS.Telematica.Expressions;
 
@@ -55,7 +56,8 @@ public static class MessageProcessing
     /// ASTs to sorted sequences of runnable lambda expressions. Resulting sequences are paired with ids of their
     /// trackers</remarks>
     /// <returns>One set of compiled sensor formulas per tracker: (tracker1, {(name1, expression1), ...}), (tracker2, {}), ...</returns>
-    public static IEnumerable<(int TrackerId, CompiledExpression<SensorExpressionProperties>[])> BuildSensors(this IEnumerable<Tracker> trackers,
+    public static IEnumerable<(int TrackerId, CompiledExpression<SensorExpressionProperties>[])> BuildSensors(
+        this IEnumerable<Tracker> trackers,
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         Dictionary<string, Type> parameterTypesDictionary = BuildParameterDictionaryByTags(trackerTags);
@@ -72,9 +74,26 @@ public static class MessageProcessing
                 t.Id,
                 t.Sensors
                     .Select(s => new SensorExpressionProperties(s, s.ValidatorId == null ? null : sensorNameById[s.ValidatorId.Value]))
-                    .SortAndBuild(parameterTypesDictionary, compilationOptions, exceptionHandler)
+                    .SortAndBuild(parameterTypesDictionary, PostprocessAst, compilationOptions, exceptionHandler)
                     .ToArray());
         });
+    }
+
+    private static AstNode? PostprocessAst(AstNode? ast, SensorExpressionProperties properties)
+    {
+        if (ast == null)
+            return null;
+        if (!properties.ValidationType.HasValue || properties.ValidatorName == null)
+            return ast;
+
+        var result = properties.ValidationType.Value switch
+        {
+            ValidationTypeEnum.LogicalAnd => new FunctionCall("And", ast, new Variable(properties.ValidatorName)),
+            ValidationTypeEnum.LogicalOr => new FunctionCall("Or", ast, new Variable(properties.ValidatorName)),
+            ValidationTypeEnum.ZeroTest => new FunctionCall("Gate", ast, new Variable(properties.ValidatorName)),
+            _ => throw new Exception("Invalid type of \"validator\"!")
+        };
+        return result;
     }
 
     /// <summary>

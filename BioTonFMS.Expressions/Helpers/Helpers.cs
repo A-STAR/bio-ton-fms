@@ -54,11 +54,15 @@ public static class Helpers
     /// <param name="expressions">Sequence of pairs of expressions and their names: (name1, expression1), (name2, expression2),...
     ///     Expressions may reference other expressions by their names</param>
     /// <param name="parameters">Types of parameters of the expressions by name</param>
+    /// <param name="postprocess">Allows to change AST before compilation</param>
     /// <param name="compilationOptions"></param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
     /// <returns>Set of compiled expressions with their names: (name1, expression1), (name2, expression2),...</returns>
     public static IEnumerable<CompiledExpression<TExpressionProperties>> SortAndBuild<TExpressionProperties>(
-        this IEnumerable<TExpressionProperties> expressions, IDictionary<string, Type> parameters, CompilationOptions? compilationOptions = null,
+        this IEnumerable<TExpressionProperties> expressions, 
+        IDictionary<string, Type> parameters, 
+        Func<AstNode?, TExpressionProperties, AstNode?> postprocess, 
+        CompilationOptions? compilationOptions = null,
         IExceptionHandler? exceptionHandler = null)
         where TExpressionProperties : IExpressionProperties
     {
@@ -70,11 +74,12 @@ public static class Helpers
                 elementSelector: e =>
                 {
                     var ast = ParseWithHandler(e.Formula, exceptionHandler);
+                    var postProcessedAst = postprocess(ast, e);
                     return (
-                        Edges: ast is null
+                        Edges: postProcessedAst is null
                             ? Array.Empty<string>()
-                            : (ICollection<string>)ast.GetVariables().Select(v => v.Name).ToArray(),
-                        Data: (Ast: ast, Props: e));
+                            : (ICollection<string>)postProcessedAst.GetVariables().Select(v => v.Name).ToArray(),
+                        Data: (Ast: postProcessedAst, Props: e));
                 });
 
         var allParameters = new Dictionary<string, Type>(parameters);
