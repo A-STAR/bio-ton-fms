@@ -1,18 +1,15 @@
-﻿using BioTonFMS.Domain;
-using BioTonFMS.Expressions;
+﻿using BioTonFMS.Expressions;
 
 namespace BioTonFMS.Telematica;
 
 public readonly struct ExpressionProperties : IExpressionProperties
 {
-    public readonly Sensor Sensor;
+    public string Name { get; }
+    public string Formula { get; }
 
-    public string Name => Sensor.Name;
-    public string Formula => Sensor.Formula;
-    public bool UseFallbacks => Sensor.UseLastReceived;
-
-    public ExpressionProperties(Sensor sensor, string? validatorName = null) : this()
+    public ExpressionProperties(string name, string formula) : this()
     {
-        Sensor = sensor;
+        Name = name;
+        Formula = formula;
     }
 }

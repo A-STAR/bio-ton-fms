@@ -52,12 +52,13 @@ public static class Helpers
     /// Builds set of mutually dependent expressions
     /// </summary>
     /// <param name="expressions">Sequence of pairs of expressions and their names: (name1, expression1), (name2, expression2),...
-    /// Expressions may reference other expressions by their names</param>
+    ///     Expressions may reference other expressions by their names</param>
     /// <param name="parameters">Types of parameters of the expressions by name</param>
+    /// <param name="compilationOptions"></param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
     /// <returns>Set of compiled expressions with their names: (name1, expression1), (name2, expression2),...</returns>
     public static IEnumerable<CompiledExpression<TExpressionProperties>> SortAndBuild<TExpressionProperties>(
-        this IEnumerable<TExpressionProperties> expressions, IDictionary<string, Type> parameters,
+        this IEnumerable<TExpressionProperties> expressions, IDictionary<string, Type> parameters, CompilationOptions? compilationOptions = null,
         IExceptionHandler? exceptionHandler = null)
         where TExpressionProperties : IExpressionProperties
     {
@@ -84,7 +85,7 @@ public static class Helpers
             .Select(name =>
             {
                 var node = graph[name];
-                var compiler = new Compiler(allParameters);
+                var compiler = new Compiler(allParameters, compilationOptions, node.Data.Props);
                 var compiledExpression = node.Data.Ast?.CompileWithHandler(compiler, exceptionHandler);
                 if (compiledExpression is not null) allParameters.Add(name, compiledExpression.ReturnType);
                 return new CompiledExpression<TExpressionProperties>(node.Data.Props, compiledExpression);

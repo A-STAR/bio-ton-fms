@@ -2,6 +2,7 @@
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.Compilation;
+using BioTonFMS.Telematica.Expressions;
 
 namespace BioTonFMS.Telematica;
 
@@ -54,10 +55,15 @@ public static class MessageProcessing
     /// ASTs to sorted sequences of runnable lambda expressions. Resulting sequences are paired with ids of their
     /// trackers</remarks>
     /// <returns>One set of compiled sensor formulas per tracker: (tracker1, {(name1, expression1), ...}), (tracker2, {}), ...</returns>
-    public static IEnumerable<(int TrackerId, CompiledExpression<ExpressionProperties>[])> BuildSensors(this IEnumerable<Tracker> trackers,
+    public static IEnumerable<(int TrackerId, CompiledExpression<SensorExpressionProperties>[])> BuildSensors(this IEnumerable<Tracker> trackers,
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         Dictionary<string, Type> parameterTypesDictionary = BuildParameterDictionaryByTags(trackerTags);
+
+        var compilationOptions = new CompilationOptions()
+        {
+            ExpressionBuilderFactory = new SensorExpressionBuilderFactory()
+        };
 
         return trackers.Select(t =>
         {
@@ -65,8 +71,8 @@ public static class MessageProcessing
             return (
                 t.Id,
                 t.Sensors
-                    .Select(s => new ExpressionProperties(s, s.ValidatorId == null ? null : sensorNameById[s.ValidatorId.Value]))
-                    .SortAndBuild(parameterTypesDictionary, exceptionHandler)
+                    .Select(s => new SensorExpressionProperties(s, s.ValidatorId == null ? null : sensorNameById[s.ValidatorId.Value]))
+                    .SortAndBuild(parameterTypesDictionary, compilationOptions, exceptionHandler)
                     .ToArray());
         });
     }
@@ -95,8 +101,8 @@ public static class MessageProcessing
     /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
     /// <returns>Sequence of calculation results paired with sensor names (for the moment
     /// sensor ids are used as names): (name1, value1), (name2, value2)...</returns>
-    public static IEnumerable<(ExpressionProperties, object?)> CalculateSensors(
-        this IEnumerable<CompiledExpression<ExpressionProperties>> sensorExpressions, IEnumerable<MessageTag> messageTags,
+    public static IEnumerable<(SensorExpressionProperties, object?)> CalculateSensors(
+        this IEnumerable<CompiledExpression<SensorExpressionProperties>> sensorExpressions, IEnumerable<MessageTag> messageTags,
         IEnumerable<MessageTag>? previousMessageTags, IDictionary<int, string> tagNameByIdDict)
     {
         // Add arguments for current message
@@ -153,7 +159,7 @@ public static class MessageProcessing
     /// <returns>Set of created message tags bound to their sensors and their message
     /// and containing calculated values</returns>
     private static IEnumerable<MessageTag> ConvertSensorValuesToTags(
-        this IEnumerable<(ExpressionProperties Props, object? Value)> sensorValues, TrackerMessage message)
+        this IEnumerable<(SensorExpressionProperties Props, object? Value)> sensorValues, TrackerMessage message)
     {
         var messageTags = sensorValues
             .Select(pair => new MessageTagDouble() /* For the moment we can process doubles only */
@@ -173,7 +179,7 @@ public static class MessageProcessing
     /// <param name="builtSensors">Previously built sensor expressions</param>
     /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
     private static void UpdateSensorTags(this TrackerMessage message, TrackerMessage? previousMessage,
-        IDictionary<int, CompiledExpression<ExpressionProperties>[]> builtSensors, IDictionary<int, string> tagNameByIdDict)
+        IDictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensors, IDictionary<int, string> tagNameByIdDict)
     {
         // Get sequence of built sensors for tracker 
         var builtTrackerSensors = builtSensors[message.TrId];
@@ -205,7 +211,7 @@ public static class MessageProcessing
         ICollection<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         // Build sensors
-        Dictionary<int, CompiledExpression<ExpressionProperties>[]> builtSensorsByTrackerId = trackers
+        Dictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensorsByTrackerId = trackers
             .BuildSensors(trackerTags, exceptionHandler)
             .ToDictionary(t => t.Item1 /* Tracker id */, t => t.Item2);
 

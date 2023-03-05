@@ -14,7 +14,7 @@ public class Compiler
     {
         _parameterTypes = parameterTypes;
         _expressionBuilder = options?.ExpressionBuilderFactory == null
-            ? new ExpressionBuilder(expressionProperties)
+            ? new ExpressionBuilder()
             : options.ExpressionBuilderFactory.Create(expressionProperties);
     }
 

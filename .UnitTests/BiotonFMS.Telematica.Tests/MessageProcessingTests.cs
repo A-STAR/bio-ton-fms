@@ -4,6 +4,7 @@ using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.Compilation;
 using BioTonFMS.Telematica;
+using BioTonFMS.Telematica.Expressions;
 using BiotonFMS.Telematica.Tests.Expressions;
 using FluentAssertions;
 
@@ -78,7 +79,7 @@ public class MessageProcessingTests
                     },
                     new()
                     {
-                        Id = 361, Formula = "b", Name = "c"
+                        Id = 361, Formula = "b", Name = "c", UseLastReceived = true
                     }
                 }
             }
@@ -101,7 +102,7 @@ public class MessageProcessingTests
 
         result[0].Item2[1].Properties.Name.Should().Be("c");
         result[0].Item2[1].ExpressionTree.Should().NotBeNull();
-        TestUtil.ExtractUnwrappedExpression(result[0].Item2[1].ExpressionTree)!.ToString().Should().Be("IIF(b.IsFallback, null, b.Value)");
+        TestUtil.ExtractUnwrappedExpression(result[0].Item2[1].ExpressionTree)!.ToString().Should().Be("b.Value");
     }
 
     [Fact]
@@ -111,10 +112,10 @@ public class MessageProcessingTests
         var parameterB = Expression.Parameter(typeof( TagData<double> ), "b");
         var parameterD = Expression.Parameter(typeof( TagData<double> ), "d");
         var parameterSharpA = Expression.Parameter(typeof( TagData<double> ), "#a");
-        var sensorExpressions = new List<CompiledExpression<ExpressionProperties>>
+        var sensorExpressions = new List<CompiledExpression<SensorExpressionProperties>>
         {
             new(
-                new ExpressionProperties(new Sensor()
+                new SensorExpressionProperties(new Sensor()
                 {
                     Name = "b"
                 }),
@@ -125,35 +126,35 @@ public class MessageProcessingTests
                     parameterA)
                 ),
             new(
-                new ExpressionProperties(new Sensor()
+                new SensorExpressionProperties(new Sensor()
                 {
                     Name = "c"
                 }),
                 Expression.Lambda(Expression.Property(parameterA, "IsFallback"), parameterA)
                 ),
             new(
-                new ExpressionProperties(new Sensor()
+                new SensorExpressionProperties(new Sensor()
                 {
                     Name = "e"
                 }),
                 Expression.Lambda(Expression.Property(parameterD, "Value"), parameterD)
                 ),
             new(
-                new ExpressionProperties(new Sensor()
+                new SensorExpressionProperties(new Sensor()
                 {
                     Name = "f"
                 }),
                 Expression.Lambda(Expression.Property(parameterD, "IsFallback"), parameterD)
                 ),
             new(
-                new ExpressionProperties(new Sensor()
+                new SensorExpressionProperties(new Sensor()
                 {
                     Name = "g"
                 }),
                 Expression.Lambda(Expression.Negate(Expression.Property(parameterB, "Value")), parameterB)
                 ),
             new(
-                new ExpressionProperties(new Sensor()
+                new SensorExpressionProperties(new Sensor()
                 {
                     Name = "h"
                 }),

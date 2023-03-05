@@ -6,13 +6,6 @@ namespace BioTonFMS.Expressions.Compilation;
 
 public class ExpressionBuilder : IExpressionBuilder
 {
-    private readonly IExpressionProperties? _expressionProperties;
-
-    public ExpressionBuilder(IExpressionProperties? expressionProperties = null)
-    {
-        _expressionProperties = expressionProperties;
-    }
-
     public Expression BuildBinary(BinaryOperationEnum operation, Expression leftOperand, Expression rightOperand)
     {
         var expression = operation switch
@@ -53,28 +46,13 @@ public class ExpressionBuilder : IExpressionBuilder
         return expression;
     }
 
-    public Expression WrapParameter(ParameterExpression parameterExpression)
-    {
-        return _expressionProperties is not { UseFallbacks: true } ? parameterExpression.Current() : parameterExpression.Latest();
-    }
+    public Expression WrapParameter(ParameterExpression parameterExpression) => parameterExpression;
 
-    public bool IsParameterTypeSupported(Type type)
-    {
-        return type == typeof( TagData<double> );
-    }
+    public bool IsParameterTypeSupported(Type type) => type == typeof( double? );
 
-    public ParameterExpression BuildParameter(string name, Type type)
-    {
-        return Expression.Parameter(type, name);
-    }
+    public ParameterExpression BuildParameter(string name, Type type) => Expression.Parameter(type, name);
 
-    public LambdaExpression BuildLambda(Expression body, IEnumerable<ParameterExpression> parameters)
-    {
-        return Expression.Lambda(body, parameters);
-    }
-    
-    public Expression WrapExpression(Expression expression)
-    {
-        return Expression.New(typeof( TagData<double> ).GetConstructors()[0], expression, Expression.Constant(false));
-    }
+    public LambdaExpression BuildLambda(Expression body, IEnumerable<ParameterExpression> parameters) => Expression.Lambda(body, parameters);
+
+    public Expression WrapExpression(Expression expression) => expression;
 }

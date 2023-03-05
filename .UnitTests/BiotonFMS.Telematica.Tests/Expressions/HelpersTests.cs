@@ -19,10 +19,10 @@ public class HelpersTests
             }.SortAndBuild(new Dictionary<string, Type>()
             {
                 {
-                    "a", typeof( TagData<double> )
+                    "a", typeof( double? )
                 },
                 {
-                    "b", typeof( TagData<double> )
+                    "b", typeof( double? )
                 },
             }).ToArray();
         result.Length.Should().Be(2);
@@ -31,13 +31,13 @@ public class HelpersTests
         result[0].Properties.Formula.Should().Be("b");
         result[0].Properties.UseFallbacks.Should().BeFalse();
         result[0].ExpressionTree.Should().NotBeNull();
-        TestUtil.ExtractUnwrappedExpression(result[0].ExpressionTree)!.ToString().Should().Be("IIF(b.IsFallback, null, b.Value)");
+        TestUtil.ExtractUnwrappedExpression(result[0].ExpressionTree)!.ToString().Should().Be("b");
 
         result[1].Properties.Name.Should().Be("c");
         result[1].Properties.Formula.Should().Be("d");
         result[1].Properties.UseFallbacks.Should().BeFalse();
         result[1].ExpressionTree.Should().NotBeNull();
-        TestUtil.ExtractUnwrappedExpression(result[1].ExpressionTree)!.ToString().Should().Be("IIF(d.IsFallback, null, d.Value)");
+        TestUtil.ExtractUnwrappedExpression(result[1].ExpressionTree)!.ToString().Should().Be("d");
     }
 
     [Fact]
