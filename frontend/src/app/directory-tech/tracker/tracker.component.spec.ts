@@ -88,6 +88,18 @@ describe('TrackerComponent', () => {
       .toBe('Конфигурация данных GPS-трекера');
   });
 
+  it('should render standard parameters card', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Стандартные параметры'
+      })
+    );
+
+    expect(card)
+      .withContext('render standard parameters card')
+      .not.toBeNull();
+  });
+
   it('should render sensors card', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
