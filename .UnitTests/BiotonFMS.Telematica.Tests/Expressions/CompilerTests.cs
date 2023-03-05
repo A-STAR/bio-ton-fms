@@ -167,7 +167,7 @@ public class CompilerTests
             "b",
             new object?[]
             {
-                2, null, null
+                2, 2, null
             }
         },
         new object[]
@@ -176,7 +176,7 @@ public class CompilerTests
             "c",
             new object?[]
             {
-                4, null, null
+                4, 4, 4
             }
         },
         new object[]
@@ -258,6 +258,38 @@ public class CompilerTests
             },
             0
         },
+        new object[]
+        {
+            new Dictionary<string, object?>
+            {
+                {
+                    "a", null
+                },
+                {
+                    "b", 2d
+                },
+                {
+                    "c", 4d
+                }
+            },
+            1
+        },
+        new object[]
+        {
+            new Dictionary<string, object?>
+            {
+                {
+                    "a", 1d
+                },
+                {
+                    "b", null
+                },
+                {
+                    "c", 4d
+                }
+            },
+            2
+        },
     };
 
     public static IEnumerable<object[]> AstArgumentsSamples
@@ -279,15 +311,15 @@ public class CompilerTests
 
     [Theory, MemberData(nameof(AstArgumentsSamples))]
     public void Compile_WellFormedAstAndCorrectParameters_ReturnsCorrectExpressionTree(AstNode node, string expression,
-        object[] calculationResults,
+        object?[] calculationResults,
         Dictionary<string, object?> arguments, int calculationResultIndex)
     {
         _outputHelper.WriteLine($"Ast: {node}");
         _outputHelper.WriteLine($"Expr: {expression}");
         _outputHelper.WriteLine($"Args: {string.Join(", ", arguments)}");
-        _outputHelper.WriteLine($"Result: {calculationResults[calculationResultIndex]}");
+        _outputHelper.WriteLine($"Result: {calculationResults[calculationResultIndex] ?? "null"}, index: {calculationResultIndex}");
 
-        var parameters = arguments.ToDictionary(a => a.Key, a => a.Value!.GetType());
+        var parameters = arguments.ToDictionary(a => a.Key, _ => typeof(double?));
 
         _outputHelper.WriteLine($"Params:\n{parameters.Aggregate("", (a, p) => a + $"{p.Key}: {p.Value}\n")}");
 
@@ -297,7 +329,7 @@ public class CompilerTests
 
         var compiledExpression = new CompiledExpression<ExpressionPropertiesMock>(new ExpressionPropertiesMock(), lambda);
         var executionResult = Helpers.Execute(compiledExpression, arguments);
-        executionResult?.Should().Be(calculationResults[calculationResultIndex]);
+        executionResult.Should().Be(calculationResults[calculationResultIndex]);
     }
 
     [Fact]

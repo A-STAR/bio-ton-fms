@@ -46,7 +46,7 @@ public class ExpressionBuilderTests
         var expressionBuilder = new ExpressionBuilder() as IExpressionBuilder;
         var wrappedExpression = expressionBuilder.BuildBinary(BinaryOperationEnum.Addition, Expression.Constant(1d, typeof( double? )),
             Expression.Constant(2d, typeof( double? )));
-        wrappedExpression.ToString().Should().Be("IIF((1.HasValue And 2.HasValue), ConvertChecked((1 + 2), Nullable`1), null)");
+        wrappedExpression.ToString().Should().Be("(1 + 2)");
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class ExpressionBuilderTests
     {
         var expressionBuilder = new ExpressionBuilder() as IExpressionBuilder;
         var wrappedExpression = expressionBuilder.BuildUnary(UnaryOperationEnum.Negation, Expression.Constant(1d, typeof(double?)));
-        wrappedExpression.ToString().Should().Be("IIF(1.HasValue, ConvertChecked(-1, Nullable`1), null)");
+        wrappedExpression.ToString().Should().Be("-1");
     }
 
     [Fact]
