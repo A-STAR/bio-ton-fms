@@ -20,6 +20,14 @@ internal static class CompilerAstExtensions
                     node = v.LeftOperand;
                     stack.Push(v.RightOperand);
                     continue;
+                case FunctionCall v:
+                    var arguments = v.Arguments;
+                    if (arguments.Length == 0)
+                        continue;
+                    node = arguments[0];
+                    for (var i = 1; i < arguments.Length; i++)
+                        stack.Push(arguments[i]);
+                    continue;
                 case UnaryOperation v:
                     node = v.Operand;
                     continue;

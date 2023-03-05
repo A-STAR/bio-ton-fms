@@ -80,7 +80,12 @@ public class MessageProcessingTests
                     new()
                     {
                         Id = 361, Formula = "b", Name = "c", UseLastReceived = true
-                    }
+                    },
+                    new()
+                    {
+                        Id = 234, Formula = "const111", Name = "d", ValidatorId = 361,
+                        ValidationType = ValidationTypeEnum.ZeroTest, UseLastReceived = true
+                    },
                 }
             }
         };
@@ -94,7 +99,7 @@ public class MessageProcessingTests
         var result = trackers.BuildSensors(trackerTags).ToArray();
         result.Length.Should().Be(1);
         result[0].Item1.Should().Be(111);
-        result[0].Item2.Length.Should().Be(2);
+        result[0].Item2.Length.Should().Be(3);
 
         result[0].Item2[0].Properties.Name.Should().Be("b");
         result[0].Item2[0].ExpressionTree.Should().NotBeNull();
@@ -103,6 +108,11 @@ public class MessageProcessingTests
         result[0].Item2[1].Properties.Name.Should().Be("c");
         result[0].Item2[1].ExpressionTree.Should().NotBeNull();
         TestUtil.ExtractUnwrappedExpression(result[0].Item2[1].ExpressionTree)!.ToString().Should().Be("b.Value");
+
+        result[0].Item2[2].Properties.Name.Should().Be("d");
+        result[0].Item2[2].ExpressionTree.Should().NotBeNull();
+        TestUtil.ExtractUnwrappedExpression(result[0].Item2[2].ExpressionTree)!.ToString().Should()
+            .Be("Invoke((signal, gate) => IIF(((gate ?? 0) == 0), null, signal), 111, c.Value)");
     }
 
     [Fact]
