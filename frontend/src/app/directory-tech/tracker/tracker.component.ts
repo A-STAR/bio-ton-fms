@@ -10,7 +10,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, filter, map, Observable, switchMap, tap } from 'rxjs';
 
-import { Sensor, Sensors, SensorService } from '../sensor.service';
+import { Sensor, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
@@ -35,7 +35,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class TrackerComponent implements OnInit {
-  protected sensors$!: Observable<Sensors | undefined>;
+  protected sensors$!: Observable<Sensor[] | undefined>;
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
   protected sensorColumns = sensorColumns;
   protected sensorColumnKeys!: string[];
@@ -54,16 +54,16 @@ export default class TrackerComponent implements OnInit {
     this.dialog.open(SensorDialogComponent, { data });
   }
 
-  #sensors$ = new BehaviorSubject<Sensors | undefined>(undefined);
+  #sensors$ = new BehaviorSubject<Sensor[] | undefined>(undefined);
 
   /**
    * Map sensors data source.
    *
-   * @param sensors Sensors with pagination.
+   * @param sensors Sensors.
    *
    * @returns Mapped sensors data source.
    */
-  #mapSensorsDataSource({ sensors }: Sensors) {
+  #mapSensorsDataSource(sensors: Sensor[]) {
     return Object
       .freeze(sensors)
       .map(({
@@ -82,7 +82,7 @@ export default class TrackerComponent implements OnInit {
    *
    * @param sensors Sensors.
    */
-  #setSensorsDataSource(sensors: Sensors) {
+  #setSensorsDataSource(sensors: Sensor[]) {
     const sensorsDataSource = this.#mapSensorsDataSource(sensors);
 
     this.sensorsDataSource = new TableDataSource<SensorDataSource>(sensorsDataSource);
@@ -98,11 +98,12 @@ export default class TrackerComponent implements OnInit {
       map(Number),
       switchMap(trackerId => this.sensorService.getSensors({ trackerId })),
       tap(sensors => {
-        this.#sensors$.next(sensors);
-
-        this.#setSensorsDataSource(sensors);
+        this.#sensors$.next(sensors.sensors);
       }),
-      switchMap(() => this.#sensors$)
+      switchMap(() => this.#sensors$),
+      tap(sensors => {
+        this.#setSensorsDataSource(sensors!);
+      })
     );
   }
 
