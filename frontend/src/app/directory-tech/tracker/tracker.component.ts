@@ -8,8 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
-import { BehaviorSubject, filter, map, Observable, Subscription, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 
+import { TrackerService, TrackerStandardParameter } from '../tracker.service';
 import { Sensor, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
@@ -35,6 +36,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class TrackerComponent implements OnInit, OnDestroy {
+  protected standardParameters$!: Observable<TrackerStandardParameter[]>;
   protected sensors$!: Observable<Sensor[] | undefined>;
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
   protected sensorColumns = sensorColumns;
@@ -107,13 +109,21 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get and set tracker sensors.
+   * Get and set tracker standard parameters, sensors.
    */
-  #setSensors() {
-    this.sensors$ = this.route.paramMap.pipe(
+  #setTrackerData() {
+    const trackerID$ = this.route.paramMap.pipe(
       map(paramMap => paramMap.get('id')),
       filter(id => id !== null),
       map(Number),
+      shareReplay()
+    );
+
+    this.standardParameters$ = trackerID$.pipe(
+      switchMap(id => this.trackerService.getStandardParameters(id))
+    );
+
+    this.sensors$ = trackerID$.pipe(
       switchMap(trackerId => this.sensorService.getSensors({ trackerId })),
       tap(sensors => {
         this.#sensors$.next(sensors.sensors);
@@ -132,11 +142,16 @@ export default class TrackerComponent implements OnInit, OnDestroy {
     this.sensorColumnKeys = this.sensorColumns.map(({ key }) => key);
   }
 
-  constructor(private route: ActivatedRoute, private dialog: MatDialog, private sensorService: SensorService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private dialog: MatDialog,
+    private trackerService: TrackerService,
+    private sensorService: SensorService
+  ) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
-    this.#setSensors();
+    this.#setTrackerData();
     this.#setColumnKeys();
   }
 

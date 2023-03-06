@@ -79,6 +79,17 @@ export class TrackerService {
     return this.httpClient.delete(`/api/telematica/tracker/${id}`);
   }
 
+  /**
+   * Get tracker standard parameters.
+   *
+   * @param id A tracker ID.
+   *
+   * @returns An `Observable' of standard parameters.
+   */
+  getStandardParameters(id: Tracker['id']) {
+    return this.httpClient.get<TrackerStandardParameter[]>(`/api/telematica/tracker/standard-parameters/${id}`);
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 
@@ -119,3 +130,18 @@ export interface NewTracker extends Partial<Pick<Tracker, 'id' | 'startDate'>>,
 export interface Trackers extends Pagination {
   trackers: Tracker[];
 }
+
+export enum TrackerParameterName {
+  Time = 'time',
+  Latitude = 'lat',
+  Longitude = 'long',
+  Altitude = 'alt',
+  Speed = 'speed'
+}
+
+export type TrackerStandardParameter = {
+  name: string;
+  paramName: TrackerParameterName;
+  lastValueDateTime?: string;
+  lastValueDecimal?: number;
+};

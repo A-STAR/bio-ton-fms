@@ -63,7 +63,6 @@ describe('TrackersComponent', () => {
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
     overlayContainer = TestBed.inject(OverlayContainer);
-
     trackerService = TestBed.inject(TrackerService);
 
     component = fixture.componentInstance;
