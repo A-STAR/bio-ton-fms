@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>Новый датчик</h1>
 
 <mat-dialog-content>
-  <form id="sensor-form" [formGroup]="sensorForm">
+  <form id="sensor-form" [formGroup]="sensorForm" (ngSubmit)="submitSensorForm()">
     <mat-tab-group mat-stretch-tabs="false">
       <mat-tab label="Основные сведения">
         <fieldset formGroupName="basic">
@@ -150,3 +150,9 @@
     </mat-tab-group>
   </form>
 </mat-dialog-content>
+
+<mat-dialog-actions fxLayoutAlign="space-between">
+  <button mat-stroked-button color="accent" mat-dialog-close>Отмена</button>
+
+  <button mat-flat-button type="submit" form="sensor-form" color="accent">Сохранить</button>
+</mat-dialog-actions>

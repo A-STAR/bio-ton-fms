@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
-import { BehaviorSubject, filter, map, Observable, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, Subscription, switchMap, tap } from 'rxjs';
 
 import { Sensor, SensorService } from '../sensor.service';
 
@@ -34,7 +34,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
   styleUrls: ['./tracker.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class TrackerComponent implements OnInit {
+export default class TrackerComponent implements OnInit, OnDestroy {
   protected sensors$!: Observable<Sensor[] | undefined>;
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
   protected sensorColumns = sensorColumns;
@@ -51,10 +51,24 @@ export default class TrackerComponent implements OnInit {
       )
     };
 
-    this.dialog.open(SensorDialogComponent, { data });
+    const dialogRef = this.dialog.open(SensorDialogComponent, { data });
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(sensor => {
+        const sensors = Array.from(this.#sensors$.value!);
+
+        sensors.push(sensor);
+
+        this.#sensors$.next(sensors);
+      });
   }
 
   #sensors$ = new BehaviorSubject<Sensor[] | undefined>(undefined);
+  #subscription: Subscription | undefined;
 
   /**
    * Map sensors data source.
@@ -85,7 +99,11 @@ export default class TrackerComponent implements OnInit {
   #setSensorsDataSource(sensors: Sensor[]) {
     const sensorsDataSource = this.#mapSensorsDataSource(sensors);
 
-    this.sensorsDataSource = new TableDataSource<SensorDataSource>(sensorsDataSource);
+    if (this.sensorsDataSource) {
+      this.sensorsDataSource.setDataSource(sensorsDataSource);
+    } else {
+      this.sensorsDataSource = new TableDataSource<SensorDataSource>(sensorsDataSource);
+    }
   }
 
   /**
@@ -120,6 +138,11 @@ export default class TrackerComponent implements OnInit {
   ngOnInit() {
     this.#setSensors();
     this.#setColumnKeys();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
   }
 }
 

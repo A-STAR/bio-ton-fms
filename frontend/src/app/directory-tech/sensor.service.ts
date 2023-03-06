@@ -74,6 +74,17 @@ export class SensorService {
     return this.httpClient.get<Sensors>(`/api/telematica/sensors`, { params });
   }
 
+  /**
+   * Create a new sensor.
+   *
+   * @param sensor A new sensor.
+   *
+   * @returns An `Observable` of creating sensor.
+   */
+  createSensor(sensor: NewSensor) {
+    return this.httpClient.post<Sensor>('/api/telematica/sensor', sensor);
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 

@@ -3,6 +3,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import {
+  NewSensor, Sensor,
   SensorDataTypeEnum,
   SensorGroup,
   Sensors,
@@ -176,6 +177,25 @@ describe('SensorService', () => {
     );
 
     validationTypeRequest.flush(testValidationTypeEnum);
+  });
+
+  it('should create tracker', (done: DoneFn) => {
+    service
+      .createSensor(testNewSensor)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBe(testSensor);
+
+        done();
+      });
+
+    const createSensorRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: '/api/telematica/sensor'
+    }, 'create sensor request');
+
+    createSensorRequest.flush(testSensor);
   });
 });
 
@@ -447,3 +467,46 @@ export const testSensors: Sensors = {
 };
 
 export const TEST_TRACKER_ID = 1;
+
+export const testNewSensor: NewSensor = {
+  trackerId: TEST_TRACKER_ID,
+  name: 'Парковочный радар',
+  dataType: testSensorDataTypeEnum[0].key,
+  sensorTypeId: testSensorTypes[2].id,
+  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.',
+  formula: '(param3+#param1)*param2',
+  unitId: testUnits[1].id,
+  useLastReceived: false,
+  visibility: true,
+  validatorId: testSensorTypes[0].id,
+  validationType: testValidationTypeEnum[0].key,
+  fuelUse: 10
+};
+
+const testSensor: Sensor = {
+  id: 1,
+  tracker: {
+    key: testNewSensor.trackerId,
+    value: 'Galileo Sky'
+  },
+  name: testNewSensor.name,
+  visibility: false,
+  dataType: testNewSensor.dataType,
+  sensorType: {
+    key: testNewSensor.sensorTypeId,
+    value: testSensorGroups[1].sensorTypes![0].name
+  },
+  description: testNewSensor.description,
+  formula: testNewSensor.formula,
+  unit: {
+    key: testNewSensor.unitId,
+    value: testUnits[1].name
+  },
+  useLastReceived: testNewSensor.useLastReceived,
+  validator: {
+    key: testNewSensor.validatorId!,
+    value: testSensorTypes[0].name
+  },
+  validationType: testNewSensor.validationType,
+  fuelUse: testNewSensor.fuelUse
+};

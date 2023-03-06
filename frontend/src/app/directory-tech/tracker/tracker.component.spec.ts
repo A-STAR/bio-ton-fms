@@ -12,15 +12,18 @@ import { MatTableHarness } from '@angular/material/table/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Observable, of } from 'rxjs';
 
-import { Sensors, SensorService } from '../sensor.service';
+import { NewSensor, Sensors, SensorService } from '../sensor.service';
 
 import TrackerComponent, { SensorColumn, sensorColumns } from './tracker.component';
+import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
-import { testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
+import { testSensors, TEST_TRACKER_ID, testNewSensor } from '../sensor.service.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
@@ -38,6 +41,7 @@ describe('TrackerComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatSnackBarModule,
           TrackerComponent
         ],
         providers: [
@@ -333,6 +337,17 @@ describe('TrackerComponent', () => {
     await sensorDialog!.close();
 
     overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating sensors. */
+
+    const dialogRef = {
+      afterClosed: () => of(testNewSensor)
+    } as MatDialogRef<SensorDialogComponent, NewSensor>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await createSensorButton.click();
   });
 });
 

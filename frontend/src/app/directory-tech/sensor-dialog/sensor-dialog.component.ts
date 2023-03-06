@@ -1,16 +1,18 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { forkJoin, map, Observable } from 'rxjs';
+import { forkJoin, map, Observable, Subscription } from 'rxjs';
 
-import { NewSensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
+import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 
@@ -28,6 +30,7 @@ import { Tracker } from '../tracker.service';
     MatInputModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatButtonModule,
     NumberOnlyInputDirective
   ],
   templateUrl: './sensor-dialog.component.html',
@@ -53,6 +56,57 @@ export class SensorDialogComponent implements OnInit {
   protected fuelUseTypeIds: SensorGroup['id'][] = [3, 13, 14];
 
   /**
+   * Submit sensor form, checking validation state.
+   */
+  protected submitSensorForm() {
+    this.#subscription?.unsubscribe();
+
+    const { invalid, value } = this.sensorForm;
+
+    if (invalid) {
+      return;
+    }
+
+    const {
+      tracker,
+      name,
+      dataType,
+      type,
+      description,
+      formula,
+      unit,
+      lastReceived,
+      validator,
+      validationType,
+      fuelUse,
+      visibility
+    } = value.basic!;
+
+    const sensor: NewSensor = {
+      trackerId: tracker!,
+      name: name!,
+      dataType: dataType!,
+      sensorTypeId: type!,
+      description: description ?? undefined,
+      formula: formula!,
+      unitId: unit!,
+      useLastReceived: lastReceived ?? false,
+      validatorId: validator ?? undefined,
+      validationType: validationType!,
+      fuelUse: fuelUse ?? undefined,
+      visibility: visibility ?? false
+    };
+
+    this.#subscription = this.sensorService
+      .createSensor(sensor)
+      .subscribe((sensor: Sensor) => {
+        this.snackBar.open(SENSOR_CREATED);
+
+        this.dialogRef.close(sensor);
+      });
+  }
+
+  /**
    * Toggle control disabled state on selection change conditionally.
    *
    * @param event `MatSelectionChange` event.
@@ -65,6 +119,8 @@ export class SensorDialogComponent implements OnInit {
       ? control?.disable()
       : control?.enable();
   }
+
+  #subscription: Subscription | undefined;
 
   /**
    * Get sensor groups, sensor types, units. Set sensor data.
@@ -119,7 +175,13 @@ export class SensorDialogComponent implements OnInit {
     });
   }
 
-  constructor(private fb: FormBuilder, @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData, private sensorService: SensorService) {}
+  constructor(
+    private fb: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData,
+    private dialogRef: MatDialogRef<SensorDialogComponent, Sensor>,
+    private snackBar: MatSnackBar,
+    private sensorService: SensorService
+  ) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
@@ -149,4 +211,5 @@ type SensorForm = {
   }>;
 }
 
+export const SENSOR_CREATED = 'Сенсор создан';
 const FUEL_USE_PATTERN = /^\d+(?:\.\d{1,2})?$/;

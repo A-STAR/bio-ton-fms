@@ -5,21 +5,25 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MAT_DIALOG_DATA, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatTabGroupHarness } from '@angular/material/tabs/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
+import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
-import { SensorDialogComponent, SensorDialogData } from './sensor-dialog.component';
+import { SENSOR_CREATED, SensorDialogComponent, SensorDialogData } from './sensor-dialog.component';
 
 import {
   TEST_TRACKER_ID,
+  testNewSensor,
   testSensorDataTypeEnum,
   testSensorGroups,
   testSensorTypes,
@@ -30,7 +34,11 @@ import {
 describe('SensorDialogComponent', () => {
   let component: SensorDialogComponent;
   let fixture: ComponentFixture<SensorDialogComponent>;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
+  let sensorService: SensorService;
+
+  const dialogRef = jasmine.createSpyObj<MatDialogRef<SensorDialogComponent, true | '' | undefined>>('MatDialogRef', ['close']);
 
   let sensorGroupsSpy: jasmine.Spy<(this: SensorService) => Observable<SensorGroup[]>>;
   let sensorTypesSpy: jasmine.Spy<(this: SensorService) => Observable<SensorType[]>>;
@@ -44,21 +52,26 @@ describe('SensorDialogComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatSnackBarModule,
           SensorDialogComponent
         ],
         providers: [
           {
             provide: MAT_DIALOG_DATA,
             useValue: testMatDialogData
+          },
+          {
+            provide: MatDialogRef,
+            useValue: dialogRef
           }
         ]
       })
       .compileComponents();
 
     fixture = TestBed.createComponent(SensorDialogComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
-
-    const sensorService = TestBed.inject(SensorService);
+    sensorService = TestBed.inject(SensorService);
 
     component = fixture.componentInstance;
 
@@ -290,6 +303,135 @@ describe('SensorDialogComponent', () => {
     /* Coverage for `onControlSelectionChange` control disabled state. */
 
     await type.clickOptions();
+  });
+
+  it('should submit invalid sensor form', async () => {
+    spyOn(sensorService, 'createSensor')
+      .and.callThrough();
+
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="sensor-form"]',
+        text: 'Сохранить'
+      })
+    );
+
+    await saveButton.click();
+
+    expect(sensorService.createSensor)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should submit create sensor form', async () => {
+    const [nameInput, formulaInput, fuelInput] = await loader.getAllHarnesses(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form'
+      })
+    );
+
+    const { name, formula } = testNewSensor;
+
+    await nameInput.setValue(name);
+
+    const [typeSelect, dataTypeSelect, unitSelect] = await loader.getAllHarnesses(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form'
+      })
+    );
+
+    await typeSelect.clickOptions({
+      text: testSensorGroups[1].sensorTypes![0].name
+    });
+
+    await dataTypeSelect.clickOptions({
+      text: testSensorDataTypeEnum[0].value
+    });
+
+    await formulaInput.setValue(formula!);
+
+    await unitSelect.clickOptions({
+      text: testUnits[1].name
+    });
+
+    const testSensor: NewSensor = {
+      trackerId: testNewSensor.trackerId,
+      name: testNewSensor.name,
+      dataType: testNewSensor.dataType,
+      sensorTypeId: testNewSensor.sensorTypeId,
+      description: undefined,
+      formula: testNewSensor.formula,
+      unitId: testNewSensor.unitId,
+      useLastReceived: false,
+      visibility: false,
+      validatorId: undefined,
+      validationType: undefined,
+      fuelUse: undefined
+    };
+
+    const testSensorResponse: Sensor = {
+      id: testSensor.trackerId,
+      tracker: {
+        key: TEST_TRACKER_ID,
+        value: 'Galileo Sky'
+      },
+      name: testSensor.name,
+      visibility: false,
+      dataType: testSensor.dataType,
+      sensorType: {
+        key: testSensorGroups[1].sensorTypes![0].id,
+        value: testSensorGroups[1].sensorTypes![0].name
+      },
+      formula: testSensor.formula,
+      unit: {
+        key: testUnits[1].id,
+        value: testUnits[1].name
+      },
+      useLastReceived: testSensor.useLastReceived
+    };
+
+    const createSensorSpy = spyOn(sensorService, 'createSensor')
+      .and.callFake(() => of(testSensorResponse));
+
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="sensor-form"]'
+      })
+    );
+
+    await saveButton.click();
+
+    expect(sensorService.createSensor)
+      .toHaveBeenCalledWith(testSensor);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(SENSOR_CREATED);
+
+    await expectAsync(
+      snackBar.hasAction()
+    )
+      .toBeResolvedTo(false);
+
+    /* Test fuel control validation. */
+
+    createSensorSpy.calls.reset();
+
+    await fuelInput.setValue(
+      testNewSensor.fuelUse!.toString()
+    );
+
+    testSensor.fuelUse = testNewSensor.fuelUse;
+    testSensorResponse.fuelUse = testSensor.fuelUse;
+
+    createSensorSpy.and.callFake(() => of(testSensorResponse));
+
+    await saveButton.click();
+
+    expect(sensorService.createSensor)
+      .toHaveBeenCalledWith(testSensor);
   });
 });
 
