@@ -23,10 +23,11 @@ public class MessageHandlerWorker : BackgroundService
         _logger.LogInformation("MessageHandlerWorker обработка начата в : {time}", DateTimeOffset.Now);
 
         _messageBus.Subscribe<TrackerMessageHandler>();
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await Task.Yield();
-        }
+        await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
+        //while (!stoppingToken.IsCancellationRequested)
+        //{
+        //    await Task.Yield();
+        //}
 
         _logger.LogInformation("MessageHandlerWorker обработка закончена в : {time}", DateTimeOffset.Now);
 
