@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using BioTonFMS.Domain;
+﻿using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
@@ -9,15 +8,19 @@ using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 {
     public class VehicleRepository : Repository<Vehicle, BioTonDBContext>, IVehicleRepository
     {
-        public VehicleRepository(IKeyValueProvider<Vehicle, int> keyValueProvider,
+        public VehicleRepository(
+            IKeyValueProvider<Vehicle, int> keyValueProvider,
             IQueryableProvider<Vehicle> queryableProvider,
-            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider,
-            unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(
+                keyValueProvider,
+                queryableProvider,
+                unitOfWorkFactory)
         {
         }
 
@@ -133,7 +136,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 if (sameTrackerVehicle is not null)
                 {
                     throw new ArgumentException(
-                        $"Трекер {vehicle.TrackerId} уже используется для машины {sameTrackerVehicle.Id}");
+                        $"Трекер {vehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
                 }
             }
 
@@ -156,7 +159,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 if (sameTrackerVehicle is not null)
                 {
                     throw new ArgumentException(
-                        $"Трекер {vehicle.TrackerId} уже используется для машины {sameTrackerVehicle.Id}");
+                        $"Трекер {vehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
                 }
             }
 
