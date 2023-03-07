@@ -24,8 +24,10 @@ public class GalileoskyMessageParser : IMessageParser
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly ILogger<GalileoskyMessageParser> _logger;
 
-    public GalileoskyMessageParser(ITrackerMessageRepository messageRepository,
-        IProtocolTagRepository protocolTagRepository, ILogger<GalileoskyMessageParser> logger)
+    public GalileoskyMessageParser(
+        ITrackerMessageRepository messageRepository,
+        IProtocolTagRepository protocolTagRepository, 
+        ILogger<GalileoskyMessageParser> logger)
     {
         _messageRepository = messageRepository;
         _protocolTagRepository = protocolTagRepository;

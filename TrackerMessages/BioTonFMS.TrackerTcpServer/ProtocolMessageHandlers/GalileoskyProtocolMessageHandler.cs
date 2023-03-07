@@ -13,7 +13,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 
     public GalileoskyProtocolMessageHandler(
         IMessageBus messageBus,
-         ILogger<GalileoskyProtocolMessageHandler> logger)
+        ILogger<GalileoskyProtocolMessageHandler> logger)
     {
         _messageBus = messageBus;
         _logger = logger;
@@ -21,7 +21,8 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 
     public byte[] HandleMessage(byte[] message)
     {
-        _logger.LogInformation("Получено сообщение. Len = {Length}", message.Length);
+        _logger.LogInformation("Получено сообщение длиной {Len} байт", message.Length);
+        _logger.LogDebug("Текст сообщения {Message}", string.Join(' ', message.Select(x => x.ToString("X"))));
         var counted = GetCrc(message[..^2], message.Length - 2);
 
         var received = BitConverter.ToUInt16(message[^2..], 0);

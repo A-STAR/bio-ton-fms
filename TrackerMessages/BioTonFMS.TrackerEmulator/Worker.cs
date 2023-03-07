@@ -32,6 +32,7 @@ public class Worker : BackgroundService
         try
         {
             client.Connect(_options.Host, _options.Port);
+            _logger.LogInformation("Установлено соединение по адресу {Host}:{Port}", _options.Host, _options.Port);
         }
         catch (Exception e)
         {
