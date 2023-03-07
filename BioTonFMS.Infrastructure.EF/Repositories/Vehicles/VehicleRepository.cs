@@ -16,7 +16,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
     {
         public VehicleRepository(IKeyValueProvider<Vehicle, int> keyValueProvider,
             IQueryableProvider<Vehicle> queryableProvider,
-            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
+            UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(keyValueProvider, queryableProvider,
+            unitOfWorkFactory)
         {
         }
 
@@ -88,9 +89,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 vehiclePredicate = SetPredicate(vehiclePredicate, regNumPredicate);
             }
 
-            var vehicles = vehiclePredicate != null ?
-                linqProvider.Where(vehiclePredicate) :
-                linqProvider;
+            var vehicles = vehiclePredicate != null ? linqProvider.Where(vehiclePredicate) : linqProvider;
 
             if (filter.SortBy.HasValue)
             {
@@ -103,7 +102,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.Type);
                         break;
                     case VehicleSortBy.Group:
-                        vehicles = SetSortDirection(filter, vehicles, v => !v.VehicleGroupId.HasValue ? "" : v.VehicleGroup!.Name);
+                        vehicles = SetSortDirection(filter, vehicles,
+                            v => !v.VehicleGroupId.HasValue ? "" : v.VehicleGroup!.Name);
                         break;
                     case VehicleSortBy.SubType:
                         vehicles = SetSortDirection(filter, vehicles, v => (int)v.VehicleSubType);
@@ -114,8 +114,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 }
             }
 
-            return vehicles.AsNoTracking().GetPagedQueryable(
-                 filter.PageNum, filter.PageSize);
+            return vehicles.AsNoTracking()
+                .GetPagedQueryable(filter.PageNum, filter.PageSize);
         }
 
         public override void Add(Vehicle vehicle)
@@ -125,6 +125,18 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             {
                 throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
             }
+
+            if (vehicle.TrackerId.HasValue)
+            {
+                var sameTrackerVehicle = QueryableProvider.Linq()
+                    .FirstOrDefault(x => x.TrackerId == vehicle.TrackerId);
+                if (sameTrackerVehicle is not null)
+                {
+                    throw new ArgumentException(
+                        $"Трекер {vehicle.TrackerId} уже используется для машины {sameTrackerVehicle.Id}");
+                }
+            }
+
             base.Add(vehicle);
         }
 
@@ -136,6 +148,18 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             {
                 throw new ArgumentException($"Машина с именем {vehicle.Name} уже существует");
             }
+
+            if (vehicle.TrackerId.HasValue)
+            {
+                var sameTrackerVehicle = QueryableProvider.Linq()
+                    .FirstOrDefault(x => x.TrackerId == vehicle.TrackerId);
+                if (sameTrackerVehicle is not null)
+                {
+                    throw new ArgumentException(
+                        $"Трекер {vehicle.TrackerId} уже используется для машины {sameTrackerVehicle.Id}");
+                }
+            }
+
             base.Update(vehicle);
         }
 
@@ -173,6 +197,5 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             return vehiclePredicate;
         }
-
     }
 }
