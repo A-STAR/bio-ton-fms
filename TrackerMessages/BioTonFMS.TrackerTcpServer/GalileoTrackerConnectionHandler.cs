@@ -37,20 +37,20 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
             {
                 message.AddRange(segment.ToArray());
             }
-                
+
             int length = _handler.GetPacketLength(message.ToArray());
             if (message.Count >= length)
+            // больше чем length быть не должно, так как трекер отослав пакет ожидает ответ
+            // и только потом шлёт новые данные
             {
                 var resp = _handler.HandleMessage(message.ToArray());
                 await connection.Transport.Output.WriteAsync(resp);
-                break;
             }
 
             if (result.IsCompleted)
             {
                 break;
             }
-
             connection.Transport.Input.AdvanceTo(buffer.End);
         }
 
