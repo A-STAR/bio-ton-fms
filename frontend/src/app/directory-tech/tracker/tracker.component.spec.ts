@@ -184,6 +184,7 @@ describe('TrackerComponent', () => {
       }) => parallel(() => [
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            selector: '[bioTableActionsTrigger]',
             variant: 'icon',
             text: 'more_horiz'
           })
