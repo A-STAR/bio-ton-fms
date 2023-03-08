@@ -24,8 +24,10 @@ public class GalileoskyMessageParser : IMessageParser
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly ILogger<GalileoskyMessageParser> _logger;
 
-    public GalileoskyMessageParser(ITrackerMessageRepository messageRepository,
-        IProtocolTagRepository protocolTagRepository, ILogger<GalileoskyMessageParser> logger)
+    public GalileoskyMessageParser(
+        ITrackerMessageRepository messageRepository,
+        IProtocolTagRepository protocolTagRepository, 
+        ILogger<GalileoskyMessageParser> logger)
     {
         _messageRepository = messageRepository;
         _protocolTagRepository = protocolTagRepository;
@@ -49,7 +51,7 @@ public class GalileoskyMessageParser : IMessageParser
 
         while (i < binaryPackage.Length - CheckSumLength)
         {
-            if (!tags.TryGetValue(binaryPackage[i], out var tag))
+            if (!tags.TryGetValue(binaryPackage[i], out ProtocolTag? tag))
             {
                 _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}",
                     binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))));

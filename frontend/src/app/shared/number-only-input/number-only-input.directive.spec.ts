@@ -8,9 +8,10 @@ describe('NumberOnlyInputDirective', () => {
   let fixture: ComponentFixture<TestNumberInputComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TestNumberInputComponent]
-    })
+    await TestBed
+      .configureTestingModule({
+        imports: [TestNumberInputComponent]
+      })
       .compileComponents();
 
     fixture = TestBed.createComponent(TestNumberInputComponent);
