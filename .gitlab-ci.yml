@@ -102,15 +102,27 @@ Deploy-test.lan.bioton-fms-ru:
   stage: deploy
   extends: .node-job
   script:
+    # backend
     - docker rm -f fms-backend || true
-    - docker run --name fms-backend -p 8080:80 -v /var/log/fms/test:/app/logs -v /etc/fms/test:/app/config --restart always  -d fms-back:$DOCKER_TAG      
+    - docker run --name fms-backend -p 8080:80 -v /var/log/fms/test:/app/logs -v /etc/fms/test:/app/config --restart always  -d fms-back:$DOCKER_TAG
+    # frontend      
     - npm run build:test    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test.lan.bioton-fms-ru/* 
+    # fms-tracker-tcp-server-test
     - docker rm -f fms-tracker-tcp-server-test || true
     - docker run --name fms-tracker-tcp-server-test -p 8090:6000 -v /var/log/fms/tracker-tcp-server/test:/app/logs -v /etc/fms/tracker-tcp-server/test:/app/config --restart always  -d fms-tracker-tcp-server:$DOCKER_TAG
+    # fms-tracker-message-test
     - docker rm -f fms-tracker-message-test || true
-    - docker run --name fms-tracker-message-test -p 8190:6000 -v /var/log/fms/tracker-message/test:/app/logs -v /etc/fms/tracker-message/test:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
+    - docker run --name fms-tracker-message-test -v /var/log/fms/tracker-message/test:/app/logs -v /etc/fms/tracker-message/test:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
+    # fms-tracker-tcp-server-test-reserve
+    - docker rm -f fms-tracker-tcp-server-test-reserve || true
+    - docker run --name fms-tracker-tcp-server-test-reserve -p 8093:6000 -v /var/log/fms/tracker-tcp-server/reserve:/app/logs -v /etc/fms/tracker-tcp-server/reserve:/app/config --restart always  -d fms-tracker-tcp-server
+    # fms-tracker-message-test-reserve
+    - docker rm -f fms-tracker-message-test-reserve || true
+    - docker run --name fms-tracker-message-test-reserve -v /var/log/fms/tracker-message/reserve:/app/logs -v /etc/fms/tracker-message/reserve:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message
+  
+
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
@@ -131,7 +143,7 @@ Deploy-test2.lan.bioton-fms-ru:
     - docker rm -f fms-tracker-tcp-server-test2 || true
     - docker run --name fms-tracker-tcp-server-test2 -p 8091:6000 -v /var/log/fms/tracker-tcp-server/test2:/app/logs -v /etc/fms/tracker-tcp-server/test2:/app/config --restart always -d git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
     - docker rm -f fms-tracker-message-test2 || true
-    - docker run --name fms-tracker-message-test2 -p 8191:6000 -v /var/log/fms/tracker-message/test2:/app/logs -v /etc/fms/tracker-message/test2:/app/config --restart always -d fms-tracker-message:$DOCKER_TAG
+    - docker run --name fms-tracker-message-test2 -v /var/log/fms/tracker-message/test2:/app/logs -v /etc/fms/tracker-message/test2:/app/config --restart always -d fms-tracker-message:$DOCKER_TAG
   rules:
     - when: manual
   allow_failure: true
@@ -153,7 +165,7 @@ Deploy-test3.lan.bioton-fms-ru:
     - docker rm -f fms-tracker-tcp-server-test3 || true
     - docker run --name fms-tracker-tcp-server-test3 -p 8092:6000 -v /var/log/fms/tracker-tcp-server/test3:/app/logs -v /etc/fms/tracker-tcp-server/test3:/app/config --restart always  -d fms-tracker-tcp-server:$DOCKER_TAG
     - docker rm -f fms-tracker-message-test3 || true
-    - docker run --name fms-tracker-message-test3 -p 8192:6000 -v /var/log/fms/tracker-message/test3:/app/logs -v /etc/fms/tracker-message/test3:/app/config --restart always  -d fms-tracker-message:$DOCKER_TAG
+    - docker run --name fms-tracker-message-test3 -v /var/log/fms/tracker-message/test3:/app/logs -v /etc/fms/tracker-message/test3:/app/config --restart always  -d fms-tracker-message:$DOCKER_TAG
   rules:    
     - when: manual    
   allow_failure: true
