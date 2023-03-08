@@ -40,7 +40,9 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   protected sensors$!: Observable<Sensor[] | undefined>;
   protected standardParametersDataSource!: TableDataSource<StandardParameterDataSource>;
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
+  protected parameterColumns = trackerParameterColumns;
   protected sensorColumns = sensorColumns;
+  protected parameterColumnKeys!: string[];
   protected sensorColumnKeys!: string[];
   protected SensorColumn = SensorColumn;
 
@@ -171,6 +173,7 @@ export default class TrackerComponent implements OnInit, OnDestroy {
    * Set column keys.
    */
   #setColumnKeys() {
+    this.parameterColumnKeys = this.parameterColumns.map(({ key }) => key);
     this.sensorColumnKeys = this.sensorColumns.map(({ key }) => key);
   }
 
@@ -193,6 +196,12 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   }
 }
 
+export enum TrackerParameterColumn {
+  Name = 'name',
+  Param = 'param',
+  Value = 'value'
+}
+
 export enum SensorColumn {
   Action = 'action',
   Name = 'name',
@@ -210,6 +219,21 @@ interface StandardParameterDataSource extends Pick<TrackerStandardParameter, 'na
 interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'formula' | 'description' | 'visibility'> {
   type: Sensor['sensorType']
 }
+
+const trackerParameterColumns: KeyValue<TrackerParameterColumn, string>[] = [
+  {
+    key: TrackerParameterColumn.Name,
+    value: 'Название'
+  },
+  {
+    key: TrackerParameterColumn.Param,
+    value: 'Имя параметра'
+  },
+  {
+    key: TrackerParameterColumn.Value,
+    value: 'Последнее значение'
+  }
+];
 
 export const sensorColumns: KeyValue<SensorColumn, string | undefined>[] = [
   {
