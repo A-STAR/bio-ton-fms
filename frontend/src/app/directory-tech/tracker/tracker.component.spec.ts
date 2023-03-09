@@ -499,27 +499,42 @@ describe('TrackerComponent', () => {
     ));
 
     const actionButtons = await parallel(() => cells.map(
-      ({
-        0: actionCell
-      }) => parallel(() => [
+      ([actionCell]) => parallel(() => [
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
             selector: '[bioTableActionsTrigger]',
             variant: 'icon',
             text: 'more_horiz'
           })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'edit'
+          })
         )
       ])
     ));
 
-    actionButtons.forEach(([actionButton]) => {
+    actionButtons.forEach(([actionButton, updateButton]) => {
       expect(actionButton)
         .withContext('render action button')
+        .not.toBeNull();
+
+      expect(updateButton)
+        .withContext('render update button')
         .not.toBeNull();
 
       actionButton!.hasHarness(
         MatIconHarness.with({
           name: 'more_horiz'
+        })
+      );
+
+      updateButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'edit'
         })
       );
     });
