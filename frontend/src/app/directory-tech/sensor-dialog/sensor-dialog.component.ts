@@ -52,6 +52,7 @@ export class SensorDialogComponent implements OnInit {
     validation: KeyValue<string, string>[];
   }>;
 
+  protected title!: string;
   protected sensorForm!: FormGroup<SensorForm>;
   protected fuelUseTypeIds: SensorGroup['id'][] = [3, 13, 14];
 
@@ -193,6 +194,8 @@ export class SensorDialogComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
+    this.title = typeof this.data === 'number' ? 'Новый датчик' : 'Сводная информация о датчике';
+
     this.#setSensorData();
     this.#initSensorForm();
   }

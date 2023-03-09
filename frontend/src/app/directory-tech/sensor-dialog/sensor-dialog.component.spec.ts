@@ -24,13 +24,14 @@ import { SENSOR_CREATED, SensorDialogComponent, SensorDialogData } from './senso
 import { Tracker } from '../tracker.service';
 
 import {
-  TEST_TRACKER_ID,
   testNewSensor,
+  testSensor,
   testSensorDataTypeEnum,
   testSensorGroups,
   testSensorTypes,
   testUnits,
-  testValidationTypeEnum
+  testValidationTypeEnum,
+  TEST_TRACKER_ID
 } from '../sensor.service.spec';
 
 describe('SensorDialogComponent', () => {
@@ -137,6 +138,16 @@ describe('SensorDialogComponent', () => {
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog title text')
       .toBe('Новый датчик');
+
+    component['data'] = testSensor;
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog update title text')
+      .toBe('Сводная информация о датчике');
   });
 
   it('should render sensor form', async () => {

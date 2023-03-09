@@ -105,7 +105,7 @@ describe('TrackerDialogComponent', () => {
     fixture.detectChanges();
 
     expect(titleTextDe.nativeElement.textContent)
-      .withContext('render dialog title text')
+      .withContext('render dialog update title text')
       .toBe('Сводная информация о GPS-трекере');
   });
 
