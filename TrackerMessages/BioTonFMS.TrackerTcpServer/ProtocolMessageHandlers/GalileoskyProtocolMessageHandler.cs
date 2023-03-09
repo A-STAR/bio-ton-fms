@@ -36,10 +36,16 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
                 PackageUID = Guid.NewGuid()
             };
             _messageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
-            _logger.LogInformation("Сообщение опубликовано. Len = {Length}", message.Length);
+            _logger.LogInformation("Сообщение опубликовано. Len = {Length} PackageUID = {PackageUID}", message.Length, raw.PackageUID);
+        }
+        else
+        {
+            _logger.LogDebug("Ошибка проверки CRC. Ожидается {Expected} насчитано {Calculated}. Сообщение не опубликовано", received.ToString("X"), counted.ToString("X"));
         }
 
-        return GetResponseForTracker(counted);
+        var response = GetResponseForTracker(counted);
+        _logger.LogDebug("Текст ответа {Response}", string.Join(' ', response.Select(x => x.ToString("X"))));
+        return response;
     }
 
     public int GetPacketLength(byte[] message)

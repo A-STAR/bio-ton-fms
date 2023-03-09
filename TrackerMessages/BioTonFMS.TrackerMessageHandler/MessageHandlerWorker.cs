@@ -24,10 +24,6 @@ public class MessageHandlerWorker : BackgroundService
 
         _messageBus.Subscribe<TrackerMessageHandler>();
         await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
-        //while (!stoppingToken.IsCancellationRequested)
-        //{
-        //    await Task.Yield();
-        //}
 
         _logger.LogInformation("MessageHandlerWorker обработка закончена в : {time}", DateTimeOffset.Now);
 
