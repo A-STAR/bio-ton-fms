@@ -98,7 +98,7 @@ describe('TrackersComponent', () => {
       .not.toBeNull();
   });
 
-  it('should render trackers table', async () => {
+  it('should render tracker table', async () => {
     const tables = await loader.getHarnessOrNull(MatTableHarness);
 
     expect(tables)

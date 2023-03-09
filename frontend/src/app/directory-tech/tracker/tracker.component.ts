@@ -10,13 +10,15 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, filter, map, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 
-import { TrackerService, TrackerStandardParameter } from '../tracker.service';
+import { TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
 import { Sensor, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
 
 import { TableDataSource } from '../shared/table/table.data-source';
+
+import { DATE_FORMAT } from '../trackers/trackers.component';
 
 @Component({
   selector: 'bio-tracker',
@@ -44,10 +46,13 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   protected sensorColumns = sensorColumns;
   protected parameterColumnKeys!: string[];
   protected sensorColumnKeys!: string[];
+  protected ParameterColumn = TrackerParameterColumn;
+  protected TrackerParameterName = TrackerParameterName;
+  protected DATE_FORMAT = DATE_FORMAT;
   protected SensorColumn = SensorColumn;
 
   /**
-   * Add a new sensor to sensors table.
+   * Add a new sensor to sensor table.
    */
   protected onCreateSensor() {
     const data: SensorDialogData = {
@@ -220,7 +225,7 @@ interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'formul
   type: Sensor['sensorType']
 }
 
-const trackerParameterColumns: KeyValue<TrackerParameterColumn, string>[] = [
+export const trackerParameterColumns: KeyValue<TrackerParameterColumn, string>[] = [
   {
     key: TrackerParameterColumn.Name,
     value: 'Название'
