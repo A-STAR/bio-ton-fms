@@ -1,7 +1,7 @@
-using System.Linq.Expressions;
 using BioTonFMS.Common.Testable;
+using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
-using BioTonFMS.Infrastructure.EF.Providers;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +10,15 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
 public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBContext>, ITrackerMessageRepository
 {
+    private readonly ITrackerTagRepository _tagsRepository;
+
     public TrackerMessageRepository(IKeyValueProvider<TrackerMessage, int> keyValueProvider,
         IQueryableProvider<TrackerMessage> queryableProvider,
-        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory)
+        UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory,
+        ITrackerTagRepository tagsRepository)
         : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
+        _tagsRepository = tagsRepository;
     }
 
     public override void Add(TrackerMessage entity)
@@ -42,7 +46,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     public bool ExistsByUID(Guid uid) =>
         QueryableProvider.Linq().Any(x => x.PackageUID == uid);
 
-    public TrackerStandardParameters GetParameters(int externalId, string imei)
+    public TrackerStandardParameters GetStandardParameters(int externalId, string imei)
     {
         var stdParams = new TrackerStandardParameters();
 
@@ -76,5 +80,58 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .FirstOrDefault()?.Height;
 
         return stdParams;
+    }
+
+    public IList<TrackerParameter> GetParameters(int externalId, string imei)
+    {
+        var lastTags = QueryableProvider.Fetch(x => x.Tags).Linq()
+            .Where(x => x.TrId == externalId || x.Imei == imei)
+            .OrderByDescending(x => x.ServerDateTime)
+            .FirstOrDefault()?.Tags;
+
+        if (lastTags is null || !lastTags.Any())
+        {
+            return new List<TrackerParameter>();
+        }
+
+        var trackerTags = _tagsRepository.GetTags().ToDictionary(x => x.Id);
+        var result = new List<TrackerParameter>();
+        foreach (var t in lastTags)
+        {
+            var tp = new TrackerParameter();
+            if (t.TrackerTagId.HasValue)
+            {
+                tp.ParamName = trackerTags[t.TrackerTagId.Value].Name;
+            }
+
+            switch (t.TagType)
+            {
+                case TagDataTypeEnum.Integer:
+                    tp.LastValueDecimal = ((MessageTagInteger)t).Value;
+                    break;
+                case TagDataTypeEnum.Bits:
+                    tp.LastValueString = ((MessageTagBits)t).Value.ToString();
+                    break;
+                case TagDataTypeEnum.Byte:
+                    tp.LastValueDecimal = ((MessageTagByte)t).Value;
+                    break;
+                case TagDataTypeEnum.Double:
+                    tp.LastValueDecimal = ((MessageTagDouble)t).Value;
+                    break;
+                case TagDataTypeEnum.Boolean:
+                    tp.LastValueString = ((MessageTagBoolean)t).Value.ToString();
+                    break;
+                case TagDataTypeEnum.String:
+                    tp.LastValueString = ((MessageTagString)t).Value;
+                    break;
+                case TagDataTypeEnum.DateTime:
+                    tp.LastValueDateTime = ((MessageTagDateTime)t).Value;
+                    break;
+            }
+            
+            result.Add(tp);
+        }
+
+        return result;
     }
 }

@@ -41,7 +41,26 @@ public class TrackerDataController : ValidationControllerBase
 
         if (tracker is null) return NotFound();
 
-        var parameters = _messageRepository.GetParameters(tracker.ExternalId, tracker.Imei);
+        var parameters = _messageRepository.GetStandardParameters(tracker.ExternalId, tracker.Imei);
         return Ok(parameters.GetArray());
+    }
+
+    /// <summary>
+    /// Возвращает список последних полученных параметров трекера
+    /// </summary>
+    /// <param name="trackerId">Id трекера</param>
+    /// <response code="200">Список параметров успешно возвращен</response>
+    /// <response code="404">Трекера не существует</response>
+    [HttpGet("tracker/parameters/{trackerId:int}")]
+    [ProducesResponseType(typeof(TrackerParameter[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
+    public IActionResult GetParameters(int trackerId)
+    {
+        var tracker = _trackerRepository[trackerId];
+
+        if (tracker is null) return NotFound();
+
+        var parameters = _messageRepository.GetParameters(tracker.ExternalId, tracker.Imei);
+        return Ok(parameters);
     }
 }
