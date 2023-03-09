@@ -16,7 +16,7 @@ import { Observable, of } from 'rxjs';
 
 import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
-import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
+import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { VehicleDialogComponent, VEHICLE_CREATED, VEHICLE_UPDATED } from './vehicle-dialog.component';
 
 import { testFuels, testNewVehicle, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
@@ -129,7 +129,7 @@ describe('VehicleDialogComponent', () => {
     const vehicleFormDe = fixture.debugElement.query(By.css('form#vehicle-form'));
 
     expect(vehicleFormDe)
-      .withContext('render Vehicle form element')
+      .withContext('render vehicle form element')
       .not.toBeNull();
 
     loader.getHarness(

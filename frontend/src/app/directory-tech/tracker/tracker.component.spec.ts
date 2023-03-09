@@ -1,8 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCardHarness } from '@angular/material/card/testing';
@@ -10,18 +12,24 @@ import { MatTableHarness } from '@angular/material/table/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Observable, of } from 'rxjs';
 
-import { Sensors, SensorService } from '../sensor.service';
+import { NewSensor, Sensors, SensorService } from '../sensor.service';
 
 import TrackerComponent, { SensorColumn, sensorColumns } from './tracker.component';
+import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
-import { testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
+import { testSensors, TEST_TRACKER_ID, testNewSensor } from '../sensor.service.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
   let fixture: ComponentFixture<TrackerComponent>;
+  let overlayContainer: OverlayContainer;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
   let sensorService: SensorService;
 
@@ -31,8 +39,10 @@ describe('TrackerComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
-          TrackerComponent,
-          HttpClientTestingModule
+          NoopAnimationsModule,
+          HttpClientTestingModule,
+          MatSnackBarModule,
+          TrackerComponent
         ],
         providers: [
           {
@@ -44,7 +54,9 @@ describe('TrackerComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(TrackerComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    overlayContainer = TestBed.inject(OverlayContainer);
     sensorService = TestBed.inject(SensorService);
 
     component = fixture.componentInstance;
@@ -280,6 +292,63 @@ describe('TrackerComponent', () => {
         .not.toBeNull();
     });
   });
+
+  it('should render create sensor button', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
+
+    const createSensorButton = await card.getHarnessOrNull(
+      MatButtonHarness.with({
+        variant: 'flat',
+        text: 'Добавить запись'
+      })
+    );
+
+    expect(createSensorButton)
+      .withContext('render a create sensor button')
+      .not.toBeNull();
+  });
+
+  it('should create tracker sensor', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Дополнительные параметры'
+      })
+    );
+
+    const createSensorButton = await card.getHarness(
+      MatButtonHarness.with({
+        variant: 'flat',
+        text: 'Добавить запись'
+      })
+    );
+
+    await createSensorButton.click();
+
+    const sensorDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(sensorDialog)
+      .withContext('render a sensor dialog')
+      .not.toBeNull();
+
+    await sensorDialog!.close();
+
+    overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating sensors. */
+
+    const dialogRef = {
+      afterClosed: () => of(testNewSensor)
+    } as MatDialogRef<SensorDialogComponent, NewSensor>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await createSensorButton.click();
+  });
 });
 
 const testParams: Params = {
@@ -290,7 +359,12 @@ const testParamMap = convertToParamMap(testParams);
 
 const testActivatedRoute = {
   params: testParams,
+  snapshot: {
+    get paramMap() {
+      return testParamMap;
+    }
+  },
   get paramMap() {
     return of(testParamMap);
   }
-} as Pick<ActivatedRoute, 'params' | 'paramMap'>;
+} as Pick<ActivatedRoute, 'params' | 'paramMap' | 'snapshot'>;

@@ -1,0 +1,158 @@
+<h1 mat-dialog-title>Новый датчик</h1>
+
+<mat-dialog-content>
+  <form id="sensor-form" [formGroup]="sensorForm" (ngSubmit)="submitSensorForm()">
+    <mat-tab-group mat-stretch-tabs="false">
+      <mat-tab label="Основные сведения">
+        <fieldset formGroupName="basic">
+          <div class="two-thirds">
+            <label for="name">Наименование датчика</label>
+
+            <mat-form-field class="full-width">
+              <input matInput id="name" placeholder="Наименование датчика" formControlName="name">
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">
+                Обязательное поле
+              </mat-error>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['maxlength'] as error">
+                Поле должно быть не более {{ error.requiredLength }} символов
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <ng-container *ngIf="sensorData$ | async as sensorData$">
+            <div>
+              <label>Тип датчика</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Тип датчика" formControlName="type"
+                  (selectionChange)="onControlSelectionChange($event, 'basic.fuelUse')">
+                  <mat-option>Тип датчика</mat-option>
+
+                  <mat-optgroup *ngFor="let group of sensorData$.groups" [label]="group.name">
+                    <mat-option *ngFor="let type of group.sensorTypes" [value]="type.id">{{type.name}}</mat-option>
+                  </mat-optgroup>
+                </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Тип данных</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Тип данных" formControlName="dataType">
+                  <mat-option>Тип данных</mat-option>
+
+                  <mat-option [value]="type.key" *ngFor="let type of sensorData$.dataType">{{ type.value }}</mat-option>
+                </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="two-thirds">
+              <label for="formula">Формула</label>
+
+              <mat-form-field class="full-width">
+                <input matInput id="formula" placeholder="Формула" formControlName="formula">
+
+                <mat-error>Обязательное поле</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Единица измерения</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Единица измерения" formControlName="unit">
+                  <mat-option>Единица измерения</mat-option>
+
+                  <mat-option [value]="unit.id" *ngFor="let unit of sensorData$.units">{{ unit.name }}</mat-option>
+                </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Валидатор</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Валидатор" formControlName="validator"
+                  (selectionChange)="onControlSelectionChange($event, 'basic.validationType')">
+                  <mat-option>Валидатор</mat-option>
+
+                  <mat-option [value]="type.id" *ngFor="let type of sensorData$.validators">{{ type.name }}</mat-option>
+                </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <label>Тип валидации</label>
+
+              <mat-form-field>
+                <mat-select placeholder="Тип валидации" formControlName="validationType">
+                  <mat-option>Тип валидации</mat-option>
+
+                  <mat-option [value]="validation.key" *ngFor="let validation of sensorData$.validation">
+                    {{ validation.value }}
+                  </mat-option>
+                </mat-select>
+
+                <mat-error>Обязательное поле</mat-error>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <div>
+            <mat-slide-toggle formControlName="lastReceived">Последнее сообщение</mat-slide-toggle>
+          </div>
+
+          <div>
+            <mat-slide-toggle formControlName="visibility">Видимость</mat-slide-toggle>
+          </div>
+
+          <div [hidden]="hiddenFuelUse">
+            <label for="fuelUse">Расход л/ч</label>
+
+            <mat-form-field>
+              <input matInput bioNumberOnlyInput id="fuelUse" type="number" placeholder="Расход л/ч" step="0.01"
+                formControlName="fuelUse">
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['required']">
+                Обязательное поле
+              </mat-error>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['pattern']">
+                Должно быть максимум 2 числа после запятой
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="full-two-thirds">
+            <label for="description">Описание</label>
+
+            <mat-form-field>
+              <textarea matInput id="description" placeholder="Описание" formControlName="description"></textarea>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.description.errors?.['maxlength'] as error">
+                Поле должно быть не более {{ error.requiredLength }} символов
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </fieldset>
+      </mat-tab>
+    </mat-tab-group>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayoutAlign="space-between">
+  <button mat-stroked-button color="accent" mat-dialog-close>Отмена</button>
+
+  <button mat-flat-button type="submit" form="sensor-form" color="accent">Сохранить</button>
+</mat-dialog-actions>
