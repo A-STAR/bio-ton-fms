@@ -142,9 +142,17 @@ export class SensorDialogComponent implements OnInit {
    * Initialize Sensor form.
    */
   #initSensorForm() {
+    let trackerID: Tracker['id'];
+
+    if (typeof this.data === 'number') {
+      trackerID = this.data;
+    } else {
+      trackerID = this.data.tracker.id;
+    }
+
     this.sensorForm = this.fb.group({
       basic: this.fb.group({
-        tracker: this.fb.nonNullable.control<NewSensor['trackerId'] | undefined>(this.data.trackerId!, Validators.required),
+        tracker: this.fb.nonNullable.control<NewSensor['trackerId']>(trackerID, Validators.required),
         name: this.fb.nonNullable.control<NewSensor['name'] | undefined>(undefined, [
           Validators.required,
           Validators.maxLength(100)
@@ -177,7 +185,7 @@ export class SensorDialogComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData,
+    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData<Tracker['id'] | Sensor>,
     private dialogRef: MatDialogRef<SensorDialogComponent, Sensor>,
     private snackBar: MatSnackBar,
     private sensorService: SensorService
@@ -190,13 +198,11 @@ export class SensorDialogComponent implements OnInit {
   }
 }
 
-export type SensorDialogData = Partial<{
-  trackerId: Tracker['id'];
-}>
+export type SensorDialogData<T extends Tracker['id'] | Sensor> = T;
 
 type SensorForm = {
   basic: FormGroup<{
-    tracker: FormControl<NewSensor['trackerId'] | undefined>;
+    tracker: FormControl<NewSensor['trackerId']>;
     name: FormControl<NewSensor['name'] | undefined>;
     type: FormControl<NewSensor['sensorTypeId'] | undefined>;
     dataType: FormControl<NewSensor['dataType'] | undefined>;

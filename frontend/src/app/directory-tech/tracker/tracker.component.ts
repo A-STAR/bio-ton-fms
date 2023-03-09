@@ -10,8 +10,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, filter, map, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 
-import { TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
-import { Sensor, SensorService } from '../sensor.service';
+import { Tracker, TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
+import { NewSensor, Sensor, SensorDataTypeEnum, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
@@ -57,13 +57,11 @@ export default class TrackerComponent implements OnInit, OnDestroy {
    * Add a new sensor to sensor table.
    */
   protected onCreateSensor() {
-    const data: SensorDialogData = {
-      trackerId: Number(
-        this.route.snapshot.paramMap.get('id')!
-      )
-    };
+    const data: SensorDialogData<Tracker['id']> = Number(
+      this.route.snapshot.paramMap.get('id')!
+    );
 
-    const dialogRef = this.dialog.open(SensorDialogComponent, { data });
+    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData<Tracker['id']>, Sensor>(SensorDialogComponent, { data });
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -77,6 +75,17 @@ export default class TrackerComponent implements OnInit, OnDestroy {
 
         this.#sensors$.next(sensors);
       });
+  }
+
+  /**
+   * Update a sensor in table.
+   *
+   * @param sensorDataSource Sensor data source.
+   */
+  protected onUpdateSensor({ id }: SensorDataSource) {
+    const data: SensorDialogData<Sensor> = this.#sensors$.value!.find(sensor => sensor.id === id)!;
+
+    this.dialog.open<SensorDialogComponent, SensorDialogData<Sensor>, Sensor>(SensorDialogComponent, { data });
   }
 
   #sensors$ = new BehaviorSubject<Sensor[] | undefined>(undefined);

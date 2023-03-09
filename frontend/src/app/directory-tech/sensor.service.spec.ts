@@ -469,45 +469,46 @@ export const testSensors: Sensors = {
 
 export const TEST_TRACKER_ID = 1;
 
-export const testNewSensor: NewSensor = {
-  trackerId: TEST_TRACKER_ID,
-  name: 'Парковочный радар',
-  dataType: testSensorDataTypeEnum[0].key,
-  sensorTypeId: testSensorTypes[2].id,
-  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.',
-  formula: '(param3+#param1)*param2',
-  unitId: testUnits[1].id,
-  useLastReceived: false,
-  visibility: true,
-  validatorId: testSensorTypes[0].id,
-  validationType: testValidationTypeEnum[0].key,
-  fuelUse: 10
-};
-
-const testSensor: Sensor = {
+export const testSensor: Sensor = {
   id: 1,
   tracker: {
-    id: testNewSensor.trackerId,
+    id: TEST_TRACKER_ID,
     value: 'Galileo Sky'
   },
-  name: testNewSensor.name,
+  name: 'Парковочный радар',
   sensorType: {
-    id: testNewSensor.sensorTypeId,
+    id: testSensorGroups[1].sensorTypes![0].id,
     value: testSensorGroups[1].sensorTypes![0].name
   },
-  dataType: testNewSensor.dataType,
-  formula: testNewSensor.formula,
+  dataType: testSensorDataTypeEnum[0].key,
+  formula: '(param1+param2)*param3',
   unit: {
-    id: testNewSensor.unitId,
+    id: testUnits[1].id,
     value: testUnits[1].name
   },
   validator: {
-    id: testNewSensor.validatorId!,
+    id: testSensorTypes[0].id,
     value: testSensorTypes[0].name
   },
-  validationType: testNewSensor.validationType,
-  useLastReceived: testNewSensor.useLastReceived,
-  visibility: testNewSensor.visibility,
-  fuelUse: testNewSensor.fuelUse,
-  description: testNewSensor.description
+  validationType: testValidationTypeEnum[0].key,
+  useLastReceived: false,
+  visibility: false,
+  fuelUse: 10,
+  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.'
+};
+
+export const testNewSensor: NewSensor = {
+  id: testSensor.id,
+  trackerId: testSensor.tracker.id,
+  name: testSensor.name,
+  sensorTypeId: testSensor.sensorType.id,
+  dataType: testSensor.dataType,
+  formula: testSensor.formula,
+  unitId: testSensor.unit.id,
+  validatorId: testSensor.validator?.id,
+  validationType: testSensor.validationType,
+  useLastReceived: testSensor.useLastReceived,
+  visibility: testSensor.visibility,
+  fuelUse: testSensor.fuelUse,
+  description: testSensor.description
 };

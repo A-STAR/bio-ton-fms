@@ -21,6 +21,8 @@ import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { SENSOR_CREATED, SensorDialogComponent, SensorDialogData } from './sensor-dialog.component';
 
+import { Tracker } from '../tracker.service';
+
 import {
   TEST_TRACKER_ID,
   testNewSensor,
@@ -435,6 +437,4 @@ describe('SensorDialogComponent', () => {
   });
 });
 
-const testMatDialogData: SensorDialogData = {
-  trackerId: TEST_TRACKER_ID
-};
+const testMatDialogData: SensorDialogData<Tracker['id']> = TEST_TRACKER_ID;

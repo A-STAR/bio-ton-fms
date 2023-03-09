@@ -21,14 +21,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
 
 import { TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
-import { NewSensor, Sensors, SensorService } from '../sensor.service';
+import { Sensor, Sensors, SensorService } from '../sensor.service';
 
 import TrackerComponent, { SensorColumn, sensorColumns, trackerParameterColumns } from './tracker.component';
 import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
 import { DATE_FORMAT } from '../trackers/trackers.component';
 import { testParameters, testStandardParameters } from '../tracker.service.spec';
-import { testSensors, TEST_TRACKER_ID, testNewSensor } from '../sensor.service.spec';
+import { testSensor, testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
@@ -670,13 +670,35 @@ describe('TrackerComponent', () => {
     /* Coverage for updating sensors. */
 
     const dialogRef = {
-      afterClosed: () => of(testNewSensor)
-    } as MatDialogRef<SensorDialogComponent, NewSensor>;
+      afterClosed: () => of(testSensor)
+    } as MatDialogRef<SensorDialogComponent, Sensor>;
 
     spyOn(component['dialog'], 'open')
       .and.returnValue(dialogRef);
 
     await createSensorButton.click();
+  });
+
+  it('should update tracker sensor', async () => {
+    const updateSensorButtons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        selector: '[mat-icon-button]',
+        text: 'edit'
+      })
+    );
+
+    await updateSensorButtons[0].click();
+
+    const sensorDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(sensorDialog)
+      .withContext('render a tracker sensor dialog')
+      .toBeDefined();
+
+    await sensorDialog!.close();
+
+    overlayContainer.ngOnDestroy();
   });
 });
 

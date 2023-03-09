@@ -153,8 +153,8 @@ export type Sensor = {
     value: Unit['name'];
   };
   validator?: {
-    id: number;
-    value: string;
+    id: SensorType['id'];
+    value: SensorType['name'];
   };
   validationType?: ValidationTypeEnum;
   useLastReceived: boolean;
