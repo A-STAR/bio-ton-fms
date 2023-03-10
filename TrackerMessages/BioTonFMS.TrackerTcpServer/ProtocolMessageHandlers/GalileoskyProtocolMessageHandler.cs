@@ -50,6 +50,11 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 
     public int GetPacketLength(byte[] message)
     {
+        if (message.Length < 3)
+        {
+            _logger.LogDebug("Получено слишком короткое сообщение. Len = {Length}", message.Length);
+            return -1;
+        }
         // Определяем длину данных. Она хранится во втором и третьем байте
         var lenRaw = BitConverter.ToUInt16(message[1..3], 0);
         // Чтобы получить длину пакета нужно замаскировать старший бит
