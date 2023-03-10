@@ -354,39 +354,39 @@ describe('SensorDialogComponent', () => {
     });
 
     const testSensor: NewSensor = {
-      trackerId: testNewSensor.trackerId,
       name: testNewSensor.name,
-      dataType: testNewSensor.dataType,
+      trackerId: testNewSensor.trackerId,
       sensorTypeId: testNewSensor.sensorTypeId,
-      description: undefined,
+      dataType: testNewSensor.dataType,
       formula: testNewSensor.formula,
       unitId: testNewSensor.unitId,
-      useLastReceived: false,
-      visibility: false,
       validatorId: undefined,
       validationType: undefined,
-      fuelUse: undefined
+      useLastReceived: false,
+      visibility: false,
+      fuelUse: undefined,
+      description: undefined
     };
 
     const testSensorResponse: Sensor = {
       id: testSensor.trackerId,
       tracker: {
-        key: TEST_TRACKER_ID,
+        id: testSensor.trackerId,
         value: 'Galileo Sky'
       },
       name: testSensor.name,
-      visibility: false,
-      dataType: testSensor.dataType,
       sensorType: {
-        key: testSensorGroups[1].sensorTypes![0].id,
+        id: testSensor.sensorTypeId,
         value: testSensorGroups[1].sensorTypes![0].name
       },
+      dataType: testSensor.dataType,
       formula: testSensor.formula,
       unit: {
-        key: testUnits[1].id,
+        id: testSensor.unitId,
         value: testUnits[1].name
       },
-      useLastReceived: testSensor.useLastReceived
+      useLastReceived: testSensor.useLastReceived,
+      visibility: testSensor.visibility
     };
 
     const createSensorSpy = spyOn(sensorService, 'createSensor')

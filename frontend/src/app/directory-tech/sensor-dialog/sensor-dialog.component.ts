@@ -70,31 +70,31 @@ export class SensorDialogComponent implements OnInit {
     const {
       tracker,
       name,
-      dataType,
       type,
-      description,
+      dataType,
       formula,
       unit,
-      lastReceived,
       validator,
       validationType,
+      lastReceived,
+      visibility,
       fuelUse,
-      visibility
+      description
     } = value.basic!;
 
     const sensor: NewSensor = {
       trackerId: tracker!,
       name: name!,
-      dataType: dataType!,
       sensorTypeId: type!,
-      description: description ?? undefined,
+      dataType: dataType!,
       formula: formula!,
       unitId: unit!,
-      useLastReceived: lastReceived ?? false,
       validatorId: validator ?? undefined,
       validationType: validationType!,
+      useLastReceived: lastReceived ?? false,
+      visibility: visibility ?? false,
       fuelUse: fuelUse ?? undefined,
-      visibility: visibility ?? false
+      description: description ?? undefined
     };
 
     this.#subscription = this.sensorService

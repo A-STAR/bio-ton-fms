@@ -137,18 +137,30 @@ export type Unit = {
 
 export type Sensor = {
   id: number;
-  tracker: KeyValue<Tracker['id'], Tracker['name']>;
+  tracker: {
+    id: Tracker['id'];
+    value: Tracker['name'];
+  };
   name: string;
+  sensorType: {
+    id: SensorType['id'];
+    value: SensorType['name'];
+  };
   dataType: SensorDataTypeEnum;
-  sensorType: KeyValue<SensorType['id'], SensorType['name']>;
-  description?: string;
   formula?: string;
-  unit: KeyValue<Unit['id'], Unit['name']>;
-  useLastReceived: boolean;
-  validator?: KeyValue<number, string>;
+  unit: {
+    id: Unit['id'];
+    value: Unit['name'];
+  };
+  validator?: {
+    id: number;
+    value: string;
+  };
   validationType?: ValidationTypeEnum;
-  fuelUse?: number;
+  useLastReceived: boolean;
   visibility?: boolean;
+  fuelUse?: number;
+  description?: string;
 }
 
 export interface Sensors extends Pagination {

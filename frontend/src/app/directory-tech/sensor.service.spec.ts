@@ -3,7 +3,8 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import {
-  NewSensor, Sensor,
+  NewSensor,
+  Sensor,
   SensorDataTypeEnum,
   SensorGroup,
   Sensors,
@@ -82,7 +83,7 @@ describe('SensorService', () => {
     };
 
     const testTrackerSensors: Sensors = {
-      sensors: testSensors.sensors.filter(({ tracker }) => tracker.key === testSensorsOptions?.trackerId),
+      sensors: testSensors.sensors.filter(({ tracker }) => tracker.id === testSensorsOptions?.trackerId),
       pagination: testSensors.pagination
     };
 
@@ -390,25 +391,25 @@ export const testSensors: Sensors = {
     {
       id: 1,
       tracker: {
-        key: 1,
+        id: 1,
         value: 'Трекер Arnavi'
       },
       name: 'Пробег',
       visibility: true,
       dataType: SensorDataTypeEnum.String,
       sensorType: {
-        key: 2,
+        id: 2,
         value: 'Датчик пробега'
       },
       description: 'Умный цифровой датчик для пробега',
       formula: '(param1-#param1)/const2',
       unit: {
-        key: 3,
+        id: 3,
         value: 'км/ч'
       },
       useLastReceived: true,
       validator: {
-        key: 2,
+        id: 2,
         value: 'Валидатор пробега'
       },
       fuelUse: 8
@@ -416,24 +417,24 @@ export const testSensors: Sensors = {
     {
       id: 2,
       tracker: {
-        key: 1,
+        id: 1,
         value: 'Трекер TKSTAR'
       },
       name: 'Разгон',
       visibility: false,
       dataType: SensorDataTypeEnum.Boolean,
       sensorType: {
-        key: 2,
+        id: 2,
         value: 'Датчик разгона'
       },
       formula: '(param1+#param1)*const2',
       unit: {
-        key: 2,
+        id: 2,
         value: 'мАч'
       },
       useLastReceived: false,
       validator: {
-        key: 1,
+        id: 1,
         value: 'Валидатор разгона'
       },
       validationType: ValidationTypeEnum.ZeroTest
@@ -441,19 +442,19 @@ export const testSensors: Sensors = {
     {
       id: 3,
       tracker: {
-        key: 2,
+        id: 2,
         value: 'Трекер Micodus MV720'
       },
       name: 'Скорость',
       visibility: true,
       dataType: SensorDataTypeEnum.Number,
       sensorType: {
-        key: 1,
+        id: 1,
         value: 'Датчик скорости'
       },
       description: 'Оповещает о превышении скорости',
       unit: {
-        key: 1,
+        id: 1,
         value: 'мАч'
       },
       useLastReceived: true,
@@ -486,27 +487,27 @@ export const testNewSensor: NewSensor = {
 const testSensor: Sensor = {
   id: 1,
   tracker: {
-    key: testNewSensor.trackerId,
+    id: testNewSensor.trackerId,
     value: 'Galileo Sky'
   },
   name: testNewSensor.name,
-  visibility: false,
-  dataType: testNewSensor.dataType,
   sensorType: {
-    key: testNewSensor.sensorTypeId,
+    id: testNewSensor.sensorTypeId,
     value: testSensorGroups[1].sensorTypes![0].name
   },
-  description: testNewSensor.description,
+  dataType: testNewSensor.dataType,
   formula: testNewSensor.formula,
   unit: {
-    key: testNewSensor.unitId,
+    id: testNewSensor.unitId,
     value: testUnits[1].name
   },
-  useLastReceived: testNewSensor.useLastReceived,
   validator: {
-    key: testNewSensor.validatorId!,
+    id: testNewSensor.validatorId!,
     value: testSensorTypes[0].name
   },
   validationType: testNewSensor.validationType,
-  fuelUse: testNewSensor.fuelUse
+  useLastReceived: testNewSensor.useLastReceived,
+  visibility: testNewSensor.visibility,
+  fuelUse: testNewSensor.fuelUse,
+  description: testNewSensor.description
 };

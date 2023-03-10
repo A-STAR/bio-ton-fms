@@ -129,11 +129,10 @@ export default class TrackerComponent implements OnInit, OnDestroy {
         id,
         name,
         sensorType: type,
-        description,
-        formula,
+        formula: parameter,
         unit,
         visibility
-      }): SensorDataSource => ({ id, name, type, description, formula, unit, visibility }));
+      }): SensorDataSource => ({ id, name, type, parameter, unit, visibility }));
   }
 
   /**
@@ -248,7 +247,7 @@ export enum SensorColumn {
   Name = 'name',
   Type = 'type',
   Unit = 'unit',
-  Formula = 'formula',
+  Parameter = 'parameter',
   Visibility = 'visibility'
 }
 
@@ -262,8 +261,9 @@ interface ParameterDataSource {
   value: TrackerParameter['lastValueDateTime'] | TrackerStandardParameter['lastValueDecimal'] | TrackerParameter['lastValueString'];
 }
 
-interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'formula' | 'description' | 'visibility'> {
-  type: Sensor['sensorType']
+interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'visibility'> {
+  type: Sensor['sensorType'],
+  parameter: Sensor['formula']
 }
 
 export const trackerParameterColumns: KeyValue<TrackerParameterColumn, string>[] = [
@@ -299,7 +299,7 @@ export const sensorColumns: KeyValue<SensorColumn, string | undefined>[] = [
     value: 'Ед. измерения'
   },
   {
-    key: SensorColumn.Formula,
+    key: SensorColumn.Parameter,
     value: 'Параметр'
   },
   {
