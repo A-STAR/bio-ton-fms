@@ -321,5 +321,5 @@ export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
   }
 ];
 
-export const DATE_FORMAT = 'd MMMM y, h:mm';
+export const DATE_FORMAT = 'd MMMM y, H:mm';
 export const TRACKER_DELETED = 'GPS-трекер удален';
