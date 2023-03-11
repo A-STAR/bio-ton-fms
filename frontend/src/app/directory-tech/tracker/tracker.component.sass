@@ -4,13 +4,32 @@
 \:host
   @extend %page-layout, %striped-table
 
-  display: block
+  display: flex
+  flex-wrap: wrap
+  gap: 40px
+
+  /* Emulate sensor data card. */
+  &::after
+    content: ''
+    flex: 1
+    order: 1
+
+h1,
+mat-card:nth-of-type(2)
+  flex: 100%
 
 h1
-  margin-bottom: 35px
+  margin-bottom: -5px
   color: $darker-gray
   font-size: 16px
   font-weight: 500
+
+mat-card
+  flex: 1
+
+  /* Set order after emulated sensor data card. */
+  &:nth-of-type(2)
+    order: 2
 
 mat-card-header
   justify-content: space-between
