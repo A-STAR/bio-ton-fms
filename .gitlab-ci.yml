@@ -11,7 +11,7 @@ variables:
     paths:
      - .npm/
 
-.rules-backend:
+.rules-backend: &rules-backend
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
       changes:
@@ -160,7 +160,7 @@ Build-backend:
     - docker image tag fms-back:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
     - docker image push git.bioton-fms.ru:5050/bioton/fms/backend:latest
-  extends: .rules-backend 
+  <<: *rules-backend 
 
 Test-backend:  
   stage: test
@@ -174,7 +174,7 @@ Test-backend:
     - dotnet build -c release .tools/BioTonFMS.Version
     - cd .UnitTests/BiotonFMS.Telematica.Tests
     - dotnet test --logger:trx
-  extends: .rules-backend
+  <<: *rules-backend 
 
 Deploy-backend-test.lan.bioton-fms-ru:
   stage: deploy  
