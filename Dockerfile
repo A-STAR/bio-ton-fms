@@ -4,12 +4,11 @@ WORKDIR /app
 # Copy everything
 COPY . ./
 
-RUN git describe
-# Restore as distinct layers
-RUN dotnet restore BioTonFMSApp/BioTonFMSApp.sln
-RUN dotnet build -c release .tools/BioTonFMS.Version
-RUN dotnet build -c release BioTonFMSApp/BioTonFMSApp.csproj
-RUN dotnet build -c release .UnitTests/BiotonFMS.Telematica.Tests/
+RUN git describe \
+    && dotnet restore BioTonFMSApp/BioTonFMSApp.sln \
+    && dotnet build -c release .tools/BioTonFMS.Version \
+    && dotnet build -c release BioTonFMSApp/BioTonFMSApp.csproj \
+    && dotnet build -c release .UnitTests/BiotonFMS.Telematica.Tests/
 
 # run the unit tests 
 FROM build AS test
