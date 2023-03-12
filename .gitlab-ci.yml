@@ -178,8 +178,6 @@ Test-backend:
 
 Deploy-backend-test.lan.bioton-fms-ru:
   stage: deploy  
-  needs: 
-    - Test-backend
   script:
     - docker rm -f fms-backend || true
     - docker run --name fms-backend -p 8080:80 -v /var/log/fms/test:/app/logs -v /etc/fms/test:/app/config --restart always  -d fms-back:$DOCKER_TAG
@@ -200,8 +198,6 @@ Deploy-backend-test.lan.bioton-fms-ru:
   
 Deploy-backend-test2.lan.bioton-fms-ru:
   stage: deploy
-  needs: 
-    - Test-backend
   script:
     - docker rm -f fms-backend-test2 || true
     - docker run --name fms-backend-test2 -p 8081:80 -v /var/log/fms/test2:/app/logs -v /etc/fms/test2:/app/config --restart always  -d fms-back:$DOCKER_TAG      
@@ -219,8 +215,6 @@ Deploy-backend-test2.lan.bioton-fms-ru:
 
 Deploy-backend-test3.lan.bioton-fms-ru:
   stage: deploy
-  needs: 
-    - Test-backend  
   script:
     - docker rm -f fms-backend-test3 || true
     - docker run --name fms-backend-test3 -p 8082:80 -v /var/log/fms/test3:/app/logs -v /etc/fms/test3:/app/config --restart always  -d fms-back:$DOCKER_TAG   
@@ -237,9 +231,7 @@ Deploy-backend-test3.lan.bioton-fms-ru:
   allow_failure: true
 
 Deploy-backend-stage.bioton-fms.ru:
-  stage: deploy
-  needs: 
-    - Test-backend
+  stage: deploy  
   script:
     # Backend
     - ssh user@stage.bioton-fms.ru docker rm -f fms-backend || true
