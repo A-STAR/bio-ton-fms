@@ -53,8 +53,8 @@ public class GalileoskyMessageParser : IMessageParser
         {
             if (!tags.TryGetValue(binaryPackage[i], out ProtocolTag? tag))
             {
-                _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}",
-                    binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))));
+                _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}, пакет {PackageUID}",
+                    binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))), packageUID);
                 return;
             }
 
@@ -66,6 +66,7 @@ public class GalileoskyMessageParser : IMessageParser
                     if (!string.IsNullOrEmpty(message.Imei))
                     {
                         _messageRepository.Add(message);
+                        _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}", packageUID, message.Id, message.TrId, message.Imei);
                         message = new TrackerMessage
                         {
                             PackageUID = packageUID
@@ -78,6 +79,7 @@ public class GalileoskyMessageParser : IMessageParser
                     if (message.TrId != 0)
                     {
                         _messageRepository.Add(message);
+                        _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}", packageUID, message.Id, message.TrId, message.Imei);
                         message = new TrackerMessage
                         {
                             PackageUID = packageUID
@@ -119,6 +121,7 @@ public class GalileoskyMessageParser : IMessageParser
         }
 
         _messageRepository.Add(message);
+        _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}", packageUID, message.Id, message.TrId, message.Imei);
     }
 
     private static MessageTag CreateMessageTag(TrackerTag trackerTag, byte[] value) =>

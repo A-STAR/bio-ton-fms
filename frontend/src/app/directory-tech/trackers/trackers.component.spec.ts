@@ -5,6 +5,7 @@ import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -43,6 +44,7 @@ describe('TrackersComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          RouterTestingModule,
           MatSnackBarModule,
           TrackersComponent
         ],
@@ -61,7 +63,6 @@ describe('TrackersComponent', () => {
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
     overlayContainer = TestBed.inject(OverlayContainer);
-
     trackerService = TestBed.inject(TrackerService);
 
     component = fixture.componentInstance;
@@ -97,7 +98,7 @@ describe('TrackersComponent', () => {
       .not.toBeNull();
   });
 
-  it('should render trackers table', async () => {
+  it('should render tracker table', async () => {
     const tables = await loader.getHarnessOrNull(MatTableHarness);
 
     expect(tables)
@@ -117,6 +118,33 @@ describe('TrackersComponent', () => {
     expect(rows.length)
       .withContext('render rows')
       .toBe(testTrackers.trackers.length);
+  });
+
+  it('should render tracker table row links', async () => {
+    const table = await loader.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    rows.forEach(async (row, index) => {
+      const rowEl = await row.host();
+      const routerLink = await rowEl.getAttribute('ng-reflect-router-link');
+
+      expect(routerLink)
+        .withContext('render GPS tracker row router link')
+        .toBe(
+          testTrackers.trackers[index].id.toString()
+        );
+    });
+
+    /* Supress 'Spec has no expectations.' warning. */
+
+    const rowEl = await rows[1].host();
+    const routerLink = await rowEl.getAttribute('ng-reflect-router-link');
+
+    expect(routerLink)
+      .withContext('render GPS-tracker row router link')
+      .toBe(
+        testTrackers.trackers[1].id.toString()
+      );
   });
 
   it('should render tracker table header cells', async () => {
@@ -203,20 +231,23 @@ describe('TrackersComponent', () => {
       ([actionCell]) => parallel(() => [
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            selector: '[bioTableActionsTrigger][bioStopClickPropagation]',
             variant: 'icon',
             text: 'more_horiz'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
-            ancestor: '.actions',
+            selector: '[bioStopClickPropagation]',
+            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'edit'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
-            ancestor: '.actions',
+            selector: '[bioStopClickPropagation]',
+            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'delete'
           })
