@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Text;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
@@ -110,7 +112,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                     tp.LastValueDecimal = ((MessageTagInteger)t).Value;
                     break;
                 case TagDataTypeEnum.Bits:
-                    tp.LastValueString = ((MessageTagBits)t).Value.ToString();
+                    tp.LastValueString = GetBitString(((MessageTagBits)t).Value);
                     break;
                 case TagDataTypeEnum.Byte:
                     tp.LastValueDecimal = ((MessageTagByte)t).Value;
@@ -133,5 +135,18 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         }
 
         return result;
+    }
+    
+    private static string GetBitString(BitArray bits)
+    {
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < bits.Count; i++)
+        {
+            char c = bits[i] ? '1' : '0';
+            sb.Append(c);
+        }
+
+        return sb.ToString();
     }
 }

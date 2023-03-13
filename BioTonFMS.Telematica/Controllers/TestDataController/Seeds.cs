@@ -86,74 +86,47 @@ public static class Seeds
     private static MessageTag[] GenerateTags(Faker f, TrackerMessage v, TrackerTag[] t, ref int id)
     {
         var result = new MessageTag[f.Random.Int(0, 12)];
-        var possibleTypes = t.Select(x => x.DataType)
-            .Distinct()
-            .Where(x => x != TagDataTypeEnum.Struct)
-            .ToArray();
-        var exclude = Enum.GetValues<TagDataTypeEnum>()
-            .Where(x => !possibleTypes.Contains(x))
-            .ToArray();
-        
+        var tags = f.Random.ArrayElements(t.Where(x => x.DataType != TagDataTypeEnum.Struct).ToArray(), result.Length);
+
         for (var i = 0; i < result.Length; i++)
         {
-            result[i] = f.Random.Enum(exclude)
+            result[i] = tags[i].DataType
                 switch
                 {
                     TagDataTypeEnum.Integer => new MessageTagInteger
                     {
                         Value = f.Random.Int(),
-                        TagType = TagDataTypeEnum.Integer,
-                        TrackerTagId = f.Random
-                            .ArrayElement(t.Where(x => x.DataType == TagDataTypeEnum.Integer).ToArray())
-                            .Id
+                        TagType = TagDataTypeEnum.Integer
                     },
                     TagDataTypeEnum.Bits => new MessageTagBits
                     {
                         Value = new BitArray(f.Random.Bytes(2)),
-                        TagType = TagDataTypeEnum.Bits,
-                        TrackerTagId = f.Random
-                            .ArrayElement(t.Where(x => x.DataType == TagDataTypeEnum.Bits).ToArray())
-                            .Id
+                        TagType = TagDataTypeEnum.Bits
                     },
                     TagDataTypeEnum.Byte => new MessageTagByte
                     {
                         Value = f.Random.Byte(),
-                        TagType = TagDataTypeEnum.Byte,
-                        TrackerTagId = f.Random
-                            .ArrayElement(t.Where(x => x.DataType == TagDataTypeEnum.Byte).ToArray())
-                            .Id
+                        TagType = TagDataTypeEnum.Byte
                     },
                     TagDataTypeEnum.Double => new MessageTagDouble
                     {
                         Value = f.Random.Double(),
-                        TagType = TagDataTypeEnum.Double,
-                        TrackerTagId = f.Random
-                            .ArrayElement(t.Where(x => x.DataType == TagDataTypeEnum.Double).ToArray())
-                            .Id
+                        TagType = TagDataTypeEnum.Double
                     },
                     TagDataTypeEnum.Boolean => new MessageTagBoolean
                     {
                         Value = f.Random.Bool(),
-                        TagType = TagDataTypeEnum.Boolean,
-                        TrackerTagId = f.Random
-                            .ArrayElement(t.Where(x => x.DataType == TagDataTypeEnum.Boolean).ToArray())
-                            .Id
+                        TagType = TagDataTypeEnum.Boolean
                     },
                     TagDataTypeEnum.String => new MessageTagString
                     {
                         Value = f.Hacker.Abbreviation(),
-                        TagType = TagDataTypeEnum.String,
-                        TrackerTagId = f.Random
-                            .ArrayElement(t.Where(x => x.DataType == TagDataTypeEnum.String).ToArray())
-                            .Id
+                        TagType = TagDataTypeEnum.String
                     },
                     TagDataTypeEnum.DateTime => new MessageTagDateTime
                     {
                         Value = f.Time(),
-                        TagType = TagDataTypeEnum.DateTime,
-                        TrackerTagId = f.Random
-                            .ArrayElement(t.Where(x => x.DataType == TagDataTypeEnum.DateTime).ToArray())
-                            .Id
+                        TagType = TagDataTypeEnum.DateTime
                     },
                     TagDataTypeEnum.Struct => throw new ArgumentOutOfRangeException(),
                     _ => throw new ArgumentOutOfRangeException()
@@ -164,6 +137,7 @@ public static class Seeds
             result[i].TrackerMessage = v;
             result[i].SensorId = null;
             result[i].IsFallback = false;
+            result[i].TrackerTagId = tags[i].Id;
         }
 
         return result;
