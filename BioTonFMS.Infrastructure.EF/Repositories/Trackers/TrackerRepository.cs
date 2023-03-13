@@ -26,10 +26,22 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
         {
             _vehicleQueryableProvider = vehicleQueryableProvider;
             _logger = logger;
+        }        
+        
+        private IQueryable<Tracker> HydratedQuery
+        {
+            get
+            {
+
+                var linqProvider = QueryableProvider
+                    .Fetch(x => x.Vehicle)
+                    .Fetch(x => x.Sensors)
+                    .Linq();
+                return linqProvider;
+            }
         }
 
-        public new Tracker? this[int key] => QueryableProvider.Fetch(x => x.Vehicle)
-            .Linq().FirstOrDefault(x => x.Id == key);
+        public new Tracker? this[int key] => HydratedQuery.FirstOrDefault(x => x.Id == key);
 
         public override void Add(Tracker tracker)
         {
@@ -95,12 +107,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
             }
         }
 
-        public PagedResult<Tracker> GetTrackers(TrackersFilter filter)
+        public PagedResult<Tracker> GetTrackers(TrackersFilter filter, bool forUpdate = false)
         {
-            var linqProvider = QueryableProvider
-                .Fetch(x => x.Vehicle)
-                .Fetch(x => x.Sensors)
-                .Linq();
+            var trackers = forUpdate ? HydratedQuery : HydratedQuery.AsNoTracking();
 
             Expression<Func<Tracker, bool>>? trackerPredicate = null;
 
@@ -125,9 +134,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 trackerPredicate = SetPredicate(trackerPredicate, simNumberPredicate);
             }
 
-            var trackers = trackerPredicate != null
-                ? linqProvider.Where(trackerPredicate)
-                : linqProvider;
+            trackers = trackerPredicate != null
+                ? trackers.Where(trackerPredicate)
+                : trackers;
 
             trackers = filter.SortBy switch
             {

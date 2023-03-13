@@ -2,6 +2,7 @@
 using BioTonFMS.Expressions.Ast;
 using BioTonFMS.Expressions.Compilation;
 using BioTonFMS.Expressions.Parsing;
+using BioTonFMS.Expressions.Util;
 
 namespace BioTonFMS.Expressions;
 
@@ -59,28 +60,16 @@ public static class Helpers
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
     /// <returns>Set of compiled expressions with their names: (name1, expression1), (name2, expression2),...</returns>
     public static IEnumerable<CompiledExpression<TExpressionProperties>> SortAndBuild<TExpressionProperties>(
-        this IEnumerable<TExpressionProperties> expressions, 
-        IDictionary<string, Type> parameters, 
-        Func<AstNode?, TExpressionProperties, AstNode?> postprocess, 
+        this IEnumerable<TExpressionProperties> expressions,
+        IDictionary<string, Type> parameters,
+        Func<AstNode?, TExpressionProperties, AstNode?> postprocess,
         CompilationOptions? compilationOptions = null,
         IExceptionHandler? exceptionHandler = null)
         where TExpressionProperties : IExpressionProperties
     {
         exceptionHandler ??= new DefaultExceptionHandler();
 
-        var graph = expressions
-            .ToDictionary(
-                keySelector: e => e.Name,
-                elementSelector: e =>
-                {
-                    var ast = ParseWithHandler(e.Formula, exceptionHandler);
-                    var postProcessedAst = postprocess(ast, e);
-                    return (
-                        Edges: postProcessedAst is null
-                            ? Array.Empty<string>()
-                            : (ICollection<string>)postProcessedAst.GetVariables().Select(v => v.Name).ToArray(),
-                        Data: (Ast: postProcessedAst, Props: e));
-                });
+        var graph = BuildExpressionGraph(expressions, exceptionHandler, postprocess);
 
         var allParameters = new Dictionary<string, Type>(parameters);
 
@@ -90,11 +79,31 @@ public static class Helpers
             .Select(name =>
             {
                 var node = graph[name];
-                var compiler = new Compiler(allParameters, compilationOptions, node.Data.Props);
-                var compiledExpression = node.Data.Ast?.CompileWithHandler(compiler, exceptionHandler);
+                var compiler = new Compiler(allParameters, compilationOptions, node.Properties);
+                var compiledExpression = node.Ast?.CompileWithHandler(compiler, exceptionHandler);
                 if (compiledExpression is not null) allParameters.Add(name, compiledExpression.ReturnType);
-                return new CompiledExpression<TExpressionProperties>(node.Data.Props, compiledExpression);
+                return new CompiledExpression<TExpressionProperties>(node.Properties, compiledExpression);
             });
+    }
+    public static Graph<ExpressionGraphNode<TExpressionProperties>> BuildExpressionGraph<TExpressionProperties>(
+        IEnumerable<TExpressionProperties> expressions,
+        IExceptionHandler? exceptionHandler = null, Func<AstNode?, TExpressionProperties, AstNode?>? postprocess = null)
+        where TExpressionProperties : IExpressionProperties
+    {
+        var graph = expressions
+            .ToDictionary(
+                keySelector: e => e.Name,
+                elementSelector: e =>
+                {
+                    var ast = ParseWithHandler(e.Formula, exceptionHandler ?? new DefaultExceptionHandler());
+                    var postProcessedAst = postprocess == null ? ast : postprocess(ast, e);
+                    return new ExpressionGraphNode<TExpressionProperties>(
+                        postProcessedAst is null
+                            ? Array.Empty<string>()
+                            : postProcessedAst.GetVariables().Select(v => v.Name).ToArray(),
+                        postProcessedAst, e);
+                });
+        return new Graph<ExpressionGraphNode<TExpressionProperties>>(graph);
     }
 
     /// <summary>
