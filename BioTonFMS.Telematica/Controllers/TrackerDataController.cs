@@ -1,3 +1,4 @@
+using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
@@ -56,11 +57,11 @@ public class TrackerDataController : ValidationControllerBase
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetParameters(int trackerId)
     {
-        var tracker = _trackerRepository[trackerId];
+        Tracker? tracker = _trackerRepository[trackerId];
 
         if (tracker is null) return NotFound();
 
-        var parameters = _messageRepository.GetParameters(tracker.ExternalId, tracker.Imei);
+        IList<TrackerParameter> parameters = _messageRepository.GetParameters(tracker.ExternalId, tracker.Imei);
         return Ok(parameters);
     }
 }

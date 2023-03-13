@@ -86,7 +86,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
     public IList<TrackerParameter> GetParameters(int externalId, string imei)
     {
-        var lastTags = QueryableProvider.Fetch(x => x.Tags).Linq()
+        IList<MessageTag>? lastTags = QueryableProvider.Fetch(x => x.Tags).Linq()
             .Where(x => x.TrId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Tags;
@@ -96,42 +96,42 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             return new List<TrackerParameter>();
         }
 
-        var trackerTags = _tagsRepository.GetTags().ToDictionary(x => x.Id);
+        Dictionary<int, TrackerTag> trackerTags = _tagsRepository.GetTags().ToDictionary(x => x.Id);
         var result = new List<TrackerParameter>();
-        foreach (var t in lastTags)
+        foreach (var tag in lastTags)
         {
-            var tp = new TrackerParameter();
-            if (t.TrackerTagId.HasValue)
+            var parameter = new TrackerParameter();
+            if (tag.TrackerTagId.HasValue)
             {
-                tp.ParamName = trackerTags[t.TrackerTagId.Value].Name;
+                parameter.ParamName = trackerTags[tag.TrackerTagId.Value].Name;
             }
 
-            switch (t.TagType)
+            switch (tag.TagType)
             {
                 case TagDataTypeEnum.Integer:
-                    tp.LastValueDecimal = ((MessageTagInteger)t).Value;
+                    parameter.LastValueDecimal = ((MessageTagInteger)tag).Value;
                     break;
                 case TagDataTypeEnum.Bits:
-                    tp.LastValueString = GetBitString(((MessageTagBits)t).Value);
+                    parameter.LastValueString = GetBitString(((MessageTagBits)tag).Value);
                     break;
                 case TagDataTypeEnum.Byte:
-                    tp.LastValueDecimal = ((MessageTagByte)t).Value;
+                    parameter.LastValueDecimal = ((MessageTagByte)tag).Value;
                     break;
                 case TagDataTypeEnum.Double:
-                    tp.LastValueDecimal = ((MessageTagDouble)t).Value;
+                    parameter.LastValueDecimal = ((MessageTagDouble)tag).Value;
                     break;
                 case TagDataTypeEnum.Boolean:
-                    tp.LastValueString = ((MessageTagBoolean)t).Value.ToString();
+                    parameter.LastValueString = ((MessageTagBoolean)tag).Value.ToString();
                     break;
                 case TagDataTypeEnum.String:
-                    tp.LastValueString = ((MessageTagString)t).Value;
+                    parameter.LastValueString = ((MessageTagString)tag).Value;
                     break;
                 case TagDataTypeEnum.DateTime:
-                    tp.LastValueDateTime = ((MessageTagDateTime)t).Value;
+                    parameter.LastValueDateTime = ((MessageTagDateTime)tag).Value;
                     break;
             }
             
-            result.Add(tp);
+            result.Add(parameter);
         }
 
         return result;

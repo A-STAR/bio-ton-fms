@@ -95,7 +95,7 @@ public static class Seeds
                 {
                     TagDataTypeEnum.Integer => new MessageTagInteger
                     {
-                        Value = f.Random.Int(),
+                        Value = f.Random.Int(-100, 1000),
                         TagType = TagDataTypeEnum.Integer
                     },
                     TagDataTypeEnum.Bits => new MessageTagBits
@@ -110,7 +110,7 @@ public static class Seeds
                     },
                     TagDataTypeEnum.Double => new MessageTagDouble
                     {
-                        Value = f.Random.Double(),
+                        Value = f.Random.Double(-100, 1000),
                         TagType = TagDataTypeEnum.Double
                     },
                     TagDataTypeEnum.Boolean => new MessageTagBoolean
