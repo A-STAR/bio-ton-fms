@@ -61,11 +61,15 @@
         <label for="external">Внешний ID</label>
 
         <mat-form-field>
-          <input matInput bioNumberOnlyInput id="external" type="number" placeholder="Внешний ID"
-            maxlength="99999999999" formControlName="external">
+          <input matInput bioNumberOnlyInput id="external" type="number" placeholder="Внешний ID" min="1"
+            max="99999999999" formControlName="external">
 
           <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['required']">
             Обязательное поле
+          </mat-error>
+
+          <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['min'] as error">
+            Поле должно быть не менее {{ error.min }}
           </mat-error>
 
           <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['max']">
