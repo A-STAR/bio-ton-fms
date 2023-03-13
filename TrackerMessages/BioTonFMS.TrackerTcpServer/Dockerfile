@@ -4,11 +4,10 @@ WORKDIR /app
 # Copy everything
 COPY . ./
 
-RUN git describe
-# Restore as distinct layers
-RUN dotnet restore BioTonFMSApp/BioTonFMSApp.sln
-RUN dotnet build -c release .tools/BioTonFMS.Version
-RUN dotnet build -c release TrackerMessages/BioTonFMS.TrackerTcpServer
+RUN git describe \
+    && dotnet restore BioTonFMSApp/BioTonFMSApp.sln \
+    && dotnet build -c release .tools/BioTonFMS.Version \
+    && dotnet build -c release TrackerMessages/BioTonFMS.TrackerTcpServer
 
 #Publish
 FROM build AS publish
