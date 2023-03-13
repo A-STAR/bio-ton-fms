@@ -60,6 +60,7 @@ public static class MessageProcessing
         this IEnumerable<Tracker> trackers,
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
+        // строит из набора тегов словарь <название тега, тип тега>
         Dictionary<string, Type> parameterTypesDictionary = BuildParameterDictionaryByTags(trackerTags);
 
         var compilationOptions = new CompilationOptions()
@@ -106,7 +107,7 @@ public static class MessageProcessing
 
         var parameters = trackerTags.Where(t =>
                 t.DataType is TagDataTypeEnum.Double or TagDataTypeEnum.Integer
-                    or TagDataTypeEnum.Byte /* For the moment we can process doubles only */)
+                    or TagDataTypeEnum.Byte /* For the moment we can process numbers only */)
             .ToDictionary(t => t.Name, _ => typeof( TagData<double> ) /* For the moment we can process doubles only */);
         return parameters;
     }
