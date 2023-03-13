@@ -1,7 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { SensorDataTypeEnum, Sensors, SensorService, SensorsOptions, ValidationTypeEnum } from './sensor.service';
+import {
+  NewSensor, Sensor,
+  SensorDataTypeEnum,
+  SensorGroup,
+  Sensors,
+  SensorService,
+  SensorsOptions,
+  SensorType,
+  Unit,
+  ValidationTypeEnum
+} from './sensor.service';
 
 import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
 
@@ -16,6 +27,10 @@ describe('SensorService', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(SensorService);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should be created', () => {
@@ -86,10 +101,289 @@ describe('SensorService', () => {
     );
 
     sensorsRequest.flush(testTrackerSensors);
+  });
 
-    httpTestingController.verify();
+  it('should get sensor groups', (done: DoneFn) => {
+    service.sensorGroups$.subscribe(groups => {
+      expect(groups)
+        .withContext('emit sensor groups')
+        .toEqual(testSensorGroups);
+
+      done();
+    });
+
+    const sensorGroupsRequest = httpTestingController.expectOne('/api/telematica/sensorGroups', 'sensor groups request');
+
+    sensorGroupsRequest.flush(testSensorGroups);
+  });
+
+  it('should get sensor types', (done: DoneFn) => {
+    service.sensorTypes$.subscribe(sensorTypes => {
+      expect(sensorTypes)
+        .withContext('emit sensor types')
+        .toEqual(testSensorTypes);
+
+      done();
+    });
+
+    const sensorTypesRequest = httpTestingController.expectOne('/api/telematica/sensorTypes', 'sensor types request');
+
+    sensorTypesRequest.flush(testSensorTypes);
+  });
+
+  it('should get units', (done: DoneFn) => {
+    service.units$.subscribe(units => {
+      expect(units)
+        .withContext('emit units')
+        .toEqual(testUnits);
+
+      done();
+    });
+
+    const unitsRequest = httpTestingController.expectOne('/api/telematica/units', 'units request');
+
+    unitsRequest.flush(testUnits);
+  });
+
+  it('should get sensor data type enum', (done: DoneFn) => {
+    service.sensorDataType$.subscribe(sensorDataType => {
+      expect(sensorDataType)
+        .withContext('emit sensor data type enum')
+        .toEqual(testSensorDataTypeEnum);
+
+      done();
+    });
+
+    const sensorDataTypeRequest = httpTestingController.expectOne(
+      '/api/telematica/enums/sensordatatypeenum',
+      'sensor data type enum request'
+    );
+
+    sensorDataTypeRequest.flush(testSensorDataTypeEnum);
+  });
+
+  it('should get validation type enum', (done: DoneFn) => {
+    service.validationType$.subscribe(validationType => {
+      expect(validationType)
+        .withContext('emit validation type enum')
+        .toEqual(testValidationTypeEnum);
+
+      done();
+    });
+
+    const validationTypeRequest = httpTestingController.expectOne(
+      '/api/telematica/enums/validationtypeenum',
+      'validation type enum request'
+    );
+
+    validationTypeRequest.flush(testValidationTypeEnum);
+  });
+
+  it('should create tracker', (done: DoneFn) => {
+    service
+      .createSensor(testNewSensor)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBe(testSensor);
+
+        done();
+      });
+
+    const createSensorRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: '/api/telematica/sensor'
+    }, 'create sensor request');
+
+    createSensorRequest.flush(testSensor);
   });
 });
+
+export const testSensorDataTypeEnum: KeyValue<SensorDataTypeEnum, string>[] = [
+  {
+    key: SensorDataTypeEnum.Boolean,
+    value: 'Булево'
+  },
+  {
+    key: SensorDataTypeEnum.String,
+    value: 'Строка'
+  },
+  {
+    key: SensorDataTypeEnum.Number,
+    value: 'Число'
+  }
+];
+
+export const testValidationTypeEnum: KeyValue<ValidationTypeEnum, string>[] = [
+  {
+    key: ValidationTypeEnum.LogicalAnd,
+    value: 'Тип валидации «Логическое И»'
+  },
+  {
+    key: ValidationTypeEnum.LogicalOr,
+    value: 'Тип валидации «Логическое ИЛИ»'
+  },
+  {
+    key: ValidationTypeEnum.ZeroTest,
+    value: 'Тип валидации «Проверка на неравенство нулю»'
+  }
+];
+
+export const testUnits: Unit[] = [
+  {
+    id: 1,
+    name: 'Безразмерная величина'
+  },
+  {
+    id: 2,
+    name: 'Километры',
+    abbreviated: 'км'
+  },
+  {
+    id: 3,
+    name: 'Градусы цельсия',
+    abbreviated: 'C°'
+  },
+  {
+    id: 4,
+    name: 'Обороты в минуту',
+    abbreviated: 'об/мин'
+  }
+];
+
+export const testSensorTypes: SensorType[] = [
+  {
+    id: 1,
+    name: 'Датчик пробега',
+    description: 'Датчик, показывающий пройденное объектом расстояние.',
+    sensorGroup: {
+      key: 1,
+      value: 'Пробег'
+    },
+    dataType: SensorDataTypeEnum.Number,
+    unit: {
+      key: testUnits[1].id,
+      value: testUnits[1].name
+    }
+  },
+  {
+    id: 2,
+    name: 'Относительный одометр',
+    description: 'Датчик, показывающий расстояние, пройденное объектом.',
+    sensorGroup: {
+      key: 1,
+      value: 'Пробег'
+    },
+    dataType: SensorDataTypeEnum.Number,
+    unit: {
+      key: testUnits[1].id,
+      value: testUnits[1].name
+    }
+  },
+  {
+    id: 3,
+    name: 'Датчик зажигания',
+    description: 'Датчик, показывающий, включено или выключено зажигание.',
+    sensorGroup: {
+      key: 2,
+      value: 'Цифровые'
+    },
+    dataType: SensorDataTypeEnum.Boolean,
+    unit: {
+      key: testUnits[0].id,
+      value: testUnits[0].name
+    }
+  },
+  {
+    id: 4,
+    name: 'Тревожная кнопка',
+    description: 'Датчик, ненулевое значение которого позволяет отмечать сообщение как тревожное (SOS).',
+    sensorGroup: {
+      key: 2,
+      value: 'Цифровые'
+    },
+    dataType: SensorDataTypeEnum.Number,
+    unit: {
+      key: testUnits[0].id,
+      value: testUnits[0].name
+    }
+  },
+  {
+    id: 5,
+    name: 'Датчик мгновенного определения движения',
+    description: 'Датчик, определяющий состояние движения объектов в реальном времени.',
+    sensorGroup: {
+      key: 2,
+      value: 'Цифровые'
+    },
+    dataType: SensorDataTypeEnum.Boolean,
+    unit: {
+      key: testUnits[0].id,
+      value: testUnits[0].name
+    }
+  }
+];
+
+export const testSensorGroups: SensorGroup[] = [
+  {
+    id: 1,
+    name: 'Пробег',
+    description: 'Группа пробега',
+    sensorTypes: [
+      {
+        id: testSensorTypes[0].id,
+        name: testSensorTypes[0].name,
+        description: testSensorTypes[0].description,
+        sensorGroupId: testSensorTypes[0].sensorGroup.key,
+        dataType: testSensorTypes[0].dataType,
+        unitId: testSensorTypes[0].unit.key
+      },
+      {
+        id: testSensorTypes[1].id,
+        name: testSensorTypes[1].name,
+        description: testSensorTypes[1].description,
+        sensorGroupId: testSensorTypes[1].sensorGroup.key,
+        dataType: testSensorTypes[1].dataType,
+        unitId: testSensorTypes[1].unit.key
+      },
+    ]
+  },
+  {
+    id: 2,
+    name: 'Цифровые',
+    sensorTypes: [
+      {
+        id: testSensorTypes[2].id,
+        name: testSensorTypes[2].name,
+        description: testSensorTypes[2].description,
+        sensorGroupId: testSensorTypes[2].sensorGroup.key,
+        dataType: testSensorTypes[2].dataType,
+        unitId: testSensorTypes[2].unit.key
+      },
+      {
+        id: testSensorTypes[3].id,
+        name: testSensorTypes[3].name,
+        description: testSensorTypes[3].description,
+        sensorGroupId: testSensorTypes[3].sensorGroup.key,
+        dataType: testSensorTypes[3].dataType,
+        unitId: testSensorTypes[3].unit.key
+      },
+      {
+        id: testSensorTypes[4].id,
+        name: testSensorTypes[4].name,
+        description: testSensorTypes[4].description,
+        sensorGroupId: testSensorTypes[4].sensorGroup.key,
+        dataType: testSensorTypes[4].dataType,
+        unitId: testSensorTypes[4].unit.key
+      }
+    ]
+  },
+  {
+    id: 3,
+    name: 'Топливо',
+    description: 'Группа топлива'
+  }
+];
 
 export const testSensors: Sensors = {
   sensors: [
@@ -117,7 +411,6 @@ export const testSensors: Sensors = {
         key: 2,
         value: 'Валидатор пробега'
       },
-      validationType: ValidationTypeEnum.LogicalAnd,
       fuelUse: 8
     },
     {
@@ -143,8 +436,7 @@ export const testSensors: Sensors = {
         key: 1,
         value: 'Валидатор разгона'
       },
-      validationType: ValidationTypeEnum.ZeroTest,
-      fuelUse: 6
+      validationType: ValidationTypeEnum.ZeroTest
     },
     {
       id: 3,
@@ -165,11 +457,6 @@ export const testSensors: Sensors = {
         value: 'мАч'
       },
       useLastReceived: true,
-      validator: {
-        key: 1,
-        value: 'Валидатор скорости'
-      },
-      validationType: ValidationTypeEnum.LogicalOr,
       fuelUse: 7
     }
   ],
@@ -180,3 +467,46 @@ export const testSensors: Sensors = {
 };
 
 export const TEST_TRACKER_ID = 1;
+
+export const testNewSensor: NewSensor = {
+  trackerId: TEST_TRACKER_ID,
+  name: 'Парковочный радар',
+  dataType: testSensorDataTypeEnum[0].key,
+  sensorTypeId: testSensorTypes[2].id,
+  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.',
+  formula: '(param3+#param1)*param2',
+  unitId: testUnits[1].id,
+  useLastReceived: false,
+  visibility: true,
+  validatorId: testSensorTypes[0].id,
+  validationType: testValidationTypeEnum[0].key,
+  fuelUse: 10
+};
+
+const testSensor: Sensor = {
+  id: 1,
+  tracker: {
+    key: testNewSensor.trackerId,
+    value: 'Galileo Sky'
+  },
+  name: testNewSensor.name,
+  visibility: false,
+  dataType: testNewSensor.dataType,
+  sensorType: {
+    key: testNewSensor.sensorTypeId,
+    value: testSensorGroups[1].sensorTypes![0].name
+  },
+  description: testNewSensor.description,
+  formula: testNewSensor.formula,
+  unit: {
+    key: testNewSensor.unitId,
+    value: testUnits[1].name
+  },
+  useLastReceived: testNewSensor.useLastReceived,
+  validator: {
+    key: testNewSensor.validatorId!,
+    value: testSensorTypes[0].name
+  },
+  validationType: testNewSensor.validationType,
+  fuelUse: testNewSensor.fuelUse
+};

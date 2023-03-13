@@ -1,0 +1,15 @@
+@use 'sass:map'
+@use 'extends'
+@use 'variables' as *
+
+\:host
+  @extend %fieldset-layout
+
+  display: block
+
+fieldset div[hidden]
+  display: unset
+  visibility: hidden
+
+mat-slide-toggle
+  margin-bottom: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)

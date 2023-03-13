@@ -358,11 +358,13 @@ public class GalileoskyMessageParserTests
         var keyValueProviderMock = new KeyValueProviderMock<TrackerMessage, int>(list);
         var vehicleQueryProviderMock = new QueryableProviderMock<TrackerMessage>(list);
         var unitOfWorkFactoryMock = new MessagesDBContextUnitOfWorkFactoryMock();
+        var tagStub = new Mock<ITrackerTagRepository>();
 
         var repo = new TrackerMessageRepository(
             keyValueProviderMock,
             vehicleQueryProviderMock,
-            unitOfWorkFactoryMock);
+            unitOfWorkFactoryMock,
+            tagStub.Object);
 
         return repo;
     }

@@ -1,0 +1,47 @@
+@use 'variables' as *
+
+mat-tab-header
+  margin-bottom: 20px
+  border-bottom: 1px solid $lighter-gray
+
+.mat-mdc-tab-labels
+  gap: 20px
+
+div.mdc-tab
+  padding-left: 10px
+  padding-right: 10px
+
+.mat-mdc-tab
+
+  &::before
+
+    @at-root :not(:first-child)#{&}
+      content: ""
+      top: 5px
+      left: -10px
+      width: 1px
+      height: 25px
+      background-color: $light-gray
+
+    @at-root div#{&}
+      margin: unset
+
+  @at-root div#{&}.mdc-tab
+    height: 35px
+
+.mdc-tab__text-label
+  color: $dark-gray
+  font-size: 16px
+  font-weight: 500
+  line-height: 20px
+
+  .mat-mdc-tab:not(.mat-mdc-tab-disabled).mdc-tab--active &
+    color: $green
+
+span.mdc-tab-indicator
+  display: unset
+
+.mat-mdc-focus-indicator::before
+  display: unset
+  border: unset
+  border-radius: unset

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +13,7 @@ import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, merg
 import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, NewTracker } from '../tracker.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
+import { StopClickPropagationDirective } from 'src/app/shared/stop-click-propagation/stop-click-propagation.directive';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import {
@@ -30,12 +32,14 @@ import { TableDataSource } from '../shared/table/table.data-source';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatTableModule,
     MatSortModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    TableActionsTriggerDirective
+    TableActionsTriggerDirective,
+    StopClickPropagationDirective
   ],
   templateUrl: './trackers.component.html',
   styleUrls: ['./trackers.component.sass'],
@@ -317,5 +321,5 @@ export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
   }
 ];
 
-export const DATE_FORMAT = 'd MMMM y, h:mm';
+export const DATE_FORMAT = 'd MMMM y, H:mm';
 export const TRACKER_DELETED = 'GPS-трекер удален';

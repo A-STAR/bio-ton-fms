@@ -2,13 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BioTonFMS.Domain.TrackerMessages;
 
-public class TrackerStandardParameter
+public class TrackerParameter
 {
-    /// <summary>
-    /// Название параметра
-    /// </summary>
-    [Required]
-    public string Name { get; set; } = string.Empty;
     /// <summary>
     /// Имя параметра
     /// </summary>
@@ -22,4 +17,8 @@ public class TrackerStandardParameter
     /// Последнее значение число
     /// </summary>
     public double? LastValueDecimal { get; set; }
+    /// <summary>
+    /// Последнее значение строка
+    /// </summary>
+    public string? LastValueString { get; set; }
 }

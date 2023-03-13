@@ -5,23 +5,26 @@
   box-shadow: $box-shadow
 
 mat-card-title-group,
-mat-card-content,
+mat-card-header,
+mat-card-content.mat-mdc-card-content,
 mat-card-actions
   padding-left: $mat-card-padding
   padding-right: $mat-card-padding
 
 mat-card-title-group,
+mat-card-header,
 mat-card-content
 
   &:first-child
     padding-top: $mat-card-padding
 
-mat-card > .mat-mdc-card-title
-  margin: $mat-card-padding $mat-card-padding 20px
+mat-card-header.mat-mdc-card-header,
+mat-card-content.mat-mdc-card-content:last-child
+  padding-bottom: $mat-card-padding
+
+mat-card-title
   font-size: 13px
-  font-size: 500
+  font-weight: 500
 
-mat-card-content
-
-  &:last-child
-    padding-top: $mat-card-padding
+mat-card > .mat-mdc-card-title
+  margin: $mat-card-padding
