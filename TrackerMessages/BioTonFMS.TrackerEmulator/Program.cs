@@ -25,7 +25,7 @@ var host = Host.CreateDefaultBuilder()
     {
         services.Configure<ClientOptions>(context.Configuration.GetSection("ClientOptions"));
         AddClientParams(services, context.Configuration);
-        services.AddHostedService<Worker>();
+        services.AddHostedService<EmulatorWorker>();
     })
     .UseSerilog((context, config) => config
         .ReadFrom.Configuration(context.Configuration)

@@ -7,13 +7,13 @@ using Microsoft.Extensions.Options;
 
 namespace BioTonFMS.TrackerEmulator;
 
-public class Worker : BackgroundService
+public class EmulatorWorker : BackgroundService
 {
     private readonly ClientOptions _options;
     private readonly ClientParams _parameters;
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<EmulatorWorker> _logger;
 
-    public Worker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<Worker> logger)
+    public EmulatorWorker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<EmulatorWorker> logger)
     {
         _options = options.Value;
         _parameters = parameters;
@@ -116,8 +116,14 @@ public class Worker : BackgroundService
 
     private void ValidateParams()
     {
-        if (File.Exists(_parameters.ScriptPath))
+        if (!string.IsNullOrWhiteSpace(_parameters.ScriptPath))
         {
+            if (!File.Exists(_parameters.ScriptPath))
+            {
+                _logger.LogError("Файл {Path} не существует", _parameters.ScriptPath);
+                Environment.Exit(1);
+            }
+
             foreach (string l in File.ReadAllLines(_parameters.ScriptPath))
             {
                 string[] paths = l.Split(' ');
@@ -135,9 +141,15 @@ public class Worker : BackgroundService
             return;
         }
 
-        if (File.Exists(_parameters.MessagePath) &&
+        if (!string.IsNullOrWhiteSpace(_parameters.MessagePath) &&
             !string.IsNullOrWhiteSpace(_parameters.ResultPath))
         {
+            if (!File.Exists(_parameters.MessagePath))
+            {
+                _logger.LogError("Файл {Path} не существует", _parameters.MessagePath);
+                Environment.Exit(1);
+            }
+
             ValidateInput(_parameters.MessagePath);
             return;
         }
