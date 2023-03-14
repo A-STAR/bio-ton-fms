@@ -2,7 +2,7 @@
 
 namespace BioTonFMS.Expressions.Compilation;
 
-internal static class CompilerAstExtensions
+public static class AstExtensions
 {
     /// <summary>
     /// Traverses AST and extracts names of variables

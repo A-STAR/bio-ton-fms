@@ -54,16 +54,16 @@ public static class GraphUtil
         }
         return sorted;
     }
-    
+
     public static List<string> FindAnyLoop<TGraphNode>(this Graph<TGraphNode> graph,
         string startingNode)
         where TGraphNode : IGraphNode
     {
         // Implements depth first search algorithm
-        
+
         var namesStack = new List<string>();
         if (graph.Count == 0)
-            return namesStack; 
+            return namesStack;
 
         var indexStack = new List<int>();
         var nameSet = new HashSet<string>();
@@ -72,7 +72,7 @@ public static class GraphUtil
         indexStack.Add(0);
         while (namesStack.Count != 0)
         {
-            var edges = graph[namesStack[^1]].Edges;
+            var edges = graph.TryGetValue(namesStack[^1], out var node) ? node.Edges : Array.Empty<string>();
             var i = indexStack[^1];
             if (i == edges.Length)
             {

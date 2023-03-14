@@ -30,7 +30,7 @@ public static class TrackerRepositoryMock
     public static ITrackerRepository GetStub()
     {
         var repo = new Mock<ITrackerRepository>();
-        repo.Setup(x => x.GetTrackers(It.IsAny<TrackersFilter>()))
+        repo.Setup(x => x.GetTrackers(It.IsAny<TrackersFilter>(), false))
             .Returns(GetTrackers);
         repo.Setup(x => x[It.IsAny<int>()])
             .Returns((int i) => GetTrackers().Results.FirstOrDefault(x => x.Id == i));
