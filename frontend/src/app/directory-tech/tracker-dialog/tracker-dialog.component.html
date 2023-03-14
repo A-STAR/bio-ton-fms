@@ -82,7 +82,7 @@
         <label for="sim">Номер SIM-карты</label>
 
         <mat-form-field>
-          <input matInput #sim id="sim" type="tel" placeholder="Номер SIM-карты" formControlName="sim">
+          <input matInput #sim id="sim" type="tel" placeholder="Номер SIM-карты" maxlength="12" formControlName="sim">
           <span matTextSuffix>{{ sim.value.length }} / 12</span>
 
           <mat-hint><em>+78462777727</em></mat-hint>
@@ -94,7 +94,6 @@
           <mat-error *ngIf="trackerForm.controls.registration.controls.sim.errors?.['pattern']">
             Поле введёно некорректно
           </mat-error>
-
         </mat-form-field>
       </div>
 
@@ -102,7 +101,7 @@
         <label for="imei">IMEI номер</label>
 
         <mat-form-field>
-          <input matInput #imei id="imei" placeholder="IMEI номер" formControlName="imei">
+          <input matInput #imei id="imei" placeholder="IMEI номер" maxlength="15" formControlName="imei">
           <span matTextSuffix>{{ imei.value.length }} / 15</span>
 
           <mat-hint><em>527111404753054</em></mat-hint>
