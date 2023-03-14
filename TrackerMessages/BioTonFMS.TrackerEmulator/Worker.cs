@@ -7,13 +7,13 @@ using Microsoft.Extensions.Options;
 
 namespace BioTonFMS.TrackerEmulator;
 
-public class Worker : BackgroundService
+public class EmulatorWorker : BackgroundService
 {
     private readonly ClientOptions _options;
     private readonly ClientParams _parameters;
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<EmulatorWorker> _logger;
 
-    public Worker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<Worker> logger)
+    public EmulatorWorker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<EmulatorWorker> logger)
     {
         _options = options.Value;
         _parameters = parameters;
