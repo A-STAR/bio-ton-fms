@@ -221,6 +221,121 @@ public class VehicleRepositoryTests
         repo.Invoking(r => r.Update(updatingVehicle)).Should().Throw<ArgumentException>()
             .WithMessage($"Машина с именем {existingVehicle.Name} уже существует");
     }
+    
+    [Fact]
+    public void AddVehicle_VehicleWithSuchTrackerExists_ShouldThrowException()
+    {
+        var existingVehicle = new Vehicle
+        {
+            Id = 1,
+            Name = "Машина",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 1",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 199",
+            InventoryNumber = "1234",
+            TrackerId = 1
+        };
+        
+        var existingTracker = new Tracker
+        {
+            Id = 1,
+            Name = "Трекер",
+            Description = "Описание 1",
+            Vehicle = existingVehicle,
+            Imei = "1234567889",
+            TrackerType = TrackerTypeEnum.GalileoSkyV50,
+            ExternalId = 1,
+            StartDate = DateTime.UtcNow
+        };
+
+        existingVehicle.Tracker = existingTracker;
+
+        var repo = CreateVehicleRepository(new List<Vehicle> { existingVehicle });
+
+        var newVehicle = new Vehicle
+        {
+            Name = "Новая машина",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 1",
+            Make = "Ford",
+            Model = "Mondeo",
+            ManufacturingYear = 2019,
+            RegistrationNumber = "В165АР 199",
+            InventoryNumber = "1235",
+            TrackerId = 1,
+            Tracker = existingTracker
+        };
+
+        repo.Invoking(r => r.Add(newVehicle)).Should().Throw<ArgumentException>()
+            .WithMessage($"Трекер {existingTracker.Name} уже используется для машины {existingVehicle.Name}");
+    }
+        
+    [Fact]
+    public void UpdateVehicle_VehicleWithSuchTrackerExists_ShouldThrowException()
+    {
+        var existingVehicle = new Vehicle
+        {
+            Id = 1,
+            Name = "Сущесвующая",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 1",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 199",
+            InventoryNumber = "1234",
+            TrackerId = 1,
+        };
+        var updatingVehicle = new Vehicle
+        {
+            Id = 2,
+            Name = "Обновляемая",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 2",
+            Make = "Ford",
+            Model = "Fiesta",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 189",
+            InventoryNumber = "1235"
+        };
+        
+        var existingTracker = new Tracker
+        {
+            Id = 1,
+            Name = "Трекер",
+            Description = "Описание 1",
+            Vehicle = existingVehicle,
+            Imei = "1234567889",
+            TrackerType = TrackerTypeEnum.GalileoSkyV50,
+            ExternalId = 1,
+            StartDate = DateTime.UtcNow
+        };
+
+        existingVehicle.Tracker = existingTracker;
+
+        var repo = CreateVehicleRepository(new List<Vehicle> { existingVehicle, updatingVehicle });
+
+        updatingVehicle.TrackerId = 1;
+        updatingVehicle.Tracker = existingTracker;
+
+        repo.Invoking(r => r.Update(updatingVehicle)).Should().Throw<ArgumentException>()
+            .WithMessage($"Трекер {existingTracker.Name} уже используется для машины {existingVehicle.Name}");
+    }
 
     private static VehicleRepository CreateVehicleRepository(ICollection<Vehicle> vehicleList)
     {
