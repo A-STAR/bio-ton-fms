@@ -1,4 +1,5 @@
-﻿using BioTonFMS.Domain;
+﻿using System.Globalization;
+using BioTonFMS.Domain;
 using BioTonFMS.Expressions;
 using BioTonFMS.Telematica.Expressions;
 using BiotonFMS.Telematica.Tests.Mocks;
@@ -17,6 +18,7 @@ public class ValidationTests
 
     public ValidationTests(ITestOutputHelper testOutputHelper)
     {
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru");
         _testOutputHelper = testOutputHelper;
     }
 
