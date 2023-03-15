@@ -72,5 +72,5 @@
 
   <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
 
-  <mat-row [routerLink]="row.id" *matRowDef="let row; columns: columnKeys"></mat-row>
+  <mat-row class="link" [routerLink]="row.id" *matRowDef="let row; columns: columnKeys"></mat-row>
 </mat-table>

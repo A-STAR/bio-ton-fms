@@ -122,7 +122,10 @@ describe('TrackersComponent', () => {
 
   it('should render tracker table row links', async () => {
     const table = await loader.getHarness(MatTableHarness);
-    const rows = await table.getRows();
+
+    const rows = await table.getRows({
+      selector: '.link'
+    });
 
     rows.forEach(async (row, index) => {
       const rowEl = await row.host();
