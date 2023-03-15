@@ -1,5 +1,6 @@
 ﻿using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;

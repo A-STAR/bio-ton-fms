@@ -9,14 +9,20 @@ namespace BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 {
     private readonly IMessageBus _messageBus;
+    private readonly ILogger<GalileoskyProtocolMessageHandler> _logger;
 
-    public GalileoskyProtocolMessageHandler(IMessageBus messageBus)
+    public GalileoskyProtocolMessageHandler(
+        IMessageBus messageBus,
+        ILogger<GalileoskyProtocolMessageHandler> logger)
     {
         _messageBus = messageBus;
+        _logger = logger;
     }
 
     public byte[] HandleMessage(byte[] message)
     {
+        _logger.LogInformation("Получено сообщение длиной {Len} байт", message.Length);
+        _logger.LogDebug("Текст сообщения {Message}", string.Join(' ', message.Select(x => x.ToString("X"))));
         var counted = GetCrc(message[..^2], message.Length - 2);
 
         var received = BitConverter.ToUInt16(message[^2..], 0);
@@ -26,16 +32,29 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
             var raw = new RawTrackerMessage
             {
                 RawMessage = message,
-                TrackerType = TrackerTypeEnum.GalileoSkyV50
+                TrackerType = TrackerTypeEnum.GalileoSkyV50,
+                PackageUID = Guid.NewGuid()
             };
             _messageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
+            _logger.LogInformation("Сообщение опубликовано. Len = {Length} PackageUID = {PackageUID}", message.Length, raw.PackageUID);
+        }
+        else
+        {
+            _logger.LogDebug("Ошибка проверки CRC. Ожидается {Expected} насчитано {Calculated}. Сообщение не опубликовано", received.ToString("X"), counted.ToString("X"));
         }
 
-        return GetResponseForTracker(counted);
+        var response = GetResponseForTracker(counted);
+        _logger.LogDebug("Текст ответа {Response}", string.Join(' ', response.Select(x => x.ToString("X"))));
+        return response;
     }
 
     public int GetPacketLength(byte[] message)
     {
+        if (message.Length < 3)
+        {
+            _logger.LogDebug("Получено слишком короткое сообщение. Len = {Length}", message.Length);
+            return -1;
+        }
         // Определяем длину данных. Она хранится во втором и третьем байте
         var lenRaw = BitConverter.ToUInt16(message[1..3], 0);
         // Чтобы получить длину пакета нужно замаскировать старший бит
@@ -66,7 +85,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 
         for (var pos = 0; pos < len; pos++)
         {
-            crc ^= (ushort)buf[pos];
+            crc ^= buf[pos];
 
             for (var i = 8; i != 0; i--)
             {

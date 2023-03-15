@@ -1,6 +1,7 @@
-﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
+﻿using System.Linq.Expressions;
+using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Paging.Extensions;
 using BioTonFMS.Infrastructure.Persistence;
@@ -8,7 +9,6 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 {
@@ -89,11 +89,13 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
 
             if (vehicle is not null)
             {
-                var regNum = vehicle.RegistrationNumber.Length > 0 ? vehicle.RegistrationNumber : "незаполнен";
+                var regNum = vehicle.RegistrationNumber.Length > 0
+                    ? vehicle.RegistrationNumber
+                    : "не заполнен";
                 _logger.LogError("Нельзя удалить трекер (id - {TrackerId}) привязанный к машине (id - {VehicleId})!",
                     tracker.Id, vehicle.Id);
-                throw new ArgumentException(
-                    $"Нельзя удалить трекер привязанный к машине (название - '{vehicle.Name}', регистрационный номер - {regNum})");
+                throw new ArgumentException($"Нельзя удалить трекер привязанный к машине (название - '{vehicle.Name}', " +
+                                            $"регистрационный номер - {regNum})");
             }
 
             try
@@ -144,7 +146,8 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 TrackerSortBy.ExternalId => trackers.SetSortDirection(filter.SortDirection, x => x.ExternalId),
                 TrackerSortBy.Type => trackers.SetSortDirection(filter.SortDirection, x => x.TrackerType),
                 TrackerSortBy.SimNumber => trackers.SetSortDirection(filter.SortDirection, x => x.SimNumber),
-                TrackerSortBy.Vehicle => trackers.SetSortDirection(filter.SortDirection, x => x.Vehicle),
+                TrackerSortBy.Vehicle => trackers.SetSortDirection(filter.SortDirection,
+                    x => x.Vehicle == null ? "" : x.Vehicle.Name),
                 TrackerSortBy.StartDate => trackers.SetSortDirection(filter.SortDirection, x => x.StartDate),
                 _ => trackers
             };

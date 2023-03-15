@@ -2,7 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { Trackers, TrackersOptions, TrackerService, TrackersSortBy, TrackerTypeEnum, NewTracker } from './tracker.service';
+import {
+  NewTracker,
+  TrackerParameterName,
+  Trackers,
+  TrackerService,
+  TrackersOptions,
+  TrackersSortBy,
+  TrackerStandardParameter,
+  TrackerTypeEnum
+} from './tracker.service';
 
 import { SortDirection } from './shared/sort';
 
@@ -187,6 +196,44 @@ describe('TrackerService', () => {
 
     updateTrackerRequest.flush(null);
   });
+
+  it('should delete tracker', (done: DoneFn) => {
+    service
+      .deleteTracker(testTrackers.trackers[0].id)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const deleteTrackerRequest = httpTestingController.expectOne({
+      method: 'DELETE',
+      url: `/api/telematica/tracker/${testNewTracker.id}`
+    }, 'delete tracker request');
+
+    deleteTrackerRequest.flush(null);
+  });
+
+  it('should get standard parameters', (done: DoneFn) => {
+    service
+      .getStandardParameters(testTrackers.trackers[0].id)
+      .subscribe(standardParameters => {
+        expect(standardParameters)
+          .withContext('emit standard parameters')
+          .toBe(standardParameters);
+
+        done();
+      });
+
+    const standardParametersRequest = httpTestingController.expectOne(
+      `/api/telematica/tracker/standard-parameters/${testNewTracker.id}`,
+      'standard parameters request'
+    );
+
+    standardParametersRequest.flush(testStandardParameters);
+  });
 });
 
 export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
@@ -260,3 +307,31 @@ export const testTrackers: Trackers = {
     total: 1
   }
 };
+
+export const testStandardParameters: TrackerStandardParameter[] = [
+  {
+    name: 'Время',
+    paramName: TrackerParameterName.Time,
+    lastValueDateTime: '2023-03-05T04:39:12.318Z'
+  },
+  {
+    name: 'Широта',
+    paramName: TrackerParameterName.Latitude,
+    lastValueDecimal: 52.557225
+  },
+  {
+    name: 'Долгота',
+    paramName: TrackerParameterName.Longitude,
+    lastValueDecimal: 49.557225
+  },
+  {
+    name: 'Высота',
+    paramName: TrackerParameterName.Altitude,
+    lastValueDecimal: 86.9
+  },
+  {
+    name: 'Скорость',
+    paramName: TrackerParameterName.Speed,
+    lastValueDecimal: 0.1
+  }
+];

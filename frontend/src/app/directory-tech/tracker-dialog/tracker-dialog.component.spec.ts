@@ -18,7 +18,7 @@ import { Observable, of } from 'rxjs';
 
 import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
-import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
+import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { DATE_PATTERN, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
 
 import { testNewTracker, testTrackerTypeEnum } from '../tracker.service.spec';

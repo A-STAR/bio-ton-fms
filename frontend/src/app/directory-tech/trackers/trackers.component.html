@@ -32,13 +32,19 @@
 
     <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
       <ng-container *ngSwitchCase="TrackerColumn.Action">
-        <button mat-icon-button bioTableActionsTrigger>
+        <button mat-icon-button bioTableActionsTrigger bioStopClickPropagation>
           <mat-icon>more_horiz</mat-icon>
         </button>
 
-        <div class="actions">
-          <button mat-icon-button title="Редактировать" color="accent" (click)="onUpdateTracker(element)">
+        <div class="actions" bioStopClickPropagation>
+          <button mat-icon-button bioStopClickPropagation title="Редактировать" color="accent"
+            (click)="onUpdateTracker(element)">
             <mat-icon class="md-18">edit</mat-icon>
+          </button>
+
+          <button mat-icon-button bioStopClickPropagation title="Удалить" color="warn"
+            (click)="onDeleteTracker(element)">
+            <mat-icon class="md-18">delete</mat-icon>
           </button>
         </div>
       </ng-container>
@@ -66,5 +72,5 @@
 
   <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
 
-  <mat-row *matRowDef="let row; columns: columnKeys"></mat-row>
+  <mat-row [routerLink]="row.id" *matRowDef="let row; columns: columnKeys"></mat-row>
 </mat-table>

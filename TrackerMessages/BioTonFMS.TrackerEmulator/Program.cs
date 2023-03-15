@@ -25,7 +25,7 @@ var host = Host.CreateDefaultBuilder()
     {
         services.Configure<ClientOptions>(context.Configuration.GetSection("ClientOptions"));
         AddClientParams(services, context.Configuration);
-        services.AddHostedService<Worker>();
+        services.AddHostedService<EmulatorWorker>();
     })
     .UseSerilog((context, config) => config
         .ReadFrom.Configuration(context.Configuration)
@@ -42,7 +42,7 @@ void AddClientParams(IServiceCollection services, IConfiguration config)
     services.AddSingleton(new ClientParams
     {
         MessagePath = config["message"],
-        RepeatPath = config["result"],
+        ResultPath = config["result"],
         RepeatCount = repeatCnt,
         ScriptPath = config["script"]
     });

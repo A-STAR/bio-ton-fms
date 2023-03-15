@@ -5,6 +5,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
 public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 {
+    bool ExistsByUID(Guid uid);
     IList<TrackerMessage> GetMessagesForUpdate();
     IList<TrackerMessage> GetMessages();
+    TrackerStandardParameters GetStandardParameters(int externalId, string imei);
+    IList<TrackerParameter> GetParameters(int externalId, string imei);
 }

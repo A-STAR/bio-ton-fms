@@ -24,30 +24,37 @@ public class GalileoskyMessageParser : IMessageParser
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly ILogger<GalileoskyMessageParser> _logger;
 
-    public GalileoskyMessageParser(ITrackerMessageRepository messageRepository,
-        IProtocolTagRepository protocolTagRepository, ILogger<GalileoskyMessageParser> logger)
+    public GalileoskyMessageParser(
+        ITrackerMessageRepository messageRepository,
+        IProtocolTagRepository protocolTagRepository, 
+        ILogger<GalileoskyMessageParser> logger)
     {
         _messageRepository = messageRepository;
         _protocolTagRepository = protocolTagRepository;
         _logger = logger;
     }
 
-    public void ParseMessage(byte[] binaryPackage)
+    public void ParseMessage(byte[] binaryPackage, Guid packageUID)
     {
+        if (_messageRepository.ExistsByUID(packageUID)) return;
+
         var i = 0;
         i += HeaderLength;
 
         var tags = _protocolTagRepository.GetTagsForTrackerType(TrackerTypeEnum.GalileoSkyV50)
             .ToDictionary(x => x.ProtocolTagCode);
 
-        var message = new TrackerMessage();
+        var message = new TrackerMessage
+        {
+            PackageUID = packageUID
+        };
 
         while (i < binaryPackage.Length - CheckSumLength)
         {
-            if (!tags.TryGetValue(binaryPackage[i], out var tag))
+            if (!tags.TryGetValue(binaryPackage[i], out ProtocolTag? tag))
             {
-                _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}",
-                    binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))));
+                _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}, пакет {PackageUID}",
+                    binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))), packageUID);
                 return;
             }
 
@@ -59,7 +66,11 @@ public class GalileoskyMessageParser : IMessageParser
                     if (!string.IsNullOrEmpty(message.Imei))
                     {
                         _messageRepository.Add(message);
-                        message = new TrackerMessage();
+                        _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}", packageUID, message.Id, message.TrId, message.Imei);
+                        message = new TrackerMessage
+                        {
+                            PackageUID = packageUID
+                        };
                     }
 
                     message.Imei = binaryPackage[i..(i + tag.Size)].ParseToString();
@@ -68,7 +79,11 @@ public class GalileoskyMessageParser : IMessageParser
                     if (message.TrId != 0)
                     {
                         _messageRepository.Add(message);
-                        message = new TrackerMessage();
+                        _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}", packageUID, message.Id, message.TrId, message.Imei);
+                        message = new TrackerMessage
+                        {
+                            PackageUID = packageUID
+                        };
                     }
 
                     message.TrId = binaryPackage[i..(i + tag.Size)].ParseToInt();
@@ -106,6 +121,7 @@ public class GalileoskyMessageParser : IMessageParser
         }
 
         _messageRepository.Add(message);
+        _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}", packageUID, message.Id, message.TrId, message.Imei);
     }
 
     private static MessageTag CreateMessageTag(TrackerTag trackerTag, byte[] value) =>

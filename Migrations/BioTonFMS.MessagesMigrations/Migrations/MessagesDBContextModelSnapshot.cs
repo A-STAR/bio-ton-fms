@@ -110,6 +110,10 @@ namespace BioTonFMS.MessagesMigrations.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("longitude");
 
+                    b.Property<Guid>("PackageUID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("package_uid");
+
                     b.Property<int?>("SatNumber")
                         .HasColumnType("integer")
                         .HasColumnName("sat_number");

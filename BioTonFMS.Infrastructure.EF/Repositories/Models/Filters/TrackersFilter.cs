@@ -1,8 +1,8 @@
 ﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Repositories.Models;
+using BioTonFMS.Infrastructure.EF.Models.Filters;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace BioTonFMS.Infrastructure.EF.Models.Filters
+namespace BioTonFMS.Infrastructure.EF.Repositories.Models.Filters
 {
     public class TrackersFilter : SortableFilterWithPaging<TrackerSortBy?>
     {

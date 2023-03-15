@@ -1,7 +1,51 @@
 <h1>Конфигурация данных GPS-трекера</h1>
 
 <mat-card>
-  <mat-card-title>Дополнительные параметры</mat-card-title>
+  <mat-card-title>Стандартные параметры</mat-card-title>
+
+  <mat-card-content>
+    <mat-table [dataSource]="standardParametersDataSource" *ngIf="standardParameters$ | async">
+      <ng-container [matColumnDef]="column.key" *ngFor="let column of parameterColumns">
+        <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+
+        <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+          <ng-container [ngSwitch]="element.param" *ngSwitchCase="ParameterColumn.Value">
+            <ng-container *ngSwitchCase="TrackerParameterName.Time">
+              {{ element[column.key] | date:DATE_FORMAT }}
+            </ng-container>
+
+            <ng-container [ngTemplateOutlet]="degree" *ngSwitchCase="TrackerParameterName.Latitude"></ng-container>
+
+            <ng-container [ngTemplateOutlet]="degree" *ngSwitchCase="TrackerParameterName.Longitude"></ng-container>
+
+            <ng-container *ngSwitchCase="TrackerParameterName.Altitude">
+              {{ element[column.key] }} m
+            </ng-container>
+
+            <ng-container *ngSwitchCase="TrackerParameterName.Speed">
+              {{ element[column.key] }} km/h
+            </ng-container>
+
+            <ng-template #degree>{{ element[column.key] }}&deg;</ng-template>
+          </ng-container>
+
+          <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="parameterColumnKeys"></mat-header-row>
+
+      <mat-row *matRowDef="let row; columns: parameterColumnKeys"></mat-row>
+    </mat-table>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Дополнительные параметры</mat-card-title>
+
+    <button mat-flat-button color="accent" (click)="onCreateSensor()">Добавить запись</button>
+  </mat-card-header>
 
   <mat-card-content>
     <mat-table [dataSource]="sensorsDataSource" *ngIf="sensors$ | async">

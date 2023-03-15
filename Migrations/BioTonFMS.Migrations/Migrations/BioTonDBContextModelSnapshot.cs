@@ -22,34 +22,6 @@ namespace BioTonFMSApp.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BioTonFMS.Domain.Device", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("name");
-
-                    b.Property<int>("TrackerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tracker_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_devices");
-
-                    b.HasIndex("TrackerId")
-                        .HasDatabaseName("ix_devices_tracker_id");
-
-                    b.ToTable("devices", (string)null);
-                });
-
             modelBuilder.Entity("BioTonFMS.Domain.FuelType", b =>
                 {
                     b.Property<int>("Id")
@@ -506,6 +478,54 @@ namespace BioTonFMSApp.Migrations
                             ProtocolTagCode = 219,
                             Size = 4,
                             TagId = 34,
+                            TrackerType = 1
+                        },
+                        new
+                        {
+                            Id = 35,
+                            ProtocolTagCode = 84,
+                            Size = 2,
+                            TagId = 35,
+                            TrackerType = 1
+                        },
+                        new
+                        {
+                            Id = 36,
+                            ProtocolTagCode = 85,
+                            Size = 2,
+                            TagId = 36,
+                            TrackerType = 1
+                        },
+                        new
+                        {
+                            Id = 37,
+                            ProtocolTagCode = 144,
+                            Size = 4,
+                            TagId = 37,
+                            TrackerType = 1
+                        },
+                        new
+                        {
+                            Id = 38,
+                            ProtocolTagCode = 211,
+                            Size = 4,
+                            TagId = 38,
+                            TrackerType = 1
+                        },
+                        new
+                        {
+                            Id = 39,
+                            ProtocolTagCode = 213,
+                            Size = 1,
+                            TagId = 39,
+                            TrackerType = 1
+                        },
+                        new
+                        {
+                            Id = 40,
+                            ProtocolTagCode = 72,
+                            Size = 2,
+                            TagId = 40,
                             TrackerType = 1
                         });
                 });
@@ -968,8 +988,8 @@ namespace BioTonFMSApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DataType")
-                        .HasColumnType("integer")
+                    b.Property<byte>("DataType")
+                        .HasColumnType("smallint")
                         .HasColumnName("data_type");
 
                     b.Property<string>("Description")
@@ -996,49 +1016,49 @@ namespace BioTonFMSApp.Migrations
                         new
                         {
                             Id = 1,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Версия терминала",
                             Name = "term_version"
                         },
                         new
                         {
                             Id = 2,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Версия прошивки",
                             Name = "soft"
                         },
                         new
                         {
                             Id = 3,
-                            DataType = 4,
+                            DataType = (byte)6,
                             Description = "IMEI",
                             Name = "imei"
                         },
                         new
                         {
                             Id = 4,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Идентификатор устройства",
                             Name = "device_id"
                         },
                         new
                         {
                             Id = 5,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Номер записи в архиве",
                             Name = "rec_sn"
                         },
                         new
                         {
                             Id = 6,
-                            DataType = 5,
+                            DataType = (byte)7,
                             Description = "Дата и время регистрации на трекере",
                             Name = "tracker_date"
                         },
                         new
                         {
                             Id = 7,
-                            DataType = 7,
+                            DataType = (byte)8,
                             Description = "Координаты в градусах, число спутников, признак корректности определения координат и источник координат.",
                             Name = "coord_struct",
                             StructType = 1
@@ -1046,7 +1066,7 @@ namespace BioTonFMSApp.Migrations
                         new
                         {
                             Id = 8,
-                            DataType = 7,
+                            DataType = (byte)8,
                             Description = "Скорость в км/ч и направление в градусах",
                             Name = "speed_direction",
                             StructType = 2
@@ -1054,185 +1074,227 @@ namespace BioTonFMSApp.Migrations
                         new
                         {
                             Id = 9,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Высота, м",
                             Name = "altitude"
                         },
                         new
                         {
                             Id = 10,
-                            DataType = 7,
-                            Description = "Одно из значений:\n1. HDOP, если источник координат ГЛОНАСС/GPS модуль\n2. Погрешность в метрах, если источник базовые станции GSM-сети",
+                            DataType = (byte)3,
+                            Description = "Одно из значений:\r\n1. HDOP, если источник координат ГЛОНАСС/GPS модуль\r\n2. Погрешность в метрах, если источник базовые станции GSM-сети",
                             Name = "hdop"
                         },
                         new
                         {
                             Id = 11,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Статус устройства",
                             Name = "dev_status"
                         },
                         new
                         {
                             Id = 12,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Напряжение питания, мВ",
                             Name = "pwr_ext"
                         },
                         new
                         {
                             Id = 13,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Напряжение на батарее",
                             Name = "pwr_int"
                         },
                         new
                         {
                             Id = 14,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Температура внутри терминала, °С",
                             Name = "temp_int"
                         },
                         new
                         {
                             Id = 15,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "Статус выходов",
                             Name = "out"
                         },
                         new
                         {
                             Id = 16,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "Статус входов",
                             Name = "in"
                         },
                         new
                         {
                             Id = 17,
-                            DataType = 1,
-                            Description = "Значение на входе 0.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
+                            DataType = (byte)1,
+                            Description = "Значение на входе 0.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
                             Name = "adc1"
                         },
                         new
                         {
                             Id = 18,
-                            DataType = 1,
-                            Description = "Значение на входе 1.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
+                            DataType = (byte)1,
+                            Description = "Значение на входе 1.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
                             Name = "adc2"
                         },
                         new
                         {
                             Id = 19,
-                            DataType = 1,
-                            Description = "Значение на входе 2.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
+                            DataType = (byte)1,
+                            Description = "Значение на входе 2.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
                             Name = "adc3"
                         },
                         new
                         {
                             Id = 20,
-                            DataType = 1,
-                            Description = "Значение на входе 3.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
+                            DataType = (byte)1,
+                            Description = "Значение на входе 3.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
                             Name = "adc4"
                         },
                         new
                         {
                             Id = 21,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "RS232 0",
                             Name = "adc9"
                         },
                         new
                         {
                             Id = 22,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "RS232 1",
                             Name = "adc10"
                         },
                         new
                         {
                             Id = 23,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "RS485[0]. ДУТ с адресом 0",
                             Name = "RS485[0]"
                         },
                         new
                         {
                             Id = 24,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "RS485[1]. ДУТ с адресом 1",
                             Name = "RS485[1]"
                         },
                         new
                         {
                             Id = 25,
-                            DataType = 1,
-                            Description = "Данные CAN-шины (CAN_A0) или CAN-LOG.\nТопливо, израсходованное машиной с момента её создания, л",
+                            DataType = (byte)1,
+                            Description = "Данные CAN-шины (CAN_A0) или CAN-LOG.\r\nТопливо, израсходованное машиной с момента её создания, л",
                             Name = "CAN_A0"
                         },
                         new
                         {
                             Id = 26,
-                            DataType = 7,
-                            Description = "Данные CAN-шины (CAN_A1) или CAN-LOG.\nУровень топлива, %;\nтемпература охлаждающей жидкости, °C;\nобороты двигателя, об/мин.",
+                            DataType = (byte)8,
+                            Description = "Данные CAN-шины (CAN_A1) или CAN-LOG.\r\nУровень топлива, %;\r\nтемпература охлаждающей жидкости, °C;\r\nобороты двигателя, об/мин.",
                             Name = "CAN_A1",
                             StructType = 4
                         },
                         new
                         {
                             Id = 27,
-                            DataType = 1,
-                            Description = "Данные CAN-шины (CAN_B0) или CAN-LOG.\nПробег автомобиля, м.",
+                            DataType = (byte)1,
+                            Description = "Данные CAN-шины (CAN_B0) или CAN-LOG.\r\nПробег автомобиля, м.",
                             Name = "CAN_B0"
                         },
                         new
                         {
                             Id = 28,
-                            DataType = 7,
-                            Description = "CAN8BITR0\nили скорость транспортного средства, передаваемая с CAN-LOG’а, км/ч",
+                            DataType = (byte)3,
+                            Description = "CAN8BITR0\r\nили скорость транспортного средства, передаваемая с CAN-LOG’а, км/ч",
                             Name = "CAN8BITR0"
                         },
                         new
                         {
                             Id = 29,
-                            DataType = 7,
-                            Description = "CAN8BITR1\nили второй байт префикса S от CAN-LOG",
+                            DataType = (byte)3,
+                            Description = "CAN8BITR1\r\nили второй байт префикса S от CAN-LOG",
                             Name = "CAN8BITR1"
                         },
                         new
                         {
                             Id = 30,
-                            DataType = 7,
-                            Description = "CAN8BITR2\nили первый байт префикса S от CAN-LOG",
+                            DataType = (byte)3,
+                            Description = "CAN8BITR2\r\nили первый байт префикса S от CAN-LOG",
                             Name = "CAN8BITR2"
                         },
                         new
                         {
                             Id = 31,
-                            DataType = 7,
-                            Description = "CAN8BITR3\nили младший байт префикса S от CAN-LOG",
+                            DataType = (byte)3,
+                            Description = "CAN8BITR3\r\nили младший байт префикса S от CAN-LOG",
                             Name = "CAN8BITR3"
                         },
                         new
                         {
                             Id = 32,
-                            DataType = 7,
-                            Description = "CAN8BITR4\nили третий байт префикса P от CAN-LOG",
+                            DataType = (byte)3,
+                            Description = "CAN8BITR4\r\nили третий байт префикса P от CAN-LOG",
                             Name = "CAN8BITR4"
                         },
                         new
                         {
                             Id = 33,
-                            DataType = 7,
-                            Description = "CAN8BITR5\nили второй байт префикса P от CAN-LOG",
+                            DataType = (byte)3,
+                            Description = "CAN8BITR5\r\nили второй байт префикса P от CAN-LOG",
                             Name = "CAN8BITR5"
                         },
                         new
                         {
                             Id = 34,
-                            DataType = 1,
-                            Description = "В зависимости от настроек один из вариантов:\nCAN32BITR0\nполное время работы двигателя, ч",
+                            DataType = (byte)1,
+                            Description = "В зависимости от настроек один из вариантов:\r\nCAN32BITR0\r\nполное время работы двигателя, ч",
                             Name = "CAN32BITR0"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            DataType = (byte)1,
+                            Description = "Значение на входе 4.\r\nВ зависимости от настроек один из вариантов:\r\n1. напряжение, мВ\r\n2. число импульсов\r\n3. частота, Гц",
+                            Name = "Port 4"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            DataType = (byte)1,
+                            Description = "Значение на входе 5.\r\nВ зависимости от настроек один из вариантов:\r\n1. напряжение, мВ\r\n2. число импульсов\r\n3. частота, Гц",
+                            Name = "Port 5"
+                        },
+                        new
+                        {
+                            Id = 37,
+                            DataType = (byte)1,
+                            Description = "Идентификационный номер первого ключа iButton",
+                            Name = "iButton 1"
+                        },
+                        new
+                        {
+                            Id = 38,
+                            DataType = (byte)1,
+                            Description = "Идентификационный номер второго ключа iButton",
+                            Name = "iButton 2"
+                        },
+                        new
+                        {
+                            Id = 39,
+                            DataType = (byte)3,
+                            Description = "Состояние ключей iButton, идентификаторы которых заданы командой iButtons.\r\nКаждый бит соответствует одному ключу.\r\nНапример, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи.",
+                            Name = "iButton Keys"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            DataType = (byte)2,
+                            Description = "0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.\r\n1 – статус GPRS сессии. 1- установлена, 0 – нет.\r\n2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.\r\n3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.\r\n4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.\r\n5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.\r\n6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует.",
+                            Name = "expanded_terminal_status"
                         });
                 });
 
@@ -1401,6 +1463,7 @@ namespace BioTonFMSApp.Migrations
                         .HasDatabaseName("ix_vehicles_fuel_type_id");
 
                     b.HasIndex("TrackerId")
+                        .IsUnique()
                         .HasDatabaseName("ix_vehicles_tracker_id");
 
                     b.HasIndex("VehicleGroupId")
@@ -1560,18 +1623,6 @@ namespace BioTonFMSApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BioTonFMS.Domain.Device", b =>
-                {
-                    b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
-                        .WithMany("Devices")
-                        .HasForeignKey("TrackerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_devices_trackers_tracker_id");
-
-                    b.Navigation("Tracker");
-                });
-
             modelBuilder.Entity("BioTonFMS.Domain.ProtocolTag", b =>
                 {
                     b.HasOne("BioTonFMS.Domain.TrackerTag", "Tag")
@@ -1594,7 +1645,7 @@ namespace BioTonFMSApp.Migrations
                         .HasConstraintName("fk_sensors_sensor_types_sensor_type_id");
 
                     b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
-                        .WithMany()
+                        .WithMany("Sensors")
                         .HasForeignKey("TrackerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -1624,7 +1675,7 @@ namespace BioTonFMSApp.Migrations
             modelBuilder.Entity("BioTonFMS.Domain.SensorType", b =>
                 {
                     b.HasOne("BioTonFMS.Domain.SensorGroup", "SensorGroup")
-                        .WithMany()
+                        .WithMany("SensorTypes")
                         .HasForeignKey("SensorGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -1650,8 +1701,8 @@ namespace BioTonFMSApp.Migrations
                         .HasConstraintName("fk_vehicles_fuel_type_fuel_type_id");
 
                     b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
-                        .WithMany()
-                        .HasForeignKey("TrackerId")
+                        .WithOne("Vehicle")
+                        .HasForeignKey("BioTonFMS.Domain.Vehicle", "TrackerId")
                         .HasConstraintName("fk_vehicles_trackers_tracker_id");
 
                     b.HasOne("BioTonFMS.Domain.VehicleGroup", "VehicleGroup")
@@ -1723,9 +1774,16 @@ namespace BioTonFMSApp.Migrations
                         .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
                 });
 
+            modelBuilder.Entity("BioTonFMS.Domain.SensorGroup", b =>
+                {
+                    b.Navigation("SensorTypes");
+                });
+
             modelBuilder.Entity("BioTonFMS.Domain.Tracker", b =>
                 {
-                    b.Navigation("Devices");
+                    b.Navigation("Sensors");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.TrackerTag", b =>

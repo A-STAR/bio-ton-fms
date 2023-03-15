@@ -23,13 +23,13 @@ public class TrackerMessageHandler : IBusMessageHandler
     public Task HandleAsync(byte[] message)
     {
         var messageText = Encoding.UTF8.GetString(message);
-        _logger.LogInformation("Получено сообщение {MessageText}", messageText);
+        _logger.LogDebug("Получен пакет {MessageText}", messageText);
 
-        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
+        var deserialized = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
                          ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", nameof(message));
 
-        _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage);
-            
+        _parserProvider(deserialized.TrackerType).ParseMessage(deserialized.RawMessage, deserialized.PackageUID);
+
         return Task.CompletedTask;
     }
 }

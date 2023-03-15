@@ -19,11 +19,39 @@ public static class TrackerRepositoryMock
             {
                 new()
                 {
-                    Id = 1, Sensors = sensors.Where(s => s.TrackerId == 1).ToList()
+                    Id = 1,
+                    Name = "трекер GalileoSky",
+                    Description = "Описание 1",
+                    Imei = "12341",
+                    ExternalId = 111,
+                    StartDate = DateTime.MinValue,
+                    TrackerType = TrackerTypeEnum.GalileoSkyV50,
+                    SimNumber = "905518101010",
+                    Sensors = sensors.Where(s => s.TrackerId == 1).ToList()
                 },
                 new()
                 {
-                    Id = 2, Sensors = sensors.Where(s => s.TrackerId == 2).ToList()
+                    Id = 2,
+                    Name = "трекер Retranslator",
+                    Description = "Описание 2",
+                    Imei = "12342",
+                    ExternalId = 222,
+                    StartDate = DateTime.UnixEpoch,
+                    TrackerType = TrackerTypeEnum.Retranslator,
+                    SimNumber = "905518101020",
+                    Sensors = sensors.Where(s => s.TrackerId == 2).ToList()
+                },
+                new()
+                {
+                    Id = 3,
+                    Name = "трекер WialonIPS",
+                    Description = "Описание 3",
+                    Imei = "12343",
+                    ExternalId = 333,
+                    StartDate = DateTime.MaxValue,
+                    TrackerType = TrackerTypeEnum.WialonIPS,
+                    SimNumber = "905518101030",
+                    Sensors = sensors.Where(s => s.TrackerId == 3).ToList()
                 }
             }
         };

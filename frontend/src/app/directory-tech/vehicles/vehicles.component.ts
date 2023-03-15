@@ -280,8 +280,8 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
 
   constructor(
     private errorHandler: ErrorHandler,
-    private snackBar: MatSnackBar,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private vehicleService: VehicleService
   ) { }
 

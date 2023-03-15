@@ -11,7 +11,8 @@
 .mat-mdc-select-value-text
   color: $dark
 
-.mat-mdc-select-placeholder
+.mat-mdc-select-placeholder,
+.mat-mdc-optgroup-label .mdc-list-item__primary-text
   color: $dark-gray
 
 div.mat-mdc-select-arrow-wrapper
@@ -23,6 +24,7 @@ div.mat-mdc-select-arrow-wrapper
 mat-select svg
   max-width: unset
 
+mat-optgroup,
 mat-option
   font-size: map.get($mat-mdc-form-field, font-size)
 
@@ -32,7 +34,11 @@ mat-option
   &.mat-mdc-option-active
     background-color: $light-gray
 
-  @at-root mat-option#{&}
+  @at-root span.mat-mdc-optgroup-label,
+  mat-option#{&}
     min-height: map.get($mat-mdc-form-field, infix, height)
     padding-left: map.get($mat-mdc-form-field, padding, horizontal)
     padding-right: map.get($mat-mdc-form-field, padding, horizontal)
+
+  @at-root .mat-mdc-optgroup mat-option#{&}:not(.mat-mdc-option-multiple)
+    padding-left: 2 * map.get($mat-mdc-form-field, padding, horizontal)

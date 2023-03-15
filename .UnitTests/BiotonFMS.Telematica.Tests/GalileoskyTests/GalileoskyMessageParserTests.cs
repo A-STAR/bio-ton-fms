@@ -232,7 +232,7 @@ public class GalileoskyMessageParserTests
             .Select(x => byte.Parse(x, NumberStyles.HexNumber))
             .ToArray();
 
-        parser.ParseMessage(message);
+        parser.ParseMessage(message, Guid.NewGuid());
 
         Assert.Equal(expected.Length, results.Count);
 
@@ -301,7 +301,7 @@ public class GalileoskyMessageParserTests
         var results = new List<TrackerMessage>();
         var parser = SetupGalileoskyMessageParser(results);
 
-        parser.ParseMessage(bytes);
+        parser.ParseMessage(bytes, Guid.NewGuid());
 
         var settings = new JsonSerializerSettings
         {
@@ -358,11 +358,13 @@ public class GalileoskyMessageParserTests
         var keyValueProviderMock = new KeyValueProviderMock<TrackerMessage, int>(list);
         var vehicleQueryProviderMock = new QueryableProviderMock<TrackerMessage>(list);
         var unitOfWorkFactoryMock = new MessagesDBContextUnitOfWorkFactoryMock();
+        var tagStub = new Mock<ITrackerTagRepository>();
 
         var repo = new TrackerMessageRepository(
             keyValueProviderMock,
             vehicleQueryProviderMock,
-            unitOfWorkFactoryMock);
+            unitOfWorkFactoryMock,
+            tagStub.Object);
 
         return repo;
     }

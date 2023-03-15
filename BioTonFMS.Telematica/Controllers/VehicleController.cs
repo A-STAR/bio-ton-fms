@@ -32,7 +32,7 @@ public class VehicleController : ValidationControllerBase
     private readonly ITrackerRepository _trackerRepo;
     private readonly IFuelTypeRepository _fuelTypeRepo;
     private readonly IVehicleGroupRepository _vehicleGroupRepo;
-    
+
     private readonly IValidator<UpdateVehicleDto> _updateValidator;
     private readonly IValidator<VehiclesRequest> _vehiclesRequestValidator;
     private readonly IValidator<CreateVehicleDto> _createValidator;
@@ -111,6 +111,7 @@ public class VehicleController : ValidationControllerBase
         {
             return NotFound(new ServiceErrorResult($"Машина с id = {id} не найдена"));
         }
+
         var vehicleDto = _mapper.Map<VehicleDto>(vehicle);
         return Ok(vehicleDto);
     }
@@ -190,16 +191,20 @@ public class VehicleController : ValidationControllerBase
         {
             return NotFound(new ServiceErrorResult($"Машина с id = {id} не найдена"));
         }
+
         if (_fuelTypeRepo[updateVehicleDto.FuelTypeId] is null)
         {
             return NotFound(
                 new ServiceErrorResult($"Тип топлива с id = {updateVehicleDto.FuelTypeId} не найден"));
         }
-        if (updateVehicleDto.VehicleGroupId.HasValue && _vehicleGroupRepo[updateVehicleDto.VehicleGroupId.Value] is null)
+
+        if (updateVehicleDto.VehicleGroupId.HasValue &&
+            _vehicleGroupRepo[updateVehicleDto.VehicleGroupId.Value] is null)
         {
             return NotFound(
                 new ServiceErrorResult($"Группа машин с id = {updateVehicleDto.VehicleGroupId.Value} не найдена"));
         }
+
         if (updateVehicleDto.TrackerId.HasValue && _trackerRepo[updateVehicleDto.TrackerId.Value] is null)
         {
             return NotFound(
@@ -207,7 +212,7 @@ public class VehicleController : ValidationControllerBase
         }
 
         _mapper.Map(updateVehicleDto, vehicle);
-        
+
         try
         {
             _vehicleRepo.Update(vehicle);
@@ -221,7 +226,7 @@ public class VehicleController : ValidationControllerBase
             _logger.LogError(ex, "Ошибка при обновлении машины {@id}", vehicle.Id);
             throw;
         }
-        
+
         return Ok();
     }
 
@@ -241,7 +246,7 @@ public class VehicleController : ValidationControllerBase
         {
             return NotFound(new ServiceErrorResult($"Машина с id = {id} не найдена"));
         }
-        
+
         try
         {
             _vehicleRepo.Remove(vehicle);
@@ -251,6 +256,7 @@ public class VehicleController : ValidationControllerBase
             _logger.LogError(ex, "Ошибка при машины {@id}", vehicle.Id);
             throw;
         }
+
         return Ok();
     }
 }

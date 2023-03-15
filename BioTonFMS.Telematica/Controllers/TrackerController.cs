@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Controllers;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
@@ -120,8 +120,6 @@ public class TrackerController : ValidationControllerBase
         {
             return ReturnValidationErrors(validationResult);
         }
-
-        createTrackerDto.StartDate ??= DateTime.UtcNow;
 
         var newTracker = _mapper.Map<Tracker>(createTrackerDto);
         try
