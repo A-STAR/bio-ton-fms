@@ -131,7 +131,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             if (vehicle.TrackerId.HasValue)
             {
-                var sameTrackerVehicle = QueryableProvider.Fetch(x => x.Tracker).Linq()
+                var sameTrackerVehicle = QueryableProvider.Linq()
                     .FirstOrDefault(x => x.TrackerId == vehicle.TrackerId);
                 if (sameTrackerVehicle is not null)
                 {
@@ -154,7 +154,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             if (vehicle.TrackerId.HasValue)
             {
-                var sameTrackerVehicle = QueryableProvider.Fetch(x => x.Tracker).Linq()
+                var sameTrackerVehicle = QueryableProvider.Linq()
                     .FirstOrDefault(x => x.TrackerId == vehicle.TrackerId);
                 if (sameTrackerVehicle is not null)
                 {

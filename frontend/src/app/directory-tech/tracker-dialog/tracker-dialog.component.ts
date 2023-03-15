@@ -131,6 +131,7 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
       registration: this.fb.group({
         external: this.fb.nonNullable.control(this.data?.externalId, [
           Validators.required,
+          Validators.min(1),
           Validators.max(99999999999)
         ]),
         sim: this.fb.nonNullable.control(this.data?.simNumber, [
@@ -188,7 +189,7 @@ type TrackerForm = {
   }>;
 }
 
-export const DATE_PATTERN = /^(0?[1-9]|[12]\d|3[01])\.(0?[1-9]|1[012])\.(\d{4})(\s(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d))?$/;
+export const DATE_PATTERN = /^(0?[1-9]|[12]\d|3[01])\.(0?[1-9]|1[012])\.(19\d{2}|2\d{3})(\s(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d))?$/;
 const SIM_PATTERN = /^\+7\d{10}$/;
 const IMEI_PATTERN = /^\d{15}$/;
 

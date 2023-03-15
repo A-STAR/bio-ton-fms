@@ -54,7 +54,7 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
             }
             else
             {
-                _logger.LogDebug("Возможная проблемма с сообщением {Message}, продолжаем приём данных для {Id}", 
+                _logger.LogDebug("Возможная проблема с сообщением {Message}, продолжаем приём данных для {Id}", 
                     string.Join(' ', message.Select(x => x.ToString("X"))), connection.ConnectionId);
             }
 
