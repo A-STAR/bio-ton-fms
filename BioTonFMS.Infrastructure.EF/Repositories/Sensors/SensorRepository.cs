@@ -8,7 +8,6 @@ using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
 {
@@ -42,12 +41,12 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
             {
                 throw new ArgumentException($"Датчик с именем \"{sensor.Name}\" уже существует!");
             }
-            
+
             try
             {
                 base.Add(sensor);
             }
-            catch (Exception ex)
+            catch( Exception ex )
             {
                 _logger.LogError(ex, "Ошибка при добавлении датчика {@Sensor}", sensor);
                 throw;
@@ -60,7 +59,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
             {
                 base.Update(sensor);
             }
-            catch (Exception ex)
+            catch( Exception ex )
             {
                 _logger.LogError(ex, "Ошибка при обновлении датчика {@id}", sensor.Id);
                 throw;
@@ -73,12 +72,12 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
             {
                 throw new ArgumentException("Невозможно удалить датчик, так как он используется в качестве валидатора в других датчиках!");
             }
-            
+
             try
             {
                 base.Remove(sensor);
             }
-            catch (Exception ex)
+            catch( Exception ex )
             {
                 _logger.LogError(ex, "Ошибка при удалении датчика {@id}", sensor.Id);
                 throw;
@@ -87,31 +86,25 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
 
         public PagedResult<Sensor> GetSensors(SensorsFilter filter)
         {
-            Expression<Func<Sensor, bool>>? sensorPredicate = null;
+            var query = HydratedQuery;
 
-            if (filter.TrackerId.HasValue)
-            {
-                sensorPredicate = sensor => sensor.TrackerId == filter.TrackerId;
-            }
-            
-            var sensors = sensorPredicate != null ? HydratedQuery.Where(sensorPredicate) : HydratedQuery;
+            query = filter.TrackerId.HasValue ? query.Where(sensor => sensor.TrackerId == filter.TrackerId) : query;
 
             if (filter.SortBy is SensorSortBy.Name)
             {
-                sensors = filter.SortDirection switch
+                query = filter.SortDirection switch
                 {
-                    SortDirection.Ascending => sensors.OrderBy(s => s.Name),
-                    SortDirection.Descending => sensors.OrderByDescending(s => s.Name),
-                    _ => sensors.OrderBy(s => s.Name)
+                    SortDirection.Ascending => query.OrderBy(s => s.Name),
+                    SortDirection.Descending => query.OrderByDescending(s => s.Name),
+                    _ => query.OrderBy(s => s.Name)
                 };
             }
             else
             {
-                sensors = sensors.OrderBy(s => s.Id);
+                query = query.OrderBy(s => s.Id);
             }
 
-            return sensors.AsNoTracking().GetPagedQueryable(
-                 filter.PageNum, filter.PageSize);
+            return query.AsNoTracking().GetPagedQueryable(filter.PageNum, filter.PageSize);
         }
     }
 }

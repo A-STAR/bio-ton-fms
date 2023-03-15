@@ -7,11 +7,6 @@ namespace BioTonFMS.Infrastructure.EF.Models.Filters
     public class TrackersFilter : SortableFilterWithPaging<TrackerSortBy?>
     {
         /// <summary>
-        /// Идентификатор трекера
-        /// </summary>
-        public int? Id { get; set; }
-        
-        /// <summary>
         /// Внешний идентификатор
         /// </summary>
         public int? ExternalId { get; set; }

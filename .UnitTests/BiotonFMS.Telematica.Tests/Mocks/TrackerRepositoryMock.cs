@@ -10,22 +10,24 @@ public static class TrackerRepositoryMock
 {
     public const int NonExistentTrackerId = -1;
     public const int ExistentTrackerId = 1;
-    private static PagedResult<Tracker> GetTrackers() =>
-        new()
+    private static PagedResult<Tracker> GetTrackers()
+    {
+        var sensors = SensorRepositoryMock.GetSensors().ToList();
+        return new PagedResult<Tracker>
         {
-            CurrentPage = 1,
-            Results = new List<Tracker>
+            CurrentPage = 1, Results = new List<Tracker>
             {
                 new()
                 {
-                    Id = 1
+                    Id = 1, Sensors = sensors.Where(s => s.TrackerId == 1).ToList()
                 },
                 new()
                 {
-                    Id = 2
+                    Id = 2, Sensors = sensors.Where(s => s.TrackerId == 2).ToList()
                 }
             }
         };
+    }
 
     public static ITrackerRepository GetStub()
     {

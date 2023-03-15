@@ -254,22 +254,32 @@ public class SensorController : ValidationControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public IActionResult DeleteSensor(int id)
     {
-        var sensor = _sensorRepository[id];
-        if (sensor is not null)
+        var sensorToDelete = _sensorRepository[id];
+
+        if (sensorToDelete is null)
         {
-            try
-            {
-                _sensorRepository.Remove(sensor);
-                return Ok();
-            }
-            catch( ArgumentException ex )
-            {
-                return Conflict(new ServiceErrorResult(ex.Message));
-            }
+            return NotFound(new ServiceErrorResult($"Датчик с id = {id} не найден"));            
         }
-        else
+        
+        var tracker = _trackerRepository.GetTrackers(new TrackersFilter
         {
-            return NotFound(new ServiceErrorResult($"Датчик с id = {id} не найден"));
+            Id = sensorToDelete.TrackerId
+        }).Results[0];
+
+        var validationResult = Expressions.Validation.ValidateSensorRemoval(tracker, sensorToDelete, _logger);
+        if (!string.IsNullOrEmpty(validationResult))
+        {
+            return BadRequest(validationResult);
+        }
+        
+        try
+        {
+            _sensorRepository.Remove(sensorToDelete);
+            return Ok();
+        }
+        catch( ArgumentException ex )
+        {
+            return Conflict(new ServiceErrorResult(ex.Message));
         }
     }
 

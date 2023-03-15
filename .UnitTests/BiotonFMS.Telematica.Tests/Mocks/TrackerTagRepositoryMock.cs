@@ -6,6 +6,8 @@ namespace BiotonFMS.Telematica.Tests.Mocks;
 
 public static class TrackerTagRepositoryMock
 {
+    public const string ExistingTagName = "tagA"; 
+    
     private static IEnumerable<TrackerTag> GetTrackerTags() =>
         new TrackerTag[]
         {

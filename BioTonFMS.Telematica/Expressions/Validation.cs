@@ -90,7 +90,7 @@ public static class Validation
             {
                 problemList.Add(new SensorProblemDescription(nameof(sensor.ValidationType), "Недопустимый тип валидатора!"));
             }
-            
+
             // Проверяем, что "валидатор" ссылается на датчик внутри трекера
             if (!tracker.Sensors.Exists(s => s.Id == sensor.ValidatorId))
             {
@@ -144,5 +144,16 @@ public static class Validation
         }
 
         return problemList;
+    }
+
+    public static string? ValidateSensorRemoval(Tracker tracker, Sensor sensorToDelete, ILogger logger)
+    {
+        var sensorById = tracker.Sensors.ToDictionary(s => s.Id);
+        var expressions = tracker.Sensors
+            .Select(s => new SensorExpressionProperties(s, s.ValidatorId.HasValue ? sensorById[s.ValidatorId.Value].Name : null));
+        var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.PostprocessAst);
+
+        var referencingNodes = graph.Where(node => node.Value.Edges.Contains(sensorToDelete.Name)).ToArray();
+        return referencingNodes.Any() ? $"На удаляемый датчик ссылается датчик с именем {referencingNodes[0].Key}!" : null;
     }
 }

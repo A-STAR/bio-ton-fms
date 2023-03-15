@@ -10,7 +10,8 @@ namespace BioTonFMS.Telematica.Validation
     {
         public SensorValidator(ITrackerRepository trackerRepository, IUnitRepository unitRepository, ISensorTypeRepository sensorTypeRepository)
         {
-            RuleFor(x => x.Name).NotEmpty().Length(1, 100);
+            RuleFor(x => x.Name).Length(1, 100);
+            RuleFor(x => x.DataType).IsInEnum();
             RuleFor(x => x.Description).Length(0, 500);
             RuleFor(x => x.Formula).Length(0, 500);
             RuleFor(x => x.TrackerId).Must(trackerId => trackerRepository[trackerId] is not null)
