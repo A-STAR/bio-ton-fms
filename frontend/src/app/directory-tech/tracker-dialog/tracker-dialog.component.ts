@@ -131,6 +131,7 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
       registration: this.fb.group({
         external: this.fb.nonNullable.control(this.data?.externalId, [
           Validators.required,
+          Validators.min(1),
           Validators.max(99999999999)
         ]),
         sim: this.fb.nonNullable.control(this.data?.simNumber, [
