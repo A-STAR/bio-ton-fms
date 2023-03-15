@@ -135,10 +135,11 @@ public class SensorController : ValidationControllerBase
 
         ApplySensorTypeConstraints(newSensor);
         
-        var tracker = _trackerRepository.GetTrackers(new TrackersFilter
+        var tracker = _trackerRepository[newSensor.TrackerId];
+        if (tracker is null)
         {
-            Id = newSensor.TrackerId
-        }).Results[0];
+            return BadRequest($"Трекер с идентификатором {newSensor.TrackerId} не существует!");
+        }
         tracker.Sensors.Add(newSensor);
 
         var trackerTags = _trackerTagRepository.GetTags();
@@ -210,10 +211,11 @@ public class SensorController : ValidationControllerBase
 
             ApplySensorTypeConstraints(updatedSensor);
             
-            var tracker = _trackerRepository.GetTrackers(new TrackersFilter
+            var tracker = _trackerRepository[updatedSensor.TrackerId];
+            if (tracker is null)
             {
-                Id = updatedSensor.TrackerId
-            }).Results[0];
+                return BadRequest($"Трекер с идентификатором {updatedSensor.TrackerId} не существует!");
+            }
             tracker.Sensors.RemoveAll(s => s.Id == id);
             tracker.Sensors.Add(updatedSensor);
 
@@ -261,10 +263,11 @@ public class SensorController : ValidationControllerBase
             return NotFound(new ServiceErrorResult($"Датчик с id = {id} не найден"));            
         }
         
-        var tracker = _trackerRepository.GetTrackers(new TrackersFilter
+        var tracker = _trackerRepository[sensorToDelete.TrackerId];
+        if (tracker is null)
         {
-            Id = sensorToDelete.TrackerId
-        }).Results[0];
+            return BadRequest($"Трекер с идентификатором {sensorToDelete.TrackerId} не существует!");
+        }
 
         var validationResult = Expressions.Validation.ValidateSensorRemoval(tracker, sensorToDelete, _logger);
         if (!string.IsNullOrEmpty(validationResult))
