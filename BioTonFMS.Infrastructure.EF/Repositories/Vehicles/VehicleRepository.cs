@@ -136,7 +136,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 if (sameTrackerVehicle is not null)
                 {
                     throw new ArgumentException(
-                        $"Трекер {vehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
+                        $"Трекер {sameTrackerVehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
                 }
             }
 
@@ -159,7 +159,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 if (sameTrackerVehicle is not null)
                 {
                     throw new ArgumentException(
-                        $"Трекер {vehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
+                        $"Трекер {sameTrackerVehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
                 }
             }
 
