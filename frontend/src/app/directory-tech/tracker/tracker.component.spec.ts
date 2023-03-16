@@ -259,6 +259,18 @@ describe('TrackerComponent', () => {
     });
   });
 
+  it('should render parameters card', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Доступные данные'
+      })
+    );
+
+    expect(card)
+      .withContext('render parameters card')
+      .not.toBeNull();
+  });
+
   it('should render sensors card', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
