@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-using BioTonFMS.Domain;
+﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
+using BioTonFMS.Expressions.Compilation;
+using BioTonFMS.Telematica.Expressions;
 
 namespace BioTonFMS.Telematica;
 
@@ -19,7 +18,7 @@ public static class MessageProcessing
     {
         if (previousMessage is null)
             return;
-        
+
         // Puts tracker tags from the previous message into dictionary
         var previousTags = previousMessage.Tags
             .Where(t => t.TrackerTagId.HasValue)
@@ -55,20 +54,31 @@ public static class MessageProcessing
     /// <remarks>This static method parses sensor formulas, sorts them by their dependencies and compiles their
     /// ASTs to sorted sequences of runnable lambda expressions. Resulting sequences are paired with ids of their
     /// trackers</remarks>
-    /// <returns>One set of compiled sensor formulas per tracker: (tracker1, {(name1, expression1), ...}), (tracker2, {}), ...</returns>
-    public static IEnumerable<(int TrackerId, (string Name, Expression? Expression)[])> BuildSensors(this IEnumerable<Tracker> trackers,
+    /// <returns>One sequence of compiled sensor formulas per tracker: (tracker1, {(name1, expression1), ...}), (tracker2, {}), ...</returns>
+    public static IEnumerable<(int TrackerId, CompiledExpression<SensorExpressionProperties>[])> BuildSensors(
+        this IEnumerable<Tracker> trackers,
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
+        // строит из набора тегов словарь <название тега, тип тега>
         Dictionary<string, Type> parameterTypesDictionary = BuildParameterDictionaryByTags(trackerTags);
-        
-        return trackers.Select(t => (
-            t.Id,
-            t.Sensors
-                .Select(s => (s.Id.ToString(), (s.Formula, UseFallbacks: s.UseLastReceived)))
-                .SortAndBuild(parameterTypesDictionary, exceptionHandler)
-                .ToArray()));
+
+        var compilationOptions = new CompilationOptions()
+        {
+            ExpressionBuilderFactory = new SensorExpressionBuilderFactory()
+        };
+
+        return trackers.Select(t =>
+        {
+            var sensorNameById = t.Sensors.ToDictionary(s => s.Id, s => s.Name);
+            return (
+                t.Id,
+                t.Sensors
+                    .Select(s => new SensorExpressionProperties(s, s.ValidatorId == null ? null : sensorNameById[s.ValidatorId.Value]))
+                    .SortAndBuild(parameterTypesDictionary, Postprocess.PostprocessAst, compilationOptions, exceptionHandler)
+                    .ToArray());
+        });
     }
-    
+
     /// <summary>
     /// Builds parameter dictionary by tags
     /// </summary>
@@ -79,7 +89,7 @@ public static class MessageProcessing
 
         var parameters = trackerTags.Where(t =>
                 t.DataType is TagDataTypeEnum.Double or TagDataTypeEnum.Integer
-                    or TagDataTypeEnum.Byte /* For the moment we can process doubles only */)
+                    or TagDataTypeEnum.Byte /* For the moment we can process numbers only */)
             .ToDictionary(t => t.Name, _ => typeof( TagData<double> ) /* For the moment we can process doubles only */);
         return parameters;
     }
@@ -89,26 +99,38 @@ public static class MessageProcessing
     /// </summary>
     /// <param name="sensorExpressions">Sorted sequence of previously compiled mutually dependent sensor expressions</param>
     /// <param name="messageTags">Set of message tags used as arguments of expressions</param>
+    /// <param name="previousMessageTags"></param>
     /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
     /// <returns>Sequence of calculation results paired with sensor names (for the moment
     /// sensor ids are used as names): (name1, value1), (name2, value2)...</returns>
-    public static IEnumerable<(string, object?)> CalculateSensors(this IEnumerable<(string, Expression?)> sensorExpressions,
-        IEnumerable<MessageTag> messageTags, IDictionary<int, string> tagNameByIdDict)
+    public static IEnumerable<(SensorExpressionProperties, object?)> CalculateSensors(
+        this IEnumerable<CompiledExpression<SensorExpressionProperties>> sensorExpressions, IEnumerable<MessageTag> messageTags,
+        IEnumerable<MessageTag>? previousMessageTags, IDictionary<int, string> tagNameByIdDict)
     {
-        Dictionary<string, object?> argumentsByNames = BuildArgumentsDictionaryByMessageTags(messageTags, tagNameByIdDict);
+        // Add arguments for current message
+        Dictionary<string, object?> argumentsByNames = messageTags
+            .CalcArguments(tagNameByIdDict)
+            .ToDictionary(p => p.Key, p => p.Value);
 
+        // Add arguments for previous message
+        if (previousMessageTags != null)
+            foreach (var pair in previousMessageTags.CalcArguments(tagNameByIdDict))
+                argumentsByNames.Add("#" + pair.Key, pair.Value);
+
+        // Calculate sensors
         var calculatedSensors = sensorExpressions.Execute(argumentsByNames);
 
         return calculatedSensors;
     }
-    
+
     /// <summary>
     /// Builds arguments dictionary by message tags
     /// </summary>
-    /// <param name="messageTags">Message tags</param>
+    /// <param name="messageTags">Message tags from updated message</param>
     /// <param name="tagNameByIdDict">Dictionary which maps tag ids to tag names (id -> name)</param>
-    /// <returns>Dictionary which maps argument names to argument values</returns>
-    private static Dictionary<string, object?> BuildArgumentsDictionaryByMessageTags(IEnumerable<MessageTag> messageTags, IDictionary<int, string> tagNameByIdDict)
+    /// <returns>Pairs of argument names and argument values</returns>
+    private static IEnumerable<KeyValuePair<string, object?>> CalcArguments(this IEnumerable<MessageTag> messageTags,
+        IDictionary<int, string> tagNameByIdDict)
     {
 
         var arguments = messageTags
@@ -116,16 +138,17 @@ public static class MessageProcessing
                 tag is MessageTagDouble or MessageTagInteger or MessageTagByte /* For the moment we can process doubles only */ &&
                 tag.TrackerTagId is not null &&
                 tagNameByIdDict.ContainsKey(tag.TrackerTagId!.Value))
-            .ToDictionary(
-                tag => tagNameByIdDict[tag.TrackerTagId!.Value],
-                new Func<MessageTag, object?>(tag => new TagData<double>(
-                    tag switch
-                    {
-                        MessageTagByte v => v.Value,
-                        MessageTagDouble v => v.Value,
-                        MessageTagInteger v => v.Value,
-                        _ => throw new Exception("This type of tags is not supported for the moment!")
-                    }, tag.IsFallback)));
+            .Select(
+                tag => new KeyValuePair<string, object?>(
+                    tagNameByIdDict[tag.TrackerTagId!.Value],
+                    new TagData<double>(
+                        tag switch
+                        {
+                            MessageTagByte v => v.Value,
+                            MessageTagDouble v => v.Value,
+                            MessageTagInteger v => v.Value,
+                            _ => throw new Exception("This type of tags is not supported for the moment!")
+                        }, tag.IsFallback)));
         return arguments;
     }
 
@@ -137,14 +160,14 @@ public static class MessageProcessing
     /// <param name="message">Message to which those sensor values pertain</param>
     /// <returns>Set of created message tags bound to their sensors and their message
     /// and containing calculated values</returns>
-    private static IEnumerable<MessageTag> ConvertSensorValuesToTags(this IEnumerable<(string, object?)> sensorValues,
-        TrackerMessage message)
+    private static IEnumerable<MessageTag> ConvertSensorValuesToTags(
+        this IEnumerable<(SensorExpressionProperties Props, object? Value)> sensorValues, TrackerMessage message)
     {
         var messageTags = sensorValues
             .Select(pair => new MessageTagDouble() /* For the moment we can process doubles only */
             {
-                TagType = TagDataTypeEnum.Double, SensorId = int.Parse(pair.Item1), TrackerTagId = null, TrackerMessageId = message.Id,
-                TrackerMessage = message, IsFallback = false, Value = pair.Item2 as double? ?? double.NaN
+                TagType = TagDataTypeEnum.Double, SensorId = pair.Props.Sensor.Id, TrackerTagId = null, TrackerMessageId = message.Id,
+                TrackerMessage = message, IsFallback = false, Value = (pair.Item2 as TagData<double>?)?.Value ?? double.NaN
             });
         return messageTags;
     }
@@ -153,25 +176,26 @@ public static class MessageProcessing
     /// Calculates sensor bound message tags and adds them to their message 
     /// </summary>
     /// <param name="message">Message which contains sensor expression arguments and which will be
-    /// modified by removing old sensor tags and then adding sensor tags with new sensor values</param>
+    ///     modified by removing old sensor tags and then adding sensor tags with new sensor values</param>
+    /// <param name="previousMessage"></param>
     /// <param name="builtSensors">Previously built sensor expressions</param>
     /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
-    private static void UpdateSensorTags(this TrackerMessage message, IDictionary<int, (string, Expression?)[]> builtSensors,
-        IDictionary<int, string> tagNameByIdDict)
+    private static void UpdateSensorTags(this TrackerMessage message, TrackerMessage? previousMessage,
+        IDictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensors, IDictionary<int, string> tagNameByIdDict)
     {
         // Get sequence of built sensors for tracker 
-        (string, Expression?)[] builtTrackerSensors = builtSensors[message.TrId];
-        
+        var builtTrackerSensors = builtSensors[message.TrId];
+
         // Calculate sensor values and put the values to message tags
         var newTags = builtTrackerSensors
-            .CalculateSensors(message.Tags, tagNameByIdDict)
+            .CalculateSensors(message.Tags, previousMessage?.Tags, tagNameByIdDict)
             .ConvertSensorValuesToTags(message);
-        
+
         // Create new tag list then fill it with existing message tags and
         // add message tags for sensors 
         var newListOfTags = message.Tags.Where(tag => !tag.SensorId.HasValue).ToList();
         newListOfTags.AddRange(newTags);
-        
+
         // Set new list instead of old list
         message.Tags = newListOfTags;
     }
@@ -189,7 +213,7 @@ public static class MessageProcessing
         ICollection<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         // Build sensors
-        Dictionary<int, (string Name, Expression? Expression)[]> builtSensorsByName = trackers
+        Dictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensorsByTrackerId = trackers
             .BuildSensors(trackerTags, exceptionHandler)
             .ToDictionary(t => t.Item1 /* Tracker id */, t => t.Item2);
 
@@ -200,9 +224,11 @@ public static class MessageProcessing
             .ToDictionary(tag => tag.Id, tag => tag.Name);
 
         // Update sensor tags for all messages in sequence
+        TrackerMessage? previousMessage = null;
         foreach (var message in messages)
         {
-            message.UpdateSensorTags(builtSensorsByName, tagNameById);
+            message.UpdateSensorTags(previousMessage, builtSensorsByTrackerId, tagNameById);
+            previousMessage = message;
         }
     }
 }

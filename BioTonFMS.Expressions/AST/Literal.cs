@@ -1,4 +1,4 @@
-﻿namespace BioTonFMS.Expressions.AST;
+﻿namespace BioTonFMS.Expressions.Ast;
 
 /// <summary>
 /// Type of AST nodes representing different types of literals
@@ -9,7 +9,7 @@ public class Literal : AstNode, IEquatable<Literal>
     /// String representation of literal
     /// </summary>
     public string LiteralString { get; }
-    
+
     /// <summary>
     /// Type of literal
     /// </summary>
@@ -48,7 +48,7 @@ public class Literal : AstNode, IEquatable<Literal>
     {
         return !Equals(left, right);
     }
-    
+
     public override string ToString()
     {
         return LiteralString;

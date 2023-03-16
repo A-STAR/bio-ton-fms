@@ -7,16 +7,14 @@ namespace BioTonFMS.Infrastructure.Controllers
 {
     public abstract class ValidationControllerBase : ControllerBase
     {
-        public IActionResult ReturnValidationErrors(ValidationResult result)
+        public IActionResult ReturnValidationErrors(ValidationResult? result = null)
         {
-            result.AddToModelState(ModelState);
+            result?.AddToModelState(ModelState);
             return ValidationProblem(
                 new ValidationProblemDetails(ModelState)
                 {
-                    Status = (int)HttpStatusCode.BadRequest,
-                    Type = "/bad-request",
-                    Title = "Запрос не соответствует требованиям API",
-                    Detail = "Произошла ошибка валидации запроса"
+                    Status = (int)HttpStatusCode.BadRequest, Type = "/bad-request", Title = "Запрос не соответствует требованиям API",
+                    Detail = "Произошла ошибка валидации запроса",
                 });
         }
     }

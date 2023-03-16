@@ -1,14 +1,13 @@
-﻿using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 
 public static class LoggerMock
 {
-    public static ILogger<SensorRepository> GetSensorRepositoryStub()
+    public static ILogger<T> GetStub<T>()
     {
-        var mock = new Mock<ILogger<SensorRepository>>();
+        var mock = new Mock<ILogger<T>>();
         return mock.Object;
     }
 }

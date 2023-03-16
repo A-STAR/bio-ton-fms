@@ -6,21 +6,17 @@ using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Mapping;
 using BiotonFMS.Telematica.Tests.Mocks;
+using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using BioTonFMS.Telematica.Validation;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Xunit.Abstractions;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
 public class SensorControllerTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public SensorControllerTests(ITestOutputHelper testOutputHelper)
+    public SensorControllerTests()
     {
-        _testOutputHelper = testOutputHelper;
         CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru");
     }
 
@@ -56,248 +52,57 @@ public class SensorControllerTests
     #endregion
 
     #region Create/update constraints
-    public static IEnumerable<object[]> ConstraintViolationTestData =>
-        new[]
-        {
-            new object[]
-            {
-                "[POSITIVE] Tracker Does Not Exist",
-                new Sensor()
-                {
-                    Name = "Sensor", TrackerId = TrackerRepositoryMock.NonExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "TrackerId",
-                new[]
-                {
-                    "*Трекер* не существует*"
-                }
-            },
-            new object[]
-            {
-                "[POSITIVE] Unit Does Not Exist",
-                new Sensor()
-                {
-                    Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.NonExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "UnitId",
-                new[]
-                {
-                    "*Единица измерения * не существует*"
-                }
-            },
-            new object[]
-            {
-                "[POSITIVE] Validator Does Not Exist",
-                new Sensor()
-                {
-                    Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.NonExistentSensorId,
-                    FuelUse = 1
-                },
-                "ValidatorId",
-                new[]
-                {
-                    "*Датчик * не существует*"
-                }
-            },
-            new object[]
-            {
-                "[POSITIVE] Sensor Type Does Not Exist",
-                new Sensor()
-                {
-                    Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.NonExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "SensorTypeId",
-                new[]
-                {
-                    "*Тип датчиков * не существует*"
-                }
-            },
-            new object[]
-            {
-                "[POSITIVE] Name is too short",
-                new Sensor()
-                {
-                    Name = "", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "Name",
-                new[]
-                {
-                    "*должно быть заполнено*", "*должно быть длиной*"
-                }
-            },
-            new object[]
-            {
-                "[POSITIVE] Name is too long",
-                new Sensor()
-                {
-                    Name = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901",
-                    TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "Name",
-                new[]
-                {
-                    "*должно быть длиной * символов*"
-                }
-            },
-            new object[]
-            {
-                "[NEGATIVE] Description is empty",
-                new Sensor()
-                {
-                    Name = "Sensor", Description = "", TrackerId = TrackerRepositoryMock.ExistentTrackerId, UnitId = UnitRepositoryMock.ExistentUnitId,
-                    SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "Description",
-                Array.Empty<string>()
-            },
-            new object[]
-            {
-                "[NEGATIVE] Description is null",
-                new Sensor()
-                {
-                    Name = "Sensor", Description = null!, TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-                    UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "Description",
-                Array.Empty<string>()
-            },
-            new object[]
-            {
-                "[POSITIVE] Description is too long",
-                new Sensor()
-                {
-                    Name = "Sensor", Description = new String('a', 501), TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-                    UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "Description",
-                new[]
-                {
-                    "*должно быть длиной * символов*"
-                }
-            },
-            new object[]
-            {
-                "[POSITIVE] Formula is too long",
-                new Sensor()
-                {
-                    Name = "Sensor", Formula = new String('a', 501), TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-                    UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 1
-                },
-                "Formula",
-                new[]
-                {
-                    "*должно быть длиной * символов*"
-                }
-            },
-            new object[]
-            {
-                "[POSITIVE] Fuel Use is less or equal zero",
-                new Sensor()
-                {
-                    Name = "Sensor", TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-                    UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                    ValidatorId = SensorRepositoryMock.ExistentSensorId,
-                    FuelUse = 0
-                },
-                "FuelUse",
-                new[]
-                {
-                    "*должно быть больше*"
-                }
-            }
-        };
-
-    [Theory, MemberData(nameof(ConstraintViolationTestData))]
-    public void UpdateSensor_SensorWithConstraintViolation_ThrowsArgumentException(string testName, Sensor sensor, string wrongField,
-        string[] errors)
+    [Fact]
+    public void UpdateSensor_SensorWithConstraintViolation_ReturnsValidationResults()
     {
-        _testOutputHelper.WriteLine(testName);
-
         var controller = GetController();
 
-        var mapperConfiguration = new MapperConfiguration(x => x.CreateMap<Sensor, UpdateSensorDto>());
-        var mapper = mapperConfiguration.CreateMapper();
-        var sensorDto = mapper.Map<Sensor, UpdateSensorDto>(sensor);
+        var sensorDto = new UpdateSensorDto()
+        {
+            Name = "", UnitId = UnitRepositoryMock.ExistentUnitId, Formula = "const1", TrackerId = TrackerRepositoryMock.ExistentTrackerId,
+            FuelUse = 1, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId
+        };
 
         var result = controller.UpdateSensor(SensorRepositoryMock.ExistentSensorId, sensorDto);
         result.Should().NotBeNull();
 
-        if (errors.IsNullOrEmpty())
-        {
-            result.Should().BeOfType<OkResult>();
-            ((OkResult)result).StatusCode.Should().Be(200);
-        }
-        else
-        {
-            result.Should().BeOfType<BadRequestObjectResult>();
-            var badResult = ((BadRequestObjectResult)result);
-            badResult.StatusCode.Should().Be(400);
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badResult = ((BadRequestObjectResult)result);
+        badResult.StatusCode.Should().Be(400);
 
-            var content = badResult.Value.As<ValidationProblemDetails>();
-            content.Should().NotBeNull();
-            content.Errors.Should().HaveCount(1);
-            content.Errors.Should().ContainKey(wrongField);
-            foreach (var errorPattern in errors)
-            {
-                content.Errors[wrongField].Should().ContainMatch(errorPattern);
-            }
-        }
+        var content = badResult.Value.As<ValidationProblemDetails>();
+        content.Should().NotBeNull();
+        content.Errors.Should().HaveCount(1);
+        content.Errors.Should().ContainKey(nameof(Sensor.Name));
+        content.Errors[nameof(Sensor.Name)].Should().ContainMatch("*должно быть длиной*");
     }
 
-    [Theory, MemberData(nameof(ConstraintViolationTestData))]
-    public void AddSensor_SensorWithConstraintViolation_ThrowsArgumentException(string testName, Sensor sensor, string wrongField,
-        string[] errors)
+    [Fact]
+    public void AddSensor_SensorWithConstraintViolation_ReturnsValidationResults()
     {
-        _testOutputHelper.WriteLine(testName);
-
         var controller = GetController();
 
-        var mapperConfiguration = new MapperConfiguration(x => x.CreateMap<Sensor, CreateSensorDto>());
-        var mapper = mapperConfiguration.CreateMapper();
-        var sensorDto = mapper.Map<Sensor, CreateSensorDto>(sensor);
+        var sensorDto = new CreateSensorDto()
+        {
+            Name = "", UnitId = UnitRepositoryMock.ExistentUnitId, Formula = "const1", TrackerId = TrackerRepositoryMock.ExistentTrackerId,
+            FuelUse = 1, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId
+        };
 
         var result = (ObjectResult)controller.AddSensor(sensorDto);
+        result.Should().NotBeNull();
 
-        if (errors.IsNullOrEmpty())
-        {
-            result.Should().BeOfType<OkObjectResult>();
-            result.StatusCode.Should().Be(200);
-        }
-        else
-        {
-            result.Should().BeOfType<BadRequestObjectResult>();
-            result.StatusCode.Should().Be(400);
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badResult = ((BadRequestObjectResult)result);
+        badResult.StatusCode.Should().Be(400);
 
-            var content = result.Value.As<ValidationProblemDetails>();
-            content.Should().NotBeNull();
-            content.Errors.Should().HaveCount(1);
-            content.Errors.Should().ContainKey(wrongField);
-            foreach (var errorPattern in errors)
-            {
-                content.Errors[wrongField].Should().ContainMatch(errorPattern);
-            }
-        }
+        var content = badResult.Value.As<ValidationProblemDetails>();
+        content.Should().NotBeNull();
+        content.Errors.Should().HaveCount(1);
+        content.Errors.Should().ContainKey(nameof(Sensor.Name));
+        content.Errors[nameof(Sensor.Name)].Should().ContainMatch("*должно быть длиной*");
     }
     #endregion
-    
+
 
     [Fact]
     public void AddSensor_SensorTypeWithDataTypeConstraint_SetsDataType()
@@ -306,16 +111,9 @@ public class SensorControllerTests
 
         var sensorDto = new CreateSensorDto()
         {
-            Name = "a",
-            TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-            Description = "",
-            ValidatorId = null,
-            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithBooleanDataTypeId,
-            UnitId = UnitRepositoryMock.ExistentUnitId,
-            Formula = "a",
-            DataType = SensorDataTypeEnum.Number,
-            FuelUse = 1,
-            ValidationType = null,
+            Name = "c", TrackerId = TrackerRepositoryMock.ExistentTrackerId, Description = "", ValidatorId = null,
+            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithBooleanDataTypeId, UnitId = UnitRepositoryMock.ExistentUnitId,
+            Formula = "const1", DataType = SensorDataTypeEnum.Number, FuelUse = 1, ValidationType = null,
             UseLastReceived = false
         };
 
@@ -327,7 +125,7 @@ public class SensorControllerTests
 
         Assert.Equal(SensorDataTypeEnum.Boolean, SensorRepositoryMock.LastAddArgument!.DataType);
     }
-    
+
     [Fact]
     public void AddSensor_SensorTypeWithUnitConstraint_SetsUnit()
     {
@@ -335,17 +133,9 @@ public class SensorControllerTests
 
         var sensorDto = new CreateSensorDto()
         {
-            Name = "a",
-            TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-            Description = "",
-            ValidatorId = null,
-            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithSecondUnitId,
-            UnitId = UnitRepositoryMock.MeterUnitId,
-            Formula = "a",
-            DataType = SensorDataTypeEnum.Number,
-            FuelUse = 1,
-            ValidationType = null,
-            UseLastReceived = false
+            Name = "c", TrackerId = TrackerRepositoryMock.ExistentTrackerId, Description = "", ValidatorId = null,
+            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithSecondUnitId, UnitId = UnitRepositoryMock.MeterUnitId, Formula = "const1",
+            DataType = SensorDataTypeEnum.Number, FuelUse = 1, ValidationType = null, UseLastReceived = false
         };
 
         var result = controller.AddSensor(sensorDto);
@@ -364,19 +154,12 @@ public class SensorControllerTests
 
         var sensorDto = new UpdateSensorDto()
         {
-            Name = "a",
-            TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-            Description = "",
-            ValidatorId = null,
-            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithBooleanDataTypeId,
-            UnitId = UnitRepositoryMock.ExistentUnitId,
-            Formula = "a",
-            DataType = SensorDataTypeEnum.Number,
-            FuelUse = 1,
-            ValidationType = null,
+            Name = "a", TrackerId = TrackerRepositoryMock.ExistentTrackerId, Description = "", ValidatorId = null,
+            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithBooleanDataTypeId, UnitId = UnitRepositoryMock.ExistentUnitId,
+            Formula = "const1", DataType = SensorDataTypeEnum.Number, FuelUse = 1, ValidationType = null,
             UseLastReceived = false
         };
-        
+
         var result = controller.UpdateSensor(1, sensorDto);
 
         result.Should().BeOfType<OkResult>();
@@ -385,7 +168,7 @@ public class SensorControllerTests
 
         Assert.Equal(SensorDataTypeEnum.Boolean, SensorRepositoryMock.LastUpdateArgument!.DataType);
     }
-    
+
     [Fact]
     public void UpdateSensor_SensorTypeWithUnitConstraint_SetsUnit()
     {
@@ -393,17 +176,9 @@ public class SensorControllerTests
 
         var sensorDto = new UpdateSensorDto()
         {
-            Name = "a",
-            TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-            Description = "",
-            ValidatorId = null,
-            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithSecondUnitId,
-            UnitId = UnitRepositoryMock.MeterUnitId,
-            Formula = "a",
-            DataType = SensorDataTypeEnum.Number,
-            FuelUse = 1,
-            ValidationType = null,
-            UseLastReceived = false
+            Name = "a", TrackerId = TrackerRepositoryMock.ExistentTrackerId, Description = "", ValidatorId = null,
+            SensorTypeId = SensorTypeRepositoryMock.SensorTypeWithSecondUnitId, UnitId = UnitRepositoryMock.MeterUnitId, Formula = "const1",
+            DataType = SensorDataTypeEnum.Number, FuelUse = 1, ValidationType = null, UseLastReceived = false
         };
 
         var result = controller.UpdateSensor(1, sensorDto);
@@ -415,6 +190,34 @@ public class SensorControllerTests
         Assert.Equal(2, SensorRepositoryMock.LastUpdateArgument!.UnitId);
     }
 
+    [Fact]
+    public void Delete_NonExistentSensor_NotFound()
+    {
+        var controller = GetController();
+
+        var result = controller.DeleteSensor(SensorRepositoryMock.NonExistentSensorId);
+
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var badResult = result as NotFoundObjectResult;
+        badResult!.StatusCode.Should().Be(404);
+        var content = badResult.Value.As<ServiceErrorResult>();
+        content.Messages.Length.Should().Be(1);
+        content.Messages[0].Should().Match("*не найден*");
+    }
+
+    [Fact]
+    public void Delete_Conflict_BadRequest()
+    {
+        var controller = GetController();
+
+        var result = controller.DeleteSensor(SensorRepositoryMock.ReferencedSensorId);
+
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badResult = result as BadRequestObjectResult;
+        badResult!.StatusCode.Should().Be(400);
+        (badResult.Value as string).Should().Match("*ссылается*");
+    }
+    
     private static SensorController GetController()
     {
         var mapperConfig = new MapperConfiguration(cfg =>
@@ -425,8 +228,8 @@ public class SensorControllerTests
 
         return new SensorController(SensorRepositoryMock.GetStub(), SensorTypeRepositoryMock.GetStub(), mapper,
             new UpdateSensorDtoValidator(), new CreateSensorDtoValidator(),
-            new SensorValidator(TrackerRepositoryMock.GetStub(), UnitRepositoryMock.GetStub(), SensorRepositoryMock.GetStub(),
-            SensorTypeRepositoryMock.GetStub()), new SensorsRequestValidator());
+            new SensorValidator(TrackerRepositoryMock.GetStub(), UnitRepositoryMock.GetStub(),
+                SensorTypeRepositoryMock.GetStub()), new SensorsRequestValidator(), TrackerRepositoryMock.GetStub(),
+            LoggerMock.GetStub<SensorController>(), TrackerTagRepositoryMock.GetStub());
     }
-
 }

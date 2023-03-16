@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using BioTonFMS.Expressions;
-using BioTonFMS.Expressions.AST;
+using BioTonFMS.Expressions.Ast;
+using BioTonFMS.Expressions.Parsing;
 using FluentAssertions;
 
 namespace BiotonFMS.Telematica.Tests.Expressions;
@@ -8,10 +9,20 @@ namespace BiotonFMS.Telematica.Tests.Expressions;
 public class ParserTests
 {
     [Fact]
-    public void EmptyString_LeadsToArgumentException()
+    public void EmptyString_LeadsToParsingException()
     {
         Action parse = () => Parser.Parse("");
-        parse.Should().Throw<ArgumentException>();
+        parse.Should().Throw<ParsingException>().WithMessage("*empty*");
+    }
+
+    [Fact]
+    public void MalformedEnding_LeadsToParsingException()
+    {
+        Action parse = () => Parser.Parse("a + const1#ddddddd");
+        parse.Should()
+            .Throw<ParsingException>()
+            .WithMessage("*unexpected*#ddddddd*")
+            .And.Location.Should().Be(new Location(10, 8));
     }
 
     public static ICollection<object> ParseSamples => new[]
@@ -257,6 +268,17 @@ public class ParserTests
         ast.Should().Be(expectedAst);
     }
 
+    [Fact]
+    public void Parse_SyntacticallyCorrectExpression_AstShouldContainLocationInfo()
+    {
+        var ast = Parser.Parse("  a   + b ");
+        ast.Should().NotBeNull();
+        ast.Should().BeAssignableTo<AstNode>();
+        ast.Location.Should().Be(new Location(0, 10));
+        ((BinaryOperation)ast).LeftOperand.Location.Should().Be(new Location(2, 1));
+        ((BinaryOperation)ast).RightOperand.Location.Should().Be(new Location(8, 1));
+    }
+    
     public static ICollection<object> SyntacticallyIncorrectSamples => new[]
     {
         new object[]
@@ -265,7 +287,7 @@ public class ParserTests
         },
         new object[]
         {
-            "a+"
+            "^a+a"
         },
     };
 
@@ -273,7 +295,9 @@ public class ParserTests
     public void Parse_SyntacticallyIncorrectExpression_Throws(string expressionString)
     {
         Action parse = () => Parser.Parse(expressionString);
-        parse.Should().Throw<FormatException>();
+        parse.Should()
+            .Throw<ParsingException>()
+            .WithMessage("*failed*")
+            .And.Location.Should().Be(new Location(0, 0));
     }
-
 }

@@ -1,15 +1,13 @@
-﻿using System.Linq.Expressions;
-using BioTonFMS.Expressions;
-using BioTonFMS.Expressions.AST;
+﻿using BioTonFMS.Expressions;
 using Microsoft.Extensions.Logging;
 
 namespace BioTonFMS.Telematica.Controllers.TestData;
 
-public class ExceptionHandler : IExceptionHandler
+public class LoggingExceptionHandler : IExceptionHandler
 {
     private readonly ILogger _logger;
 
-    public ExceptionHandler(ILogger logger)
+    public LoggingExceptionHandler(ILogger logger)
     {
         _logger = logger;
     }

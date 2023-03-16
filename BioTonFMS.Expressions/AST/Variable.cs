@@ -1,4 +1,5 @@
-﻿using BioTonFMS.Expressions.AST;
+﻿using BioTonFMS.Expressions;
+using BioTonFMS.Expressions.Ast;
 
 /// <summary>
 /// Type of AST nodes which represents reference to tracker tag or other sensor 

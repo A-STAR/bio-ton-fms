@@ -183,7 +183,7 @@ public class SensorRepositoryTests
         IQueryableProvider<Sensor> sensorQueryProviderMock = new QueryableProviderMock<Sensor>(sensorList);
         UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactoryMock = new BioTonDBContextUnitOfWorkFactoryMock();
 
-        var repo = new SensorRepository(LoggerMock.GetSensorRepositoryStub(), keyValueProviderMock, sensorQueryProviderMock,
+        var repo = new SensorRepository(LoggerMock.GetStub<SensorRepository>(), keyValueProviderMock, sensorQueryProviderMock,
             unitOfWorkFactoryMock);
         return repo;
     }

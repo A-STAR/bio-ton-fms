@@ -1,3 +1,4 @@
+using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
@@ -10,34 +11,36 @@ public static class SensorRepositoryMock
 {
     public const int ExistentSensorId = 1;
     public const int NonExistentSensorId = -1;
+    public const int ReferencedSensorId = 2;
 
-    private static PagedResult<Sensor> GetSensors() =>
+    private static PagedResult<Sensor> GetSensorsPaged() =>
         new()
         {
-            CurrentPage = 1,
-            Results = new List<Sensor>
-            {
-                new()
-                {
-                    Id = 1
-                },
-                new()
-                {
-                    Id = 2
-                }
-            }
+            CurrentPage = 1, Results = GetSensors().ToList()
         };
 
-    public static Sensor? LastUpdateArgument = null;
-    public static Sensor? LastAddArgument = null;
+    public static IEnumerable<Sensor> GetSensors() => new List<Sensor>
+    {
+        new()
+        {
+            Id = 1, TrackerId = 1, Name = "a", Formula = "b"
+        },
+        new()
+        {
+            Id = 2, TrackerId = 1, Name = "b", Formula = "const1"
+        }
+    };
+
+    public static Sensor? LastUpdateArgument;
+    public static Sensor? LastAddArgument;
 
     public static ISensorRepository GetStub()
     {
         var repo = new Mock<ISensorRepository>();
         repo.Setup(x => x.GetSensors(It.IsAny<SensorsFilter>()))
-            .Returns(GetSensors);
+            .Returns(GetSensorsPaged);
         repo.Setup(x => x[It.IsAny<int>()])
-            .Returns((int i) => GetSensors().Results.FirstOrDefault(x => x.Id == i));
+            .Returns((int i) => GetSensorsPaged().Results.FirstOrDefault(x => x.Id == i));
         repo.Setup(x => x.Update(It.IsAny<Sensor>())).Callback((Sensor x) => LastUpdateArgument = x);
         repo.Setup(x => x.Add(It.IsAny<Sensor>())).Callback((Sensor x) => LastAddArgument = x);
         return repo.Object;

@@ -104,7 +104,7 @@ public class TestDataController : ValidationControllerBase
         var trackers = _trackerRepository.GetTrackers(new TrackersFilter()
         {
             PageSize = 100000
-        });
+        }, forUpdate: true);
         foreach (var tracker in trackers.Results)
         {
             if (tracker.Id >= 0)
@@ -149,7 +149,7 @@ public class TestDataController : ValidationControllerBase
             MessageProcessing.CalculateFallBackValues(message, i > 0 ? messages[i - 1] : null);
         }
         var trackerTags = _trackerTagRepository.GetTags().ToArray();
-        var exceptionHandler = new ExceptionHandler(_logger);
+        var exceptionHandler = new LoggingExceptionHandler(_logger);
         messages.UpdateSensorTags(pageWithTrackers.Results, trackerTags, exceptionHandler);
         foreach (var message in messages)
         {
