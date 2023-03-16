@@ -73,6 +73,6 @@ namespace BioTonFMS.Telematica.Dtos
         /// <summary>
         /// Использование горючего (л/c)
         /// </summary>
-        public float FuelUse { get; set; }
+        public double? FuelUse { get; set; }
     }
 }
