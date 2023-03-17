@@ -30,9 +30,10 @@ public static class EnumExtension
 
         foreach (var key in ((T[])Enum.GetValues(typeof(T))).OrderBy(e => e))
         {
+            var keyString = key.ToString();
             var pair = new KeyValuePair
             {
-                Key = key.ToString(),
+                Key = char.ToLower(keyString[0]) + keyString[1..],
                 Value = key.GetDescription() ?? ""
             };
 
