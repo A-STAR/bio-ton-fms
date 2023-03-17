@@ -10,7 +10,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, filter, map, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 
-import { TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
+import { TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
 import { Sensor, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
@@ -39,6 +39,7 @@ import { DATE_FORMAT } from '../trackers/trackers.component';
 })
 export default class TrackerComponent implements OnInit, OnDestroy {
   protected standardParameters$!: Observable<TrackerStandardParameter[]>;
+  protected parameters$!: Observable<TrackerParameter[]>;
   protected sensors$!: Observable<Sensor[] | undefined>;
   protected standardParametersDataSource!: TableDataSource<StandardParameterDataSource>;
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
@@ -145,7 +146,7 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get and set tracker standard parameters, sensors.
+   * Get and set tracker standard parameters, parameters, sensors.
    */
   #setTrackerData() {
     const trackerID$ = this.route.paramMap.pipe(
@@ -160,6 +161,10 @@ export default class TrackerComponent implements OnInit, OnDestroy {
       tap(parameters => {
         this.#setStandardParametersDataSource(parameters);
       })
+    );
+
+    this.parameters$ = trackerID$.pipe(
+      switchMap(id => this.trackerService.getParameters(id))
     );
 
     this.sensors$ = trackerID$.pipe(

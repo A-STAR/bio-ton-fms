@@ -20,14 +20,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Observable, of } from 'rxjs';
 
-import { TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
+import { TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
 import { NewSensor, Sensors, SensorService } from '../sensor.service';
 
 import TrackerComponent, { SensorColumn, sensorColumns, trackerParameterColumns } from './tracker.component';
 import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
 import { DATE_FORMAT } from '../trackers/trackers.component';
-import { testStandardParameters } from '../tracker.service.spec';
+import { testParameters, testStandardParameters } from '../tracker.service.spec';
 import { testSensors, TEST_TRACKER_ID, testNewSensor } from '../sensor.service.spec';
 
 describe('TrackerComponent', () => {
@@ -38,6 +38,7 @@ describe('TrackerComponent', () => {
   let loader: HarnessLoader;
 
   let standardParametersSpy: jasmine.Spy<() => Observable<TrackerStandardParameter[]>>;
+  let parametersSpy: jasmine.Spy<() => Observable<TrackerParameter[]>>;
   let sensorsSpy: jasmine.Spy<() => Observable<Sensors>>;
 
   beforeEach(async () => {
@@ -75,10 +76,14 @@ describe('TrackerComponent', () => {
     const sensorService = TestBed.inject(SensorService);
 
     const standardParameters$ = of(testStandardParameters);
+    const parameters$ = of(testParameters);
     const sensors$ = of(testSensors);
 
     standardParametersSpy = spyOn(trackerService, 'getStandardParameters')
       .and.returnValue(standardParameters$);
+
+    parametersSpy = spyOn(trackerService, 'getParameters')
+      .and.returnValue(parameters$);
 
     sensorsSpy = spyOn(sensorService, 'getSensors')
       .and.returnValue(sensors$);
@@ -269,6 +274,11 @@ describe('TrackerComponent', () => {
     expect(card)
       .withContext('render parameters card')
       .not.toBeNull();
+  });
+
+  it('should get parameters', () => {
+    expect(parametersSpy)
+      .toHaveBeenCalled();
   });
 
   it('should render sensors card', async () => {
