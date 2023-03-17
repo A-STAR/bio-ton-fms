@@ -16,7 +16,7 @@ export class SensorService {
    * @returns An `Observable` of sensor groups stream.
    */
   get sensorGroups$() {
-    return this.httpClient.get<SensorGroup[]>('/api/telematica/sensorGroups');
+    return this.httpClient.get<SensorGroup[]>('/api/telematica/sensorgroups');
   }
 
   /**
@@ -25,7 +25,7 @@ export class SensorService {
    * @returns An `Observable` of sensor types stream.
    */
   get sensorTypes$() {
-    return this.httpClient.get<SensorType[]>('/api/telematica/sensorTypes');
+    return this.httpClient.get<SensorType[]>('/api/telematica/sensortypes');
   }
 
   /**

@@ -85,7 +85,9 @@
                   (selectionChange)="onControlSelectionChange($event, 'basic.validationType')">
                   <mat-option>Валидатор</mat-option>
 
-                  <mat-option [value]="type.id" *ngFor="let type of sensorData$.validators">{{ type.name }}</mat-option>
+                  <mat-option [value]="validator.id" *ngFor="let validator of sensorData$.types">
+                    {{ validator.name }}
+                  </mat-option>
                 </mat-select>
 
                 <mat-error>Обязательное поле</mat-error>

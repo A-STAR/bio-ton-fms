@@ -113,7 +113,7 @@ describe('SensorService', () => {
       done();
     });
 
-    const sensorGroupsRequest = httpTestingController.expectOne('/api/telematica/sensorGroups', 'sensor groups request');
+    const sensorGroupsRequest = httpTestingController.expectOne('/api/telematica/sensorgroups', 'sensor groups request');
 
     sensorGroupsRequest.flush(testSensorGroups);
   });
@@ -127,7 +127,7 @@ describe('SensorService', () => {
       done();
     });
 
-    const sensorTypesRequest = httpTestingController.expectOne('/api/telematica/sensorTypes', 'sensor types request');
+    const sensorTypesRequest = httpTestingController.expectOne('/api/telematica/sensortypes', 'sensor types request');
 
     sensorTypesRequest.flush(testSensorTypes);
   });

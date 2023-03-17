@@ -44,9 +44,9 @@ describe('SensorDialogComponent', () => {
   const dialogRef = jasmine.createSpyObj<MatDialogRef<SensorDialogComponent, true | '' | undefined>>('MatDialogRef', ['close']);
 
   let sensorGroupsSpy: jasmine.Spy<(this: SensorService) => Observable<SensorGroup[]>>;
-  let sensorTypesSpy: jasmine.Spy<(this: SensorService) => Observable<SensorType[]>>;
   let unitsSpy: jasmine.Spy<(this: SensorService) => Observable<Unit[]>>;
   let sensorDataTypeSpy: jasmine.Spy<(this: SensorService) => Observable<KeyValue<string, string>[]>>;
+  let sensorTypesSpy: jasmine.Spy<(this: SensorService) => Observable<SensorType[]>>;
   let validationTypeSpy: jasmine.Spy<(this: SensorService) => Observable<KeyValue<string, string>[]>>;
 
   beforeEach(async () => {
@@ -79,22 +79,22 @@ describe('SensorDialogComponent', () => {
     component = fixture.componentInstance;
 
     const sensorGroups$ = of(testSensorGroups);
-    const sensorTypes$ = of(testSensorTypes);
     const units$ = of(testUnits);
     const sensorDataType$ = of(testSensorDataTypeEnum);
+    const sensorTypes$ = of(testSensorTypes);
     const validationType$ = of(testValidationTypeEnum);
 
     sensorGroupsSpy = spyOnProperty(sensorService, 'sensorGroups$')
       .and.returnValue(sensorGroups$);
-
-    sensorTypesSpy = spyOnProperty(sensorService, 'sensorTypes$')
-      .and.returnValue(sensorTypes$);
 
     unitsSpy = spyOnProperty(sensorService, 'units$')
       .and.returnValue(units$);
 
     sensorDataTypeSpy = spyOnProperty(sensorService, 'sensorDataType$')
       .and.returnValue(sensorDataType$);
+
+    sensorTypesSpy = spyOnProperty(sensorService, 'sensorTypes$')
+      .and.returnValue(sensorTypes$);
 
     validationTypeSpy = spyOnProperty(sensorService, 'validationType$')
       .and.returnValue(validationType$);
@@ -107,14 +107,14 @@ describe('SensorDialogComponent', () => {
       .toBeTruthy();
   });
 
-  it('should get sensor groups, sensor types, units', () => {
+  it('should get sensor groups, units, types', () => {
     expect(sensorGroupsSpy)
       .toHaveBeenCalled();
 
-    expect(sensorTypesSpy)
+    expect(unitsSpy)
       .toHaveBeenCalled();
 
-    expect(unitsSpy)
+    expect(sensorTypesSpy)
       .toHaveBeenCalled();
   });
 
@@ -316,6 +316,131 @@ describe('SensorDialogComponent', () => {
     /* Coverage for `onControlSelectionChange` control disabled state. */
 
     await type.clickOptions();
+  });
+
+  it('should render update sensor form', async () => {
+    component['data'] = testSensor;
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Наименование датчика',
+        value: testNewSensor.name
+      })
+    );
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Тип датчика"]'
+      })
+    );
+
+    await expectAsync(
+      typeSelect.getValueText()
+    )
+      .withContext('render type select text')
+      .toBeResolvedTo(testSensorTypes[2].name);
+
+    const dataTypeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Тип данных"]'
+      })
+    );
+
+    await expectAsync(
+      dataTypeSelect.getValueText()
+    )
+      .withContext('render data type select text')
+      .toBeResolvedTo(testSensorDataTypeEnum[0].value);
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Формула',
+        value: testSensor.formula
+      })
+    );
+
+    const unitSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Единица измерения"]'
+      })
+    );
+
+    await expectAsync(
+      unitSelect.getValueText()
+    )
+      .withContext('render type select text')
+      .toBeResolvedTo(testUnits[1].name);
+
+    const validatorSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Валидатор"]'
+      })
+    );
+
+    await expectAsync(
+      validatorSelect.getValueText()
+    )
+      .withContext('render type select text')
+      .toBeResolvedTo(testSensorTypes[0].name);
+
+    const validationTypeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form',
+        selector: '[placeholder="Тип валидации"]'
+      })
+    );
+
+    await expectAsync(
+      validationTypeSelect.getValueText()
+    )
+      .withContext('render type select text')
+      .toBeResolvedTo(testValidationTypeEnum[0].value);
+
+    await expectAsync(
+      validationTypeSelect.isDisabled()
+    )
+      .withContext('render validation type control enabled')
+      .toBeResolvedTo(false);
+
+    loader.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Последнее сообщение',
+        checked: testSensor.useLastReceived
+      })
+    );
+
+    loader.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Видимость',
+        checked: testSensor.visibility
+      })
+    );
+
+    const fuelInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Расход л/ч',
+        value: testNewSensor.fuelUse?.toString()
+      })
+    );
+
+    await expectAsync(
+      fuelInput.isDisabled()
+    )
+      .withContext('render fuel use control enabled')
+      .toBeResolvedTo(false);
   });
 
   it('should submit invalid sensor form', async () => {
