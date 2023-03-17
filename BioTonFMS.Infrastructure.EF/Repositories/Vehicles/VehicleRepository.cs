@@ -131,12 +131,12 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             if (vehicle.TrackerId.HasValue)
             {
-                var sameTrackerVehicle = QueryableProvider.Linq()
+                var sameTrackerVehicle = QueryableProvider.Fetch(x => x.Tracker).Linq()
                     .FirstOrDefault(x => x.TrackerId == vehicle.TrackerId);
                 if (sameTrackerVehicle is not null)
                 {
                     throw new ArgumentException(
-                        $"Трекер {vehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
+                        $"Трекер {sameTrackerVehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
                 }
             }
 
@@ -154,12 +154,12 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             if (vehicle.TrackerId.HasValue)
             {
-                var sameTrackerVehicle = QueryableProvider.Linq()
+                var sameTrackerVehicle = QueryableProvider.Fetch(x => x.Tracker).Linq()
                     .FirstOrDefault(x => x.TrackerId == vehicle.TrackerId);
                 if (sameTrackerVehicle is not null)
                 {
                     throw new ArgumentException(
-                        $"Трекер {vehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
+                        $"Трекер {sameTrackerVehicle.Tracker!.Name} уже используется для машины {sameTrackerVehicle.Name}");
                 }
             }
 
