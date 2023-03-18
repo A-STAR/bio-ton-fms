@@ -40,6 +40,7 @@ import { DATE_FORMAT } from '../trackers/trackers.component';
 export default class TrackerComponent implements OnInit, OnDestroy {
   protected standardParameters$!: Observable<TrackerStandardParameter[]>;
   protected parameters$!: Observable<TrackerParameter[]>;
+  protected parametersDataSource!: TableDataSource<ParameterDataSource>;
   protected sensors$!: Observable<Sensor[] | undefined>;
   protected standardParametersDataSource!: TableDataSource<StandardParameterDataSource>;
   protected sensorsDataSource!: TableDataSource<SensorDataSource>;
@@ -99,6 +100,22 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Map parameters data source.
+   *
+   * @param parameters Parameters.
+   *
+   * @returns Mapped parameters data source.
+   */
+  #mapParametersDataSource(parameters: TrackerParameter[]) {
+    return Object
+      .freeze(parameters)
+      .map(({ paramName, lastValueDateTime, lastValueDecimal, lastValueString }): ParameterDataSource => ({
+        param: paramName,
+        value: lastValueDecimal ?? lastValueDateTime ?? lastValueString
+      }));
+  }
+
+  /**
    * Map sensors data source.
    *
    * @param sensors Sensors.
@@ -128,6 +145,17 @@ export default class TrackerComponent implements OnInit, OnDestroy {
     const standardParametersDataSource = this.#mapStandardParametersDataSource(parameters);
 
     this.standardParametersDataSource = new TableDataSource<StandardParameterDataSource>(standardParametersDataSource);
+  }
+
+  /**
+   * Initialize `TableDataSource` with parameters data source.
+   *
+   * @param parameters Parameters.
+   */
+  #setParametersDataSource(parameters: TrackerParameter[]) {
+    const parametersDataSource = this.#mapParametersDataSource(parameters);
+
+    this.parametersDataSource = new TableDataSource<ParameterDataSource>(parametersDataSource);
   }
 
   /**
@@ -164,7 +192,10 @@ export default class TrackerComponent implements OnInit, OnDestroy {
     );
 
     this.parameters$ = trackerID$.pipe(
-      switchMap(id => this.trackerService.getParameters(id))
+      switchMap(id => this.trackerService.getParameters(id)),
+      tap(parameters => {
+        this.#setParametersDataSource(parameters);
+      })
     );
 
     this.sensors$ = trackerID$.pipe(
@@ -224,6 +255,11 @@ export enum SensorColumn {
 interface StandardParameterDataSource extends Pick<TrackerStandardParameter, 'name'> {
   param: TrackerStandardParameter['paramName'];
   value: TrackerStandardParameter['lastValueDateTime'] | TrackerStandardParameter['lastValueDecimal'];
+}
+
+interface ParameterDataSource {
+  param: TrackerParameter['paramName'];
+  value: TrackerParameter['lastValueDateTime'] | TrackerStandardParameter['lastValueDecimal'] | TrackerParameter['lastValueString'];
 }
 
 interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'formula' | 'description' | 'visibility'> {
