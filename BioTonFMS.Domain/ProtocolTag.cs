@@ -24,7 +24,7 @@ public class ProtocolTag : EntityBase, IAggregateRoot
     /// Ссылка на тег
     /// </summary>
     [Required]
-    public TrackerTag Tag { get; set; } = null!;
+    public TrackerTag? Tag { get; set; } = null!;
 
     /// <summary>
     /// Код тега в протоколе
