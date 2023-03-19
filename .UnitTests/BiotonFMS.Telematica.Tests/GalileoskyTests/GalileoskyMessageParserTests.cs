@@ -22,333 +22,339 @@ public class GalileoskyMessageParserTests
     public GalileoskyMessageParserTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
     }
 
-    public static IEnumerable<object[]> Data =>
-        new List<object[]>
+    public static IEnumerable<object[]> Data
+    {
+        get
         {
-            new object[]
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-Ru");
+            return new List<object[]>
             {
-                "Расшифровка пакетов.docx",
-                "01 1a 80 01 82 02 17 03 38 36 32 30 35 37 30 34 37 36 31 35 36 30 31 04 2c 07 20 c9", //48 0b 00
-                new TrackerMessage[]
+                new object[]
                 {
-                    new()
+                    "Расшифровка пакетов.docx",
+                    "01 1a 80 01 82 02 17 03 38 36 32 30 35 37 30 34 37 36 31 35 36 30 31 04 2c 07 20 c9", //48 0b 00
+                    new TrackerMessage[]
                     {
-                        Imei = "862057047615601",
-                        TrId = 1836,
-                        Tags = new List<MessageTag>
+                        new()
                         {
-                            new MessageTagInteger
+                            Imei = "862057047615601",
+                            TrId = 1836,
+                            Tags = new List<MessageTag>
                             {
-                                Value = 130,
-                                TrackerTagId = 1
-                            },
-                            new MessageTagInteger
-                            {
-                                Value = 23,
-                                TrackerTagId = 2
-                            },
-                            new MessageTagString()
-                            {
-                                Value = "862057047615601",
-                                TrackerTagId = 3
-                            },
-                            new MessageTagInteger()
-                            {
-                                Value = 1836,
-                                TrackerTagId = 4
-                            },
-                            
+                                new MessageTagInteger
+                                {
+                                    Value = 130,
+                                    TrackerTagId = 1
+                                },
+                                new MessageTagInteger
+                                {
+                                    Value = 23,
+                                    TrackerTagId = 2
+                                },
+                                new MessageTagString()
+                                {
+                                    Value = "862057047615601",
+                                    TrackerTagId = 3
+                                },
+                                new MessageTagInteger()
+                                {
+                                    Value = 1836,
+                                    TrackerTagId = 4
+                                }
+                            }                            
                         }
                     }
-                }
-            },
-            new object[]
-            {
-                "Расшифровка_пакет_а_JD_с_CAN_данными.docx",
-                "01 B8 83 04 F8 09 10 05 47 20 48 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 06 40 00 3A 41 5C 34 42 16 0E 43 08 53 00 00 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 04 F8 09 10 04 47 20 3C 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 06 40 00 3A 41 93 38 42 16 0E 43 08 53 5B 38 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 F1 68",
-                new TrackerMessage[]
+                },
+                new object[]
                 {
-                    new()
+                    "Расшифровка_пакет_а_JD_с_CAN_данными.docx",
+                    "01 B8 83 04 F8 09 10 05 47 20 48 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 06 40 00 3A 41 5C 34 42 16 0E 43 08 53 00 00 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 04 F8 09 10 04 47 20 3C 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 06 40 00 3A 41 93 38 42 16 0E 43 08 53 5B 38 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 F1 68",
+                    new TrackerMessage[]
                     {
-                        TrId = 2552,
-                        TrackerDateTime = new DateTime(638071130320000000),
-                        SatNumber = 12,
-                        CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-                        Longitude = 52556861 / (double)1000000,
-                        Latitude = 49432023 / (double)1000000,
-                        Speed = 0,
-                        Direction = 28 / (double)10,
-                        Altitude = 97,
-                        FuelLevel = 100,
-                        CoolantTemperature = 45,
-                        EngineSpeed = 901,
-                        Tags = new List<MessageTag>
+                        new()
                         {
-                            new MessageTagInteger
+                            TrId = 2552,
+                            TrackerDateTime = new DateTime(638071130320000000),
+                            SatNumber = 12,
+                            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+                            Longitude = 52556861 / (double)1000000,
+                            Latitude = 49432023 / (double)1000000,
+                            Speed = 0,
+                            Direction = 28 / (double)10,
+                            Altitude = 97,
+                            FuelLevel = 100,
+                            CoolantTemperature = 45,
+                            EngineSpeed = 901,
+                            Tags = new List<MessageTag>
                             {
-                                TrackerTagId = TagsSeed.RecSn,
-                                Value = 18181
-                            },
-                            new MessageTagByte
-                            {
-                                TrackerTagId = TagsSeed.HdopId,
-                                Value = 6
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.DevStatusId,
-                                Value = 14848
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.PwrExtId,
-                                Value = 13404
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.PwrIntId,
-                                Value = 3606
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.TempIntId,
-                                Value = 8
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Adc4Id,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Rs4850Id,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Rs4851Id,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.CanA0Id,
-                                Value = 983966
-                            },
-                            new MessageTagByte()
-                            {
-                                TrackerTagId = TagsSeed.Can8BitR0Id,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Can32BitR0Id,
-                                Value = 1405370
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.CoordLatitudeId,
-                                Value = 49.432023000000001
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.CoordLongitudeId,
-                                Value = 52.556860999999998
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CoordCorrectnessId,
-                                Value = 0
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CoordSatNumberId,
-                                Value = 12
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CanLogFuelLevelId,
-                                Value = 100
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
-                                Value = 45
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CanLogEngineSpeedId,
-                                Value = 901
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.VelocitySpeedId,
-                                Value = 0
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.VelocityDirectionId,
-                                Value = 2.7999999999999998
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.DeviceIdId,
-                                Value = 2552
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.AltitudeId,
-                                Value = 97
-                            },
-                            new MessageTagDateTime()
-                            {
-                                TrackerTagId = TagsSeed.TrackerDateId,
-                                Value = DateTime.Parse("20.12.2022 6:03:52")
-                            },
-                        }
-                    },
-                    new()
-                    {
-                        TrId = 2552,
-                        TrackerDateTime = new DateTime(638071130200000000),
-                        SatNumber = 12,
-                        CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-                        Longitude = 52556861 / (double)1000000,
-                        Latitude = 49432023 / (double)1000000,
-                        Speed = 0,
-                        Direction = 28 / (double)10,
-                        Altitude = 97,
-                        FuelLevel = 100,
-                        CoolantTemperature = 45,
-                        EngineSpeed = 901,
-                        Tags = new List<MessageTag>
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.RecSn,
+                                    Value = 18181
+                                },
+                                new MessageTagByte
+                                {
+                                    TrackerTagId = TagsSeed.HdopId,
+                                    Value = 6
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.DevStatusId,
+                                    Value = 14848
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.PwrExtId,
+                                    Value = 13404
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.PwrIntId,
+                                    Value = 3606
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.TempIntId,
+                                    Value = 8
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Adc4Id,
+                                    Value = 0
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Rs4850Id,
+                                    Value = 0
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Rs4851Id,
+                                    Value = 0
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.CanA0Id,
+                                    Value = 983966
+                                },
+                                new MessageTagByte()
+                                {
+                                    TrackerTagId = TagsSeed.Can8BitR0Id,
+                                    Value = 0
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Can32BitR0Id,
+                                    Value = 1405370
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.CoordLatitudeId,
+                                    Value = 49.432023000000001
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.CoordLongitudeId,
+                                    Value = 52.556860999999998
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CoordCorrectnessId,
+                                    Value = 0
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CoordSatNumberId,
+                                    Value = 12
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CanLogFuelLevelId,
+                                    Value = 100
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
+                                    Value = 45
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CanLogEngineSpeedId,
+                                    Value = 901
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.VelocitySpeedId,
+                                    Value = 0
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.VelocityDirectionId,
+                                    Value = 2.7999999999999998
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.DeviceIdId,
+                                    Value = 2552
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.AltitudeId,
+                                    Value = 97
+                                },
+                                new MessageTagDateTime()
+                                {
+                                    TrackerTagId = TagsSeed.TrackerDateId,
+                                    Value = DateTime.Parse("20.12.2022 6:03:52")
+                                },
+                            }
+                        },
+                        new()
                         {
-                            new MessageTagInteger
+                            TrId = 2552,
+                            TrackerDateTime = new DateTime(638071130200000000),
+                            SatNumber = 12,
+                            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+                            Longitude = 52556861 / (double)1000000,
+                            Latitude = 49432023 / (double)1000000,
+                            Speed = 0,
+                            Direction = 28 / (double)10,
+                            Altitude = 97,
+                            FuelLevel = 100,
+                            CoolantTemperature = 45,
+                            EngineSpeed = 901,
+                            Tags = new List<MessageTag>
                             {
-                                TrackerTagId = TagsSeed.RecSn,
-                                Value = 18180
-                            },
-                            new MessageTagByte
-                            {
-                                TrackerTagId = TagsSeed.HdopId,
-                                Value = 6
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.DevStatusId,
-                                Value = 14848
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.PwrExtId,
-                                Value = 14483
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.PwrIntId,
-                                Value = 3606
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.TempIntId,
-                                Value = 8
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Adc4Id,
-                                Value = 14427
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Rs4850Id,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Rs4851Id,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.CanA0Id,
-                                Value = 983966
-                            },
-                            new MessageTagByte()
-                            {
-                                TrackerTagId = TagsSeed.Can8BitR0Id,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.Can32BitR0Id,
-                                Value = 1405370
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.CoordLatitudeId,
-                                Value = 49.432023000000001
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.CoordLongitudeId,
-                                Value = 52.556860999999998
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CoordCorrectnessId,
-                                Value = 0
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CoordSatNumberId,
-                                Value = 12
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CanLogFuelLevelId,
-                                Value = 100
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
-                                Value = 45
-                            },
-                            new MessageTagInteger()
-                            {
-                                TrackerTagId = TagsSeed.CanLogEngineSpeedId,
-                                Value = 901
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.VelocitySpeedId,
-                                Value = 0
-                            },
-                            new MessageTagDouble()
-                            {
-                                TrackerTagId = TagsSeed.VelocityDirectionId,
-                                Value = 2.7999999999999998
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.DeviceIdId,
-                                Value = 2552
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = TagsSeed.AltitudeId,
-                                Value = 97
-                            },
-                            new MessageTagDateTime()
-                            {
-                                TrackerTagId = TagsSeed.TrackerDateId,
-                                Value = DateTime.Parse("20.12.2022 6:03:40")
-                            },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.RecSn,
+                                    Value = 18180
+                                },
+                                new MessageTagByte
+                                {
+                                    TrackerTagId = TagsSeed.HdopId,
+                                    Value = 6
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.DevStatusId,
+                                    Value = 14848
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.PwrExtId,
+                                    Value = 14483
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.PwrIntId,
+                                    Value = 3606
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.TempIntId,
+                                    Value = 8
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Adc4Id,
+                                    Value = 14427
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Rs4850Id,
+                                    Value = 0
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Rs4851Id,
+                                    Value = 0
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.CanA0Id,
+                                    Value = 983966
+                                },
+                                new MessageTagByte()
+                                {
+                                    TrackerTagId = TagsSeed.Can8BitR0Id,
+                                    Value = 0
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.Can32BitR0Id,
+                                    Value = 1405370
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.CoordLatitudeId,
+                                    Value = 49.432023000000001
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.CoordLongitudeId,
+                                    Value = 52.556860999999998
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CoordCorrectnessId,
+                                    Value = 0
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CoordSatNumberId,
+                                    Value = 12
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CanLogFuelLevelId,
+                                    Value = 100
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
+                                    Value = 45
+                                },
+                                new MessageTagInteger()
+                                {
+                                    TrackerTagId = TagsSeed.CanLogEngineSpeedId,
+                                    Value = 901
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.VelocitySpeedId,
+                                    Value = 0
+                                },
+                                new MessageTagDouble()
+                                {
+                                    TrackerTagId = TagsSeed.VelocityDirectionId,
+                                    Value = 2.7999999999999998
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.DeviceIdId,
+                                    Value = 2552
+                                },
+                                new MessageTagInteger
+                                {
+                                    TrackerTagId = TagsSeed.AltitudeId,
+                                    Value = 97
+                                },
+                                new MessageTagDateTime()
+                                {
+                                    TrackerTagId = TagsSeed.TrackerDateId,
+                                    Value = DateTime.Parse("20.12.2022 6:03:40")
+                                },
+                            }
                         }
                     }
-                }
-            },
-        };
+                },
+            };
+        }
+    }
 
     [Theory, MemberData(nameof(Data))]
     public void ParseMessage_ValidTagsValues_ShouldParseCorrectly(
