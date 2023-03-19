@@ -221,47 +221,44 @@ describe('TrackerComponent', () => {
         )
     ));
 
-    cellTexts.slice(0, 1).forEach((rowCellTexts, index) => {
-      const {
-        name,
-        paramName: param,
-        lastValueDateTime: date,
-        lastValueDecimal: decimal
-      } = testStandardParameters[index];
+    cellTexts
+      .slice(0, 1)
+      .forEach((rowCellTexts, index) => {
+        const {
+          name,
+          paramName: param,
+          lastValueDateTime: date,
+          lastValueDecimal: decimal
+        } = testStandardParameters[index];
 
-      let value: string;
+        let value: string;
 
-      switch (param) {
-        case TrackerParameterName.Time:
-          value = formatDate(date!, DATE_FORMAT, 'ru-RU');
+        switch (param) {
+          case TrackerParameterName.Time:
+            value = formatDate(date!, DATE_FORMAT, 'ru-RU');
 
-          break;
-        case TrackerParameterName.Latitude:
-        case TrackerParameterName.Longitude:
-          value = `${decimal}&deg;`;
+            break;
+          case TrackerParameterName.Latitude:
+          case TrackerParameterName.Longitude:
+            value = `${decimal}&deg;`;
 
-          break;
+            break;
 
-        case TrackerParameterName.Altitude:
-          value = `${decimal} m`;
+          case TrackerParameterName.Altitude:
+            value = `${decimal} m`;
 
-          break;
+            break;
 
-        case TrackerParameterName.Speed:
-          value = `${decimal} km/h`;
+          case TrackerParameterName.Speed:
+            value = `${decimal} km/h`;
+        }
 
-          break;
+        const standardParameterTexts = [name, param, value];
 
-        default:
-          value = formatDate(date!, DATE_FORMAT, 'ru-RU') ?? decimal?.toString();
-      }
-
-      const standardParameterTexts = [name, param, value];
-
-      expect(rowCellTexts)
-        .withContext('render cells text')
-        .toEqual(standardParameterTexts);
-    });
+        expect(rowCellTexts)
+          .withContext('render cells text')
+          .toEqual(standardParameterTexts);
+      });
   });
 
   it('should render parameters card', async () => {
@@ -279,6 +276,124 @@ describe('TrackerComponent', () => {
   it('should get parameters', () => {
     expect(parametersSpy)
       .toHaveBeenCalled();
+  });
+
+  it('should render tracker parameter table', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Доступные данные'
+      })
+    );
+
+    const table = await card.getHarnessOrNull(
+      MatTableHarness.with({
+        ancestor: 'mat-card-content'
+      })
+    );
+
+    expect(table)
+      .withContext('render a tracker parameter table')
+      .not.toBeNull();
+  });
+
+  it('should render tracker parameter table rows', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Доступные данные'
+      })
+    );
+
+    const table = await card.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+    const rows = await table.getRows();
+
+    expect(headerRows.length)
+      .withContext('render a header row')
+      .toBe(1);
+
+    expect(rows.length)
+      .withContext('render rows')
+      .toBe(testParameters.length);
+  });
+
+  it('should render tracker parameter table header cells', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Доступные данные'
+      })
+    );
+
+    const table = await card.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+
+    const [headerCells] = await parallel(() => headerRows.map(
+      row => row.getCells()
+    ));
+
+    expect(headerCells.length)
+      .withContext('render header cells')
+      .toBe(trackerParameterColumns.length - 1);
+
+    const headerCellTexts = await parallel(
+      () => headerCells.map(cell => cell.getText())
+    );
+
+    const columnLabels = trackerParameterColumns
+      .slice(1)
+      .map(({ value }) => value);
+
+    expect(headerCellTexts)
+      .withContext('render column labels')
+      .toEqual(columnLabels);
+  });
+
+  it('should render tracker parameter table cells', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Доступные данные'
+      })
+    );
+
+    const table = await card.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells()
+    ));
+
+    cells.forEach(({ length }) => {
+      expect(length)
+        .withContext('render cells')
+        .toBe(trackerParameterColumns.length - 1);
+    });
+
+    const cellTexts = await parallel(() => cells.map(
+      rowCells =>
+        parallel(
+          () => rowCells.map(cell => cell.getText())
+        )
+    ));
+
+    cellTexts
+      .slice(0, 1)
+      .forEach((rowCellTexts, index) => {
+        const {
+          paramName: param,
+          lastValueDateTime: date,
+          lastValueDecimal: decimal,
+          lastValueString: string
+        } = testParameters[index];
+
+        const value = param === TrackerParameterName.Time
+          ? formatDate(date!, DATE_FORMAT, 'ru-RU')
+          : decimal?.toString() ?? string!;
+
+        const parameterTexts = [param, value];
+
+        expect(rowCellTexts)
+          .withContext('render cells text')
+          .toEqual(parameterTexts);
+      });
   });
 
   it('should render sensors card', async () => {

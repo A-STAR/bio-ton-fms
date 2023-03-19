@@ -43,7 +43,29 @@
 <mat-card>
   <mat-card-title>Доступные данные</mat-card-title>
 
-  <ng-container *ngIf="parameters$ | async"></ng-container>
+  <mat-card-content>
+    <mat-table [dataSource]="parametersDataSource" *ngIf="parameters$ | async">
+      <ng-container [matColumnDef]="column.key" *ngFor="let column of parameterColumns | slice:1">
+        <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+
+        <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+          <ng-container [ngSwitch]="element.param" *ngSwitchCase="ParameterColumn.Value">
+            <ng-container *ngSwitchCase="TrackerParameterName.Time">
+              {{ element[column.key] | date:DATE_FORMAT }}
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+          </ng-container>
+
+          <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="parameterColumnKeys | slice:1"></mat-header-row>
+
+      <mat-row *matRowDef="let row; columns: parameterColumnKeys | slice:1"></mat-row>
+    </mat-table>
+  </mat-card-content>
 </mat-card>
 
 <mat-card>
