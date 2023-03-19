@@ -86,7 +86,7 @@ internal static class BinaryParsingExtensions
 
         return new CanLog
         {
-            СoolantTemperature = bytes[1] - 40,
+            CoolantTemperature = bytes[1] - 40,
             EngineSpeed = ParseToInt(bytes[2..]) / 8,
             FuelLevel = bytes[0] * 4 / 10
         };
@@ -104,7 +104,7 @@ internal class Coordinates
 internal class CanLog
 {
     internal int FuelLevel { get; set; }
-    internal int СoolantTemperature { get; set; }
+    internal int CoolantTemperature { get; set; }
     internal int EngineSpeed { get; set; }
 }
 

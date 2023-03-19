@@ -7,6 +7,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using BioTonFMS.TrackerMessageHandler.MessageParsing;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
@@ -47,7 +48,18 @@ public class GalileoskyMessageParserTests
                             {
                                 Value = 23,
                                 TrackerTagId = 2
-                            }
+                            },
+                            new MessageTagString()
+                            {
+                                Value = "862057047615601",
+                                TrackerTagId = 3
+                            },
+                            new MessageTagInteger()
+                            {
+                                Value = 1836,
+                                TrackerTagId = 4
+                            },
+                            
                         }
                     }
                 }
@@ -68,7 +80,7 @@ public class GalileoskyMessageParserTests
                         Latitude = 49432023 / (double)1000000,
                         Speed = 0,
                         Direction = 28 / (double)10,
-                        Height = 97,
+                        Altitude = 97,
                         FuelLevel = 100,
                         CoolantTemperature = 45,
                         EngineSpeed = 901,
@@ -76,64 +88,124 @@ public class GalileoskyMessageParserTests
                         {
                             new MessageTagInteger
                             {
-                                TrackerTagId = 5,
+                                TrackerTagId = TagsSeed.RecSn,
                                 Value = 18181
                             },
                             new MessageTagByte
                             {
-                                TrackerTagId = 10,
+                                TrackerTagId = TagsSeed.HdopId,
                                 Value = 6
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 11,
+                                TrackerTagId = TagsSeed.DevStatusId,
                                 Value = 14848
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 12,
+                                TrackerTagId = TagsSeed.PwrExtId,
                                 Value = 13404
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 13,
+                                TrackerTagId = TagsSeed.PwrIntId,
                                 Value = 3606
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 14,
+                                TrackerTagId = TagsSeed.TempIntId,
                                 Value = 8
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 20,
+                                TrackerTagId = TagsSeed.Adc4Id,
                                 Value = 0
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 23,
+                                TrackerTagId = TagsSeed.Rs4850Id,
                                 Value = 0
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 24,
+                                TrackerTagId = TagsSeed.Rs4851Id,
                                 Value = 0
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 25,
+                                TrackerTagId = TagsSeed.CanA0Id,
                                 Value = 983966
                             },
-                            new MessageTagInteger
+                            new MessageTagByte()
                             {
-                                TrackerTagId = 28,
+                                TrackerTagId = TagsSeed.Can8BitR0Id,
                                 Value = 0
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 34,
+                                TrackerTagId = TagsSeed.Can32BitR0Id,
                                 Value = 1405370
-                            }
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.CoordLatitudeId,
+                                Value = 49.432023000000001
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.CoordLongitudeId,
+                                Value = 52.556860999999998
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CoordCorrectnessId,
+                                Value = 0
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CoordSatNumberId,
+                                Value = 12
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CanLogFuelLevelId,
+                                Value = 100
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
+                                Value = 45
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CanLogEngineSpeedId,
+                                Value = 901
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.VelocitySpeedId,
+                                Value = 0
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.VelocityDirectionId,
+                                Value = 2.7999999999999998
+                            },
+                            new MessageTagInteger
+                            {
+                                TrackerTagId = TagsSeed.DeviceIdId,
+                                Value = 2552
+                            },
+                            new MessageTagInteger
+                            {
+                                TrackerTagId = TagsSeed.AltitudeId,
+                                Value = 97
+                            },
+                            new MessageTagDateTime()
+                            {
+                                TrackerTagId = TagsSeed.TrackerDateId,
+                                Value = DateTime.Parse("20.12.2022 6:03:52")
+                            },
                         }
                     },
                     new()
@@ -146,7 +218,7 @@ public class GalileoskyMessageParserTests
                         Latitude = 49432023 / (double)1000000,
                         Speed = 0,
                         Direction = 28 / (double)10,
-                        Height = 97,
+                        Altitude = 97,
                         FuelLevel = 100,
                         CoolantTemperature = 45,
                         EngineSpeed = 901,
@@ -154,64 +226,124 @@ public class GalileoskyMessageParserTests
                         {
                             new MessageTagInteger
                             {
-                                TrackerTagId = 5,
-                                Value = 18182
+                                TrackerTagId = TagsSeed.RecSn,
+                                Value = 18180
                             },
                             new MessageTagByte
                             {
-                                TrackerTagId = 10,
+                                TrackerTagId = TagsSeed.HdopId,
                                 Value = 6
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 11,
+                                TrackerTagId = TagsSeed.DevStatusId,
                                 Value = 14848
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 12,
-                                Value = 13404
+                                TrackerTagId = TagsSeed.PwrExtId,
+                                Value = 14483
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 13,
+                                TrackerTagId = TagsSeed.PwrIntId,
                                 Value = 3606
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 14,
+                                TrackerTagId = TagsSeed.TempIntId,
                                 Value = 8
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 20,
+                                TrackerTagId = TagsSeed.Adc4Id,
+                                Value = 14427
+                            },
+                            new MessageTagInteger
+                            {
+                                TrackerTagId = TagsSeed.Rs4850Id,
                                 Value = 0
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 23,
+                                TrackerTagId = TagsSeed.Rs4851Id,
                                 Value = 0
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 24,
-                                Value = 0
-                            },
-                            new MessageTagInteger
-                            {
-                                TrackerTagId = 25,
+                                TrackerTagId = TagsSeed.CanA0Id,
                                 Value = 983966
                             },
-                            new MessageTagInteger
+                            new MessageTagByte()
                             {
-                                TrackerTagId = 28,
+                                TrackerTagId = TagsSeed.Can8BitR0Id,
                                 Value = 0
                             },
                             new MessageTagInteger
                             {
-                                TrackerTagId = 34,
+                                TrackerTagId = TagsSeed.Can32BitR0Id,
                                 Value = 1405370
-                            }
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.CoordLatitudeId,
+                                Value = 49.432023000000001
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.CoordLongitudeId,
+                                Value = 52.556860999999998
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CoordCorrectnessId,
+                                Value = 0
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CoordSatNumberId,
+                                Value = 12
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CanLogFuelLevelId,
+                                Value = 100
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
+                                Value = 45
+                            },
+                            new MessageTagInteger()
+                            {
+                                TrackerTagId = TagsSeed.CanLogEngineSpeedId,
+                                Value = 901
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.VelocitySpeedId,
+                                Value = 0
+                            },
+                            new MessageTagDouble()
+                            {
+                                TrackerTagId = TagsSeed.VelocityDirectionId,
+                                Value = 2.7999999999999998
+                            },
+                            new MessageTagInteger
+                            {
+                                TrackerTagId = TagsSeed.DeviceIdId,
+                                Value = 2552
+                            },
+                            new MessageTagInteger
+                            {
+                                TrackerTagId = TagsSeed.AltitudeId,
+                                Value = 97
+                            },
+                            new MessageTagDateTime()
+                            {
+                                TrackerTagId = TagsSeed.TrackerDateId,
+                                Value = DateTime.Parse("20.12.2022 6:03:40")
+                            },
                         }
                     }
                 }
@@ -220,19 +352,19 @@ public class GalileoskyMessageParserTests
 
     [Theory, MemberData(nameof(Data))]
     public void ParseMessage_ValidTagsValues_ShouldParseCorrectly(
-        string link, string str, TrackerMessage[] expected)
+        string sourseDescription, string messageAsText, TrackerMessage[] expected)
     {
-        _testOutputHelper.WriteLine(link);
-        _testOutputHelper.WriteLine(str);
+        _testOutputHelper.WriteLine(sourseDescription);
+        _testOutputHelper.WriteLine(messageAsText);
 
         var results = new List<TrackerMessage>();
         var parser = SetupGalileoskyMessageParser(results);
 
-        var message = str.Split()
+        var messageBytes = messageAsText.Split()
             .Select(x => byte.Parse(x, NumberStyles.HexNumber))
             .ToArray();
 
-        parser.ParseMessage(message, Guid.NewGuid());
+        parser.ParseMessage(messageBytes, Guid.NewGuid());
 
         Assert.Equal(expected.Length, results.Count);
 
@@ -244,7 +376,7 @@ public class GalileoskyMessageParserTests
             Assert.Equal(expected[i].TrId, results[i].TrId);
             Assert.Equal(expected[i].CoordCorrectness, results[i].CoordCorrectness);
             Assert.Equal(expected[i].Direction, results[i].Direction);
-            Assert.Equal(expected[i].Height, results[i].Height);
+            Assert.Equal(expected[i].Altitude, results[i].Altitude);
             Assert.Equal(expected[i].Longitude, results[i].Longitude);
             Assert.Equal(expected[i].Latitude, results[i].Latitude);
             Assert.Equal(expected[i].Speed, results[i].Speed);
@@ -255,6 +387,17 @@ public class GalileoskyMessageParserTests
             Assert.Equal(expected[i].FuelLevel, results[i].FuelLevel);
 
             Assert.Equal(expected[i].Tags.Count, results[i].Tags.Count);
+            foreach (var expectedTag in expected[i].Tags)
+            {
+                var targetTags = results[i].Tags.Where(t => t.TrackerTagId == expectedTag.TrackerTagId).ToArray();
+                var hint = $"TrackerTagId: {expectedTag.TrackerTagId}";
+                targetTags.Length.Should().Be(1, hint);
+                var targetTag = targetTags[0];
+                targetTag.Should().BeOfType(expectedTag.GetType(), hint);
+                targetTag.IsFallback.Should().Be(expectedTag.IsFallback, hint);
+                targetTag.SensorId.Should().Be(expectedTag.SensorId, hint);
+                targetTag.GetValue().Should().Be(expectedTag.GetValue(), hint);
+            }
         }
     }
 
@@ -328,7 +471,7 @@ public class GalileoskyMessageParserTests
             Assert.Equal(expected[i].TrId, results[i].TrId);
             Assert.Equal(expected[i].CoordCorrectness, results[i].CoordCorrectness);
             Assert.Equal(expected[i].Direction, results[i].Direction);
-            Assert.Equal(expected[i].Height, results[i].Height);
+            Assert.Equal(expected[i].Altitude, results[i].Altitude);
             Assert.Equal(expected[i].Longitude, results[i].Longitude);
             Assert.Equal(expected[i].Latitude, results[i].Latitude);
             Assert.Equal(expected[i].Speed, results[i].Speed);
@@ -380,7 +523,8 @@ public class GalileoskyMessageParserTests
             .Where(x => x.TrackerType == TrackerTypeEnum.GalileoSkyV50)
             .Select(x =>
             {
-                x.Tag = trackerTags[x.TagId];
+                trackerTags.TryGetValue(x.TagId, out var tag);
+                x.Tag = tag;
                 return x;
             })
             .ToArray();

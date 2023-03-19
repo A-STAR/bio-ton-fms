@@ -59,7 +59,7 @@ public class TrackerMessage : EntityBase, IAggregateRoot
     /// <summary>
     /// Высота
     /// </summary>
-    public double? Height { get; set; }
+    public double? Altitude { get; set; }
     
     /// <summary>
     /// Скорость

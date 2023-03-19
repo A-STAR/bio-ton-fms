@@ -40,7 +40,7 @@ public static class Seeds
             .RuleFor(v => v.Latitude, (f, _) => f.Random.Double(-90, 90).OrNull(f, .1f))
             .RuleFor(v => v.Longitude, (f, v) => v.Latitude is null ? null : f.Random.Double(-180, 180))
             .RuleFor(v => v.Speed, (f, _) => f.Random.Double(0, 120).OrNull(f, .1f))
-            .RuleFor(v => v.Height, (f, _) => f.Random.Double(-90, 90).OrNull(f, .1f))
+            .RuleFor(v => v.Altitude, (f, _) => f.Random.Double(-90, 90).OrNull(f, .1f))
             .RuleFor(v => v.CoolantTemperature, (f, _) => f.Random.Int(-40, 180).OrNull(f, .1f))
             .RuleFor(v => v.Direction, (f, _) => f.Random.Double(-180, 180).OrNull(f, .1f))
             .RuleFor(v => v.FuelLevel, (f, _) => f.Random.Int(0, 100).OrNull(f, .1f))

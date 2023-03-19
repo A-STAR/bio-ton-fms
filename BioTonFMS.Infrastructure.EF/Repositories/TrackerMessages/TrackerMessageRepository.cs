@@ -76,10 +76,10 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Speed;
 
-        stdParams.Alt = last.Height ?? QueryableProvider.Linq()
-            .Where(x => x.Height != null && x.TrId == externalId || x.Imei == imei)
+        stdParams.Alt = last.Altitude ?? QueryableProvider.Linq()
+            .Where(x => x.Altitude != null && x.TrId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
-            .FirstOrDefault()?.Height;
+            .FirstOrDefault()?.Altitude;
 
         return stdParams;
     }
