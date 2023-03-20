@@ -79,7 +79,7 @@ describe('VehiclesComponent', () => {
 
   it('should render create vehicle button', async () => {
     const createVehicleButton = await loader.getHarnessOrNull(MatButtonHarness.with({
-      selector: '[mat-stroked-button]',
+      variant: 'stroked',
       text: 'Добавить технику'
     }));
 
@@ -407,7 +407,7 @@ describe('VehiclesComponent', () => {
 
   it('should create vehicle', async () => {
     const createVehicleButton = await loader.getHarness(MatButtonHarness.with({
-      selector: '[mat-stroked-button]',
+      variant: 'stroked',
       text: 'Добавить технику'
     }));
 

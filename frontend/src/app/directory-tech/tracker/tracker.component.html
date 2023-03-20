@@ -41,7 +41,11 @@
 </mat-card>
 
 <mat-card>
-  <mat-card-title>Доступные данные</mat-card-title>
+  <mat-card-header>
+    <mat-card-title>Доступные параметры</mat-card-title>
+
+    <button mat-stroked-button color="accent">История значений</button>
+  </mat-card-header>
 
   <mat-card-content>
     <mat-table [dataSource]="parametersDataSource" *ngIf="parameters$ | async">
@@ -70,9 +74,9 @@
 
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Дополнительные параметры</mat-card-title>
+    <mat-card-title>Датчики</mat-card-title>
 
-    <button mat-flat-button color="accent" (click)="onCreateSensor()">Добавить запись</button>
+    <button mat-flat-button color="accent" (click)="onCreateSensor()">Добавить датчик</button>
   </mat-card-header>
 
   <mat-card-content>

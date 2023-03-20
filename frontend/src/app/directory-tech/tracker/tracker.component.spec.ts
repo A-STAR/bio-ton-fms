@@ -9,6 +9,7 @@ import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatCardHeader } from '@angular/material/card';
 import { MatCardHarness } from '@angular/material/card/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -264,13 +265,33 @@ describe('TrackerComponent', () => {
   it('should render parameters card', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
     expect(card)
-      .withContext('render parameters card')
+      .withContext('render card')
       .not.toBeNull();
+
+    const cardHeader = fixture.debugElement
+      .query(
+        By.css('mat-card:nth-of-type(2)')
+      )
+      .query(
+        By.directive(MatCardHeader)
+      );
+
+    expect(cardHeader)
+      .withContext('render card header')
+      .not.toBeNull();
+
+    card.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-card-header',
+        text: 'История значений',
+        variant: 'stroked'
+      })
+    );
   });
 
   it('should get parameters', () => {
@@ -281,7 +302,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -299,7 +320,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table rows', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -319,7 +340,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table header cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -350,7 +371,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -399,13 +420,33 @@ describe('TrackerComponent', () => {
   it('should render sensors card', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
     expect(card)
-      .withContext('render sensors card')
+      .withContext('render card')
       .not.toBeNull();
+
+    const cardHeader = fixture.debugElement
+      .query(
+        By.css('mat-card:nth-of-type(3)')
+      )
+      .query(
+        By.directive(MatCardHeader)
+      );
+
+    expect(cardHeader)
+      .withContext('render card header')
+      .not.toBeNull();
+
+    await card.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-card-header',
+        text: 'Добавить датчик',
+        variant: 'flat'
+      })
+    );
   });
 
   it('should get sensors', () => {
@@ -416,7 +457,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -434,7 +475,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table rows', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -454,7 +495,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table header cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -487,7 +528,7 @@ describe('TrackerComponent', () => {
   it('should render sensor table action cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -543,7 +584,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -592,7 +633,7 @@ describe('TrackerComponent', () => {
   it('should render sensor table visibility cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -622,36 +663,17 @@ describe('TrackerComponent', () => {
     });
   });
 
-  it('should render create sensor button', async () => {
-    const card = await loader.getHarness(
-      MatCardHarness.with({
-        title: 'Дополнительные параметры'
-      })
-    );
-
-    const createSensorButton = await card.getHarnessOrNull(
-      MatButtonHarness.with({
-        variant: 'flat',
-        text: 'Добавить запись'
-      })
-    );
-
-    expect(createSensorButton)
-      .withContext('render a create sensor button')
-      .not.toBeNull();
-  });
-
   it('should create tracker sensor', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
     const createSensorButton = await card.getHarness(
       MatButtonHarness.with({
         variant: 'flat',
-        text: 'Добавить запись'
+        text: 'Добавить датчик'
       })
     );
 
