@@ -1,9 +1,12 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
+using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Services;
+using BioTonFMS.Telematica.Dtos.Parameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -63,5 +66,31 @@ public class TrackerDataController : ValidationControllerBase
 
         IList<TrackerParameter> parameters = _messageRepository.GetParameters(tracker.ExternalId, tracker.Imei);
         return Ok(parameters);
+    }
+
+    /// <summary>
+    /// Возвращает историю полученных параметров трекера
+    /// </summary>
+    /// <param name="request">Параметры запроса для получения истории параметров трекера</param>
+    /// <response code="200">Список параметров успешно возвращен</response>
+    /// <response code="404">Трекера не существует</response>
+    [HttpGet("tracker/history")]
+    [ProducesResponseType(typeof(ParametersHistoryRecord[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
+    public IActionResult GetParametersHistory([FromQuery] ParametersHistoryRequest request)
+    {
+        Tracker? tracker = _trackerRepository[request.TrackerId];
+
+        if (tracker is null) return NotFound();
+
+        PagedResult<ParametersHistoryRecord> history = _messageRepository.GetParametersHistory(new ParametersHistoryFilter
+        {
+            ExternalId = tracker.ExternalId,
+            Imei = tracker.Imei,
+            PageNum = request.PageNum,
+            PageSize = request.PageSize
+        });
+
+        return Ok(history);
     }
 }

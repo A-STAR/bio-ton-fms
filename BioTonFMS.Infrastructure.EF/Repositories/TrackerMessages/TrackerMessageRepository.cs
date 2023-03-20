@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Text;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
+using BioTonFMS.Infrastructure.Paging;
+using BioTonFMS.Infrastructure.Paging.Extensions;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
@@ -111,8 +112,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 case TagDataTypeEnum.Integer:
                     parameter.LastValueDecimal = ((MessageTagInteger)tag).Value;
                     break;
-                case TagDataTypeEnum.Bits:
-                    parameter.LastValueString = GetBitString(((MessageTagBits)tag).Value);
+                case TagDataTypeEnum.Bits or TagDataTypeEnum.Boolean or TagDataTypeEnum.String:
+                    parameter.LastValueString = tag.ValueString;
                     break;
                 case TagDataTypeEnum.Byte:
                     parameter.LastValueDecimal = ((MessageTagByte)tag).Value;
@@ -120,33 +121,42 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 case TagDataTypeEnum.Double:
                     parameter.LastValueDecimal = ((MessageTagDouble)tag).Value;
                     break;
-                case TagDataTypeEnum.Boolean:
-                    parameter.LastValueString = ((MessageTagBoolean)tag).Value.ToString();
-                    break;
-                case TagDataTypeEnum.String:
-                    parameter.LastValueString = ((MessageTagString)tag).Value;
-                    break;
                 case TagDataTypeEnum.DateTime:
                     parameter.LastValueDateTime = ((MessageTagDateTime)tag).Value;
                     break;
             }
-            
+
             result.Add(parameter);
         }
 
         return result;
     }
-    
-    private static string GetBitString(BitArray bits)
+
+    public PagedResult<ParametersHistoryRecord> GetParametersHistory(ParametersHistoryFilter filter)
     {
-        var sb = new StringBuilder();
+        Dictionary<int, string> tagNames = _tagsRepository.GetTags()
+            .ToDictionary(x => x.Id, x => x.Name);
 
-        for (var i = 0; i < bits.Count; i++)
+        var page = QueryableProvider.Fetch(x => x.Tags).Linq()
+            .Where(x => x.Imei == filter.Imei || x.TrId == filter.ExternalId)
+            .GetPagedQueryable(filter.PageNum, filter.PageSize);
+
+        return new PagedResult<ParametersHistoryRecord>
         {
-            char c = bits[i] ? '1' : '0';
-            sb.Append(c);
-        }
-
-        return sb.ToString();
+            PageSize = page.PageSize,
+            CurrentPage = page.CurrentPage,
+            TolalRowCount = page.TolalRowCount,
+            TotalPageCount = page.TotalPageCount,
+            Results = page.Results.Select(x => new ParametersHistoryRecord
+            {
+                Latitude = x.Latitude,
+                Longitude = x.Longitude,
+                Altitude = x.Altitude,
+                Speed = x.Speed,
+                Time = x.ServerDateTime,
+                Parameters = x.Tags.Aggregate("", (res, tag) =>
+                    res + tagNames[tag.TrackerTagId!.Value] + '=' + tag.ValueString + ',')
+            }).ToList()
+        };
     }
 }
