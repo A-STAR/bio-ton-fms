@@ -1,11 +1,11 @@
 ﻿using BioTonFMS.Infrastructure.Controllers;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
+using BioTonFMS.MessageProcessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -138,7 +138,7 @@ public class TestDataController : ValidationControllerBase
             return BadRequest("Test data service is not available!");
         }
 
-        var messages = _messageRepository.GetMessagesForUpdate();
+        var messages = _messageRepository.GetMessages(forUpdate: true);
         var pageWithTrackers = _trackerRepository.GetTrackers(new TrackersFilter
         {
             PageSize = 10000
@@ -146,11 +146,11 @@ public class TestDataController : ValidationControllerBase
         for (var i = 0; i < messages.Count; i++)
         {
             var message = messages[i];
-            MessageProcessing.CalculateFallBackValues(message, i > 0 ? messages[i - 1] : null);
+            MessageProcessing.MessageProcessing.CalculateFallBackValues(message, i > 0 ? messages[i - 1] : null);
         }
         var trackerTags = _trackerTagRepository.GetTags().ToArray();
         var exceptionHandler = new LoggingExceptionHandler(_logger);
-        messages.UpdateSensorTags(pageWithTrackers.Results, trackerTags, exceptionHandler);
+        messages.UpdateSensorTags(previousMessage: null, pageWithTrackers.Results, trackerTags, exceptionHandler);
         foreach (var message in messages)
         {
             _messageRepository.Update(message);

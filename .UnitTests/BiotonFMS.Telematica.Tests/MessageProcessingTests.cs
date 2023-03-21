@@ -2,9 +2,7 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
-using BioTonFMS.Expressions.Compilation;
-using BioTonFMS.Telematica;
-using BioTonFMS.Telematica.Expressions;
+using BioTonFMS.MessageProcessing;
 using BiotonFMS.Telematica.Tests.Expressions;
 using FluentAssertions;
 
@@ -236,7 +234,7 @@ public class MessageProcessingTests
         {
             new TrackerMessage
             {
-                TrId = 111, Tags = new List<MessageTag>
+                ExternalTrackerId = 111, Tags = new List<MessageTag>
                 {
                     new MessageTagDouble
                     {
@@ -271,7 +269,7 @@ public class MessageProcessingTests
         };
 
 
-        messages.UpdateSensorTags(trackers, trackerTags);
+        messages.UpdateSensorTags(previousMessage: null, trackers, trackerTags);
 
         messages.Length.Should().Be(1);
         messages[0].Tags.Count.Should().Be(2);

@@ -2,9 +2,8 @@
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.Compilation;
-using BioTonFMS.Telematica.Expressions;
 
-namespace BioTonFMS.Telematica;
+namespace BioTonFMS.MessageProcessing;
 
 public static class MessageProcessing
 {
@@ -184,7 +183,7 @@ public static class MessageProcessing
         IDictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensors, IDictionary<int, string> tagNameByIdDict)
     {
         // Get sequence of built sensors for tracker 
-        var builtTrackerSensors = builtSensors[message.TrId];
+        var builtTrackerSensors = builtSensors[message.ExternalTrackerId];
 
         // Calculate sensor values and put the values to message tags
         var newTags = builtTrackerSensors
@@ -205,11 +204,12 @@ public static class MessageProcessing
     /// </summary>
     /// <param name="messages">Sequence of messages for which sensor values will be calculated. They will be
     /// modified by removing old sensor tags and then adding tags with new sensor values</param>
+    /// <param name="previousMessage">Сообщение предшествующее последовательности обрабатываемых сообщений</param>
     /// <param name="trackers">Trackers for messages. Should contain all trackers which are
     /// referenced by the messages</param>
     /// <param name="trackerTags">Tracker tags used to determine names, types and values of sensor parameters</param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
-    public static void UpdateSensorTags(this IEnumerable<TrackerMessage> messages, IEnumerable<Tracker> trackers,
+    public static void UpdateSensorTags(this IEnumerable<TrackerMessage> messages, TrackerMessage? previousMessage, IEnumerable<Tracker> trackers,
         ICollection<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         // Build sensors
@@ -224,7 +224,6 @@ public static class MessageProcessing
             .ToDictionary(tag => tag.Id, tag => tag.Name);
 
         // Update sensor tags for all messages in sequence
-        TrackerMessage? previousMessage = null;
         foreach (var message in messages)
         {
             message.UpdateSensorTags(previousMessage, builtSensorsByTrackerId, tagNameById);

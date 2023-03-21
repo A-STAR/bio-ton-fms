@@ -6,25 +6,12 @@ using BioTonFMS.Expressions.Ast;
 using BioTonFMS.Expressions.Compilation;
 using BioTonFMS.Expressions.Parsing;
 using BioTonFMS.Expressions.Util;
-using BioTonFMS.Telematica.Controllers.TestData;
+using BioTonFMS.MessageProcessing;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace BioTonFMS.Telematica.Expressions;
 
-public struct SensorProblemDescription
-{
-    public readonly string FieldName;
-    public readonly string Message;
-    public readonly Location? Location; // Используется только для формул
-
-    public SensorProblemDescription(string fieldName, string message, Location? location = null) : this()
-    {
-        FieldName = fieldName;
-        Message = message;
-        Location = location;
-    }
-}
 public static class Validation
 {
     public static IEnumerable<SensorProblemDescription> ValidateSensor(Tracker tracker, IEnumerable<TrackerTag> trackerTags, Sensor sensor,

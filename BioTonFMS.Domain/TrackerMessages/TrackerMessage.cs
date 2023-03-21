@@ -16,9 +16,9 @@ public class TrackerMessage : EntityBase, IAggregateRoot
     public Guid PackageUID { get; set; }
     
     /// <summary>
-    /// Уникальный идентификатор трекера
+    /// Уникальный идентификатор трекера 
     /// </summary>
-    public int TrId { get; set; }
+    public int ExternalTrackerId { get; set; }
     
     /// <summary>
     /// IMEI трекера

@@ -1,8 +1,7 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Expressions.Ast;
-using BioTonFMS.Telematica.Expressions;
 
-namespace BioTonFMS.Telematica;
+namespace BioTonFMS.MessageProcessing;
 
 public static class Postprocess
 {

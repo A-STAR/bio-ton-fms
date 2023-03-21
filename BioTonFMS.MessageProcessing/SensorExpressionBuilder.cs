@@ -2,7 +2,7 @@
 using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.Compilation;
 
-namespace BioTonFMS.Telematica.Expressions;
+namespace BioTonFMS.MessageProcessing;
 
 public class SensorExpressionBuilder : ExpressionBuilder, IExpressionBuilder
 {

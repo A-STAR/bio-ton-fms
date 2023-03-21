@@ -3,9 +3,7 @@ using System.Globalization;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
-using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
-using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -41,7 +39,7 @@ public class GalileoskyMessageParserTests
                         new()
                         {
                             Imei = "862057047615601",
-                            TrId = 1836,
+                            ExternalTrackerId = 1836,
                             Tags = new List<MessageTag>
                             {
                                 new MessageTagInteger
@@ -76,7 +74,7 @@ public class GalileoskyMessageParserTests
                     {
                         new()
                         {
-                            TrId = 2552,
+                            ExternalTrackerId = 2552,
                             TrackerDateTime = new DateTime(638071130320000000),
                             SatNumber = 12,
                             CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
@@ -214,7 +212,7 @@ public class GalileoskyMessageParserTests
                         },
                         new()
                         {
-                            TrId = 2552,
+                            ExternalTrackerId = 2552,
                             TrackerDateTime = new DateTime(638071130200000000),
                             SatNumber = 12,
                             CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
@@ -363,23 +361,22 @@ public class GalileoskyMessageParserTests
         _testOutputHelper.WriteLine(sourseDescription);
         _testOutputHelper.WriteLine(messageAsText);
 
-        var results = new List<TrackerMessage>();
-        var parser = SetupGalileoskyMessageParser(results);
+        var parser = SetupGalileoskyMessageParser();
 
         var messageBytes = messageAsText.Split()
             .Select(x => byte.Parse(x, NumberStyles.HexNumber))
             .ToArray();
 
-        parser.ParseMessage(messageBytes, Guid.NewGuid());
+        var results = parser.ParseMessage(messageBytes, Guid.NewGuid()).ToArray();
 
-        Assert.Equal(expected.Length, results.Count);
+        Assert.Equal(expected.Length, results.Length);
 
         for (var i = 0; i < expected.Length; i++)
         {
             Assert.NotNull(results[i]);
 
             Assert.Equal(expected[i].Imei, results[i].Imei);
-            Assert.Equal(expected[i].TrId, results[i].TrId);
+            Assert.Equal(expected[i].ExternalTrackerId, results[i].ExternalTrackerId);
             Assert.Equal(expected[i].CoordCorrectness, results[i].CoordCorrectness);
             Assert.Equal(expected[i].Direction, results[i].Direction);
             Assert.Equal(expected[i].Altitude, results[i].Altitude);
@@ -447,34 +444,33 @@ public class GalileoskyMessageParserTests
             .Select(x => byte.Parse(x, NumberStyles.HexNumber))
             .ToArray();
 
-        var results = new List<TrackerMessage>();
-        var parser = SetupGalileoskyMessageParser(results);
+        var parser = SetupGalileoskyMessageParser();
 
-        parser.ParseMessage(bytes, Guid.NewGuid());
+        var results = parser.ParseMessage(bytes, Guid.NewGuid()).ToArray();
 
         var settings = new JsonSerializerSettings
         {
-            TypeNameHandling = TypeNameHandling.All,
-            Formatting = Formatting.Indented,
-            NullValueHandling = NullValueHandling.Ignore,
-            Converters = new List<JsonConverter> { new BitArrayConverter() }
+            TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore,
+            Converters = new List<JsonConverter>
+            {
+                new BitArrayConverter()
+            }
         };
 
         var str = JsonConvert.SerializeObject(results, settings);
         File.WriteAllText(expectedPath, str);
 
-        //var str = File.ReadAllText(expectedPath);
-        var expected = JsonConvert.DeserializeObject<List<TrackerMessage>>(str, settings);
+        var expected = JsonConvert.DeserializeObject<TrackerMessage[]>(str, settings);
 
         Assert.NotNull(expected);
-        Assert.Equal(expected!.Count, results.Count);
+        Assert.Equal(expected!.Length, results.Length);
 
-        for (var i = 0; i < expected.Count; i++)
+        for (var i = 0; i < expected.Length; i++)
         {
             Assert.NotNull(results[i]);
 
             Assert.Equal(expected[i].Imei, results[i].Imei);
-            Assert.Equal(expected[i].TrId, results[i].TrId);
+            Assert.Equal(expected[i].ExternalTrackerId, results[i].ExternalTrackerId);
             Assert.Equal(expected[i].CoordCorrectness, results[i].CoordCorrectness);
             Assert.Equal(expected[i].Direction, results[i].Direction);
             Assert.Equal(expected[i].Altitude, results[i].Altitude);
@@ -492,30 +488,12 @@ public class GalileoskyMessageParserTests
     }
 
     #region SetupTools
-
-    private static GalileoskyMessageParser SetupGalileoskyMessageParser(ICollection<TrackerMessage> results)
+    private static GalileoskyMessageParser SetupGalileoskyMessageParser()
     {
-        var messageRepo = SetupMessageRepository(results);
         var tagRepo = SetupTagRepository();
         var logStub = new Mock<ILogger<GalileoskyMessageParser>>();
 
-        return new GalileoskyMessageParser(messageRepo, tagRepo, logStub.Object);
-    }
-
-    private static ITrackerMessageRepository SetupMessageRepository(ICollection<TrackerMessage> list)
-    {
-        var keyValueProviderMock = new KeyValueProviderMock<TrackerMessage, int>(list);
-        var vehicleQueryProviderMock = new QueryableProviderMock<TrackerMessage>(list);
-        var unitOfWorkFactoryMock = new MessagesDBContextUnitOfWorkFactoryMock();
-        var tagStub = new Mock<ITrackerTagRepository>();
-
-        var repo = new TrackerMessageRepository(
-            keyValueProviderMock,
-            vehicleQueryProviderMock,
-            unitOfWorkFactoryMock,
-            tagStub.Object);
-
-        return repo;
+        return new GalileoskyMessageParser(tagRepo, logStub.Object);
     }
 
     private static IProtocolTagRepository SetupTagRepository()
@@ -540,10 +518,8 @@ public class GalileoskyMessageParserTests
 
         return tagStub.Object;
     }
-
     #endregion
 }
-
 public class BitArrayConverter : JsonConverter<BitArray>
 {
     public override void WriteJson(JsonWriter writer, BitArray? value, JsonSerializer serializer)
