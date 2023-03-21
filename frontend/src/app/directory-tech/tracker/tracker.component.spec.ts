@@ -417,6 +417,33 @@ describe('TrackerComponent', () => {
       });
   });
 
+  it('should render parameters history dialog', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Доступные параметры'
+      })
+    );
+
+    const parametersHistoryButton = await card.getHarness(
+      MatButtonHarness.with({
+        text: 'История значений',
+        variant: 'stroked'
+      })
+    );
+
+    await parametersHistoryButton.click();
+
+    const parametersHistoryDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(parametersHistoryDialog)
+      .withContext('render a parameters history dialog')
+      .not.toBeNull();
+
+    await parametersHistoryDialog!.close();
+
+    overlayContainer.ngOnDestroy();
+  });
+
   it('should render sensors card', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({

@@ -11,10 +11,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { BehaviorSubject, filter, map, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 
 import { Tracker, TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
-import { NewSensor, Sensor, SensorDataTypeEnum, SensorService } from '../sensor.service';
+import { Sensor, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
+import { TrackerParametersHistoryDialogComponent } from '../tracker-parameters-history-dialog/tracker-parameters-history-dialog.component';
 
 import { TableDataSource } from '../shared/table/table.data-source';
 
@@ -52,6 +53,17 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   protected TrackerParameterName = TrackerParameterName;
   protected DATE_FORMAT = DATE_FORMAT;
   protected SensorColumn = SensorColumn;
+
+  /**
+   * Open tracker parameters history dialog.
+   */
+  protected onParametersHistory() {
+    const data: Tracker['id'] = Number(
+      this.route.snapshot.paramMap.get('id')!
+    );
+
+    this.dialog.open(TrackerParametersHistoryDialogComponent, { data });
+  }
 
   /**
    * Add a new sensor to sensor table.
