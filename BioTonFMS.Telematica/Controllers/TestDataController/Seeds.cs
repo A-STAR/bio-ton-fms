@@ -74,7 +74,7 @@ public static class Seeds
                 var result = message.Generate(10);
                 result.ForEach(s =>
                 {
-                    s.TrId = v.Tracker!.Id;
+                    s.ExternalTrackerId = v.Tracker!.Id;
                     s.Imei = v.Tracker.Imei;
                 });
                 return result.ToArray();

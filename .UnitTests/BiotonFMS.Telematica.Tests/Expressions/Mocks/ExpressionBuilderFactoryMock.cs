@@ -1,6 +1,6 @@
 ﻿using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.Compilation;
-using BioTonFMS.Telematica.Expressions;
+using BioTonFMS.MessageProcessing;
 
 namespace BiotonFMS.Telematica.Tests.Expressions;
 

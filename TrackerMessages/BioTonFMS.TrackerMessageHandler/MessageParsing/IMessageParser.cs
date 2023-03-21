@@ -1,6 +1,8 @@
+using BioTonFMS.Domain.TrackerMessages;
+
 namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
 
 public interface IMessageParser
 {
-    void ParseMessage(byte[] binaryPackage, Guid packageUID);
+    IEnumerable<TrackerMessage> ParseMessage(byte[] binaryPackage, Guid packageUid);
 }

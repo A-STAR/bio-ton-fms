@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace BioTonFMS.Telematica.Expressions;
+namespace BioTonFMS.MessageProcessing;
 
 public static class SensorExpressionBuilderExtensions
 {

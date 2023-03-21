@@ -120,6 +120,11 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 trackerPredicate = tracker => tracker.ExternalId == filter.ExternalId;
             }
 
+            if (filter.Imei is not null)
+            {
+                trackerPredicate = tracker => tracker.Imei == filter.Imei;
+            }
+
             if (filter.Type.HasValue)
             {
                 Expression<Func<Tracker, bool>> typePredicate =

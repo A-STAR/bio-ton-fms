@@ -1,7 +1,7 @@
 ﻿using BioTonFMS.Expressions;
 using Microsoft.Extensions.Logging;
 
-namespace BioTonFMS.Telematica.Controllers.TestData;
+namespace BioTonFMS.MessageProcessing;
 
 public class LoggingExceptionHandler : IExceptionHandler
 {

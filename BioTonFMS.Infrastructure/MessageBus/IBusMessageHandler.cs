@@ -2,6 +2,6 @@
 {
     public interface IBusMessageHandler
     {
-        Task HandleAsync(byte[] message);
+        Task HandleAsync(byte[] binaryMessage);
     }
 }

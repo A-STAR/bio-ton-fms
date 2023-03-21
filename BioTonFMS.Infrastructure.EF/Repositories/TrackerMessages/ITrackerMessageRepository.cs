@@ -7,10 +7,10 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
 public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 {
-    bool ExistsByUID(Guid uid);
-    IList<TrackerMessage> GetMessagesForUpdate();
-    IList<TrackerMessage> GetMessages();
+    bool ExistsByUid(Guid uid);
+    IList<TrackerMessage> GetMessages(bool forUpdate = false);
     TrackerStandardParameters GetStandardParameters(int externalId, string imei);
     IList<TrackerParameter> GetParameters(int externalId, string imei);
+    TrackerMessage? GetLastMessageFor(TrackerMessage trackerMessage);
     PagedResult<ParametersHistoryRecord> GetParametersHistory(ParametersHistoryFilter filter);
 }

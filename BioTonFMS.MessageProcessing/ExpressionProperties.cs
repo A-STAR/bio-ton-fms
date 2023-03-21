@@ -1,6 +1,6 @@
 ﻿using BioTonFMS.Expressions;
 
-namespace BioTonFMS.Telematica;
+namespace BioTonFMS.MessageProcessing;
 
 public readonly struct ExpressionProperties : IExpressionProperties
 {

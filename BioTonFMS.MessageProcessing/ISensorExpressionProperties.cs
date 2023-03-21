@@ -1,7 +1,7 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Expressions;
 
-namespace BioTonFMS.Telematica.Expressions;
+namespace BioTonFMS.MessageProcessing;
 
 public interface ISensorExpressionProperties : IExpressionProperties
 {
