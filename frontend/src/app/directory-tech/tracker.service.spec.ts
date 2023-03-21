@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import {
   NewTracker,
+  TrackerParameter,
   TrackerParameterName,
   Trackers,
   TrackerService,
@@ -222,7 +223,7 @@ describe('TrackerService', () => {
       .subscribe(standardParameters => {
         expect(standardParameters)
           .withContext('emit standard parameters')
-          .toBe(standardParameters);
+          .toBe(testStandardParameters);
 
         done();
       });
@@ -233,6 +234,25 @@ describe('TrackerService', () => {
     );
 
     standardParametersRequest.flush(testStandardParameters);
+  });
+
+  it('should get parameters', (done: DoneFn) => {
+    service
+      .getParameters(testTrackers.trackers[0].id)
+      .subscribe(parameters => {
+        expect(parameters)
+          .withContext('emit parameters')
+          .toBe(testParameters);
+
+        done();
+      });
+
+    const parametersRequest = httpTestingController.expectOne(
+      `/api/telematica/tracker/parameters/${testNewTracker.id}`,
+      'parameters request'
+    );
+
+    parametersRequest.flush(testParameters);
   });
 });
 
@@ -333,5 +353,32 @@ export const testStandardParameters: TrackerStandardParameter[] = [
     name: 'Скорость',
     paramName: TrackerParameterName.Speed,
     lastValueDecimal: 0.1
+  }
+];
+
+export const testParameters: TrackerParameter[] = [
+  {
+    paramName: 'acc1',
+    lastValueDecimal: 0
+  },
+  {
+    paramName: 'alarm_codeN',
+    lastValueString: 'warn'
+  },
+  {
+    paramName: 'blast_air_tempN',
+    lastValueDecimal: 86.9
+  },
+  {
+    paramName: 'ds1923_humidityX',
+    lastValueDecimal: 35
+  },
+  {
+    paramName: 'gsm_status',
+    lastValueString: 'available'
+  },
+  {
+    paramName: TrackerParameterName.Time,
+    lastValueDateTime: '2023-03-16T09:14:36.422Z'
   }
 ];

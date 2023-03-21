@@ -6,16 +6,11 @@
 
   display: flex
   flex-wrap: wrap
+  align-items: flex-start
   gap: 40px
 
-  /* Emulate sensor data card. */
-  &::after
-    content: ''
-    flex: 1
-    order: 1
-
 h1,
-mat-card:nth-of-type(2)
+mat-card:nth-of-type(3)
   flex: 100%
 
 h1
@@ -26,10 +21,6 @@ h1
 
 mat-card
   flex: 1
-
-  /* Set order after emulated sensor data card. */
-  &:nth-of-type(2)
-    order: 2
 
 mat-card-header
   justify-content: space-between

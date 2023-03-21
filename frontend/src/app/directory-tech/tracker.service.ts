@@ -90,6 +90,17 @@ export class TrackerService {
     return this.httpClient.get<TrackerStandardParameter[]>(`/api/telematica/tracker/standard-parameters/${id}`);
   }
 
+  /**
+   * Get tracker parameters.
+   *
+   * @param id A tracker ID.
+   *
+   * @returns An `Observable' of parameters.
+   */
+  getParameters(id: Tracker['id']) {
+    return this.httpClient.get<TrackerParameter[]>(`/api/telematica/tracker/parameters/${id}`);
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 
@@ -144,4 +155,11 @@ export type TrackerStandardParameter = {
   paramName: TrackerParameterName;
   lastValueDateTime?: string;
   lastValueDecimal?: number;
-};
+}
+
+export type TrackerParameter = {
+  paramName: TrackerParameterName.Time | string;
+  lastValueDateTime?: string;
+  lastValueDecimal?: number;
+  lastValueString?: string;
+}
