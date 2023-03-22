@@ -12,7 +12,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import DirectoryTechComponent, { navigation } from './directory-tech.component';
 
 import routes from '../directory-tech.routes';
-import { TEST_TRACKER_ID } from '../sensor.service.spec';
+import { TEST_TRACKER_ID } from '../tracker.service.spec';
 
 describe('DirectoryTechComponent', () => {
   let component: DirectoryTechComponent;

@@ -17,7 +17,6 @@ import {
 import { SortDirection } from './shared/sort';
 
 import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
-import { testDataSource as testVehiclesDataSource } from './shared/table/table.data-source.spec';
 
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
@@ -245,7 +244,7 @@ describe('VehicleService', () => {
 
   it('should delete vehicle', (done: DoneFn) => {
     service
-      .deleteVehicle(testVehiclesDataSource[0].id)
+      .deleteVehicle(testVehicles.vehicles[0].id)
       .subscribe(response => {
         expect(response)
           .withContext('emit response')

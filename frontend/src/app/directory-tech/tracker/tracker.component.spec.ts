@@ -28,8 +28,8 @@ import TrackerComponent, { SensorColumn, sensorColumns, trackerParameterColumns 
 import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
 import { DATE_FORMAT } from '../trackers/trackers.component';
-import { testParameters, testStandardParameters } from '../tracker.service.spec';
-import { testSensor, testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
+import { testParameters, testStandardParameters, TEST_TRACKER_ID } from '../tracker.service.spec';
+import { testSensor, testSensors } from '../sensor.service.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;

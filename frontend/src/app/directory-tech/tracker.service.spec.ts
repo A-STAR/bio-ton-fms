@@ -6,12 +6,15 @@ import {
   NewTracker,
   TrackerParameter,
   TrackerParameterName,
+  TrackerParametersHistory,
+  TrackerParametersHistoryOptions,
   Trackers,
   TrackerService,
   TrackersOptions,
   TrackersSortBy,
   TrackerStandardParameter,
-  TrackerTypeEnum
+  TrackerTypeEnum,
+  TRACKER_PARAMETERS_HISTORY_PAGE_SIZE
 } from './tracker.service';
 
 import { SortDirection } from './shared/sort';
@@ -256,6 +259,67 @@ describe('TrackerService', () => {
 
     parametersRequest.flush(testParameters);
   });
+
+  it('should get parameters history', (done: DoneFn) => {
+    let testTrackerParametersHistoryOptions: TrackerParametersHistoryOptions | undefined;
+
+    let subscription = service
+      .getParametersHistory(testTrackerParametersHistoryOptions)
+      .subscribe(parametersHistory => {
+        expect(parametersHistory)
+          .withContext('get tracker parameters history without options')
+          .toEqual(testParametersHistory);
+      });
+
+    let parametersHistoryRequest = httpTestingController.expectOne(
+      `/api/telematica/tracker/history?pageNum=${PAGE_NUM}&pageSize=${TRACKER_PARAMETERS_HISTORY_PAGE_SIZE}`,
+      'parameters history request'
+    );
+
+    parametersHistoryRequest.flush(testParametersHistory);
+
+    subscription.unsubscribe();
+
+    testTrackerParametersHistoryOptions = {};
+
+    subscription = service
+      .getParametersHistory(testTrackerParametersHistoryOptions)
+      .subscribe(parametersHistory => {
+        expect(parametersHistory)
+          .withContext('get tracker parameters history with blank options')
+          .toEqual(testParametersHistory);
+      });
+
+    parametersHistoryRequest = httpTestingController.expectOne(
+      `/api/telematica/tracker/history?pageNum=${PAGE_NUM}&pageSize=${TRACKER_PARAMETERS_HISTORY_PAGE_SIZE}`,
+      'parameters history request'
+    );
+
+    parametersHistoryRequest.flush(testParametersHistory);
+
+    subscription.unsubscribe();
+
+    testTrackerParametersHistoryOptions = {
+      trackerId: TEST_TRACKER_ID
+    };
+
+    service.getParametersHistory(testTrackerParametersHistoryOptions)
+      .subscribe(parametersHistory => {
+        expect(parametersHistory)
+          .withContext('get tracker parameters history with tracker ID')
+          .toEqual(testParametersHistory);
+
+        done();
+      });
+
+    parametersHistoryRequest = httpTestingController.expectOne(
+      // eslint-disable-next-line max-len
+      `/api/telematica/tracker/history?pageNum=${PAGE_NUM}&pageSize=${TRACKER_PARAMETERS_HISTORY_PAGE_SIZE}&trackerId=${testTrackerParametersHistoryOptions.trackerId}`,
+      'parameters history request'
+    );
+
+    parametersHistoryRequest.flush(testParametersHistory);
+  });
 });
 
 export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
@@ -272,6 +336,8 @@ export const testTrackerTypeEnum: KeyValue<TrackerTypeEnum, string>[] = [
     value: 'Протокол Wialon'
   }
 ];
+
+export const TEST_TRACKER_ID = 1;
 
 export const testNewTracker: NewTracker = {
   id: 1,
@@ -384,3 +450,31 @@ export const testParameters: TrackerParameter[] = [
     lastValueDateTime: '2023-03-16T09:14:36.422Z'
   }
 ];
+
+export const testParametersHistory: TrackerParametersHistory = {
+  parameters: [
+    {
+      time: '2023-03-23T01:38:11.880998Z',
+      latitude: -77.33591583905098,
+      longitude: -89.8236521368749,
+      altitude: -47.53263511409112,
+      speed: 16.100714299456435,
+      parameters: 'adc3=329,soft=939,RS485[0]=497,adc4=467,pwr_ext=584,tracker_date=03/23/2023 01:38:11,CAN8BITR4=234,'
+    },
+    {
+      time: '2023-03-23T01:38:11.874915Z',
+      latitude: -16.77493846512141,
+      longitude: -42.85802677162167,
+      altitude: 59.12587789103651,
+      parameters: 'rec_sn=857altitude196,term_version=-94,'
+    },
+    {
+      time: '2023-03-23T01:38:11.863854Z',
+      parameters: 'Port 4=740,adc4=629,pwr_int=303,'
+    },
+  ],
+  pagination: {
+    pageIndex: 1,
+    total: 1
+  }
+};

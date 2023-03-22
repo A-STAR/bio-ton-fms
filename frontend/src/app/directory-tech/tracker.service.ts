@@ -51,7 +51,7 @@ export class TrackerService {
    *
    * @param tracker A new tracker.
    *
-   * @returns An `Observable' of creating tracker.
+   * @returns An `Observable' of creating tracker stream.
    */
   createTracker(tracker: NewTracker) {
     return this.httpClient.post('/api/telematica/tracker', tracker);
@@ -62,7 +62,7 @@ export class TrackerService {
    *
    * @param tracker An updated tracker.
    *
-   * @returns An `Observable' of updating tracker.
+   * @returns An `Observable' of updating tracker stream.
    */
   updateTracker(tracker: NewTracker) {
     return this.httpClient.put(`/api/telematica/tracker/${tracker.id}`, tracker);
@@ -73,7 +73,7 @@ export class TrackerService {
    *
    * @param id An deleted tracker ID.
    *
-   * @returns An `Observable` of deleting tracker.
+   * @returns An `Observable` of deleting tracker stream.
    */
   deleteTracker(id: TrackerDataSource['id']) {
     return this.httpClient.delete(`/api/telematica/tracker/${id}`);
@@ -84,7 +84,7 @@ export class TrackerService {
    *
    * @param id A tracker ID.
    *
-   * @returns An `Observable' of standard parameters.
+   * @returns An `Observable' of standard parameters stream.
    */
   getStandardParameters(id: Tracker['id']) {
     return this.httpClient.get<TrackerStandardParameter[]>(`/api/telematica/tracker/standard-parameters/${id}`);
@@ -95,10 +95,36 @@ export class TrackerService {
    *
    * @param id A tracker ID.
    *
-   * @returns An `Observable' of parameters.
+   * @returns An `Observable' of parameters stream.
    */
   getParameters(id: Tracker['id']) {
     return this.httpClient.get<TrackerParameter[]>(`/api/telematica/tracker/parameters/${id}`);
+  }
+
+  /**
+   * Get tracker parameters history.
+   *
+   * @param fromObject Tracker params options.
+   *
+   * @returns An `Observable` of parameters stream.
+   */
+  getParametersHistory(fromObject: TrackerParametersHistoryOptions = {
+    pageNum,
+    pageSize: TRACKER_PARAMETERS_HISTORY_PAGE_SIZE
+  }) {
+    if (!fromObject.pageNum || !fromObject.pageSize) {
+      fromObject = {
+        pageNum,
+        pageSize: TRACKER_PARAMETERS_HISTORY_PAGE_SIZE,
+        ...fromObject
+      };
+    }
+
+    const paramsOptions: HttpParamsOptions = { fromObject };
+
+    const params = new HttpParams(paramsOptions);
+
+    return this.httpClient.get<TrackerParametersHistory>(`/api/telematica/tracker/history`, { params });
   }
 
   constructor(private httpClient: HttpClient) { }
@@ -163,3 +189,22 @@ export type TrackerParameter = {
   lastValueDecimal?: number;
   lastValueString?: string;
 }
+
+export type TrackerParametersHistoryOptions = PaginationOptions & Partial<{
+  trackerId: number;
+}>
+
+export type TrackerParameterHistory = {
+  time: string;
+  speed?: number;
+  latitude?: number;
+  longitude?: number;
+  altitude?: number;
+  parameters: string;
+}
+
+export interface TrackerParametersHistory extends Pagination {
+  parameters: TrackerParameterHistory[];
+}
+
+export const TRACKER_PARAMETERS_HISTORY_PAGE_SIZE = 100;
