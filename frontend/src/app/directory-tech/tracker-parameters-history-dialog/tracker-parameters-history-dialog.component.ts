@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
 import { Observable } from 'rxjs';
 
 import { Tracker, TrackerParametersHistory, TrackerService } from '../tracker.service';

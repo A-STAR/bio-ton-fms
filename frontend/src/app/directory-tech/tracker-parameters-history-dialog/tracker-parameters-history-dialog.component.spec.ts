@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogTitle, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
 import { Observable, of } from 'rxjs';
 
 import { TrackerParametersHistory, TrackerService } from '../tracker.service';
@@ -53,5 +55,19 @@ describe('TrackerParametersHistoryDialogComponent', () => {
   it('should get parameters history', () => {
     expect(parametersHistorySpy)
       .toHaveBeenCalled();
+  });
+
+  it('should render dialog title', async () => {
+    const titleTextDe = fixture.debugElement.query(
+      By.directive(MatDialogTitle)
+    );
+
+    expect(titleTextDe)
+      .withContext('render dialog title element')
+      .not.toBeNull();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog title text')
+      .toBe('История значений параметров');
   });
 });
