@@ -21,6 +21,6 @@ shift
 done
 
 for db in ${param_db[@]}; do
-        find . \( -name "*.sql.gz" \) -ctime +$retention -delete
+        find $directory \( -name "*.sql.gz" \) -ctime +$retention -delete
         pg_dump -U$user -h$host -p$port -d$db -w | gzip > $directory/$db-$(date "+%Y-%m-%d").sql.gz
 done
