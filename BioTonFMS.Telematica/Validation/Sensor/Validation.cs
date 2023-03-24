@@ -12,9 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace BioTonFMS.Telematica.Expressions;
 
-public static class Validation
+public static class ValidationExtension
 {
-    public static IEnumerable<SensorProblemDescription> ValidateSensor(Tracker tracker, IEnumerable<TrackerTag> trackerTags, Sensor sensor,
+    public static IEnumerable<SensorProblemDescription> ValidateSensor(this Tracker tracker, IEnumerable<TrackerTag> trackerTags, Sensor sensor,
         ILogger logger, IValidator<Sensor> sensorValidator)
     {
         Debug.Assert(tracker.Sensors.Contains(sensor));
@@ -30,7 +30,7 @@ public static class Validation
 
         if (tracker.Sensors.Exists(s => s.Name == sensor.Name && !ReferenceEquals(s, sensor)))
         {
-            problemList.Add(new SensorProblemDescription(nameof(sensor.Name), $"Датчик с именем {sensor.Name} уже существует!"));
+            problemList.Add(new SensorProblemDescription(nameof(sensor.Name), $"Датчик с именем {sensor.Name} уже существует"));
         }
 
         var sensorsByName = tracker.Sensors.Where(s => !ReferenceEquals(s, sensor)).ToDictionary(s => s.Name);
@@ -39,7 +39,7 @@ public static class Validation
         if (tagsByName.ContainsKey(sensor.Name))
         {
             problemList.Add(new SensorProblemDescription(nameof(sensor.Name),
-                $"Существует тэг с именем {sensor.Name}! Имя датчика не должно совпадать с именем тэга"));
+                $"Существует параметр трекера с именем {sensor.Name}. Имя датчика не должно совпадать с именем параметра трекера"));
         }
 
         AstNode? ast = null;
@@ -49,7 +49,7 @@ public static class Validation
         }
         catch( ParsingException e )
         {
-            problemList.Add(new SensorProblemDescription(nameof(sensor.Formula), "Синтаксическая ошибка в выражении!", e.Location));
+            problemList.Add(new SensorProblemDescription(nameof(sensor.Formula), "Синтаксическая ошибка в выражении", e.Location));
         }
 
         Variable[]? parameters = null;
@@ -61,7 +61,7 @@ public static class Validation
                 if (!sensorsByName.ContainsKey(parameter.Name) && !tagsByName.ContainsKey(parameter.Name))
                 {
                     problemList.Add(new SensorProblemDescription(nameof(sensor.Formula),
-                        "Выражение содержит ссылку на несуществующий тэг или датчик!", parameter.Location));
+                        "Выражение содержит ссылку на несуществующий параметр трекера или датчик", parameter.Location));
                 }
             }
         }
@@ -71,18 +71,18 @@ public static class Validation
             if (!sensor.ValidationType.HasValue)
             {
                 problemList.Add(new SensorProblemDescription(nameof(sensor.ValidationType),
-                    "Не указан тип валидатора!"));
+                    "Не указан тип валидатора"));
             }
             else if (!Enum.IsDefined(typeof( ValidationTypeEnum ), sensor.ValidationType))
             {
-                problemList.Add(new SensorProblemDescription(nameof(sensor.ValidationType), "Недопустимый тип валидатора!"));
+                problemList.Add(new SensorProblemDescription(nameof(sensor.ValidationType), "Недопустимый тип валидатора"));
             }
 
             // Проверяем, что "валидатор" ссылается на датчик внутри трекера
             if (!tracker.Sensors.Exists(s => s.Id == sensor.ValidatorId))
             {
                 problemList.Add(new SensorProblemDescription(nameof(sensor.ValidatorId),
-                    "Валидатор может ссылаться только на датчики своего трекера!"));
+                    "Валидатор может ссылаться только на датчики своего трекера"));
             }
         }
         else
@@ -111,7 +111,7 @@ public static class Validation
             if (cyclePath.Count == 1)
             {
                 problemList.Add(new SensorProblemDescription("error",
-                    "Внутренняя ошибка! Путь цикла не должен содержать менее двух узлов!"));
+                    "Внутренняя ошибка. Путь цикла не должен содержать менее двух узлов"));
                 return problemList;
             }
             if (sensor.ValidatorId.HasValue && cyclePath[1] == sensorById[sensor.ValidatorId.Value].Name)
@@ -133,7 +133,7 @@ public static class Validation
         return problemList;
     }
 
-    public static string? ValidateSensorRemoval(Tracker tracker, Sensor sensorToDelete, ILogger logger)
+    public static string? ValidateSensorRemoval(this Tracker tracker, Sensor sensorToDelete, ILogger logger)
     {
         var sensorById = tracker.Sensors.ToDictionary(s => s.Id);
         var expressions = tracker.Sensors
@@ -141,6 +141,6 @@ public static class Validation
         var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.PostprocessAst);
 
         var referencingNodes = graph.Where(node => node.Value.Edges.Contains(sensorToDelete.Name)).ToArray();
-        return referencingNodes.Any() ? $"На удаляемый датчик ссылается датчик с именем {referencingNodes[0].Key}!" : null;
+        return referencingNodes.Any() ? $"На удаляемый датчик ссылается датчик с именем {referencingNodes[0].Key}" : null;
     }
 }

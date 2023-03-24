@@ -206,15 +206,15 @@ public class SensorControllerTests
     }
 
     [Fact]
-    public void Delete_Conflict_BadRequest()
+    public void Delete_Conflict_ThrowConflict()
     {
         var controller = GetController();
 
         var result = controller.DeleteSensor(SensorRepositoryMock.ReferencedSensorId);
 
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badResult = result as BadRequestObjectResult;
-        badResult!.StatusCode.Should().Be(400);
+        result.Should().BeOfType<ConflictObjectResult>();
+        var badResult = result as ConflictObjectResult;
+        badResult!.StatusCode.Should().Be(409);
         (badResult.Value as string).Should().Match("*ссылается*");
     }
     

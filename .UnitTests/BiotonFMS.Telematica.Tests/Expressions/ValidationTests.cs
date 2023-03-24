@@ -186,7 +186,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.Formula), "Синтаксическая ошибка в выражении!", new Location(0))
+                new SensorProblemDescription(nameof(Sensor.Formula), "Синтаксическая ошибка в выражении", new Location(0))
             }
         },
         new object[]
@@ -198,7 +198,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.Formula), "Синтаксическая ошибка в выражении!", new Location(3, 1))
+                new SensorProblemDescription(nameof(Sensor.Formula), "Синтаксическая ошибка в выражении", new Location(3, 1))
             }
         },
         new object[]
@@ -210,7 +210,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.Formula), "Выражение содержит ссылку на несуществующий тэг или датчик!",
+                new SensorProblemDescription(nameof(Sensor.Formula), "Выражение содержит ссылку на несуществующий параметр трекера или датчик",
                     new Location(9, 5))
             }
         },
@@ -223,7 +223,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.Name), "Датчик с именем a уже существует!")
+                new SensorProblemDescription(nameof(Sensor.Name), "Датчик с именем a уже существует")
             }
         },
         new object[]
@@ -236,7 +236,7 @@ public class ValidationTests
             new[]
             {
                 new SensorProblemDescription(nameof(Sensor.Name),
-                    "Существует тэг с именем tagA! Имя датчика не должно совпадать с именем тэга")
+                    "Существует параметр трекера с именем tagA. Имя датчика не должно совпадать с именем параметра трекера")
             }
         },
         new object?[]
@@ -258,7 +258,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.ValidationType), "Не указан тип валидатора!")
+                new SensorProblemDescription(nameof(Sensor.ValidationType), "Не указан тип валидатора")
             }
         },
         new object?[]
@@ -282,7 +282,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.ValidatorId), "Валидатор может ссылаться только на датчики своего трекера!")
+                new SensorProblemDescription(nameof(Sensor.ValidatorId), "Валидатор может ссылаться только на датчики своего трекера")
             }
         },
         new object?[]
@@ -294,7 +294,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.ValidationType), "Недопустимый тип валидатора!")
+                new SensorProblemDescription(nameof(Sensor.ValidationType), "Недопустимый тип валидатора")
             }
         },
         new object?[]
@@ -336,7 +336,7 @@ public class ValidationTests
             }
         };
 
-        var validationResults = Validation.ValidateSensor(tracker, trackerTags, sensorToValidate, LoggerMock.GetStub<int>(),
+        var validationResults = tracker.ValidateSensor(trackerTags, sensorToValidate, LoggerMock.GetStub<int>(),
             new SensorValidator(TrackerRepositoryMock.GetStub(), UnitRepositoryMock.GetStub(),
                 SensorTypeRepositoryMock.GetStub())).ToArray();
 
@@ -375,7 +375,7 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.Formula), "Выражение содержит ссылку на несуществующий тэг или датчик!",
+                new SensorProblemDescription(nameof(Sensor.Formula), "Выражение содержит ссылку на несуществующий параметр трекера или датчик",
                     new Location(1, 1))
             }
         },
@@ -418,7 +418,7 @@ public class ValidationTests
             }
         };
 
-        var validationResults = Validation.ValidateSensor(tracker, trackerTags, sensorToValidate, LoggerMock.GetStub<int>(),
+        var validationResults = tracker.ValidateSensor(trackerTags, sensorToValidate, LoggerMock.GetStub<int>(),
             FluentValidatorMock.GetStub<Sensor>()).ToArray();
         CheckValidationResults(referenceProblems, validationResults);
     }
@@ -475,7 +475,7 @@ public class ValidationTests
             }
         };
 
-        var validationResult = Validation.ValidateSensorRemoval(tracker, sensorToDelete, LoggerMock.GetStub<int>());
+        var validationResult = tracker.ValidateSensorRemoval(sensorToDelete, LoggerMock.GetStub<int>());
 
         validationResult.Should().BeNull();
     }
@@ -500,7 +500,7 @@ public class ValidationTests
             }
         };
 
-        var validationResult = Validation.ValidateSensorRemoval(tracker, sensorToDelete, LoggerMock.GetStub<int>());
+        var validationResult = tracker.ValidateSensorRemoval(sensorToDelete, LoggerMock.GetStub<int>());
 
         validationResult.Should().NotBeNull();
         validationResult.Should().Match("*ссылается*");

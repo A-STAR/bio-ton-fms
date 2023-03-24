@@ -39,7 +39,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Sensors
             var sameNameRecord = QueryableProvider.Linq().Where(v => v.Name == sensor.Name && v.TrackerId == sensor.TrackerId);
             if (sameNameRecord.Any())
             {
-                throw new ArgumentException($"Датчик с именем \"{sensor.Name}\" уже существует!");
+                throw new ArgumentException($"Датчик с именем \"{sensor.Name}\" уже существует");
             }
 
             try

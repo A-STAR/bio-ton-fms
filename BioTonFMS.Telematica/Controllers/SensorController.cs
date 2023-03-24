@@ -144,7 +144,7 @@ public class SensorController : ValidationControllerBase
 
         var trackerTags = _trackerTagRepository.GetTags();
 
-        var validationResults = Expressions.Validation.ValidateSensor(tracker, trackerTags, newSensor, _logger, _sensorValidator);
+        var validationResults = tracker.ValidateSensor(trackerTags, newSensor, _logger, _sensorValidator);
 
         var hasValidationErrors = ProcessValidationResults(validationResults);
         if (hasValidationErrors)
@@ -221,7 +221,7 @@ public class SensorController : ValidationControllerBase
 
             var trackerTags = _trackerTagRepository.GetTags();
 
-            var validationResults = Expressions.Validation.ValidateSensor(tracker, trackerTags, updatedSensor, _logger, _sensorValidator);
+            var validationResults = tracker.ValidateSensor(trackerTags, updatedSensor, _logger, _sensorValidator);
 
             var hasValidationErrors = ProcessValidationResults(validationResults);
             if (hasValidationErrors)
@@ -266,13 +266,13 @@ public class SensorController : ValidationControllerBase
         var tracker = _trackerRepository[sensorToDelete.TrackerId];
         if (tracker is null)
         {
-            return BadRequest($"Трекер с идентификатором {sensorToDelete.TrackerId} не существует!");
+            return Conflict($"Трекер с идентификатором {sensorToDelete.TrackerId} не существует");
         }
 
-        var validationResult = Expressions.Validation.ValidateSensorRemoval(tracker, sensorToDelete, _logger);
+        var validationResult = tracker.ValidateSensorRemoval(sensorToDelete, _logger);
         if (!string.IsNullOrEmpty(validationResult))
         {
-            return BadRequest(validationResult);
+            return Conflict(validationResult);
         }
         
         try
