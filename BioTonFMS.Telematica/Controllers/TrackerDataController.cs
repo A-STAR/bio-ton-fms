@@ -76,7 +76,7 @@ public class TrackerDataController : ValidationControllerBase
     /// <response code="200">Список параметров успешно возвращен</response>
     /// <response code="404">Трекера не существует</response>
     [HttpGet("tracker/history")]
-    [ProducesResponseType(typeof(ParametersHistoryRecord[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ParametersHistoryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetParametersHistory([FromQuery] ParametersHistoryRequest request)
     {
