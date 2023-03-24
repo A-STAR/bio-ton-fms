@@ -6,12 +6,12 @@
     public class Pagination
     {
         /// <summary>
-        /// Номер страницы для постраничного вывода
+        /// Номер текущей страницы
         /// </summary>
         public int PageIndex { get; set; }
 
         /// <summary>
-        /// Размер страницы для постраничного вывода
+        /// Общее количество страниц для вывода всех данных
         /// </summary>
         public int Total { get; set; }
     }

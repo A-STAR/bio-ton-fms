@@ -6,6 +6,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Services;
+using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.Parameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -75,7 +76,7 @@ public class TrackerDataController : ValidationControllerBase
     /// <response code="200">Список параметров успешно возвращен</response>
     /// <response code="404">Трекера не существует</response>
     [HttpGet("tracker/history")]
-    [ProducesResponseType(typeof(ParametersHistoryRecord[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ParametersHistoryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetParametersHistory([FromQuery] ParametersHistoryRequest request)
     {
@@ -83,14 +84,25 @@ public class TrackerDataController : ValidationControllerBase
 
         if (tracker is null) return NotFound();
 
-        PagedResult<ParametersHistoryRecord> history = _messageRepository.GetParametersHistory(new ParametersHistoryFilter
-        {
-            ExternalId = tracker.ExternalId,
-            Imei = tracker.Imei,
-            PageNum = request.PageNum,
-            PageSize = request.PageSize
-        });
+        PagedResult<ParametersHistoryRecord> history = _messageRepository.GetParametersHistory(
+            new ParametersHistoryFilter
+            {
+                ExternalId = tracker.ExternalId,
+                Imei = tracker.Imei,
+                PageNum = request.PageNum,
+                PageSize = request.PageSize
+            });
 
-        return Ok(history);
+        var resp = new ParametersHistoryResponse
+        {
+            Parameters = history.Results,
+            Pagination = new Pagination
+            {
+                PageIndex = history.CurrentPage,
+                Total = history.TotalPageCount
+            }
+        };
+
+        return Ok(resp);
     }
 }
