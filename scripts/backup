@@ -1,0 +1,26 @@
+#!/bin/bash
+
+param_db=()
+while [ -n "$1" ]
+do
+case "$1" in
+        -d) directory="$2"
+                shift ;;
+        --db) param_db+=("$2")
+                shift ;;
+        -r) retention="$2"
+                shift ;;
+        -u) user="$2"
+                shift ;;
+        -h) host="$2"
+                shift ;;
+        -p) port="$2"
+                shift ;;
+esac
+shift
+done
+
+for db in ${param_db[@]}; do
+        find . \( -name "*.sql.gz" \) -ctime +$retention -delete
+        pg_dump -U$user -h$host -p$port -d$db -w | gzip > $directory/$db-$(date "+%Y-%m-%d").sql.gz
+done
