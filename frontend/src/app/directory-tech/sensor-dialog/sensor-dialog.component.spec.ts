@@ -19,7 +19,7 @@ import { Observable, of } from 'rxjs';
 import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
-import { SENSOR_CREATED, SensorDialogComponent, SensorDialogData } from './sensor-dialog.component';
+import { SensorDialogComponent, SensorDialogData, SENSOR_CREATED, SENSOR_UPDATED } from './sensor-dialog.component';
 
 import { Tracker } from '../tracker.service';
 
@@ -41,7 +41,7 @@ describe('SensorDialogComponent', () => {
   let loader: HarnessLoader;
   let sensorService: SensorService;
 
-  const dialogRef = jasmine.createSpyObj<MatDialogRef<SensorDialogComponent, true | '' | undefined>>('MatDialogRef', ['close']);
+  const dialogRef = jasmine.createSpyObj<MatDialogRef<SensorDialogComponent, Sensor | '' | undefined>>('MatDialogRef', ['close']);
 
   let sensorGroupsSpy: jasmine.Spy<(this: SensorService) => Observable<SensorGroup[]>>;
   let unitsSpy: jasmine.Spy<(this: SensorService) => Observable<Unit[]>>;
@@ -491,7 +491,7 @@ describe('SensorDialogComponent', () => {
       text: testUnits[1].name
     });
 
-    const testSensor: NewSensor = {
+    const newSensor: NewSensor = {
       name: testNewSensor.name,
       trackerId: testNewSensor.trackerId,
       sensorTypeId: testNewSensor.sensorTypeId,
@@ -507,24 +507,24 @@ describe('SensorDialogComponent', () => {
     };
 
     const testSensorResponse: Sensor = {
-      id: testSensor.trackerId,
+      id: newSensor.trackerId,
       tracker: {
-        id: testSensor.trackerId,
+        id: newSensor.trackerId,
         value: 'Galileo Sky'
       },
-      name: testSensor.name,
+      name: newSensor.name,
       sensorType: {
-        id: testSensor.sensorTypeId,
+        id: newSensor.sensorTypeId,
         value: testSensorGroups[1].sensorTypes![0].name
       },
-      dataType: testSensor.dataType,
-      formula: testSensor.formula,
+      dataType: newSensor.dataType,
+      formula: newSensor.formula,
       unit: {
-        id: testSensor.unitId,
+        id: newSensor.unitId,
         value: testUnits[1].name
       },
-      useLastReceived: testSensor.useLastReceived,
-      visibility: testSensor.visibility
+      useLastReceived: newSensor.useLastReceived,
+      visibility: newSensor.visibility
     };
 
     const createSensorSpy = spyOn(sensorService, 'createSensor')
@@ -539,7 +539,7 @@ describe('SensorDialogComponent', () => {
     await saveButton.click();
 
     expect(sensorService.createSensor)
-      .toHaveBeenCalledWith(testSensor);
+      .toHaveBeenCalledWith(newSensor);
 
     const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
 
@@ -553,6 +553,9 @@ describe('SensorDialogComponent', () => {
     )
       .toBeResolvedTo(false);
 
+    expect(dialogRef.close)
+      .toHaveBeenCalledWith(testSensorResponse);
+
     /* Test fuel control validation. */
 
     createSensorSpy.calls.reset();
@@ -561,15 +564,118 @@ describe('SensorDialogComponent', () => {
       testNewSensor.fuelUse!.toString()
     );
 
-    testSensor.fuelUse = testNewSensor.fuelUse;
-    testSensorResponse.fuelUse = testSensor.fuelUse;
+    testSensorResponse.fuelUse = testNewSensor.fuelUse;
 
     createSensorSpy.and.callFake(() => of(testSensorResponse));
 
     await saveButton.click();
 
+    newSensor.fuelUse = testNewSensor.fuelUse;
+
     expect(sensorService.createSensor)
-      .toHaveBeenCalledWith(testSensor);
+      .toHaveBeenCalledWith(newSensor);
+  });
+
+  it('should submit update sensor form', async () => {
+    component['data'] = testSensor;
+
+    component.ngOnInit();
+
+    const [nameInput, formulaInput] = await loader.getAllHarnesses(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form'
+      })
+    );
+
+    const updatedName = 'Парктроник';
+
+    await nameInput.setValue(updatedName);
+
+    const [typeSelect, dataTypeSelect, unitSelect] = await loader.getAllHarnesses(
+      MatSelectHarness.with({
+        ancestor: 'form#sensor-form'
+      })
+    );
+
+    const updatedGroupIndex = 1;
+    const updatedTypeIndex = 1;
+
+    await typeSelect.clickOptions({
+      text: testSensorGroups[updatedGroupIndex].sensorTypes![updatedTypeIndex].name
+    });
+
+    const updatedDataTypeIndex = 2;
+
+    await dataTypeSelect.clickOptions({
+      text: testSensorDataTypeEnum[updatedDataTypeIndex].value
+    });
+
+    const updatedFormula = 'park_ext';
+
+    await formulaInput.setValue(updatedFormula);
+
+    const updatedUnitIndex = 2;
+
+    await unitSelect.clickOptions({
+      text: testUnits[updatedUnitIndex].name
+    });
+
+    spyOn(sensorService, 'updateSensor')
+      .and.callFake(() => of(null));
+
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="sensor-form"]'
+      })
+    );
+
+    await saveButton.click();
+
+    const newSensor: NewSensor = {
+      ...testNewSensor,
+      name: updatedName,
+      sensorTypeId: testSensorGroups[updatedGroupIndex].sensorTypes![updatedTypeIndex].id,
+      dataType: testSensorDataTypeEnum[updatedDataTypeIndex].key,
+      formula: updatedFormula,
+      unitId: testUnits[updatedUnitIndex].id,
+      visibility: false,
+      fuelUse: undefined
+    };
+
+    expect(sensorService.updateSensor)
+      .toHaveBeenCalledWith(newSensor);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(SENSOR_UPDATED);
+
+    await expectAsync(
+      snackBar.hasAction()
+    )
+      .toBeResolvedTo(false);
+
+    const sensor: Sensor = {
+      ...testSensor,
+      name: updatedName,
+      sensorType: {
+        id: newSensor.sensorTypeId,
+        value: testSensorGroups[updatedGroupIndex].sensorTypes![updatedTypeIndex].name
+      },
+      dataType: newSensor.dataType,
+      formula: updatedFormula,
+      unit: {
+        id: newSensor.unitId,
+        value: testUnits[updatedUnitIndex].name
+      },
+      visibility: newSensor.visibility,
+      fuelUse: newSensor.fuelUse
+    };
+
+    expect(dialogRef.close)
+      .toHaveBeenCalledWith(sensor);
   });
 });
 

@@ -10,7 +10,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { forkJoin, map, Observable, Subscription } from 'rxjs';
+import { forkJoin, map, Observable, Subscription, tap } from 'rxjs';
 
 import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
 
@@ -83,7 +83,7 @@ export class SensorDialogComponent implements OnInit {
       description
     } = value.basic!;
 
-    const sensor: NewSensor = {
+    const newSensor: NewSensor = {
       trackerId: tracker!,
       name: name!,
       sensorTypeId: type!,
@@ -98,13 +98,31 @@ export class SensorDialogComponent implements OnInit {
       description: description ?? undefined
     };
 
-    this.#subscription = this.sensorService
-      .createSensor(sensor)
-      .subscribe((sensor: Sensor) => {
-        this.snackBar.open(SENSOR_CREATED);
+    let sensor$: Observable<Sensor | null>;
 
-        this.dialogRef.close(sensor);
-      });
+    if (typeof this.data === 'number') {
+      sensor$ = this.sensorService.createSensor(newSensor);
+    } else {
+      newSensor.id = this.data.id;
+
+      sensor$ = this.sensorService.updateSensor(newSensor);
+    }
+
+    this.#subscription = sensor$.subscribe((response: Sensor | null) => {
+      const message = typeof this.data === 'number' ? SENSOR_CREATED : SENSOR_UPDATED;
+
+      this.snackBar.open(message);
+
+      let sensor: Sensor;
+
+      if (typeof this.data === 'number') {
+        sensor = response!;
+      } else {
+        sensor = this.#serializeSensor(newSensor);
+      }
+
+      this.dialogRef.close(sensor);
+    });
   }
 
   /**
@@ -121,7 +139,67 @@ export class SensorDialogComponent implements OnInit {
       : control?.enable();
   }
 
+  #sensorTypes!: SensorType[];
+  #units!: Unit[];
   #subscription: Subscription | undefined;
+
+  /**
+   * Map `NewSensor` to `Sensor`.
+   *
+   * @param newSensor `NewSensor` sensor.
+   *
+   * @returns `Sensor` sensor.
+   */
+  #serializeSensor(newSensor: NewSensor) {
+    const {
+      name,
+      sensorTypeId,
+      dataType,
+      formula,
+      unitId,
+      validatorId,
+      validationType,
+      useLastReceived,
+      visibility,
+      fuelUse,
+      description
+    } = newSensor;
+
+    const type = this.#sensorTypes.find(({ id }) => id === sensorTypeId)!;
+    const unit = this.#units.find(({ id }) => id === unitId)!;
+
+    const sensor: Sensor = {
+      id: newSensor.id!,
+      tracker: (this.data as Sensor).tracker,
+      name,
+      sensorType: {
+        id: sensorTypeId,
+        value: type.name,
+      },
+      dataType,
+      formula,
+      unit: {
+        id: unitId,
+        value: unit.name
+      },
+      validationType,
+      useLastReceived,
+      visibility,
+      fuelUse,
+      description
+    };
+
+    if (validatorId) {
+      const validator = this.#sensorTypes.find(({ id }) => id === validatorId)!;
+
+      sensor.validator = {
+        id: validatorId,
+        value: validator.name
+      };
+    }
+
+    return sensor;
+  }
 
   /**
    * Initialize Sensor form.
@@ -218,6 +296,10 @@ export class SensorDialogComponent implements OnInit {
       this.sensorService.validationType$
     ])
       .pipe(
+        tap(([, , units, types]) => {
+          this.#sensorTypes = types;
+          this.#units = units;
+        }),
         map(([groups, dataType, units, types, validation]) => ({ groups, dataType, units, types, validation }))
       );
   }
@@ -258,5 +340,7 @@ type SensorForm = {
   }>;
 }
 
-export const SENSOR_CREATED = 'Сенсор создан';
 const FUEL_USE_PATTERN = /^\d+(?:\.\d{1,2})?$/;
+
+export const SENSOR_CREATED = 'Датчик создан';
+export const SENSOR_UPDATED = 'Датчик обновлён';

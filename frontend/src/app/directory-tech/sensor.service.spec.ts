@@ -180,12 +180,14 @@ describe('SensorService', () => {
     validationTypeRequest.flush(testValidationTypeEnum);
   });
 
-  it('should create tracker', (done: DoneFn) => {
+  it('should create sensor', (done: DoneFn) => {
+    const { id, ...sensor } = testNewSensor;
+
     service
-      .createSensor(testNewSensor)
+      .createSensor(sensor)
       .subscribe(response => {
         expect(response)
-          .withContext('emit response')
+          .withContext('emit new sensor')
           .toBe(testSensor);
 
         done();
@@ -197,6 +199,25 @@ describe('SensorService', () => {
     }, 'create sensor request');
 
     createSensorRequest.flush(testSensor);
+  });
+
+  it('should update sensor', (done: DoneFn) => {
+    service
+      .updateSensor(testNewSensor)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const updateSensorRequest = httpTestingController.expectOne({
+      method: 'PUT',
+      url: `/api/telematica/sensor/${testNewSensor.id}`
+    }, 'update sensor request');
+
+    updateSensorRequest.flush(null);
   });
 });
 
