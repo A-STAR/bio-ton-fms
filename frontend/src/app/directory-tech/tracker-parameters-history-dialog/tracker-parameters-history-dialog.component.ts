@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatTableModule } from '@angular/material/table';
 
 import { Observable, tap } from 'rxjs';
 
@@ -13,7 +14,8 @@ import { TableDataSource } from '../shared/table/table.data-source';
   standalone: true,
   imports: [
     CommonModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTableModule
   ],
   templateUrl: './tracker-parameters-history-dialog.component.html',
   styleUrls: ['./tracker-parameters-history-dialog.component.sass'],
@@ -22,6 +24,8 @@ import { TableDataSource } from '../shared/table/table.data-source';
 export class TrackerParametersHistoryDialogComponent implements OnInit {
   protected parameters$!: Observable<TrackerParametersHistory>;
   protected parametersDataSource!: TableDataSource<ParameterHistoryDataSource>;
+  protected columns = trackerParameterHistoryColumns;
+  protected columnKeys!: string[];
 
   /**
    * Map parameters history data source.
@@ -68,12 +72,29 @@ export class TrackerParametersHistoryDialogComponent implements OnInit {
       );
   }
 
+  /**
+   * Set column keys.
+   */
+  #setColumnKeys() {
+    this.columnKeys = this.columns.map(({ key }) => key);
+  }
+
   constructor(@Inject(MAT_DIALOG_DATA) protected data: Tracker['id'], private trackerService: TrackerService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#setParameters();
+    this.#setColumnKeys();
   }
+}
+
+enum ParameterHistoryColumn {
+  Hash = 'hash',
+  Time = 'time',
+  Speed = 'speed',
+  Coordinates = 'coordinates',
+  Altitude = 'altitude',
+  Parameters = 'parameters',
 }
 
 interface ParameterHistoryDataSource extends Pick<TrackerParameterHistory, 'time' | 'speed' | 'altitude' | 'parameters'> {
@@ -82,3 +103,30 @@ interface ParameterHistoryDataSource extends Pick<TrackerParameterHistory, 'time
     longitude: TrackerParameterHistory['longitude'];
   }
 }
+
+const trackerParameterHistoryColumns: KeyValue<ParameterHistoryColumn, string>[] = [
+  {
+    key: ParameterHistoryColumn.Hash,
+    value: '#'
+  },
+  {
+    key: ParameterHistoryColumn.Time,
+    value: 'Время'
+  },
+  {
+    key: ParameterHistoryColumn.Speed,
+    value: 'Скорость, км/ч'
+  },
+  {
+    key: ParameterHistoryColumn.Coordinates,
+    value: 'Координаты'
+  },
+  {
+    key: ParameterHistoryColumn.Altitude,
+    value: 'Высота, м'
+  },
+  {
+    key: ParameterHistoryColumn.Parameters,
+    value: 'Параметры'
+  }
+];
