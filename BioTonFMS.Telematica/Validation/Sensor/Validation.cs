@@ -33,7 +33,7 @@ public static class ValidationExtension
             problemList.Add(new SensorProblemDescription(nameof(sensor.Name), $"Датчик с именем {sensor.Name} уже существует"));
         }
 
-        var sensorsByName = tracker.Sensors.Where(s => !ReferenceEquals(s, sensor)).ToDictionary(s => s.Name);
+        var existingSensorsByName = tracker.Sensors.Where(s => !ReferenceEquals(s, sensor)).ToDictionary(s => s.Name);
         var tagsByName = trackerTags.ToDictionary(t => t.Name);
 
         if (tagsByName.ContainsKey(sensor.Name))
@@ -58,7 +58,7 @@ public static class ValidationExtension
             parameters = ast.GetVariables().ToArray();
             foreach (var parameter in parameters)
             {
-                if (!sensorsByName.ContainsKey(parameter.Name) && !tagsByName.ContainsKey(parameter.Name))
+                if (!existingSensorsByName.ContainsKey(parameter.Name) && !tagsByName.ContainsKey(parameter.Name))
                 {
                     problemList.Add(new SensorProblemDescription(nameof(sensor.Formula),
                         "Выражение содержит ссылку на несуществующий параметр трекера или датчик", parameter.Location));

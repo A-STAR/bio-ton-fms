@@ -275,7 +275,7 @@ public class ValidationTests
         },
         new object?[]
         {
-            "[POSITIVE] Ссылка на несуществующий датчик, или датчик другого трекера",
+            "[POSITIVE] Ссылка валидатора на несуществующий датчик, или датчик другого трекера",
             new Sensor
             {
                 Formula = "a", Name = "b", ValidatorId = 2224, ValidationType = ValidationTypeEnum.LogicalAnd
@@ -503,6 +503,6 @@ public class ValidationTests
         var validationResult = tracker.ValidateSensorRemoval(sensorToDelete, LoggerMock.GetStub<int>());
 
         validationResult.Should().NotBeNull();
-        validationResult.Should().Match("*ссылается*");
+        validationResult.Should().Match("*На удаляемый датчик ссылается датчик с именем*");
     }    
 }
