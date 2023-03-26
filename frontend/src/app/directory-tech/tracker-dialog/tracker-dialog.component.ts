@@ -114,7 +114,7 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
     let start: string | undefined;
 
     if (this.data) {
-      start = formatDate(this.data.startDate!, 'dd.MM.YYYY HH:mm', 'ru-RU');
+      start = formatDate(this.data.startDate!, inputDateFormat, localeID);
 
       startValidators.push(Validators.required);
     }
@@ -192,6 +192,9 @@ type TrackerForm = {
 export const DATE_PATTERN = /^(0?[1-9]|[12]\d|3[01])\.(0?[1-9]|1[012])\.(19\d{2}|2\d{3})(\s(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d))?$/;
 const SIM_PATTERN = /^\+7\d{10}$/;
 const IMEI_PATTERN = /^\d{15}$/;
+
+export const localeID = 'ru-RU';
+export const inputDateFormat = 'dd.MM.YYYY HH:mm';
 
 export const TRACKER_CREATED = 'GPS-трекер создан';
 export const TRACKER_UPDATED = 'GPS-трекер обновлён';

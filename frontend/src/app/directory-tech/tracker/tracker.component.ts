@@ -19,8 +19,6 @@ import { TrackerParametersHistoryDialogComponent } from '../tracker-parameters-h
 
 import { TableDataSource } from '../shared/table/table.data-source';
 
-import { DATE_FORMAT } from '../trackers/trackers.component';
-
 @Component({
   selector: 'bio-tracker',
   standalone: true,
@@ -51,7 +49,6 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   protected sensorColumnKeys!: string[];
   protected ParameterColumn = TrackerParameterColumn;
   protected TrackerParameterName = TrackerParameterName;
-  protected DATE_FORMAT = DATE_FORMAT;
   protected SensorColumn = SensorColumn;
 
   /**

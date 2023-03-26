@@ -2,7 +2,7 @@ import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
@@ -27,9 +27,10 @@ import { Sensor, Sensors, SensorService } from '../sensor.service';
 import TrackerComponent, { SensorColumn, sensorColumns, trackerParameterColumns } from './tracker.component';
 import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
-import { DATE_FORMAT } from '../trackers/trackers.component';
+import { localeID } from '../tracker-dialog/tracker-dialog.component';
 import { testParameters, testStandardParameters, TEST_TRACKER_ID } from '../tracker.service.spec';
 import { testSensor, testSensors } from '../sensor.service.spec';
+import { dateFormat } from '../trackers/trackers.component.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
@@ -54,7 +55,11 @@ describe('TrackerComponent', () => {
         providers: [
           {
             provide: LOCALE_ID,
-            useValue: 'ru-RU'
+            useValue: localeID
+          },
+          {
+            provide: DATE_PIPE_DEFAULT_OPTIONS,
+            useValue: { dateFormat }
           },
           {
             provide: ActivatedRoute,
@@ -64,7 +69,7 @@ describe('TrackerComponent', () => {
       })
       .compileComponents();
 
-    registerLocaleData(localeRu, 'ru-RU');
+    registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackerComponent);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
@@ -236,7 +241,7 @@ describe('TrackerComponent', () => {
 
         switch (param) {
           case TrackerParameterName.Time:
-            value = formatDate(date!, DATE_FORMAT, 'ru-RU');
+            value = formatDate(date!, dateFormat, localeID);
 
             break;
           case TrackerParameterName.Latitude:
@@ -406,7 +411,7 @@ describe('TrackerComponent', () => {
         } = testParameters[index];
 
         const value = param === TrackerParameterName.Time
-          ? formatDate(date!, DATE_FORMAT, 'ru-RU')
+          ? formatDate(date!, dateFormat, localeID)
           : decimal?.toString() ?? string!;
 
         const parameterTexts = [param, value];

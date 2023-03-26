@@ -51,7 +51,6 @@ export default class TrackersComponent implements OnInit, OnDestroy {
   protected columns = trackerColumns;
   protected columnKeys!: string[];
   protected TrackerColumn = TrackerColumn;
-  protected DATE_FORMAT = DATE_FORMAT;
 
   /**
    * `sortChange` handler sorting trackers.
@@ -321,5 +320,4 @@ export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [
   }
 ];
 
-export const DATE_FORMAT = 'd MMMM y, H:mm';
 export const TRACKER_DELETED = 'GPS-трекер удален';

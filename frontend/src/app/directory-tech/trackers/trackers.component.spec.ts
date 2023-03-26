@@ -1,7 +1,7 @@
 import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -22,8 +22,8 @@ import { Observable, of, throwError } from 'rxjs';
 
 import { Trackers, TrackerService } from '../tracker.service';
 
-import TrackersComponent, { DATE_FORMAT, TrackerColumn, trackerColumns, TRACKER_DELETED } from './trackers.component';
-import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
+import TrackersComponent, { TrackerColumn, trackerColumns, TRACKER_DELETED } from './trackers.component';
+import { localeID, TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import { environment } from '../../../environments/environment';
 import { testTrackers } from '../tracker.service.spec';
@@ -51,13 +51,17 @@ describe('TrackersComponent', () => {
         providers: [
           {
             provide: LOCALE_ID,
-            useValue: 'ru-RU'
+            useValue: localeID
+          },
+          {
+            provide: DATE_PIPE_DEFAULT_OPTIONS,
+            useValue: { dateFormat }
           }
         ]
       })
       .compileComponents();
 
-    registerLocaleData(localeRu, 'ru-RU');
+    registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackersComponent);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
@@ -332,7 +336,7 @@ describe('TrackersComponent', () => {
       } = testTrackers.trackers[index];
 
       const sim = simNumber ? `${simNumber.slice(0, 2)} (${simNumber.slice(2, 5)}) ${simNumber.slice(4)}` : '';
-      const start = formatDate(startDate, DATE_FORMAT, 'ru-RU');
+      const start = formatDate(startDate, dateFormat, localeID);
 
       const trackerTexts = [name, external, type, sim, imei, start, vehicle].map(
         value => value?.toString() ?? ''
@@ -587,3 +591,5 @@ describe('TrackersComponent', () => {
     overlayContainer.ngOnDestroy();
   });
 });
+
+export const dateFormat = 'd MMMM y, H:mm';
