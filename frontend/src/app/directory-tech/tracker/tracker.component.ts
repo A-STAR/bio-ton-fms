@@ -85,7 +85,22 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   protected onUpdateSensor({ id }: SensorDataSource) {
     const data: SensorDialogData<Sensor> = this.#sensors$.value!.find(sensor => sensor.id === id)!;
 
-    this.dialog.open<SensorDialogComponent, SensorDialogData<Sensor>, Sensor>(SensorDialogComponent, { data });
+    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData<Sensor>, Sensor>(SensorDialogComponent, { data });
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(sensor => {
+        const sensors = Array.from(this.#sensors$.value!);
+
+        const index = sensors.findIndex(({ id }) => id === sensor.id);
+
+        sensors[index] = sensor;
+
+        this.#sensors$.next(sensors);
+      });
   }
 
   #sensors$ = new BehaviorSubject<Sensor[] | undefined>(undefined);
