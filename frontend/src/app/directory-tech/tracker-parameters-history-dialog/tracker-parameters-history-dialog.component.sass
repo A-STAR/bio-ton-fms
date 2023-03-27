@@ -1,2 +1,21 @@
+@use 'extends'
+
 \:host
+  @extend %striped-table
+
   display: block
+
+.mat-column-hash,
+.mat-column-speed,
+.mat-column-altitude
+  flex: unset
+
+.mat-column-hash
+  flex-basis: 45px
+
+.mat-column-speed,
+.mat-column-altitude
+  flex-basis: 70px
+
+.mat-column-parameters
+  flex: 2

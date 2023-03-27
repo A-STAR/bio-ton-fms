@@ -2,7 +2,7 @@ import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, formatNumber, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
@@ -227,44 +227,51 @@ describe('TrackerComponent', () => {
         )
     ));
 
-    cellTexts
-      .slice(0, 1)
-      .forEach((rowCellTexts, index) => {
-        const {
-          name,
-          paramName: param,
-          lastValueDateTime: date,
-          lastValueDecimal: decimal
-        } = testStandardParameters[index];
+    cellTexts.forEach((rowCellTexts, index) => {
+      const {
+        name,
+        paramName: param,
+        lastValueDateTime: date,
+        lastValueDecimal: decimal
+      } = testStandardParameters[index];
 
-        let value: string;
+      let value: string;
 
-        switch (param) {
-          case TrackerParameterName.Time:
-            value = formatDate(date!, dateFormat, localeID);
+      switch (param) {
+        case TrackerParameterName.Time:
+          value = formatDate(date!, dateFormat, localeID);
 
-            break;
-          case TrackerParameterName.Latitude:
-          case TrackerParameterName.Longitude:
-            value = `${decimal}&deg;`;
+          break;
+        case TrackerParameterName.Latitude:
+        case TrackerParameterName.Longitude: {
+          const formattedDecimal = formatNumber(decimal!, 'en-US', '1.6-6');
 
-            break;
+          value = `${formattedDecimal}°`;
 
-          case TrackerParameterName.Altitude:
-            value = `${decimal} m`;
-
-            break;
-
-          case TrackerParameterName.Speed:
-            value = `${decimal} km/h`;
+          break;
         }
 
-        const standardParameterTexts = [name, param, value];
+        case TrackerParameterName.Altitude: {
+          const formattedDecimal = formatNumber(decimal!, 'en-US', '1.1-1');
 
-        expect(rowCellTexts)
-          .withContext('render cells text')
-          .toEqual(standardParameterTexts);
-      });
+          value = `${formattedDecimal} м`;
+
+          break;
+        }
+
+        case TrackerParameterName.Speed: {
+          const formattedDecimal = formatNumber(decimal!, 'en-US', '1.1-1');
+
+          value = `${formattedDecimal} км/ч`;
+        }
+      }
+
+      const standardParameterTexts = [name, param, value];
+
+      expect(rowCellTexts)
+        .withContext('render cells text')
+        .toEqual(standardParameterTexts);
+    });
   });
 
   it('should render parameters card', async () => {
@@ -400,26 +407,24 @@ describe('TrackerComponent', () => {
         )
     ));
 
-    cellTexts
-      .slice(0, 1)
-      .forEach((rowCellTexts, index) => {
-        const {
-          paramName: param,
-          lastValueDateTime: date,
-          lastValueDecimal: decimal,
-          lastValueString: string
-        } = testParameters[index];
+    cellTexts.forEach((rowCellTexts, index) => {
+      const {
+        paramName: param,
+        lastValueDateTime: date,
+        lastValueDecimal: decimal,
+        lastValueString: string
+      } = testParameters[index];
 
-        const value = param === TrackerParameterName.Time
-          ? formatDate(date!, dateFormat, localeID)
-          : decimal?.toString() ?? string!;
+      const value = param === TrackerParameterName.Time
+        ? formatDate(date!, dateFormat, localeID)
+        : decimal?.toString() ?? string!;
 
-        const parameterTexts = [param, value];
+      const parameterTexts = [param, value];
 
-        expect(rowCellTexts)
-          .withContext('render cells text')
-          .toEqual(parameterTexts);
-      });
+      expect(rowCellTexts)
+        .withContext('render cells text')
+        .toEqual(parameterTexts);
+    });
   });
 
   it('should render parameters history dialog', async () => {

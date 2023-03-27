@@ -26,6 +26,7 @@ export class TrackerParametersHistoryDialogComponent implements OnInit {
   protected parametersDataSource!: TableDataSource<ParameterHistoryDataSource>;
   protected columns = trackerParameterHistoryColumns;
   protected columnKeys!: string[];
+  protected Column = ParameterHistoryColumn;
 
   /**
    * Map parameters history data source.
@@ -104,7 +105,7 @@ interface ParameterHistoryDataSource extends Pick<TrackerParameterHistory, 'time
   }
 }
 
-const trackerParameterHistoryColumns: KeyValue<ParameterHistoryColumn, string>[] = [
+export const trackerParameterHistoryColumns: KeyValue<ParameterHistoryColumn, string>[] = [
   {
     key: ParameterHistoryColumn.Hash,
     value: '#'

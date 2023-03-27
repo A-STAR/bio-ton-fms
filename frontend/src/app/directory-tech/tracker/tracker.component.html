@@ -19,14 +19,14 @@
             <ng-container [ngTemplateOutlet]="degree" *ngSwitchCase="TrackerParameterName.Longitude"></ng-container>
 
             <ng-container *ngSwitchCase="TrackerParameterName.Altitude">
-              {{ element[column.key] }} m
+              {{ element[column.key] | number: '1.1-1':'en-US' }} м
             </ng-container>
 
             <ng-container *ngSwitchCase="TrackerParameterName.Speed">
-              {{ element[column.key] }} km/h
+              {{ element[column.key] | number: '1.1-1':'en-US' }} км/ч
             </ng-container>
 
-            <ng-template #degree>{{ element[column.key] }}&deg;</ng-template>
+            <ng-template #degree>{{ element[column.key] | number: '1.6-6':'en-US' }}&deg;</ng-template>
           </ng-container>
 
           <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>

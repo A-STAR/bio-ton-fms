@@ -405,22 +405,22 @@ export const testStandardParameters: TrackerStandardParameter[] = [
   {
     name: 'Широта',
     paramName: TrackerParameterName.Latitude,
-    lastValueDecimal: 52.557225
+    lastValueDecimal: 78.5801259148088
   },
   {
     name: 'Долгота',
     paramName: TrackerParameterName.Longitude,
-    lastValueDecimal: 49.557225
+    lastValueDecimal: -110.63479717264961
   },
   {
     name: 'Высота',
     paramName: TrackerParameterName.Altitude,
-    lastValueDecimal: 86.9
+    lastValueDecimal: 86.87415885961714
   },
   {
     name: 'Скорость',
     paramName: TrackerParameterName.Speed,
-    lastValueDecimal: 0.1
+    lastValueDecimal: 7.676381634986047
   }
 ];
 
@@ -435,11 +435,11 @@ export const testParameters: TrackerParameter[] = [
   },
   {
     paramName: 'blast_air_tempN',
-    lastValueDecimal: 86.9
+    lastValueDecimal: 86.62323119282430
   },
   {
     paramName: 'ds1923_humidityX',
-    lastValueDecimal: 35
+    lastValueDecimal: 35.13960513159938
   },
   {
     paramName: 'gsm_status',
@@ -470,8 +470,8 @@ export const testParametersHistory: TrackerParametersHistory = {
     },
     {
       time: '2023-03-23T01:38:11.863854Z',
-      parameters: 'Port 4=740,adc4=629,pwr_int=303,'
-    },
+      parameters: 'Port_4=740,adc4=629,pwr_int=303,'
+    }
   ],
   pagination: {
     pageIndex: 1,
