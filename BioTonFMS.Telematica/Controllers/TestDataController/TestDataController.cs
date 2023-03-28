@@ -1,4 +1,5 @@
-﻿using BioTonFMS.Infrastructure.Controllers;
+﻿using BioTonFMS.Domain.Identity;
+using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
@@ -7,6 +8,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.MessageProcessing;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,13 +33,15 @@ public class TestDataController : ValidationControllerBase
     private readonly ITrackerTagRepository _trackerTagRepository;
     private readonly ILogger<TestDataController> _logger;
     private readonly ITrackerMessageRepository _trackerMessageRepository;
+    private readonly UserManager<AppUser> _userManager;
 
     private bool ServiceEnabled => _configuration["TestDataEnabled"] == "True";
 
     public TestDataController(ITrackerMessageRepository messageRepository,
         ITrackerRepository trackerRepository, ISensorTypeRepository sensorTypeRepository,
         IUnitRepository unitRepository, IConfiguration configuration, ITrackerTagRepository trackerTagRepository,
-        ILogger<TestDataController> logger, ITrackerMessageRepository trackerMessageRepository)
+        ILogger<TestDataController> logger, ITrackerMessageRepository trackerMessageRepository,
+        UserManager<AppUser> userManager)
     {
         _messageRepository = messageRepository;
         _trackerRepository = trackerRepository;
@@ -47,8 +51,38 @@ public class TestDataController : ValidationControllerBase
         _trackerTagRepository = trackerTagRepository;
         _logger = logger;
         _trackerMessageRepository = trackerMessageRepository;
+        _userManager = userManager;
     }
 
+    /// <summary>
+    /// Добавляет тестового пользоветеля test/test в базу данных. 
+    /// </summary>
+    /// <remarks>Это чисто отладочный метод. Поэтому тут нет обработки ошибок. В случае неудачи всегда возвращается статус 500</remarks>
+    /// <response code="200">Данные успешно добавлены в базу</response>
+    /// <response code="500">Внутренняя ошибка сервиса</response>
+    [HttpPost("debug/add-test-user")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddTestUser()
+    {
+        if (!ServiceEnabled)
+        {
+            return BadRequest("Test data service is not available!");
+        }
+        var user = new AppUser
+        {
+            FirstName = "Иван",
+            LastName = "Тестов",
+            UserName = "test",
+        };
+
+        var result = await _userManager.CreateAsync(user, "test");
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+        return Ok();
+    }
 
     /// <summary>
     /// Генерирует и добавляет тестовые данные в базу данных. 
