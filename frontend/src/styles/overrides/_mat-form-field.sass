@@ -10,43 +10,56 @@ mat-form-field
 
   padding-right: $mat-mdc-form-field-icon-suffix-padding
 
-.mdc-text-field--outlined
+.mdc-text-field
 
-  @at-root div#{&}
-    padding-left: map.get($mat-mdc-form-field, padding, horizontal)
-    padding-right: map.get($mat-mdc-form-field, padding, horizontal)
+  &--outlined
 
-  .mdc-notched-outline div
-    $mdc-notched-outline-border-radius: 3px
+    @at-root div#{&}
+      padding-left: map.get($mat-mdc-form-field, padding, horizontal)
+      padding-right: map.get($mat-mdc-form-field, padding, horizontal)
 
-    &.mdc-notched-outline__leading
-      border-top-left-radius: $mdc-notched-outline-border-radius
-      border-bottom-left-radius: $mdc-notched-outline-border-radius
+    .mdc-notched-outline div
+      $mdc-notched-outline-border-radius: 3px
 
-    &.mdc-notched-outline__trailing
-      border-top-right-radius: $mdc-notched-outline-border-radius
-      border-bottom-right-radius: $mdc-notched-outline-border-radius
+      &.mdc-notched-outline
 
-  &:not(.mdc-text-field--disabled, .mdc-text-field--invalid)
+        &__leading
+          border-top-left-radius: $mdc-notched-outline-border-radius
+          border-bottom-left-radius: $mdc-notched-outline-border-radius
 
-    .mdc-notched-outline__leading,
-    .mdc-notched-outline__notch,
-    .mdc-notched-outline__trailing
-      border-color: $light-gray
+        &__trailing
+          border-top-right-radius: $mdc-notched-outline-border-radius
+          border-bottom-right-radius: $mdc-notched-outline-border-radius
 
-    &:not(.mdc-text-field--focused):hover .mdc-notched-outline
+    &:not(.mdc-text-field--disabled, .mdc-text-field--invalid)
 
-      .mdc-notched-outline__leading,
-      .mdc-notched-outline__notch,
-      .mdc-notched-outline__trailing
-        border-color: $gray
+      .mdc-notched-outline
 
-.mdc-text-field--focused div
+        &__leading,
+        &__notch,
+        &__trailing
+          border-color: $light-gray
 
-  &.mdc-notched-outline__leading,
-  &.mdc-notched-outline__notch,
-  &.mdc-notched-outline__trailing
-    border-width: 1px
+      &:not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline
+
+        &__leading,
+        &__notch,
+        &__trailing
+          border-color: $gray
+
+  &--disabled .mdc-notched-outline
+
+    &__leading,
+    &__notch,
+    &__trailing
+      border-color: $lighter-gray
+
+  &--focused div.mdc-notched-outline
+
+    &__leading,
+    &__notch,
+    &__trailing
+      border-width: 1px
 
 .mat-mdc-form-field-text-prefix,
 .mat-mdc-form-field-text-suffix
@@ -69,7 +82,7 @@ mat-form-field
   align-items: center
   min-height: map.get($mat-mdc-form-field, infix, height)
 
-  @at-root div#{&}
+  .mat-mdc-form-field-type-mat-input &
     width: unset
 
   @at-root .mat-mdc-text-field-wrapper.mdc-text-field--outlined &

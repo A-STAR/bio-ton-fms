@@ -204,8 +204,10 @@ describe('VehicleService', () => {
   });
 
   it('should create vehicle', (done: DoneFn) => {
+    const { id, ...vehicle } = testNewVehicle;
+
     service
-      .createVehicle(testNewVehicle)
+      .createVehicle(vehicle)
       .subscribe(response => {
         expect(response)
           .withContext('emit response')

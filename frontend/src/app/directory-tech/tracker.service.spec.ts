@@ -161,8 +161,10 @@ describe('TrackerService', () => {
   });
 
   it('should create tracker', (done: DoneFn) => {
+    const { id, ...tracker } = testNewTracker;
+
     service
-      .createTracker(testNewTracker)
+      .createTracker(tracker)
       .subscribe(response => {
         expect(response)
           .withContext('emit response')

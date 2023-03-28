@@ -121,7 +121,7 @@ describe('VehicleDialogComponent', () => {
     fixture.detectChanges();
 
     expect(titleTextDe.nativeElement.textContent)
-      .withContext('render dialog title text')
+      .withContext('render dialog update title text')
       .toBe('Сводная информация о техническом средстве');
   });
 

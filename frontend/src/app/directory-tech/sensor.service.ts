@@ -16,7 +16,7 @@ export class SensorService {
    * @returns An `Observable` of sensor groups stream.
    */
   get sensorGroups$() {
-    return this.httpClient.get<SensorGroup[]>('/api/telematica/sensorGroups');
+    return this.httpClient.get<SensorGroup[]>('/api/telematica/sensorgroups');
   }
 
   /**
@@ -25,7 +25,7 @@ export class SensorService {
    * @returns An `Observable` of sensor types stream.
    */
   get sensorTypes$() {
-    return this.httpClient.get<SensorType[]>('/api/telematica/sensorTypes');
+    return this.httpClient.get<SensorType[]>('/api/telematica/sensortypes');
   }
 
   /**
@@ -85,6 +85,17 @@ export class SensorService {
     return this.httpClient.post<Sensor>('/api/telematica/sensor', sensor);
   }
 
+  /**
+   * Update a sensor.
+   *
+   * @param sensor An updated sensor.
+   *
+   * @returns An `Observable' of updating sensor.
+   */
+  updateSensor(sensor: NewSensor) {
+    return this.httpClient.put<null>(`/api/telematica/sensor/${sensor.id}`, sensor);
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 
@@ -137,18 +148,30 @@ export type Unit = {
 
 export type Sensor = {
   id: number;
-  tracker: KeyValue<Tracker['id'], Tracker['name']>;
+  tracker: {
+    id: Tracker['id'];
+    value: Tracker['name'];
+  };
   name: string;
+  sensorType: {
+    id: SensorType['id'];
+    value: SensorType['name'];
+  };
   dataType: SensorDataTypeEnum;
-  sensorType: KeyValue<SensorType['id'], SensorType['name']>;
-  description?: string;
   formula?: string;
-  unit: KeyValue<Unit['id'], Unit['name']>;
-  useLastReceived: boolean;
-  validator?: KeyValue<number, string>;
+  unit: {
+    id: Unit['id'];
+    value: Unit['name'];
+  };
+  validator?: {
+    id: SensorType['id'];
+    value: SensorType['name'];
+  };
   validationType?: ValidationTypeEnum;
-  fuelUse?: number;
+  useLastReceived: boolean;
   visibility?: boolean;
+  fuelUse?: number;
+  description?: string;
 }
 
 export interface Sensors extends Pagination {

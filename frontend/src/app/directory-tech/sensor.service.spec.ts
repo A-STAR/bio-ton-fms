@@ -3,7 +3,8 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import {
-  NewSensor, Sensor,
+  NewSensor,
+  Sensor,
   SensorDataTypeEnum,
   SensorGroup,
   Sensors,
@@ -82,7 +83,7 @@ describe('SensorService', () => {
     };
 
     const testTrackerSensors: Sensors = {
-      sensors: testSensors.sensors.filter(({ tracker }) => tracker.key === testSensorsOptions?.trackerId),
+      sensors: testSensors.sensors.filter(({ tracker }) => tracker.id === testSensorsOptions?.trackerId),
       pagination: testSensors.pagination
     };
 
@@ -112,7 +113,7 @@ describe('SensorService', () => {
       done();
     });
 
-    const sensorGroupsRequest = httpTestingController.expectOne('/api/telematica/sensorGroups', 'sensor groups request');
+    const sensorGroupsRequest = httpTestingController.expectOne('/api/telematica/sensorgroups', 'sensor groups request');
 
     sensorGroupsRequest.flush(testSensorGroups);
   });
@@ -126,7 +127,7 @@ describe('SensorService', () => {
       done();
     });
 
-    const sensorTypesRequest = httpTestingController.expectOne('/api/telematica/sensorTypes', 'sensor types request');
+    const sensorTypesRequest = httpTestingController.expectOne('/api/telematica/sensortypes', 'sensor types request');
 
     sensorTypesRequest.flush(testSensorTypes);
   });
@@ -179,12 +180,14 @@ describe('SensorService', () => {
     validationTypeRequest.flush(testValidationTypeEnum);
   });
 
-  it('should create tracker', (done: DoneFn) => {
+  it('should create sensor', (done: DoneFn) => {
+    const { id, ...sensor } = testNewSensor;
+
     service
-      .createSensor(testNewSensor)
+      .createSensor(sensor)
       .subscribe(response => {
         expect(response)
-          .withContext('emit response')
+          .withContext('emit new sensor')
           .toBe(testSensor);
 
         done();
@@ -196,6 +199,25 @@ describe('SensorService', () => {
     }, 'create sensor request');
 
     createSensorRequest.flush(testSensor);
+  });
+
+  it('should update sensor', (done: DoneFn) => {
+    service
+      .updateSensor(testNewSensor)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const updateSensorRequest = httpTestingController.expectOne({
+      method: 'PUT',
+      url: `/api/telematica/sensor/${testNewSensor.id}`
+    }, 'update sensor request');
+
+    updateSensorRequest.flush(null);
   });
 });
 
@@ -390,25 +412,25 @@ export const testSensors: Sensors = {
     {
       id: 1,
       tracker: {
-        key: 1,
+        id: 1,
         value: 'Трекер Arnavi'
       },
       name: 'Пробег',
       visibility: true,
       dataType: SensorDataTypeEnum.String,
       sensorType: {
-        key: 2,
+        id: 2,
         value: 'Датчик пробега'
       },
       description: 'Умный цифровой датчик для пробега',
       formula: '(param1-#param1)/const2',
       unit: {
-        key: 3,
+        id: 3,
         value: 'км/ч'
       },
       useLastReceived: true,
       validator: {
-        key: 2,
+        id: 2,
         value: 'Валидатор пробега'
       },
       fuelUse: 8
@@ -416,24 +438,24 @@ export const testSensors: Sensors = {
     {
       id: 2,
       tracker: {
-        key: 1,
+        id: 1,
         value: 'Трекер TKSTAR'
       },
       name: 'Разгон',
       visibility: false,
       dataType: SensorDataTypeEnum.Boolean,
       sensorType: {
-        key: 2,
+        id: 2,
         value: 'Датчик разгона'
       },
       formula: '(param1+#param1)*const2',
       unit: {
-        key: 2,
+        id: 2,
         value: 'мАч'
       },
       useLastReceived: false,
       validator: {
-        key: 1,
+        id: 1,
         value: 'Валидатор разгона'
       },
       validationType: ValidationTypeEnum.ZeroTest
@@ -441,19 +463,19 @@ export const testSensors: Sensors = {
     {
       id: 3,
       tracker: {
-        key: 2,
+        id: 2,
         value: 'Трекер Micodus MV720'
       },
       name: 'Скорость',
       visibility: true,
       dataType: SensorDataTypeEnum.Number,
       sensorType: {
-        key: 1,
+        id: 1,
         value: 'Датчик скорости'
       },
       description: 'Оповещает о превышении скорости',
       unit: {
-        key: 1,
+        id: 1,
         value: 'мАч'
       },
       useLastReceived: true,
@@ -468,45 +490,46 @@ export const testSensors: Sensors = {
 
 export const TEST_TRACKER_ID = 1;
 
-export const testNewSensor: NewSensor = {
-  trackerId: TEST_TRACKER_ID,
-  name: 'Парковочный радар',
-  dataType: testSensorDataTypeEnum[0].key,
-  sensorTypeId: testSensorTypes[2].id,
-  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.',
-  formula: '(param3+#param1)*param2',
-  unitId: testUnits[1].id,
-  useLastReceived: false,
-  visibility: true,
-  validatorId: testSensorTypes[0].id,
-  validationType: testValidationTypeEnum[0].key,
-  fuelUse: 10
-};
-
-const testSensor: Sensor = {
+export const testSensor: Sensor = {
   id: 1,
   tracker: {
-    key: testNewSensor.trackerId,
+    id: TEST_TRACKER_ID,
     value: 'Galileo Sky'
   },
-  name: testNewSensor.name,
-  visibility: false,
-  dataType: testNewSensor.dataType,
+  name: 'Парковочный радар',
   sensorType: {
-    key: testNewSensor.sensorTypeId,
+    id: testSensorGroups[1].sensorTypes![0].id,
     value: testSensorGroups[1].sensorTypes![0].name
   },
-  description: testNewSensor.description,
-  formula: testNewSensor.formula,
+  dataType: testSensorDataTypeEnum[0].key,
+  formula: '(param1+param2)*param3',
   unit: {
-    key: testNewSensor.unitId,
+    id: testUnits[1].id,
     value: testUnits[1].name
   },
-  useLastReceived: testNewSensor.useLastReceived,
   validator: {
-    key: testNewSensor.validatorId!,
+    id: testSensorTypes[0].id,
     value: testSensorTypes[0].name
   },
-  validationType: testNewSensor.validationType,
-  fuelUse: testNewSensor.fuelUse
+  validationType: testValidationTypeEnum[0].key,
+  useLastReceived: false,
+  visibility: false,
+  fuelUse: 10,
+  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.'
+};
+
+export const testNewSensor: NewSensor = {
+  id: testSensor.id,
+  trackerId: testSensor.tracker.id,
+  name: testSensor.name,
+  sensorTypeId: testSensor.sensorType.id,
+  dataType: testSensor.dataType,
+  formula: testSensor.formula,
+  unitId: testSensor.unit.id,
+  validatorId: testSensor.validator?.id,
+  validationType: testSensor.validationType,
+  useLastReceived: testSensor.useLastReceived,
+  visibility: testSensor.visibility,
+  fuelUse: testSensor.fuelUse,
+  description: testSensor.description
 };

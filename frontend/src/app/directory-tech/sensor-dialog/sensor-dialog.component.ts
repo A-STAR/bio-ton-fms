@@ -10,7 +10,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { forkJoin, map, Observable, Subscription } from 'rxjs';
+import { forkJoin, map, Observable, Subscription, tap } from 'rxjs';
 
 import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
 
@@ -46,12 +46,13 @@ export class SensorDialogComponent implements OnInit {
 
   protected sensorData$!: Observable<{
     groups: SensorGroup[];
-    validators: SensorType[];
-    units: Unit[];
     dataType: KeyValue<string, string>[];
+    units: Unit[];
+    types: SensorType[];
     validation: KeyValue<string, string>[];
   }>;
 
+  protected title!: string;
   protected sensorForm!: FormGroup<SensorForm>;
   protected fuelUseTypeIds: SensorGroup['id'][] = [3, 13, 14];
 
@@ -70,40 +71,58 @@ export class SensorDialogComponent implements OnInit {
     const {
       tracker,
       name,
-      dataType,
       type,
-      description,
+      dataType,
       formula,
       unit,
-      lastReceived,
       validator,
       validationType,
+      lastReceived,
+      visibility,
       fuelUse,
-      visibility
+      description
     } = value.basic!;
 
-    const sensor: NewSensor = {
+    const newSensor: NewSensor = {
       trackerId: tracker!,
       name: name!,
-      dataType: dataType!,
       sensorTypeId: type!,
-      description: description ?? undefined,
+      dataType: dataType!,
       formula: formula!,
       unitId: unit!,
-      useLastReceived: lastReceived ?? false,
       validatorId: validator ?? undefined,
       validationType: validationType!,
+      useLastReceived: lastReceived ?? false,
+      visibility: visibility ?? false,
       fuelUse: fuelUse ?? undefined,
-      visibility: visibility ?? false
+      description: description ?? undefined
     };
 
-    this.#subscription = this.sensorService
-      .createSensor(sensor)
-      .subscribe((sensor: Sensor) => {
-        this.snackBar.open(SENSOR_CREATED);
+    let sensor$: Observable<Sensor | null>;
 
-        this.dialogRef.close(sensor);
-      });
+    if (typeof this.data === 'number') {
+      sensor$ = this.sensorService.createSensor(newSensor);
+    } else {
+      newSensor.id = this.data.id;
+
+      sensor$ = this.sensorService.updateSensor(newSensor);
+    }
+
+    this.#subscription = sensor$.subscribe((response: Sensor | null) => {
+      const message = typeof this.data === 'number' ? SENSOR_CREATED : SENSOR_UPDATED;
+
+      this.snackBar.open(message);
+
+      let sensor: Sensor;
+
+      if (typeof this.data === 'number') {
+        sensor = response!;
+      } else {
+        sensor = this.#serializeSensor(newSensor);
+      }
+
+      this.dialogRef.close(sensor);
+    });
   }
 
   /**
@@ -120,64 +139,174 @@ export class SensorDialogComponent implements OnInit {
       : control?.enable();
   }
 
+  #sensorTypes!: SensorType[];
+  #units!: Unit[];
   #subscription: Subscription | undefined;
 
   /**
-   * Get sensor groups, sensor types, units. Set sensor data.
+   * Map `NewSensor` to `Sensor`.
+   *
+   * @param newSensor `NewSensor` sensor.
+   *
+   * @returns `Sensor` sensor.
    */
-  #setSensorData() {
-    this.sensorData$ = forkJoin([
-      this.sensorService.sensorGroups$,
-      this.sensorService.sensorTypes$,
-      this.sensorService.units$,
-      this.sensorService.sensorDataType$,
-      this.sensorService.validationType$
-    ])
-      .pipe(
-        map(([groups, validators, units, dataType, validation]) => ({ groups, validators, units, dataType, validation }))
-      );
+  #serializeSensor(newSensor: NewSensor) {
+    const {
+      name,
+      sensorTypeId,
+      dataType,
+      formula,
+      unitId,
+      validatorId,
+      validationType,
+      useLastReceived,
+      visibility,
+      fuelUse,
+      description
+    } = newSensor;
+
+    const type = this.#sensorTypes.find(({ id }) => id === sensorTypeId)!;
+    const unit = this.#units.find(({ id }) => id === unitId)!;
+
+    const sensor: Sensor = {
+      id: newSensor.id!,
+      tracker: (this.data as Sensor).tracker,
+      name,
+      sensorType: {
+        id: sensorTypeId,
+        value: type.name,
+      },
+      dataType,
+      formula,
+      unit: {
+        id: unitId,
+        value: unit.name
+      },
+      validationType,
+      useLastReceived,
+      visibility,
+      fuelUse,
+      description
+    };
+
+    if (validatorId) {
+      const validator = this.#sensorTypes.find(({ id }) => id === validatorId)!;
+
+      sensor.validator = {
+        id: validatorId,
+        value: validator.name
+      };
+    }
+
+    return sensor;
   }
 
   /**
    * Initialize Sensor form.
    */
   #initSensorForm() {
+    let trackerID: Tracker['id'];
+    let sensor: NewSensor | undefined;
+
+    if (typeof this.data === 'number') {
+      trackerID = this.data;
+    } else {
+      trackerID = this.data.tracker.id;
+
+      sensor = this.#deserializeSensor(this.data);
+    }
+
     this.sensorForm = this.fb.group({
       basic: this.fb.group({
-        tracker: this.fb.nonNullable.control<NewSensor['trackerId'] | undefined>(this.data.trackerId!, Validators.required),
-        name: this.fb.nonNullable.control<NewSensor['name'] | undefined>(undefined, [
+        tracker: this.fb.nonNullable.control(trackerID, Validators.required),
+        name: this.fb.nonNullable.control(sensor?.name, [
           Validators.required,
           Validators.maxLength(100)
         ]),
-        type: this.fb.nonNullable.control<NewSensor['sensorTypeId'] | undefined>(undefined, Validators.required),
-        dataType: this.fb.nonNullable.control<NewSensor['dataType'] | undefined>(undefined, Validators.required),
-        formula: this.fb.nonNullable.control<NewSensor['formula'] | undefined>(undefined, Validators.required),
-        unit: this.fb.nonNullable.control<NewSensor['unitId'] | undefined>(undefined, Validators.required),
-        validator: this.fb.nonNullable.control<NewSensor['validatorId'] | undefined>(undefined),
-        validationType: this.fb.nonNullable.control<NewSensor['validationType'] | undefined>({
-          value: undefined,
-          disabled: true
+        type: this.fb.nonNullable.control(sensor?.sensorTypeId, Validators.required),
+        dataType: this.fb.nonNullable.control(sensor?.dataType, Validators.required),
+        formula: this.fb.nonNullable.control(sensor?.formula, Validators.required),
+        unit: this.fb.nonNullable.control(sensor?.unitId, Validators.required),
+        validator: this.fb.nonNullable.control(sensor?.validatorId),
+        validationType: this.fb.nonNullable.control({
+          value: sensor?.validationType,
+          disabled: sensor?.validatorId === undefined
         }, Validators.required),
-        lastReceived: this.fb.nonNullable.control<NewSensor['useLastReceived'] | undefined>(undefined),
-        visibility: this.fb.nonNullable.control<NewSensor['visibility'] | undefined>(undefined),
-        fuelUse: this.fb.nonNullable.control<NewSensor['fuelUse'] | undefined>(
+        lastReceived: this.fb.nonNullable.control(sensor?.useLastReceived),
+        visibility: this.fb.nonNullable.control(sensor?.visibility),
+        fuelUse: this.fb.nonNullable.control(
           {
-            value: undefined,
-            disabled: true
+            value: sensor?.fuelUse,
+            disabled: !(sensor?.sensorTypeId && this.fuelUseTypeIds.includes(sensor.sensorTypeId))
           },
           Validators.pattern(FUEL_USE_PATTERN)
         ),
-        description: this.fb.nonNullable.control<NewSensor['description'] | undefined>(
-          undefined,
+        description: this.fb.nonNullable.control(
+          sensor?.description,
           Validators.maxLength(500)
         )
       })
     });
   }
 
+  /**
+   * Map `Sensor` to `NewSensor`.
+   */
+  #deserializeSensor({
+    id,
+    tracker,
+    name,
+    sensorType,
+    dataType,
+    formula,
+    unit,
+    validator,
+    validationType,
+    useLastReceived,
+    visibility,
+    fuelUse,
+    description
+  }: Sensor): NewSensor {
+    return {
+      id,
+      trackerId: tracker.id,
+      name,
+      sensorTypeId: sensorType.id,
+      dataType,
+      formula,
+      unitId: unit.id,
+      validatorId: validator?.id,
+      validationType,
+      useLastReceived,
+      visibility,
+      fuelUse,
+      description
+    };
+  }
+
+  /**
+   * Get sensor groups, data type, units, sensor types, validation type. Set sensor data.
+   */
+  #setSensorData() {
+    this.sensorData$ = forkJoin([
+      this.sensorService.sensorGroups$,
+      this.sensorService.sensorDataType$,
+      this.sensorService.units$,
+      this.sensorService.sensorTypes$,
+      this.sensorService.validationType$
+    ])
+      .pipe(
+        tap(([, , units, types]) => {
+          this.#sensorTypes = types;
+          this.#units = units;
+        }),
+        map(([groups, dataType, units, types, validation]) => ({ groups, dataType, units, types, validation }))
+      );
+  }
+
   constructor(
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData,
+    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData<Tracker['id'] | Sensor>,
     private dialogRef: MatDialogRef<SensorDialogComponent, Sensor>,
     private snackBar: MatSnackBar,
     private sensorService: SensorService
@@ -185,18 +314,18 @@ export class SensorDialogComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
+    this.title = typeof this.data === 'number' ? 'Новый датчик' : 'Сводная информация о датчике';
+
     this.#setSensorData();
     this.#initSensorForm();
   }
 }
 
-export type SensorDialogData = Partial<{
-  trackerId: Tracker['id'];
-}>
+export type SensorDialogData<T extends Tracker['id'] | Sensor> = T;
 
 type SensorForm = {
   basic: FormGroup<{
-    tracker: FormControl<NewSensor['trackerId'] | undefined>;
+    tracker: FormControl<NewSensor['trackerId']>;
     name: FormControl<NewSensor['name'] | undefined>;
     type: FormControl<NewSensor['sensorTypeId'] | undefined>;
     dataType: FormControl<NewSensor['dataType'] | undefined>;
@@ -211,5 +340,7 @@ type SensorForm = {
   }>;
 }
 
-export const SENSOR_CREATED = 'Сенсор создан';
 const FUEL_USE_PATTERN = /^\d+(?:\.\d{1,2})?$/;
+
+export const SENSOR_CREATED = 'Датчик создан';
+export const SENSOR_UPDATED = 'Датчик обновлён';

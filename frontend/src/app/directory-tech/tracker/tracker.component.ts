@@ -10,8 +10,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BehaviorSubject, filter, map, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 
-import { TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
-import { Sensor, SensorService } from '../sensor.service';
+import { Tracker, TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
+import { NewSensor, Sensor, SensorDataTypeEnum, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
@@ -57,13 +57,11 @@ export default class TrackerComponent implements OnInit, OnDestroy {
    * Add a new sensor to sensor table.
    */
   protected onCreateSensor() {
-    const data: SensorDialogData = {
-      trackerId: Number(
-        this.route.snapshot.paramMap.get('id')!
-      )
-    };
+    const data: SensorDialogData<Tracker['id']> = Number(
+      this.route.snapshot.paramMap.get('id')!
+    );
 
-    const dialogRef = this.dialog.open(SensorDialogComponent, { data });
+    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData<Tracker['id']>, Sensor>(SensorDialogComponent, { data });
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -74,6 +72,32 @@ export default class TrackerComponent implements OnInit, OnDestroy {
         const sensors = Array.from(this.#sensors$.value!);
 
         sensors.push(sensor);
+
+        this.#sensors$.next(sensors);
+      });
+  }
+
+  /**
+   * Update a sensor in table.
+   *
+   * @param sensorDataSource Sensor data source.
+   */
+  protected onUpdateSensor({ id }: SensorDataSource) {
+    const data: SensorDialogData<Sensor> = this.#sensors$.value!.find(sensor => sensor.id === id)!;
+
+    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData<Sensor>, Sensor>(SensorDialogComponent, { data });
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean)
+      )
+      .subscribe(sensor => {
+        const sensors = Array.from(this.#sensors$.value!);
+
+        const index = sensors.findIndex(({ id }) => id === sensor.id);
+
+        sensors[index] = sensor;
 
         this.#sensors$.next(sensors);
       });
@@ -129,11 +153,10 @@ export default class TrackerComponent implements OnInit, OnDestroy {
         id,
         name,
         sensorType: type,
-        description,
-        formula,
+        formula: parameter,
         unit,
         visibility
-      }): SensorDataSource => ({ id, name, type, description, formula, unit, visibility }));
+      }): SensorDataSource => ({ id, name, type, parameter, unit, visibility }));
   }
 
   /**
@@ -248,7 +271,7 @@ export enum SensorColumn {
   Name = 'name',
   Type = 'type',
   Unit = 'unit',
-  Formula = 'formula',
+  Parameter = 'parameter',
   Visibility = 'visibility'
 }
 
@@ -262,8 +285,9 @@ interface ParameterDataSource {
   value: TrackerParameter['lastValueDateTime'] | TrackerStandardParameter['lastValueDecimal'] | TrackerParameter['lastValueString'];
 }
 
-interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'formula' | 'description' | 'visibility'> {
-  type: Sensor['sensorType']
+interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'visibility'> {
+  type: Sensor['sensorType'],
+  parameter: Sensor['formula']
 }
 
 export const trackerParameterColumns: KeyValue<TrackerParameterColumn, string>[] = [
@@ -299,7 +323,7 @@ export const sensorColumns: KeyValue<SensorColumn, string | undefined>[] = [
     value: 'Ед. измерения'
   },
   {
-    key: SensorColumn.Formula,
+    key: SensorColumn.Parameter,
     value: 'Параметр'
   },
   {
