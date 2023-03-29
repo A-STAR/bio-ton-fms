@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/cor
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
 
 import { Observable, tap } from 'rxjs';
 
@@ -15,7 +16,8 @@ import { TableDataSource } from '../shared/table/table.data-source';
   imports: [
     CommonModule,
     MatDialogModule,
-    MatTableModule
+    MatTableModule,
+    MatButtonModule
   ],
   templateUrl: './tracker-parameters-history-dialog.component.html',
   styleUrls: ['./tracker-parameters-history-dialog.component.sass'],

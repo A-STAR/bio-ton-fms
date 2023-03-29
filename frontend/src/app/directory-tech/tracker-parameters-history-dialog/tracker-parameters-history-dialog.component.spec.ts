@@ -6,8 +6,9 @@ import localeRu from '@angular/common/locales/ru';
 import { HttpClientModule } from '@angular/common/http';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatDialogTitle, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogTitle, MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { MatTableHarness } from '@angular/material/table/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -204,5 +205,26 @@ describe('TrackerParametersHistoryDialogComponent', () => {
         .withContext('render cells text')
         .toEqual(parametersHistoryTexts);
     });
+  });
+
+  it('should render dialog actions', async () => {
+    const closeButton = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Закрыть',
+        variant: 'stroked'
+      })
+    );
+
+    expect(closeButton)
+      .withContext('render close button')
+      .not.toBeNull();
+
+    const dialogCloseDe = fixture.debugElement.query(
+      By.directive(MatDialogClose)
+    );
+
+    expect(dialogCloseDe)
+      .withContext('render dialog close element')
+      .not.toBeNull();
   });
 });
