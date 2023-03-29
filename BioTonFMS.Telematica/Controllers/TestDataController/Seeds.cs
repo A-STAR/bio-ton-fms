@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Text.RegularExpressions;
-using BioTonFMS.Domain;
+﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using Bogus;
+using System.Collections;
+using System.Text.RegularExpressions;
 
 // ReSharper disable UnassignedField.Global
 // ReSharper disable ClassNeverInstantiated.Global
@@ -83,6 +83,33 @@ public static class Seeds
         return trackerData.Generate(10);
     }
 
+    public static List<Vehicle> GenerateVehicles(Tracker[] trackers, int[] vehicleGroupIds, int[] fuelTypeIds)
+    {
+        var vehicleId = -1;
+        var vehicleFaker = new Faker<Vehicle>()
+            .RuleFor(v => v.Id, (_, _) => vehicleId--)
+            .RuleFor(v => v.Name, (f, _) => f.Hacker.Adjective() + -(vehicleId+1))
+            .RuleFor(v => v.Type, (f, _) => f.Random.Enum<VehicleTypeEnum>())
+            .RuleFor(v => v.VehicleGroupId, (f, _) => vehicleGroupIds[f.Random.Int(0, vehicleGroupIds.Length - 1)])
+            .RuleFor(v => v.Make, (f, _) => f.Vehicle.Manufacturer())
+            .RuleFor(v => v.Model, (f, _) => f.Vehicle.Model())
+            .RuleFor(v => v.VehicleSubType, (f, _) => f.Random.Enum<VehicleSubTypeEnum>())
+            .RuleFor(v => v.FuelTypeId, (f, _) => fuelTypeIds[f.Random.Int(0, fuelTypeIds.Length - 1)])
+            .RuleFor(v => v.ManufacturingYear, (f, _) => f.Random.Int(2000, 2023).OrNull(f, .1f))
+            .RuleFor(v => v.RegistrationNumber, (f, _) => f.Random.Replace("?###?? ###"))
+            .RuleFor(v => v.TrackerId, (f, vv) =>
+            {
+                if (trackers.Length == 0)
+                    return null;
+                var tracker = trackers[f.Random.Int(0, trackers.Length - 1)];
+                trackers = trackers.Where(t => t != tracker).ToArray();
+                return tracker.Id;
+            }
+            );
+
+        return vehicleFaker.Generate(10);
+    }
+
     private static MessageTag[] GenerateTags(Faker f, TrackerMessage v, TrackerTag[] t, ref int id)
     {
         var result = new MessageTag[f.Random.Int(0, 12)];
@@ -92,45 +119,45 @@ public static class Seeds
         {
             result[i] = tags[i].DataType
                 switch
+            {
+                TagDataTypeEnum.Integer => new MessageTagInteger
                 {
-                    TagDataTypeEnum.Integer => new MessageTagInteger
-                    {
-                        Value = f.Random.Int(-100, 1000),
-                        TagType = TagDataTypeEnum.Integer
-                    },
-                    TagDataTypeEnum.Bits => new MessageTagBits
-                    {
-                        Value = new BitArray(f.Random.Bytes(2)),
-                        TagType = TagDataTypeEnum.Bits
-                    },
-                    TagDataTypeEnum.Byte => new MessageTagByte
-                    {
-                        Value = f.Random.Byte(),
-                        TagType = TagDataTypeEnum.Byte
-                    },
-                    TagDataTypeEnum.Double => new MessageTagDouble
-                    {
-                        Value = f.Random.Double(-100, 1000),
-                        TagType = TagDataTypeEnum.Double
-                    },
-                    TagDataTypeEnum.Boolean => new MessageTagBoolean
-                    {
-                        Value = f.Random.Bool(),
-                        TagType = TagDataTypeEnum.Boolean
-                    },
-                    TagDataTypeEnum.String => new MessageTagString
-                    {
-                        Value = f.Hacker.Abbreviation(),
-                        TagType = TagDataTypeEnum.String
-                    },
-                    TagDataTypeEnum.DateTime => new MessageTagDateTime
-                    {
-                        Value = f.Time(),
-                        TagType = TagDataTypeEnum.DateTime
-                    },
-                    TagDataTypeEnum.Struct => throw new ArgumentOutOfRangeException(),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                    Value = f.Random.Int(-100, 1000),
+                    TagType = TagDataTypeEnum.Integer
+                },
+                TagDataTypeEnum.Bits => new MessageTagBits
+                {
+                    Value = new BitArray(f.Random.Bytes(2)),
+                    TagType = TagDataTypeEnum.Bits
+                },
+                TagDataTypeEnum.Byte => new MessageTagByte
+                {
+                    Value = f.Random.Byte(),
+                    TagType = TagDataTypeEnum.Byte
+                },
+                TagDataTypeEnum.Double => new MessageTagDouble
+                {
+                    Value = f.Random.Double(-100, 1000),
+                    TagType = TagDataTypeEnum.Double
+                },
+                TagDataTypeEnum.Boolean => new MessageTagBoolean
+                {
+                    Value = f.Random.Bool(),
+                    TagType = TagDataTypeEnum.Boolean
+                },
+                TagDataTypeEnum.String => new MessageTagString
+                {
+                    Value = f.Hacker.Abbreviation(),
+                    TagType = TagDataTypeEnum.String
+                },
+                TagDataTypeEnum.DateTime => new MessageTagDateTime
+                {
+                    Value = f.Time(),
+                    TagType = TagDataTypeEnum.DateTime
+                },
+                TagDataTypeEnum.Struct => throw new ArgumentOutOfRangeException(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
             result[i].Id = id--;
             result[i].TrackerMessageId = v.Id;

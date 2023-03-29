@@ -1,11 +1,14 @@
 ﻿using BioTonFMS.Domain.Identity;
 using BioTonFMS.Infrastructure.Controllers;
+using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
+using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
+using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.MessageProcessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +29,7 @@ namespace BioTonFMS.Telematica.Controllers.TestData;
 public class TestDataController : ValidationControllerBase
 {
     private readonly ITrackerRepository _trackerRepository;
+    private readonly IVehicleRepository _vehicleRepository;
     private readonly ISensorTypeRepository _sensorTypeRepository;
     private readonly IUnitRepository _unitRepository;
     private readonly IConfiguration _configuration;
@@ -33,25 +37,32 @@ public class TestDataController : ValidationControllerBase
     private readonly ITrackerTagRepository _trackerTagRepository;
     private readonly ILogger<TestDataController> _logger;
     private readonly ITrackerMessageRepository _trackerMessageRepository;
+    private readonly IVehicleGroupRepository _vehicleGroupRepository;
+    private readonly IFuelTypeRepository _fuelTypeRepository;
     private readonly UserManager<AppUser> _userManager;
 
     private bool ServiceEnabled => _configuration["TestDataEnabled"] == "True";
 
-    public TestDataController(ITrackerMessageRepository messageRepository,
+    public TestDataController(
+        ILogger<TestDataController> logger, UserManager<AppUser> userManager, IConfiguration configuration,
+        ITrackerMessageRepository messageRepository,
         ITrackerRepository trackerRepository, ISensorTypeRepository sensorTypeRepository,
-        IUnitRepository unitRepository, IConfiguration configuration, ITrackerTagRepository trackerTagRepository,
-        ILogger<TestDataController> logger, ITrackerMessageRepository trackerMessageRepository,
-        UserManager<AppUser> userManager)
+        IVehicleRepository vehicleRepository, IUnitRepository unitRepository, 
+        ITrackerTagRepository trackerTagRepository, IVehicleGroupRepository vehicleGroupRepository,
+        ITrackerMessageRepository trackerMessageRepository, IFuelTypeRepository fuelTypeRepository)
     {
+        _logger = logger;
+        _userManager = userManager;
+        _configuration = configuration;
         _messageRepository = messageRepository;
         _trackerRepository = trackerRepository;
+        _vehicleRepository = vehicleRepository;
         _sensorTypeRepository = sensorTypeRepository;
         _unitRepository = unitRepository;
-        _configuration = configuration;
         _trackerTagRepository = trackerTagRepository;
-        _logger = logger;
         _trackerMessageRepository = trackerMessageRepository;
-        _userManager = userManager;
+        _vehicleGroupRepository = vehicleGroupRepository;
+        _fuelTypeRepository = fuelTypeRepository;
     }
 
     /// <summary>
@@ -103,17 +114,27 @@ public class TestDataController : ValidationControllerBase
         var sensorTypeIds = _sensorTypeRepository.GetSensorTypes().Select(v => v.Id);
         var unitIds = _unitRepository.GetUnits().Select(v => v.Id);
         var trackerTags = _trackerTagRepository.GetTags().ToArray();
-        var trackers = Seeds.GenerateTrackers(sensorTypeIds.ToArray(), unitIds.ToArray(), trackerTags);
-        foreach (var tracker in trackers)
+        var trackerDatas = Seeds.GenerateTrackers(sensorTypeIds.ToArray(), unitIds.ToArray(), trackerTags);
+        foreach (var trackerData in trackerDatas)
         {
-            if (tracker.Tracker == null)
+            if (trackerData.Tracker == null)
                 continue;
-            _trackerRepository.Add(tracker.Tracker);
+            _trackerRepository.Add(trackerData.Tracker);
         }
-        foreach (var message in trackers.Where(t => t.Messages != null).SelectMany(t => t.Messages!))
+        foreach (var message in trackerDatas.Where(t => t.Messages != null).SelectMany(t => t.Messages!))
         {
             _trackerMessageRepository.Add(message);
         }
+
+        var vehicleGroupIds = _vehicleGroupRepository.GetVehicleGroups().Select(v => v.Id);
+        var fuelTypeIds = _fuelTypeRepository.GetFuelTypes().Select(v => v.Id);
+        var vehicles = Seeds.GenerateVehicles(trackerDatas.Where(td => td.Tracker != null)
+            .Select(td => td.Tracker!).ToArray(), vehicleGroupIds.ToArray(), fuelTypeIds.ToArray());
+        foreach (var vehicle in vehicles)
+        {
+            _vehicleRepository.Add(vehicle);
+        }
+
         return Ok();
     }
 
@@ -133,6 +154,17 @@ public class TestDataController : ValidationControllerBase
         if (!ServiceEnabled)
         {
             return BadRequest("Test data service is not available!");
+        }
+
+        var vehicles = _vehicleRepository.GetVehicles(new VehiclesFilter()
+        {
+            PageSize = 100000
+        });
+        foreach (var vehicle in vehicles.Results)
+        {
+            if (vehicle.Id >= 0)
+                continue;
+            _vehicleRepository.Remove(vehicle);
         }
 
         var trackers = _trackerRepository.GetTrackers(new TrackersFilter()
