@@ -8,13 +8,18 @@ import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialogTitle, MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { MatTableHarness } from '@angular/material/table/testing';
+import { MatChipSetHarness } from '@angular/material/chips/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { Observable, of } from 'rxjs';
 
 import { TrackerParametersHistory, TrackerService } from '../tracker.service';
 
-import { trackerParameterHistoryColumns, TrackerParametersHistoryDialogComponent } from './tracker-parameters-history-dialog.component';
+import {
+  ParameterHistoryColumn,
+  trackerParameterHistoryColumns,
+  TrackerParametersHistoryDialogComponent
+} from './tracker-parameters-history-dialog.component';
 
 import { localeID } from '../tracker-dialog/tracker-dialog.component';
 import { dateFormat } from '../trackers/trackers.component.spec';
@@ -152,13 +157,15 @@ describe('TrackerParametersHistoryDialogComponent', () => {
     });
 
     const cellTexts = await parallel(() => cells.map(
-      rowCells => parallel(() => rowCells.map(
-        cell => cell.getText()
-      ))
+      rowCells => parallel(
+        () => rowCells
+          .slice(0, -1)
+          .map(cell => cell.getText())
+      )
     ));
 
     cellTexts.forEach((rowCellTexts, index) => {
-      const { time, latitude, longitude, altitude, speed, parameters } = testParametersHistory.parameters[index];
+      const { time, latitude, longitude, altitude, speed } = testParametersHistory.parameters[index];
 
       const hash = index + 1;
 
@@ -190,20 +197,50 @@ describe('TrackerParametersHistoryDialogComponent', () => {
         formattedSpeed = formatNumber(speed, 'en-US', '1.1-1');
       }
 
-      const parametersHistoryTexts = [
-        hash,
-        formattedTime,
-        formattedSpeed,
-        coordinates,
-        formattedAltitude,
-        parameters
-      ].map(
+      const parametersHistoryTexts = [hash, formattedTime, formattedSpeed, coordinates, formattedAltitude].map(
         value => value?.toString() ?? ''
       );
 
       expect(rowCellTexts)
         .withContext('render cells text')
         .toEqual(parametersHistoryTexts);
+    });
+  });
+
+  it('should render parameters cells chips', async () => {
+    const table = await loader.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells({
+        columnName: ParameterHistoryColumn.Parameters
+      })
+    ));
+
+    const parametersChipSets = await parallel(() => cells.map(
+      ([parametersCell]) => parametersCell.getHarness(MatChipSetHarness))
+    );
+
+    parametersChipSets.forEach(async (parametersChipSet, index) => {
+      const chips = await parametersChipSet.getChips();
+
+      const chipTexts = await parallel(() => chips.map(
+        chip => chip.getText()
+      ));
+
+      const parameters = testParametersHistory.parameters[index].parameters
+        .split(',')
+        .slice(0, -1);
+
+      expect(chipTexts)
+        .withContext('render chip texts')
+        .toEqual(parameters);
+    });
+
+    parametersChipSets.forEach(parametersChipSet => {
+      expect(parametersChipSet)
+        .withContext('render chip set')
+        .not.toBeNull();
     });
   });
 

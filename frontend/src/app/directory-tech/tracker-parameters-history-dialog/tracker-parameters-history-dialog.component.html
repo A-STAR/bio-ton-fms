@@ -25,7 +25,13 @@
           {{ element[column.key] | number: '1.1-1':'en-US' }}
         </ng-container>
 
-        <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+        <ng-container *ngSwitchCase="Column.Parameters">
+          <mat-chip-set>
+            <mat-chip [disableRipple]="true" *ngFor="let parameter of element[column.key].split(',') | slice:0:-1">
+              {{ parameter }}
+            </mat-chip>
+          </mat-chip-set>
+        </ng-container>
       </mat-cell>
     </ng-container>
 

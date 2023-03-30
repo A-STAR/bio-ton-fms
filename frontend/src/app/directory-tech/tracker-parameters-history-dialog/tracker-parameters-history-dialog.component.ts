@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/cor
 import { CommonModule, KeyValue } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
 
 import { Observable, tap } from 'rxjs';
@@ -17,6 +18,7 @@ import { TableDataSource } from '../shared/table/table.data-source';
     CommonModule,
     MatDialogModule,
     MatTableModule,
+    MatChipsModule,
     MatButtonModule
   ],
   templateUrl: './tracker-parameters-history-dialog.component.html',
@@ -91,7 +93,7 @@ export class TrackerParametersHistoryDialogComponent implements OnInit {
   }
 }
 
-enum ParameterHistoryColumn {
+export enum ParameterHistoryColumn {
   Hash = 'hash',
   Time = 'time',
   Speed = 'speed',

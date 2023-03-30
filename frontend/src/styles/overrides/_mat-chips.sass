@@ -1,0 +1,26 @@
+@use 'variables' as *
+
+mat-chip.mat-mdc-standard-chip
+  height: 20px
+
+  .mdc-evolution-chip-set &
+    margin-top: 2px
+    margin-bottom: 2px
+    margin-left: 4px
+
+  .mdc-evolution-chip__action--primary
+    padding-left: 6px
+    padding-right: 6px
+
+.mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled)
+
+  @at-root mat-chip#{&}
+    background-color: $white
+    border: 1px solid $gray
+
+  span.mdc-evolution-chip__text-label
+    color: $light-dark
+    user-select: unset
+
+.mat-mdc-chip-focus-overlay
+  display: none

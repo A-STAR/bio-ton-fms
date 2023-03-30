@@ -293,12 +293,11 @@ describe('VehiclesComponent', () => {
     });
 
     const cellTexts = await parallel(() => cells.map(
-      rowCells =>
-        parallel(
-          () => rowCells
-            .slice(1)
-            .map(cell => cell.getText())
-        )
+      rowCells => parallel(
+        () => rowCells
+          .slice(1)
+          .map(cell => cell.getText())
+      )
     ));
 
     cellTexts.forEach((rowCellTexts, index) => {
