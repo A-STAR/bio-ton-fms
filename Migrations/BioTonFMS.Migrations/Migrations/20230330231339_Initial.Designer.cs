@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BioTonFMSApp.Migrations
+namespace BioTonFMS.Migrations.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    [Migration("20230124095608_NewTags")]
-    partial class NewTags
+    [Migration("20230330231339_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,34 +23,6 @@ namespace BioTonFMSApp.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("BioTonFMS.Domain.Device", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("name");
-
-                    b.Property<int>("TrackerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tracker_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_devices");
-
-                    b.HasIndex("TrackerId")
-                        .HasDatabaseName("ix_devices_tracker_id");
-
-                    b.ToTable("devices", (string)null);
-                });
 
             modelBuilder.Entity("BioTonFMS.Domain.FuelType", b =>
                 {
@@ -71,6 +43,13 @@ namespace BioTonFMSApp.Migrations
                         .HasName("pk_fuel_type");
 
                     b.ToTable("fuel_type", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Бензин АИ-95"
+                        });
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Identity.AppRole", b =>
@@ -221,7 +200,7 @@ namespace BioTonFMSApp.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("size");
 
-                    b.Property<int>("TagId")
+                    b.Property<int?>("TagId")
                         .HasColumnType("integer")
                         .HasColumnName("tag_id");
 
@@ -291,7 +270,6 @@ namespace BioTonFMSApp.Migrations
                             Id = 7,
                             ProtocolTagCode = 48,
                             Size = 9,
-                            TagId = 7,
                             TrackerType = 1
                         },
                         new
@@ -299,7 +277,6 @@ namespace BioTonFMSApp.Migrations
                             Id = 8,
                             ProtocolTagCode = 51,
                             Size = 4,
-                            TagId = 8,
                             TrackerType = 1
                         },
                         new
@@ -443,7 +420,6 @@ namespace BioTonFMSApp.Migrations
                             Id = 26,
                             ProtocolTagCode = 193,
                             Size = 4,
-                            TagId = 26,
                             TrackerType = 1
                         },
                         new
@@ -560,6 +536,400 @@ namespace BioTonFMSApp.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BioTonFMS.Domain.Sensor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DataType")
+                        .HasColumnType("integer")
+                        .HasColumnName("data_type");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Formula")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("formula");
+
+                    b.Property<double?>("FuelUse")
+                        .HasColumnType("double precision")
+                        .HasColumnName("fuel_use");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_visible");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("SensorTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sensor_type_id");
+
+                    b.Property<int>("TrackerId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tracker_id");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("integer")
+                        .HasColumnName("unit_id");
+
+                    b.Property<bool>("UseLastReceived")
+                        .HasColumnType("boolean")
+                        .HasColumnName("use_last_received");
+
+                    b.Property<int?>("ValidationType")
+                        .HasColumnType("integer")
+                        .HasColumnName("validation_type");
+
+                    b.Property<int?>("ValidatorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("validator_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sensors");
+
+                    b.HasIndex("SensorTypeId")
+                        .HasDatabaseName("ix_sensors_sensor_type_id");
+
+                    b.HasIndex("TrackerId")
+                        .HasDatabaseName("ix_sensors_tracker_id");
+
+                    b.HasIndex("UnitId")
+                        .HasDatabaseName("ix_sensors_unit_id");
+
+                    b.HasIndex("ValidatorId")
+                        .HasDatabaseName("ix_sensors_validator_id");
+
+                    b.ToTable("sensors", (string)null);
+                });
+
+            modelBuilder.Entity("BioTonFMS.Domain.SensorGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sensor_groups");
+
+                    b.ToTable("sensor_groups", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "",
+                            Name = "Пробег"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "",
+                            Name = "Цифровые"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "",
+                            Name = "Показатели"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "",
+                            Name = "Двигатель"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "",
+                            Name = "Топливо"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "",
+                            Name = "Другие"
+                        });
+                });
+
+            modelBuilder.Entity("BioTonFMS.Domain.SensorType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("DataType")
+                        .HasColumnType("integer")
+                        .HasColumnName("data_type");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("SensorGroupId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sensor_group_id");
+
+                    b.Property<int?>("UnitId")
+                        .HasColumnType("integer")
+                        .HasColumnName("unit_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sensor_types");
+
+                    b.HasIndex("SensorGroupId")
+                        .HasDatabaseName("ix_sensor_types_sensor_group_id");
+
+                    b.HasIndex("UnitId")
+                        .HasDatabaseName("ix_sensor_types_unit_id");
+
+                    b.ToTable("sensor_types", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DataType = 1,
+                            Description = "Датчик, показывающий пройденное объектом расстояние. Может использоваться в детекторе поездок для определения поездок и стоянок.",
+                            Name = "Датчик пробега",
+                            SensorGroupId = 1,
+                            UnitId = 2
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DataType = 1,
+                            Description = "Датчик, показывающий расстояние, пройденное объектом с момента получения от него последнего сообщения. Может использоваться в детекторе поездок для определения поездок и стоянок.",
+                            Name = "Относительный одометр",
+                            SensorGroupId = 1,
+                            UnitId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DataType = 0,
+                            Description = "Датчик, показывающий, включено или выключено зажигание. Может использоваться в детекторе поездок для определения поездок и стоянок и в счетчиках пробега и моточасов. Кроме того, с помощью датчика зажигания можно выявлять сливы топлива на холостом ходу. Для этого необходимо указать норму расхода топлива на холостом ходу в поле Расход, литров в час.",
+                            Name = "Датчик зажигания",
+                            SensorGroupId = 2,
+                            UnitId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DataType = 1,
+                            Description = "Датчик, ненулевое значение которого позволяет отмечать сообщение как тревожное (SOS). Сообщения, зарегистрированные в системе до создания датчика, не отмечаются как тревожные.",
+                            Name = "Тревожная кнопка",
+                            SensorGroupId = 2,
+                            UnitId = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DataType = 0,
+                            Description = "Датчик, определяющий состояние движения объектов в реальном времени. Состояние движения, определенное датчиком, показывается на карте и в рабочей области вкладки Мониторинг. Для этого должны быть активированы опции Заменять иконки знаками состояния движения в настройках пользователя и Состояние движения на вкладке Мониторинг соответственно. Показания датчика могут основываться на значениях скорости, зажигания, оборотов двигателя и т. д. Как и для других типов датчиков, для него можно указать параметр в виде выражения и настроить валидацию.",
+                            Name = "Датчик мгновенного определения движения",
+                            SensorGroupId = 2,
+                            UnitId = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            DataType = 1,
+                            Description = "Датчик, показывающий значение напряжения. По напряжению, например, может определяться температура или состояние зажигания.",
+                            Name = "Датчик напряжения",
+                            SensorGroupId = 3,
+                            UnitId = 3
+                        },
+                        new
+                        {
+                            Id = 7,
+                            DataType = 1,
+                            Description = "Датчик, с помощью которого можно определять массу перевозимого груза.",
+                            Name = "Датчик веса",
+                            SensorGroupId = 3,
+                            UnitId = 4
+                        },
+                        new
+                        {
+                            Id = 8,
+                            DataType = 1,
+                            Description = "Датчик, с помощью которого можно фиксировать ускорение по осям X, Y, Z, что позволяет определять факт столкновения, т. е. дорожно-транспортного происшествия.",
+                            Name = "Акселерометр",
+                            SensorGroupId = 3,
+                            UnitId = 5
+                        },
+                        new
+                        {
+                            Id = 9,
+                            DataType = 1,
+                            Description = "Датчик, показывающий значение температуры или какого-либо другого параметра. Датчик температуры можно использовать для анализа приходящих значений. См. пример настройки.",
+                            Name = "Датчик температуры",
+                            SensorGroupId = 3,
+                            UnitId = 6
+                        },
+                        new
+                        {
+                            Id = 10,
+                            DataType = 1,
+                            Description = "Коэффициент, который применяется для более точных вычислений уровня топлива при разной температуре в баке. См. пример настройки.",
+                            Name = "Коэффициент температуры",
+                            SensorGroupId = 3,
+                            UnitId = 1
+                        },
+                        new
+                        {
+                            Id = 11,
+                            DataType = 1,
+                            Description = "Датчик, показывающий частоту оборотов двигателя.",
+                            Name = "Датчик оборотов двигателя",
+                            SensorGroupId = 4,
+                            UnitId = 7
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Description = "Датчик, с помощью которого можно определять коэффициент движения под нагрузкой, используемый для вычисления расхода топлива по расчету. Может выступать в качестве понижающего коэффициента (при значениях от 0 до 1). Для этого датчика можно указать любую единицу измерения.",
+                            Name = "Датчик полезной работы двигателя",
+                            SensorGroupId = 4
+                        },
+                        new
+                        {
+                            Id = 13,
+                            DataType = 1,
+                            Description = "Датчик, показывающий общее количество наработанных моточасов.",
+                            Name = "Абсолютные моточасы",
+                            SensorGroupId = 4,
+                            UnitId = 8
+                        },
+                        new
+                        {
+                            Id = 14,
+                            DataType = 1,
+                            Description = "Датчик, показывающий количество моточасов с учетом коэффициента интенсивности работы. См. пример настройки.",
+                            Name = "Относительные моточасы",
+                            SensorGroupId = 4,
+                            UnitId = 8
+                        },
+                        new
+                        {
+                            Id = 15,
+                            DataType = 1,
+                            Description = "Датчик, который показывает накапливаемое значение импульсов. Для пересчета приходящего значения в количество потраченного топлива необходимо настроить таблицу расчета и активировать опцию Рассчитывать расход топлива по датчику. Для датчиков этого типа таблица расчета применяется к разнице между двумя соседними сообщениями. Если устройство передает не накапливаемое значение импульсов, а количество импульсов между сообщениями, то необходимо использовать датчик мгновенного расхода топлива.",
+                            Name = "Импульсный датчик расхода топлива",
+                            SensorGroupId = 5,
+                            UnitId = 9
+                        },
+                        new
+                        {
+                            Id = 16,
+                            DataType = 1,
+                            Description = "Датчик, который показывает расход топлива за весь период эксплуатации автомобиля. Чтобы получить данные о расходе топлива за конкретный период, необходимо снять показания с датчика в конце выбранного периода и вычесть показания датчика в начале периода. В свойствах датчика необходимо активировать опцию Рассчитывать расход топлива по датчику.",
+                            Name = "Датчик абсолютного расхода топлива",
+                            SensorGroupId = 5,
+                            UnitId = 9
+                        },
+                        new
+                        {
+                            Id = 17,
+                            DataType = 1,
+                            Description = "Датчик, показывающий количество потраченного топлива с момента предыдущего измерения (сообщения). В свойствах датчика необходимо активировать опцию Рассчитывать расход топлива по датчику.",
+                            Name = "Датчик мгновенного расхода топлива",
+                            SensorGroupId = 5,
+                            UnitId = 9
+                        },
+                        new
+                        {
+                            Id = 18,
+                            DataType = 1,
+                            Description = "Датчик, определяющий уровень топлива в баке. В свойствах датчика необходимо активировать опцию Рассчитывать расход топлива по датчику. См. пример настройки.",
+                            Name = "Датчик уровня топлива",
+                            SensorGroupId = 5,
+                            UnitId = 9
+                        },
+                        new
+                        {
+                            Id = 19,
+                            DataType = 1,
+                            Description = "Датчик, предназначенный для расчета количества топлива в баке. При расчете разница значений импульсов из двух соседних сообщений делится на разницу времени между ними.",
+                            Name = "Импульсный датчик уровня топлива",
+                            SensorGroupId = 5,
+                            UnitId = 9
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Датчик, позволяющий определять интенсивность пассажиропотока или количество некоторых действий (например, открытие и закрытие двери). Есть несколько типов таких датчиков:",
+                            Name = "Счетчик",
+                            SensorGroupId = 6
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Description = "Датчик, который можно настроить для измерения любого показателя. Для произвольного датчика можно указать любую единицу измерения.",
+                            Name = "Произвольный датчик",
+                            SensorGroupId = 6
+                        },
+                        new
+                        {
+                            Id = 22,
+                            DataType = 2,
+                            Description = "Датчик, с помощью которого можно фиксировать назначение водителя на объект.",
+                            Name = "Назначение водителя",
+                            SensorGroupId = 6,
+                            UnitId = 1
+                        },
+                        new
+                        {
+                            Id = 23,
+                            DataType = 2,
+                            Description = "Датчик, с помощью которого можно фиксировать назначение прицепа на объект.",
+                            Name = "Назначение прицепа",
+                            SensorGroupId = 6,
+                            UnitId = 1
+                        });
+                });
+
             modelBuilder.Entity("BioTonFMS.Domain.Tracker", b =>
                 {
                     b.Property<int>("Id")
@@ -624,8 +994,8 @@ namespace BioTonFMSApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DataType")
-                        .HasColumnType("integer")
+                    b.Property<byte>("DataType")
+                        .HasColumnType("smallint")
                         .HasColumnName("data_type");
 
                     b.Property<string>("Description")
@@ -652,285 +1022,414 @@ namespace BioTonFMSApp.Migrations
                         new
                         {
                             Id = 1,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Версия терминала",
                             Name = "term_version"
                         },
                         new
                         {
                             Id = 2,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Версия прошивки",
                             Name = "soft"
                         },
                         new
                         {
                             Id = 3,
-                            DataType = 4,
+                            DataType = (byte)6,
                             Description = "IMEI",
                             Name = "imei"
                         },
                         new
                         {
                             Id = 4,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Идентификатор устройства",
                             Name = "device_id"
                         },
                         new
                         {
                             Id = 5,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Номер записи в архиве",
                             Name = "rec_sn"
                         },
                         new
                         {
                             Id = 6,
-                            DataType = 5,
+                            DataType = (byte)7,
                             Description = "Дата и время регистрации на трекере",
                             Name = "tracker_date"
                         },
                         new
                         {
-                            Id = 7,
-                            DataType = 8,
-                            Description = "Координаты в градусах, число спутников, признак корректности определения координат и источник координат.",
-                            Name = "coord_struct",
-                            StructType = 1
+                            Id = 100,
+                            DataType = (byte)4,
+                            Description = "Широта в градусах",
+                            Name = "coord_latitude"
                         },
                         new
                         {
-                            Id = 8,
-                            DataType = 8,
-                            Description = "Скорость в км/ч и направление в градусах",
-                            Name = "speed_direction",
-                            StructType = 2
+                            Id = 101,
+                            DataType = (byte)4,
+                            Description = "Долгота в градусах",
+                            Name = "coord_longitude"
+                        },
+                        new
+                        {
+                            Id = 102,
+                            DataType = (byte)1,
+                            Description = "Признак корректности определения координат",
+                            Name = "coord_correctness"
+                        },
+                        new
+                        {
+                            Id = 103,
+                            DataType = (byte)1,
+                            Description = "Источник координат",
+                            Name = "coord_sat_number"
+                        },
+                        new
+                        {
+                            Id = 110,
+                            DataType = (byte)1,
+                            Description = "Уровень топлива, %",
+                            Name = "can_log_fuel_level"
+                        },
+                        new
+                        {
+                            Id = 111,
+                            DataType = (byte)1,
+                            Description = "Температура охлаждающей жидкости, °C",
+                            Name = "can_log_coolant_temperature"
+                        },
+                        new
+                        {
+                            Id = 112,
+                            DataType = (byte)1,
+                            Description = "Обороты двигателя, об/мин",
+                            Name = "can_log_engine_speed"
+                        },
+                        new
+                        {
+                            Id = 120,
+                            DataType = (byte)4,
+                            Description = "Скорость",
+                            Name = "velocity_speed"
+                        },
+                        new
+                        {
+                            Id = 121,
+                            DataType = (byte)4,
+                            Description = "Направление",
+                            Name = "velocity_direction"
                         },
                         new
                         {
                             Id = 9,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Высота, м",
                             Name = "altitude"
                         },
                         new
                         {
                             Id = 10,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "Одно из значений:\n1. HDOP, если источник координат ГЛОНАСС/GPS модуль\n2. Погрешность в метрах, если источник базовые станции GSM-сети",
                             Name = "hdop"
                         },
                         new
                         {
                             Id = 11,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Статус устройства",
                             Name = "dev_status"
                         },
                         new
                         {
                             Id = 12,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Напряжение питания, мВ",
                             Name = "pwr_ext"
                         },
                         new
                         {
                             Id = 13,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Напряжение на батарее",
                             Name = "pwr_int"
                         },
                         new
                         {
                             Id = 14,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Температура внутри терминала, °С",
                             Name = "temp_int"
                         },
                         new
                         {
                             Id = 15,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "Статус выходов",
                             Name = "out"
                         },
                         new
                         {
                             Id = 16,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "Статус входов",
                             Name = "in"
                         },
                         new
                         {
                             Id = 17,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Значение на входе 0.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc1"
                         },
                         new
                         {
                             Id = 18,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Значение на входе 1.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc2"
                         },
                         new
                         {
                             Id = 19,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Значение на входе 2.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc3"
                         },
                         new
                         {
                             Id = 20,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Значение на входе 3.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc4"
                         },
                         new
                         {
                             Id = 21,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "RS232 0",
                             Name = "adc9"
                         },
                         new
                         {
                             Id = 22,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "RS232 1",
                             Name = "adc10"
                         },
                         new
                         {
                             Id = 23,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "RS485[0]. ДУТ с адресом 0",
                             Name = "RS485[0]"
                         },
                         new
                         {
                             Id = 24,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "RS485[1]. ДУТ с адресом 1",
                             Name = "RS485[1]"
                         },
                         new
                         {
                             Id = 25,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Данные CAN-шины (CAN_A0) или CAN-LOG.\nТопливо, израсходованное машиной с момента её создания, л",
                             Name = "CAN_A0"
                         },
                         new
                         {
-                            Id = 26,
-                            DataType = 8,
-                            Description = "Данные CAN-шины (CAN_A1) или CAN-LOG.\nУровень топлива, %;\nтемпература охлаждающей жидкости, °C;\nобороты двигателя, об/мин.",
-                            Name = "CAN_A1",
-                            StructType = 4
-                        },
-                        new
-                        {
                             Id = 27,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Данные CAN-шины (CAN_B0) или CAN-LOG.\nПробег автомобиля, м.",
                             Name = "CAN_B0"
                         },
                         new
                         {
                             Id = 28,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "CAN8BITR0\nили скорость транспортного средства, передаваемая с CAN-LOG’а, км/ч",
                             Name = "CAN8BITR0"
                         },
                         new
                         {
                             Id = 29,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "CAN8BITR1\nили второй байт префикса S от CAN-LOG",
                             Name = "CAN8BITR1"
                         },
                         new
                         {
                             Id = 30,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "CAN8BITR2\nили первый байт префикса S от CAN-LOG",
                             Name = "CAN8BITR2"
                         },
                         new
                         {
                             Id = 31,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "CAN8BITR3\nили младший байт префикса S от CAN-LOG",
                             Name = "CAN8BITR3"
                         },
                         new
                         {
                             Id = 32,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "CAN8BITR4\nили третий байт префикса P от CAN-LOG",
                             Name = "CAN8BITR4"
                         },
                         new
                         {
                             Id = 33,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "CAN8BITR5\nили второй байт префикса P от CAN-LOG",
                             Name = "CAN8BITR5"
                         },
                         new
                         {
                             Id = 34,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "В зависимости от настроек один из вариантов:\nCAN32BITR0\nполное время работы двигателя, ч",
                             Name = "CAN32BITR0"
                         },
                         new
                         {
                             Id = 35,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Значение на входе 4.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
                             Name = "Port 4"
                         },
                         new
                         {
                             Id = 36,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Значение на входе 5.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
                             Name = "Port 5"
                         },
                         new
                         {
                             Id = 37,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Идентификационный номер первого ключа iButton",
                             Name = "iButton 1"
                         },
                         new
                         {
                             Id = 38,
-                            DataType = 1,
+                            DataType = (byte)1,
                             Description = "Идентификационный номер второго ключа iButton",
                             Name = "iButton 2"
                         },
                         new
                         {
                             Id = 39,
-                            DataType = 7,
+                            DataType = (byte)3,
                             Description = "Состояние ключей iButton, идентификаторы которых заданы командой iButtons.\nКаждый бит соответствует одному ключу.\nНапример, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи.",
                             Name = "iButton Keys"
                         },
                         new
                         {
                             Id = 40,
-                            DataType = 6,
+                            DataType = (byte)2,
                             Description = "0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.\n1 – статус GPRS сессии. 1- установлена, 0 – нет.\n2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.\n3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.\n4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.\n5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.\n6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует.",
                             Name = "expanded_terminal_status"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            DataType = (byte)2,
+                            Description = "",
+                            Name = "expanded_terminal_status"
+                        });
+                });
+
+            modelBuilder.Entity("BioTonFMS.Domain.Unit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Abbreviated")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("abbreviated");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_units");
+
+                    b.ToTable("units", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Abbreviated = "",
+                            Name = "Безразмерная величина"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Abbreviated = "км",
+                            Name = "Километры"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Abbreviated = "V",
+                            Name = "Вольты"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Abbreviated = "т",
+                            Name = "Тонны"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Abbreviated = "g",
+                            Name = "g"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Abbreviated = "C°",
+                            Name = "Градусы цельсия"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Abbreviated = "об/мин",
+                            Name = "Обороты в минуту"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Abbreviated = "ч",
+                            Name = "Часы"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Abbreviated = "л",
+                            Name = "Литры"
                         });
                 });
 
@@ -965,7 +1464,7 @@ namespace BioTonFMSApp.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("make");
 
-                    b.Property<int>("ManufacturingYear")
+                    b.Property<int?>("ManufacturingYear")
                         .HasColumnType("integer")
                         .HasColumnName("manufacturing_year");
 
@@ -1016,6 +1515,7 @@ namespace BioTonFMSApp.Migrations
                         .HasDatabaseName("ix_vehicles_fuel_type_id");
 
                     b.HasIndex("TrackerId")
+                        .IsUnique()
                         .HasDatabaseName("ix_vehicles_tracker_id");
 
                     b.HasIndex("VehicleGroupId")
@@ -1175,28 +1675,70 @@ namespace BioTonFMSApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BioTonFMS.Domain.Device", b =>
-                {
-                    b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
-                        .WithMany("Devices")
-                        .HasForeignKey("TrackerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_devices_trackers_tracker_id");
-
-                    b.Navigation("Tracker");
-                });
-
             modelBuilder.Entity("BioTonFMS.Domain.ProtocolTag", b =>
                 {
                     b.HasOne("BioTonFMS.Domain.TrackerTag", "Tag")
                         .WithMany("ProtocolTags")
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_protocol_tag_tracker_tags_tag_id");
 
                     b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("BioTonFMS.Domain.Sensor", b =>
+                {
+                    b.HasOne("BioTonFMS.Domain.SensorType", "SensorType")
+                        .WithMany()
+                        .HasForeignKey("SensorTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sensors_sensor_types_sensor_type_id");
+
+                    b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
+                        .WithMany("Sensors")
+                        .HasForeignKey("TrackerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sensors_trackers_tracker_id");
+
+                    b.HasOne("BioTonFMS.Domain.Unit", "Unit")
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sensors_units_unit_id");
+
+                    b.HasOne("BioTonFMS.Domain.Sensor", "Validator")
+                        .WithMany()
+                        .HasForeignKey("ValidatorId")
+                        .HasConstraintName("fk_sensors_sensors_validator_id");
+
+                    b.Navigation("SensorType");
+
+                    b.Navigation("Tracker");
+
+                    b.Navigation("Unit");
+
+                    b.Navigation("Validator");
+                });
+
+            modelBuilder.Entity("BioTonFMS.Domain.SensorType", b =>
+                {
+                    b.HasOne("BioTonFMS.Domain.SensorGroup", "SensorGroup")
+                        .WithMany("SensorTypes")
+                        .HasForeignKey("SensorGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sensor_types_sensor_groups_sensor_group_id");
+
+                    b.HasOne("BioTonFMS.Domain.Unit", "Unit")
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .HasConstraintName("fk_sensor_types_units_unit_id");
+
+                    b.Navigation("SensorGroup");
+
+                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Vehicle", b =>
@@ -1209,8 +1751,8 @@ namespace BioTonFMSApp.Migrations
                         .HasConstraintName("fk_vehicles_fuel_type_fuel_type_id");
 
                     b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
-                        .WithMany()
-                        .HasForeignKey("TrackerId")
+                        .WithOne("Vehicle")
+                        .HasForeignKey("BioTonFMS.Domain.Vehicle", "TrackerId")
                         .HasConstraintName("fk_vehicles_trackers_tracker_id");
 
                     b.HasOne("BioTonFMS.Domain.VehicleGroup", "VehicleGroup")
@@ -1282,9 +1824,16 @@ namespace BioTonFMSApp.Migrations
                         .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
                 });
 
+            modelBuilder.Entity("BioTonFMS.Domain.SensorGroup", b =>
+                {
+                    b.Navigation("SensorTypes");
+                });
+
             modelBuilder.Entity("BioTonFMS.Domain.Tracker", b =>
                 {
-                    b.Navigation("Devices");
+                    b.Navigation("Sensors");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.TrackerTag", b =>

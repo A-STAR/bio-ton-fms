@@ -1,5 +1,4 @@
 ﻿using BioTonFMS.Migrations;
-using BioTonFMSApp.Migrations;
 
 namespace BioTonFMSApp.Startup;
 

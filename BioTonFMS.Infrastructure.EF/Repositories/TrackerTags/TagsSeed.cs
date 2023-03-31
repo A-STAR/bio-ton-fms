@@ -69,12 +69,12 @@ public static class TagsSeed
         },
         new ProtocolTag
         {
-            Id = 7, TagId = 7, ProtocolTagCode = 0x30, Size = 9,
+            Id = 7, ProtocolTagCode = 0x30, Size = 9,
             TrackerType = TrackerTypeEnum.GalileoSkyV50
         },
         new ProtocolTag
         {
-            Id = 8, TagId = 8, ProtocolTagCode = 0x33, Size = 4,
+            Id = 8, ProtocolTagCode = 0x33, Size = 4,
             TrackerType = TrackerTypeEnum.GalileoSkyV50
         },
         new ProtocolTag
@@ -164,7 +164,7 @@ public static class TagsSeed
         },
         new ProtocolTag
         {
-            Id = 26, TagId = 26, ProtocolTagCode = 0xC1, Size = 4,
+            Id = 26, ProtocolTagCode = 0xC1, Size = 4,
             TrackerType = TrackerTypeEnum.GalileoSkyV50
         },
         new ProtocolTag

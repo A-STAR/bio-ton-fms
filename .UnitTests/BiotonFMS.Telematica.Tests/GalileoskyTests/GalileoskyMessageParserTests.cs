@@ -507,8 +507,8 @@ public class GalileoskyMessageParserTests
             .Where(x => x.TrackerType == TrackerTypeEnum.GalileoSkyV50)
             .Select(x =>
             {
-                trackerTags.TryGetValue(x.TagId, out var tag);
-                x.Tag = tag;
+                if (x.TagId.HasValue && trackerTags.TryGetValue(x.TagId.Value, out var tag))
+                    x.Tag = tag;
                 return x;
             })
             .ToArray();

@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BioTonFMSApp.Migrations
+namespace BioTonFMS.Migrations.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
     partial class BioTonDBContextModelSnapshot : ModelSnapshot
@@ -41,6 +41,13 @@ namespace BioTonFMSApp.Migrations
                         .HasName("pk_fuel_type");
 
                     b.ToTable("fuel_type", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Бензин АИ-95"
+                        });
                 });
 
             modelBuilder.Entity("BioTonFMS.Domain.Identity.AppRole", b =>
@@ -191,7 +198,7 @@ namespace BioTonFMSApp.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("size");
 
-                    b.Property<int>("TagId")
+                    b.Property<int?>("TagId")
                         .HasColumnType("integer")
                         .HasColumnName("tag_id");
 
@@ -261,7 +268,6 @@ namespace BioTonFMSApp.Migrations
                             Id = 7,
                             ProtocolTagCode = 48,
                             Size = 9,
-                            TagId = 7,
                             TrackerType = 1
                         },
                         new
@@ -269,7 +275,6 @@ namespace BioTonFMSApp.Migrations
                             Id = 8,
                             ProtocolTagCode = 51,
                             Size = 4,
-                            TagId = 8,
                             TrackerType = 1
                         },
                         new
@@ -413,7 +418,6 @@ namespace BioTonFMSApp.Migrations
                             Id = 26,
                             ProtocolTagCode = 193,
                             Size = 4,
-                            TagId = 26,
                             TrackerType = 1
                         },
                         new
@@ -1057,19 +1061,66 @@ namespace BioTonFMSApp.Migrations
                         },
                         new
                         {
-                            Id = 7,
-                            DataType = (byte)8,
-                            Description = "Координаты в градусах, число спутников, признак корректности определения координат и источник координат.",
-                            Name = "coord_struct",
-                            StructType = 1
+                            Id = 100,
+                            DataType = (byte)4,
+                            Description = "Широта в градусах",
+                            Name = "coord_latitude"
                         },
                         new
                         {
-                            Id = 8,
-                            DataType = (byte)8,
-                            Description = "Скорость в км/ч и направление в градусах",
-                            Name = "speed_direction",
-                            StructType = 2
+                            Id = 101,
+                            DataType = (byte)4,
+                            Description = "Долгота в градусах",
+                            Name = "coord_longitude"
+                        },
+                        new
+                        {
+                            Id = 102,
+                            DataType = (byte)1,
+                            Description = "Признак корректности определения координат",
+                            Name = "coord_correctness"
+                        },
+                        new
+                        {
+                            Id = 103,
+                            DataType = (byte)1,
+                            Description = "Источник координат",
+                            Name = "coord_sat_number"
+                        },
+                        new
+                        {
+                            Id = 110,
+                            DataType = (byte)1,
+                            Description = "Уровень топлива, %",
+                            Name = "can_log_fuel_level"
+                        },
+                        new
+                        {
+                            Id = 111,
+                            DataType = (byte)1,
+                            Description = "Температура охлаждающей жидкости, °C",
+                            Name = "can_log_coolant_temperature"
+                        },
+                        new
+                        {
+                            Id = 112,
+                            DataType = (byte)1,
+                            Description = "Обороты двигателя, об/мин",
+                            Name = "can_log_engine_speed"
+                        },
+                        new
+                        {
+                            Id = 120,
+                            DataType = (byte)4,
+                            Description = "Скорость",
+                            Name = "velocity_speed"
+                        },
+                        new
+                        {
+                            Id = 121,
+                            DataType = (byte)4,
+                            Description = "Направление",
+                            Name = "velocity_direction"
                         },
                         new
                         {
@@ -1192,14 +1243,6 @@ namespace BioTonFMSApp.Migrations
                         },
                         new
                         {
-                            Id = 26,
-                            DataType = (byte)8,
-                            Description = "Данные CAN-шины (CAN_A1) или CAN-LOG.\nУровень топлива, %;\nтемпература охлаждающей жидкости, °C;\nобороты двигателя, об/мин.",
-                            Name = "CAN_A1",
-                            StructType = 4
-                        },
-                        new
-                        {
                             Id = 27,
                             DataType = (byte)1,
                             Description = "Данные CAN-шины (CAN_B0) или CAN-LOG.\nПробег автомобиля, м.",
@@ -1294,6 +1337,13 @@ namespace BioTonFMSApp.Migrations
                             Id = 40,
                             DataType = (byte)2,
                             Description = "0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.\n1 – статус GPRS сессии. 1- установлена, 0 – нет.\n2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.\n3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.\n4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.\n5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.\n6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует.",
+                            Name = "expanded_terminal_status"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            DataType = (byte)2,
+                            Description = "",
                             Name = "expanded_terminal_status"
                         });
                 });
@@ -1628,8 +1678,6 @@ namespace BioTonFMSApp.Migrations
                     b.HasOne("BioTonFMS.Domain.TrackerTag", "Tag")
                         .WithMany("ProtocolTags")
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_protocol_tag_tracker_tags_tag_id");
 
                     b.Navigation("Tag");

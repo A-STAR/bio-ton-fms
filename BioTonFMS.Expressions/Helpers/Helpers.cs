@@ -118,7 +118,8 @@ public static class Helpers
     {
         if (compiledExpression.ExpressionTree == null)
             return null;
-        var args = compiledExpression.ExpressionTree.Parameters.Select(p => arguments[p.Name!]);
+        var args = compiledExpression.ExpressionTree.Parameters
+            .Select(p => arguments.TryGetValue(p.Name!, out var value) ? value : null);
         return compiledExpression.Compile()?.DynamicInvoke(args.ToArray());
     }
 

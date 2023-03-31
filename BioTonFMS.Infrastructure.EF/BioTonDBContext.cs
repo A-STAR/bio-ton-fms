@@ -1,5 +1,6 @@
 ﻿using BioTonFMS.Domain;
 using BioTonFMS.Domain.Identity;
+using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
@@ -46,6 +47,9 @@ namespace BioTonFMS.Infrastructure.EF
 
             modelBuilder.Entity<Unit>()
                 .HasData(UnitPredefinedData.Units);
+
+            modelBuilder.Entity<FuelType>()
+                .HasData(FuelTypePredefinedData.FuelTypes);
         }
     }
 }

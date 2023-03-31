@@ -90,7 +90,7 @@ public static class Seeds
             .RuleFor(v => v.Id, (_, _) => vehicleId--)
             .RuleFor(v => v.Name, (f, _) => f.Hacker.Adjective() + -(vehicleId+1))
             .RuleFor(v => v.Type, (f, _) => f.Random.Enum<VehicleTypeEnum>())
-            .RuleFor(v => v.VehicleGroupId, (f, _) => vehicleGroupIds[f.Random.Int(0, vehicleGroupIds.Length - 1)])
+            .RuleFor(v => v.VehicleGroupId, (f, _) => vehicleGroupIds.Length == 0 ? null : vehicleGroupIds[f.Random.Int(0, vehicleGroupIds.Length - 1)])
             .RuleFor(v => v.Make, (f, _) => f.Vehicle.Manufacturer())
             .RuleFor(v => v.Model, (f, _) => f.Vehicle.Model())
             .RuleFor(v => v.VehicleSubType, (f, _) => f.Random.Enum<VehicleSubTypeEnum>())

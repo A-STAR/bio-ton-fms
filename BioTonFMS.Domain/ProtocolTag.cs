@@ -17,13 +17,11 @@ public class ProtocolTag : EntityBase, IAggregateRoot
     /// <summary>
     /// Идентификатор тега
     /// </summary>
-    [Required]
-    public int TagId { get; set; }
+    public int? TagId { get; set; }
 
     /// <summary>
     /// Ссылка на тег
     /// </summary>
-    [Required]
     public TrackerTag? Tag { get; set; } = null!;
 
     /// <summary>
