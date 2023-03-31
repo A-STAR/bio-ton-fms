@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Observable, Subscription } from 'rxjs';
 
@@ -65,6 +66,8 @@ export default class SignInComponent implements OnInit, OnDestroy {
       .signIn(value as Credentials)
       .subscribe({
         next: async () => {
+          this.snackBar.dismiss();
+
           await this.router.navigate(['/'], {
             replaceUrl: true
           });
@@ -97,7 +100,13 @@ export default class SignInComponent implements OnInit, OnDestroy {
     });
   }
 
-  constructor(private fb: FormBuilder, private router: Router, private systemService: SystemService, private authService: AuthService) { }
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private systemService: SystemService,
+    private authService: AuthService
+  ) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
