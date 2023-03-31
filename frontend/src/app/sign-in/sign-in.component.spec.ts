@@ -11,6 +11,7 @@ import { MatCardHarness } from '@angular/material/card/testing';
 import { MatDividerHarness } from '@angular/material/divider/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AuthService } from '../auth.service';
 
@@ -35,6 +36,7 @@ describe('SignInComponent', () => {
           NoopAnimationsModule,
           HttpClientTestingModule,
           RouterTestingModule,
+          MatSnackBarModule,
           SignInComponent
         ]
       })
@@ -277,6 +279,9 @@ describe('SignInComponent', () => {
     spyOn(authService, 'signIn')
       .and.callThrough();
 
+    const snackBar = TestBed.inject(MatSnackBar);
+
+    spyOn(snackBar, 'dismiss');
     spyOn(router, 'navigate');
 
     const signInButton = await card.getHarness(MatButtonHarness.with({
@@ -294,6 +299,9 @@ describe('SignInComponent', () => {
     }, 'login request');
 
     loginRequest.flush(testCredentialsResponse);
+
+    expect(snackBar.dismiss)
+      .toHaveBeenCalledBefore(router.navigate);
 
     expect(router.navigate)
       .toHaveBeenCalledWith(['/'], {

@@ -1,13 +1,13 @@
-import { ErrorHandler as ErrorHanlderInterface, Injectable, NgZone } from '@angular/core';
+import { ErrorHandler as ErrorHandlerClass, Injectable, NgZone } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 
 @Injectable()
-export class ErrorHandler implements ErrorHanlderInterface {
+export class ErrorHandler implements ErrorHandlerClass {
   /**
    * Handle application and response errors.
    *
-   * @param error An error or `HttpErrorResposne`.
+   * @param error An error or `HttpErrorResponse`.
    */
   handleError(error: any) {
     const isErrorResponse = error instanceof HttpErrorResponse;
