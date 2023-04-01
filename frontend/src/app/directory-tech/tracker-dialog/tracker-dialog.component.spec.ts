@@ -19,7 +19,14 @@ import { Observable, of } from 'rxjs';
 import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
-import { DATE_PATTERN, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
+import {
+  DATE_PATTERN,
+  inputDateFormat,
+  localeID,
+  TrackerDialogComponent,
+  TRACKER_CREATED,
+  TRACKER_UPDATED
+} from './tracker-dialog.component';
 
 import { testNewTracker, testTrackerTypeEnum } from '../tracker.service.spec';
 
@@ -46,7 +53,7 @@ describe('TrackerDialogComponent', () => {
         providers: [
           {
             provide: LOCALE_ID,
-            useValue: 'ru-RU'
+            useValue: localeID
           },
           {
             provide: MAT_DIALOG_DATA,
@@ -60,7 +67,7 @@ describe('TrackerDialogComponent', () => {
       })
       .compileComponents();
 
-    registerLocaleData(localeRu, 'ru-RU');
+    registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackerDialogComponent);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
@@ -211,7 +218,7 @@ describe('TrackerDialogComponent', () => {
       .withContext('render type select text')
       .toBeResolvedTo(testTrackerTypeEnum[0].value);
 
-    const start = formatDate(testNewTracker.startDate!, 'dd.MM.YYYY HH:mm', 'ru-RU');
+    const start = formatDate(testNewTracker.startDate!, inputDateFormat, localeID);
 
     loader.getHarness(
       MatInputHarness.with({
@@ -294,9 +301,9 @@ describe('TrackerDialogComponent', () => {
     });
 
     const testDate = new Date();
-    const testLocaleTime = testDate.toLocaleTimeString('ru-RU');
+    const testLocaleTime = testDate.toLocaleTimeString(localeID);
 
-    let testStart = `${testDate.toLocaleDateString('ru-RU')} ${testLocaleTime.slice(0, -3)}`;
+    let testStart = `${testDate.toLocaleDateString(localeID)} ${testLocaleTime.slice(0, -3)}`;
 
     await startInput.setValue(testStart);
 

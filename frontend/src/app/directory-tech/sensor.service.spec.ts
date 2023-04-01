@@ -16,6 +16,7 @@ import {
 } from './sensor.service';
 
 import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
+import { TEST_TRACKER_ID } from './tracker.service.spec';
 
 describe('SensorService', () => {
   let httpTestingController: HttpTestingController;
@@ -487,8 +488,6 @@ export const testSensors: Sensors = {
     total: 1
   }
 };
-
-export const TEST_TRACKER_ID = 1;
 
 export const testSensor: Sensor = {
   id: 1,

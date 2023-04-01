@@ -1,7 +1,7 @@
 import { ErrorHandler, importProvidersFrom, LOCALE_ID } from '@angular/core';
 import { ApplicationConfig, bootstrapApplication } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, registerLocaleData } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import localeRu from '@angular/common/locales/ru';
 import { provideRouter } from '@angular/router';
@@ -54,6 +54,12 @@ const appConfig: ApplicationConfig = {
     {
       provide: LOCALE_ID,
       useValue: 'ru-RU'
+    },
+    {
+      provide: DATE_PIPE_DEFAULT_OPTIONS,
+      useValue: {
+        dateFormat: 'd MMMM y, H:mm'
+      }
     },
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,

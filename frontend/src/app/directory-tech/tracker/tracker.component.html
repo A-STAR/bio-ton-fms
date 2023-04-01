@@ -11,7 +11,7 @@
         <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
           <ng-container [ngSwitch]="element.param" *ngSwitchCase="ParameterColumn.Value">
             <ng-container *ngSwitchCase="TrackerParameterName.Time">
-              {{ element[column.key] | date:DATE_FORMAT }}
+              {{ element[column.key] | date }}
             </ng-container>
 
             <ng-container [ngTemplateOutlet]="degree" *ngSwitchCase="TrackerParameterName.Latitude"></ng-container>
@@ -19,14 +19,14 @@
             <ng-container [ngTemplateOutlet]="degree" *ngSwitchCase="TrackerParameterName.Longitude"></ng-container>
 
             <ng-container *ngSwitchCase="TrackerParameterName.Altitude">
-              {{ element[column.key] }} m
+              {{ element[column.key] | number: '1.1-1':'en-US' }} м
             </ng-container>
 
             <ng-container *ngSwitchCase="TrackerParameterName.Speed">
-              {{ element[column.key] }} km/h
+              {{ element[column.key] | number: '1.1-1':'en-US' }} км/ч
             </ng-container>
 
-            <ng-template #degree>{{ element[column.key] }}&deg;</ng-template>
+            <ng-template #degree>{{ element[column.key] | number: '1.6-6':'en-US' }}&deg;</ng-template>
           </ng-container>
 
           <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
@@ -41,7 +41,11 @@
 </mat-card>
 
 <mat-card>
-  <mat-card-title>Доступные данные</mat-card-title>
+  <mat-card-header>
+    <mat-card-title>Доступные параметры</mat-card-title>
+
+    <button mat-stroked-button color="accent" (click)="onParametersHistory()">История значений</button>
+  </mat-card-header>
 
   <mat-card-content>
     <mat-table [dataSource]="parametersDataSource" *ngIf="parameters$ | async">
@@ -51,7 +55,7 @@
         <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
           <ng-container [ngSwitch]="element.param" *ngSwitchCase="ParameterColumn.Value">
             <ng-container *ngSwitchCase="TrackerParameterName.Time">
-              {{ element[column.key] | date:DATE_FORMAT }}
+              {{ element[column.key] | date }}
             </ng-container>
 
             <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
@@ -70,9 +74,9 @@
 
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Дополнительные параметры</mat-card-title>
+    <mat-card-title>Датчики</mat-card-title>
 
-    <button mat-flat-button color="accent" (click)="onCreateSensor()">Добавить запись</button>
+    <button mat-flat-button color="accent" (click)="onCreateSensor()">Добавить датчик</button>
   </mat-card-header>
 
   <mat-card-content>

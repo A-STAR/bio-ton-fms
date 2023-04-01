@@ -23,6 +23,7 @@ import { SensorDialogComponent, SensorDialogData, SENSOR_CREATED, SENSOR_UPDATED
 
 import { Tracker } from '../tracker.service';
 
+import { TEST_TRACKER_ID } from '../tracker.service.spec';
 import {
   testNewSensor,
   testSensor,
@@ -30,8 +31,7 @@ import {
   testSensorGroups,
   testSensorTypes,
   testUnits,
-  testValidationTypeEnum,
-  TEST_TRACKER_ID
+  testValidationTypeEnum
 } from '../sensor.service.spec';
 
 describe('SensorDialogComponent', () => {

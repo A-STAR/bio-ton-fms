@@ -59,7 +59,7 @@
       </ng-container>
 
       <ng-container *ngSwitchCase="TrackerColumn.Start">
-        {{ element[column.key] | date:DATE_FORMAT }}
+        {{ element[column.key] | date }}
       </ng-container>
 
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="TrackerColumn.Vehicle"></ng-container>

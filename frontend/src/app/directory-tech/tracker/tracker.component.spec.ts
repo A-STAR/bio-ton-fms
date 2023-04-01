@@ -2,13 +2,14 @@ import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, formatNumber, KeyValue, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatCardHeader } from '@angular/material/card';
 import { MatCardHarness } from '@angular/material/card/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -26,9 +27,10 @@ import { Sensor, Sensors, SensorService } from '../sensor.service';
 import TrackerComponent, { SensorColumn, sensorColumns, trackerParameterColumns } from './tracker.component';
 import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
-import { DATE_FORMAT } from '../trackers/trackers.component';
-import { testParameters, testStandardParameters } from '../tracker.service.spec';
-import { testSensor, testSensors, TEST_TRACKER_ID } from '../sensor.service.spec';
+import { localeID } from '../tracker-dialog/tracker-dialog.component';
+import { testParameters, testStandardParameters, TEST_TRACKER_ID } from '../tracker.service.spec';
+import { testSensor, testSensors } from '../sensor.service.spec';
+import { dateFormat } from '../trackers/trackers.component.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;
@@ -53,7 +55,11 @@ describe('TrackerComponent', () => {
         providers: [
           {
             provide: LOCALE_ID,
-            useValue: 'ru-RU'
+            useValue: localeID
+          },
+          {
+            provide: DATE_PIPE_DEFAULT_OPTIONS,
+            useValue: { dateFormat }
           },
           {
             provide: ActivatedRoute,
@@ -63,7 +69,7 @@ describe('TrackerComponent', () => {
       })
       .compileComponents();
 
-    registerLocaleData(localeRu, 'ru-RU');
+    registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackerComponent);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
@@ -221,56 +227,83 @@ describe('TrackerComponent', () => {
         )
     ));
 
-    cellTexts
-      .slice(0, 1)
-      .forEach((rowCellTexts, index) => {
-        const {
-          name,
-          paramName: param,
-          lastValueDateTime: date,
-          lastValueDecimal: decimal
-        } = testStandardParameters[index];
+    cellTexts.forEach((rowCellTexts, index) => {
+      const {
+        name,
+        paramName: param,
+        lastValueDateTime: date,
+        lastValueDecimal: decimal
+      } = testStandardParameters[index];
 
-        let value: string;
+      let value: string;
 
-        switch (param) {
-          case TrackerParameterName.Time:
-            value = formatDate(date!, DATE_FORMAT, 'ru-RU');
+      switch (param) {
+        case TrackerParameterName.Time:
+          value = formatDate(date!, dateFormat, localeID);
 
-            break;
-          case TrackerParameterName.Latitude:
-          case TrackerParameterName.Longitude:
-            value = `${decimal}&deg;`;
+          break;
+        case TrackerParameterName.Latitude:
+        case TrackerParameterName.Longitude: {
+          const formattedDecimal = formatNumber(decimal!, 'en-US', '1.6-6');
 
-            break;
+          value = `${formattedDecimal}°`;
 
-          case TrackerParameterName.Altitude:
-            value = `${decimal} m`;
-
-            break;
-
-          case TrackerParameterName.Speed:
-            value = `${decimal} km/h`;
+          break;
         }
 
-        const standardParameterTexts = [name, param, value];
+        case TrackerParameterName.Altitude: {
+          const formattedDecimal = formatNumber(decimal!, 'en-US', '1.1-1');
 
-        expect(rowCellTexts)
-          .withContext('render cells text')
-          .toEqual(standardParameterTexts);
-      });
+          value = `${formattedDecimal} м`;
+
+          break;
+        }
+
+        case TrackerParameterName.Speed: {
+          const formattedDecimal = formatNumber(decimal!, 'en-US', '1.1-1');
+
+          value = `${formattedDecimal} км/ч`;
+        }
+      }
+
+      const standardParameterTexts = [name, param, value];
+
+      expect(rowCellTexts)
+        .withContext('render cells text')
+        .toEqual(standardParameterTexts);
+    });
   });
 
   it('should render parameters card', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
     expect(card)
-      .withContext('render parameters card')
+      .withContext('render card')
       .not.toBeNull();
+
+    const cardHeader = fixture.debugElement
+      .query(
+        By.css('mat-card:nth-of-type(2)')
+      )
+      .query(
+        By.directive(MatCardHeader)
+      );
+
+    expect(cardHeader)
+      .withContext('render card header')
+      .not.toBeNull();
+
+    card.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-card-header',
+        text: 'История значений',
+        variant: 'stroked'
+      })
+    );
   });
 
   it('should get parameters', () => {
@@ -281,7 +314,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -299,7 +332,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table rows', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -319,7 +352,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table header cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -350,7 +383,7 @@ describe('TrackerComponent', () => {
   it('should render tracker parameter table cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Доступные данные'
+        title: 'Доступные параметры'
       })
     );
 
@@ -374,38 +407,83 @@ describe('TrackerComponent', () => {
         )
     ));
 
-    cellTexts
-      .slice(0, 1)
-      .forEach((rowCellTexts, index) => {
-        const {
-          paramName: param,
-          lastValueDateTime: date,
-          lastValueDecimal: decimal,
-          lastValueString: string
-        } = testParameters[index];
+    cellTexts.forEach((rowCellTexts, index) => {
+      const {
+        paramName: param,
+        lastValueDateTime: date,
+        lastValueDecimal: decimal,
+        lastValueString: string
+      } = testParameters[index];
 
-        const value = param === TrackerParameterName.Time
-          ? formatDate(date!, DATE_FORMAT, 'ru-RU')
-          : decimal?.toString() ?? string!;
+      const value = param === TrackerParameterName.Time
+        ? formatDate(date!, dateFormat, localeID)
+        : decimal?.toString() ?? string!;
 
-        const parameterTexts = [param, value];
+      const parameterTexts = [param, value];
 
-        expect(rowCellTexts)
-          .withContext('render cells text')
-          .toEqual(parameterTexts);
-      });
+      expect(rowCellTexts)
+        .withContext('render cells text')
+        .toEqual(parameterTexts);
+    });
+  });
+
+  it('should render parameters history dialog', async () => {
+    const card = await loader.getHarness(
+      MatCardHarness.with({
+        title: 'Доступные параметры'
+      })
+    );
+
+    const parametersHistoryButton = await card.getHarness(
+      MatButtonHarness.with({
+        text: 'История значений',
+        variant: 'stroked'
+      })
+    );
+
+    await parametersHistoryButton.click();
+
+    const parametersHistoryDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(parametersHistoryDialog)
+      .withContext('render a parameters history dialog')
+      .not.toBeNull();
+
+    await parametersHistoryDialog!.close();
+
+    overlayContainer.ngOnDestroy();
   });
 
   it('should render sensors card', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
     expect(card)
-      .withContext('render sensors card')
+      .withContext('render card')
       .not.toBeNull();
+
+    const cardHeader = fixture.debugElement
+      .query(
+        By.css('mat-card:nth-of-type(3)')
+      )
+      .query(
+        By.directive(MatCardHeader)
+      );
+
+    expect(cardHeader)
+      .withContext('render card header')
+      .not.toBeNull();
+
+    await card.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-card-header',
+        text: 'Добавить датчик',
+        variant: 'flat'
+      })
+    );
   });
 
   it('should get sensors', () => {
@@ -416,7 +494,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -434,7 +512,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table rows', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -454,7 +532,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table header cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -487,7 +565,7 @@ describe('TrackerComponent', () => {
   it('should render sensor table action cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -543,7 +621,7 @@ describe('TrackerComponent', () => {
   it('should render tracker sensor table cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -592,7 +670,7 @@ describe('TrackerComponent', () => {
   it('should render sensor table visibility cells', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
@@ -622,36 +700,17 @@ describe('TrackerComponent', () => {
     });
   });
 
-  it('should render create sensor button', async () => {
-    const card = await loader.getHarness(
-      MatCardHarness.with({
-        title: 'Дополнительные параметры'
-      })
-    );
-
-    const createSensorButton = await card.getHarnessOrNull(
-      MatButtonHarness.with({
-        variant: 'flat',
-        text: 'Добавить запись'
-      })
-    );
-
-    expect(createSensorButton)
-      .withContext('render a create sensor button')
-      .not.toBeNull();
-  });
-
   it('should create tracker sensor', async () => {
     const card = await loader.getHarness(
       MatCardHarness.with({
-        title: 'Дополнительные параметры'
+        title: 'Датчики'
       })
     );
 
     const createSensorButton = await card.getHarness(
       MatButtonHarness.with({
         variant: 'flat',
-        text: 'Добавить запись'
+        text: 'Добавить датчик'
       })
     );
 

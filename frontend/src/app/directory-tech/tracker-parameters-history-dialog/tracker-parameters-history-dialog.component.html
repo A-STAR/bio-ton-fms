@@ -1,0 +1,46 @@
+<h1 mat-dialog-title>История значений параметров</h1>
+
+<mat-dialog-content>
+  <mat-table [dataSource]="parametersDataSource" *ngIf="parameters$ | async">
+    <ng-container [matColumnDef]="column.key" *ngFor="let column of columns">
+      <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+
+      <mat-cell [ngSwitch]="column.key" *matCellDef="let element; let index = index">
+        <ng-container *ngSwitchCase="Column.Hash">{{ index + 1 }}</ng-container>
+
+        <ng-container *ngSwitchCase="Column.Time">
+          {{ element[column.key] | date }}
+        </ng-container>
+
+        <ng-container *ngSwitchCase="Column.Speed">
+          {{ element[column.key] | number: '1.1-1':'en-US' }}
+        </ng-container>
+
+        <ng-container *ngSwitchCase="Column.Coordinates">
+          {{ element[column.key].latitude | number: '1.6-6':'en-US' }}
+          {{ element[column.key].longitude | number: '1.6-6':'en-US' }}
+        </ng-container>
+
+        <ng-container *ngSwitchCase="Column.Altitude">
+          {{ element[column.key] | number: '1.1-1':'en-US' }}
+        </ng-container>
+
+        <ng-container *ngSwitchCase="Column.Parameters">
+          <mat-chip-set>
+            <mat-chip [disableRipple]="true" *ngFor="let parameter of element[column.key].split(',') | slice:0:-1">
+              {{ parameter }}
+            </mat-chip>
+          </mat-chip-set>
+        </ng-container>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
+
+    <mat-row *matRowDef="let row; columns: columnKeys"></mat-row>
+  </mat-table>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-stroked-button color="accent" mat-dialog-close>Закрыть</button>
+</mat-dialog-actions>
