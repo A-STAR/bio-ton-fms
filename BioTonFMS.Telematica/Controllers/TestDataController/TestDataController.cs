@@ -110,7 +110,8 @@ public class TestDataController : ValidationControllerBase
         {
             return BadRequest("Test data service is not available!");
         }
-
+        // удаляем старые тестовые данные, чтобы избежать конфликтов 
+        DeleteData();
         var sensorTypeIds = _sensorTypeRepository.GetSensorTypes().Select(v => v.Id);
         var unitIds = _unitRepository.GetUnits().Select(v => v.Id);
         var trackerTags = _trackerTagRepository.GetTags().ToArray();

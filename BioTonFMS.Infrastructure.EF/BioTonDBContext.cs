@@ -4,6 +4,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Units;
+using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 // ReSharper disable InconsistentNaming
@@ -50,6 +51,9 @@ namespace BioTonFMS.Infrastructure.EF
 
             modelBuilder.Entity<FuelType>()
                 .HasData(FuelTypePredefinedData.FuelTypes);
+
+            modelBuilder.Entity<VehicleGroup>()
+                .HasData(VehicleGroupPredefinedData.VehicleGroups);
         }
     }
 }

@@ -10,6 +10,11 @@ public static class FuelTypePredefinedData
         {
             Id = 1,
             Name = "Бензин АИ-95"
+        },
+        new FuelType()
+        {
+            Id = 2,
+            Name = "Дизельное топливо"
         }
     };
 }
