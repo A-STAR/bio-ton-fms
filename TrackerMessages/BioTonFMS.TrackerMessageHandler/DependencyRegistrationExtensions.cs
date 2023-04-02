@@ -52,6 +52,14 @@ public static class DependencyRegistrationExtensions
 
     public static IServiceCollection RegisterDataAccess(this IServiceCollection services)
     {
+        services.AddTransient<IKeyValueProvider<Tracker, int>, KeyValueProvider<Tracker, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<Tracker>, QueryableProvider<Tracker, BioTonDBContext>>();
+        services.AddTransient<ITrackerRepository, TrackerRepository>();
+
+        services.AddTransient<IKeyValueProvider<Vehicle, int>, KeyValueProvider<Vehicle, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<Vehicle>, QueryableProvider<Vehicle, BioTonDBContext>>();
+        services.AddTransient<IVehicleRepository, VehicleRepository>();
+
         services.AddTransient<IKeyValueProvider<TrackerTag, int>, KeyValueProvider<TrackerTag, BioTonDBContext, int>>();
         services.AddTransient<IQueryableProvider<TrackerTag>, QueryableProvider<TrackerTag, BioTonDBContext>>();
         services.AddTransient<ITrackerTagRepository, TrackerTagRepository>();
