@@ -14,7 +14,8 @@ namespace BioTonFMS.Telematica.Expressions;
 
 public static class ValidationExtension
 {
-    public static IEnumerable<SensorProblemDescription> ValidateSensor(this Tracker tracker, IEnumerable<TrackerTag> trackerTags, Sensor sensor,
+    public static IEnumerable<SensorProblemDescription> ValidateSensor(this Tracker tracker, IEnumerable<TrackerTag> trackerTags,
+        Sensor sensor,
         ILogger logger, IValidator<Sensor> sensorValidator)
     {
         Debug.Assert(tracker.Sensors.Contains(sensor));
@@ -25,7 +26,8 @@ public static class ValidationExtension
 
         if (!new Regex("^[a-zA-Z_]+[a-zA-Z_0-9]*$").IsMatch(sensor.Name))
         {
-            problemList.Add(new SensorProblemDescription(nameof(sensor.Name), $"Имя датчика не соответствует требованиям!"));
+            problemList.Add(new SensorProblemDescription(nameof(sensor.Name),
+                $"Имя датчика должно содержать только латинские буквы цифры и подчеркивание и начинаться с буквы или подчеркивания!"));
         }
 
         if (tracker.Sensors.Exists(s => s.Name == sensor.Name && !ReferenceEquals(s, sensor)))

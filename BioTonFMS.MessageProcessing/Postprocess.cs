@@ -5,6 +5,14 @@ namespace BioTonFMS.MessageProcessing;
 
 public static class Postprocess
 {
+    /// <summary>
+    /// Выполняет постобработку AST датчика, добавляя в него вычисление "валидатора",
+    /// при его наличии.
+    /// </summary>
+    /// <param name="ast">Дерево выражения датчика</param>
+    /// <param name="properties">Свойства выражения датчика</param>
+    /// <returns>Обработанное выражение с добавленным "валидатором"</returns>
+    /// <exception cref="Exception">Исключение выбрасывается в том случае, если тип датчика неверен</exception>
     public static AstNode? PostprocessAst(AstNode? ast, SensorExpressionProperties properties)
     {
         if (ast == null)

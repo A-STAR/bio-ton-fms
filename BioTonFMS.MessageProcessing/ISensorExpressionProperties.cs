@@ -3,6 +3,10 @@ using BioTonFMS.Expressions;
 
 namespace BioTonFMS.MessageProcessing;
 
+/// <summary>
+/// Этот интерфейс позволяет построителю деревьев выражений для формул датчиков обращаться к той части описания выражения, которая
+/// относится именно к датчикам
+/// </summary>
 public interface ISensorExpressionProperties : IExpressionProperties
 {
     /// <summary>

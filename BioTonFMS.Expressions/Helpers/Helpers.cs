@@ -85,6 +85,15 @@ public static class Helpers
                 return new CompiledExpression<TExpressionProperties>(node.Properties, compiledExpression);
             });
     }
+    
+    /// <summary>
+    /// Строит граф выражений
+    /// </summary>
+    /// <param name="expressions">Выражения</param>
+    /// <param name="exceptionHandler">Обработчик исключений парсинга</param>
+    /// <param name="postprocess">Постобработчик AST выражений</param>
+    /// <typeparam name="TExpressionProperties">Тип представляющий выражение. Должен реализовывать интерфейс IExpressionProperties</typeparam>
+    /// <returns>Граф выражений</returns>
     public static Graph<ExpressionGraphNode<TExpressionProperties>> BuildExpressionGraph<TExpressionProperties>(
         IEnumerable<TExpressionProperties> expressions,
         IExceptionHandler? exceptionHandler = null, Func<AstNode?, TExpressionProperties, AstNode?>? postprocess = null)

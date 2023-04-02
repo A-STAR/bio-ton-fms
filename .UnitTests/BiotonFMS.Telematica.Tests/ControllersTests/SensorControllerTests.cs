@@ -105,6 +105,40 @@ public class SensorControllerTests
 
 
     [Fact]
+    public void AddSensor_ValidSensor_Ok()
+    {
+        var controller = GetController();
+
+        var sensorDto = new CreateSensorDto()
+        {
+            Name = "c", TrackerId = TrackerRepositoryMock.ExistentTrackerId, Description = "description", Formula = "const1",
+            ValidatorId = SensorRepositoryMock.ExistentSensorId, ValidationType = ValidationTypeEnum.LogicalAnd,
+            SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, UnitId = UnitRepositoryMock.MeterUnitId,
+            DataType = SensorDataTypeEnum.Number, FuelUse = 1, UseLastReceived = false
+        };
+
+        var result = controller.AddSensor(sensorDto);
+
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = result as OkObjectResult;
+        okResult!.StatusCode.Should().Be(200);
+
+        SensorRepositoryMock.LastAddArgument.Should().NotBeNull();
+        if (SensorRepositoryMock.LastAddArgument is null) return;
+        SensorRepositoryMock.LastAddArgument.Name.Should().Be("c");
+        SensorRepositoryMock.LastAddArgument.TrackerId.Should().Be(TrackerRepositoryMock.ExistentTrackerId);
+        SensorRepositoryMock.LastAddArgument.Description.Should().Be("description");
+        SensorRepositoryMock.LastAddArgument.Formula.Should().Be("const1");
+        SensorRepositoryMock.LastAddArgument.ValidatorId.Should().Be(SensorRepositoryMock.ExistentSensorId);
+        SensorRepositoryMock.LastAddArgument.ValidationType.Should().Be(ValidationTypeEnum.LogicalAnd);
+        SensorRepositoryMock.LastAddArgument.SensorTypeId.Should().Be(SensorTypeRepositoryMock.ExistentSensorTypeId);
+        SensorRepositoryMock.LastAddArgument.UnitId.Should().Be(UnitRepositoryMock.MeterUnitId);
+        SensorRepositoryMock.LastAddArgument.DataType.Should().Be(SensorDataTypeEnum.Number);
+        SensorRepositoryMock.LastAddArgument.FuelUse.Should().Be(1);
+        SensorRepositoryMock.LastAddArgument.UseLastReceived.Should().Be(false);
+    }
+
+    [Fact]
     public void AddSensor_SensorTypeWithDataTypeConstraint_SetsDataType()
     {
         var controller = GetController();
@@ -145,6 +179,40 @@ public class SensorControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         Assert.Equal(UnitRepositoryMock.SecondUnitId, SensorRepositoryMock.LastAddArgument!.UnitId);
+    }
+
+    [Fact]
+    public void UpdateSensor_ValidSensor_Ok()
+    {
+        var controller = GetController();
+
+        var sensorDto = new UpdateSensorDto()
+        {
+            Name = "a", TrackerId = TrackerRepositoryMock.ExistentTrackerId, Description = "description", Formula = "const1",
+            ValidatorId = SensorRepositoryMock.ExistentSensorId, ValidationType = ValidationTypeEnum.LogicalAnd,
+            SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, UnitId = UnitRepositoryMock.ExistentUnitId,
+            DataType = SensorDataTypeEnum.Number, FuelUse = 1, UseLastReceived = false
+        };
+
+        var result = controller.UpdateSensor(1, sensorDto);
+
+        result.Should().BeOfType<OkResult>();
+        var okResult = result as OkResult;
+        okResult!.StatusCode.Should().Be(200);
+
+        SensorRepositoryMock.LastUpdateArgument.Should().NotBeNull();
+        if (SensorRepositoryMock.LastUpdateArgument is null) return;
+        SensorRepositoryMock.LastUpdateArgument.Name.Should().Be("a");
+        SensorRepositoryMock.LastUpdateArgument.TrackerId.Should().Be(TrackerRepositoryMock.ExistentTrackerId);
+        SensorRepositoryMock.LastUpdateArgument.Description.Should().Be("description");
+        SensorRepositoryMock.LastUpdateArgument.Formula.Should().Be("const1");
+        SensorRepositoryMock.LastUpdateArgument.ValidatorId.Should().Be(SensorRepositoryMock.ExistentSensorId);
+        SensorRepositoryMock.LastUpdateArgument.ValidationType.Should().Be(ValidationTypeEnum.LogicalAnd);
+        SensorRepositoryMock.LastUpdateArgument.SensorTypeId.Should().Be(SensorTypeRepositoryMock.ExistentSensorTypeId);
+        SensorRepositoryMock.LastUpdateArgument.UnitId.Should().Be(UnitRepositoryMock.MeterUnitId);
+        SensorRepositoryMock.LastUpdateArgument.DataType.Should().Be(SensorDataTypeEnum.Number);
+        SensorRepositoryMock.LastUpdateArgument.FuelUse.Should().Be(1);
+        SensorRepositoryMock.LastUpdateArgument.UseLastReceived.Should().Be(false);
     }
 
     [Fact]
@@ -191,6 +259,18 @@ public class SensorControllerTests
     }
 
     [Fact]
+    public void Delete_ExistingSensor_Ok()
+    {
+        var controller = GetController();
+
+        var result = controller.DeleteSensor(SensorRepositoryMock.ExistentSensorId);
+
+        result.Should().BeOfType<OkResult>();
+        var okResult = result as OkResult;
+        okResult!.StatusCode.Should().Be(200);
+    }
+    
+    [Fact]
     public void Delete_NonExistentSensor_NotFound()
     {
         var controller = GetController();
@@ -217,7 +297,7 @@ public class SensorControllerTests
         badResult!.StatusCode.Should().Be(409);
         (badResult.Value as string).Should().Match("*ссылается*");
     }
-    
+
     private static SensorController GetController()
     {
         var mapperConfig = new MapperConfiguration(cfg =>

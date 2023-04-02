@@ -2,6 +2,7 @@
 
 namespace BioTonFMS.MessageProcessing;
 
+/// <inheritdoc cref="ISensorExpressionProperties"/>
 public readonly struct SensorExpressionProperties : ISensorExpressionProperties
 {
     public readonly Sensor Sensor;

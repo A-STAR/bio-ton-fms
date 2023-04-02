@@ -1,5 +1,10 @@
 ﻿namespace BioTonFMS.Expressions.Ast;
 
+/// <summary>
+/// Тип узла AST, который представляет вызов функции.
+/// </summary>
+/// <remarks>Пока этот тип узла добавляется только во время постобработки.
+/// В синтаксис выражений вызов функций не добавлен.</remarks>
 public class FunctionCall : AstNode, IEquatable<FunctionCall>
 {
     /// <summary>
@@ -12,6 +17,11 @@ public class FunctionCall : AstNode, IEquatable<FunctionCall>
     /// </summary>
     public AstNode[] Arguments { get; }
 
+    /// <summary>
+    /// Конструирует узел вызова функции
+    /// </summary>
+    /// <param name="name">Имя функции</param>
+    /// <param name="arguments">Массив узлов AST представляющих аргументы функции</param>
     public FunctionCall(string name, params AstNode[] arguments)
     {
         Name = name;

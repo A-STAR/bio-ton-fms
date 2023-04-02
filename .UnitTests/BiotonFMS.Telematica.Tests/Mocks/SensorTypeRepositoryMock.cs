@@ -6,7 +6,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks;
 
 public static class SensorTypeRepositoryMock
 {
-    public const int ExistentSensorTypeId = 1;
+    public const int ExistentSensorTypeId = 3;
     public const int NonExistentSensorTypeId = -1;
 
     public const int SensorTypeWithBooleanDataTypeId = 1;

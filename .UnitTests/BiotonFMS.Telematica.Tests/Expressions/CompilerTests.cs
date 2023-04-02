@@ -118,6 +118,32 @@ public class CompilerTests
         },
         new object[]
         {
+            new BinaryOperation(
+                new Literal("1", LiteralEnum.Decimal),
+                new Literal("0", LiteralEnum.Decimal),
+                BinaryOperationEnum.Division
+                ),
+            "(1 / 0)",
+            new object[]
+            {
+                double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity
+            }
+        },
+        new object[]
+        {
+            new BinaryOperation(
+                new Literal("-1", LiteralEnum.Decimal),
+                new Literal("0", LiteralEnum.Decimal),
+                BinaryOperationEnum.Division
+                ),
+            "(-1 / 0)",
+            new object[]
+            {
+                double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity
+            }
+        },
+        new object[]
+        {
             new UnaryOperation(
                 new Literal("1", LiteralEnum.Decimal),
                 UnaryOperationEnum.Negation

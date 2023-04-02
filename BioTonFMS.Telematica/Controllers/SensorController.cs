@@ -161,28 +161,6 @@ public class SensorController : ValidationControllerBase
             return Conflict(new ServiceErrorResult(ex.Message));
         }
     }
-    private bool ProcessValidationResults(IEnumerable<SensorProblemDescription> validationResults)
-    {
-
-        var hasValidationErrors = false;
-        foreach (var problem in validationResults)
-        {
-            switch (problem.FieldName)
-            {
-                case "error":
-                    _logger.LogError("{}", problem.Message);
-                    break;
-                case "warning":
-                    _logger.LogWarning("{}", problem.Message);
-                    break;
-                default:
-                    ModelState.AddModelError(problem.FieldName, problem.Message);
-                    hasValidationErrors = true;
-                    break;
-            }
-        }
-        return hasValidationErrors;
-    }
 
     /// <summary>
     /// Обновляет датчик
@@ -295,5 +273,28 @@ public class SensorController : ValidationControllerBase
             newSensor.UnitId = sensorType.UnitId.Value;
         if (sensorType.DataType.HasValue)
             newSensor.DataType = sensorType.DataType.Value;
+    }
+    
+    private bool ProcessValidationResults(IEnumerable<SensorProblemDescription> validationResults)
+    {
+
+        var hasValidationErrors = false;
+        foreach (var problem in validationResults)
+        {
+            switch (problem.FieldName)
+            {
+                case "error":
+                    _logger.LogError("{}", problem.Message);
+                    break;
+                case "warning":
+                    _logger.LogWarning("{}", problem.Message);
+                    break;
+                default:
+                    ModelState.AddModelError(problem.FieldName, problem.Message);
+                    hasValidationErrors = true;
+                    break;
+            }
+        }
+        return hasValidationErrors;
     }
 }
