@@ -591,17 +591,28 @@ describe('TrackerComponent', () => {
             variant: 'icon',
             text: 'edit'
           })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'content_copy'
+          })
         )
       ])
     ));
 
-    actionButtons.forEach(([actionButton, updateButton]) => {
+    actionButtons.forEach(([actionButton, updateButton, duplicateButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
 
       expect(updateButton)
         .withContext('render update button')
+        .not.toBeNull();
+
+      expect(duplicateButton)
+        .withContext('render duplicate button')
         .not.toBeNull();
 
       actionButton!.hasHarness(
@@ -613,6 +624,12 @@ describe('TrackerComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
+        })
+      );
+
+      duplicateButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'content_copy'
         })
       );
     });
