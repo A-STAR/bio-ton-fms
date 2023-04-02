@@ -68,16 +68,8 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
     };
 
     if (start) {
-      const [
-        ,
-        day,
-        month,
-        year,
-        ,
-        hours,
-        minutes
-      ] = start
-        .match(DATE_PATTERN)!
+      const [day, month, year, hours, minutes] = start
+        .split(/[\.\s:]/)
         .map(Number);
 
       const monthIndex = month - 1;
@@ -189,7 +181,8 @@ type TrackerForm = {
   }>;
 }
 
-export const DATE_PATTERN = /^(0?[1-9]|[12]\d|3[01])\.(0?[1-9]|1[012])\.(19\d{2}|2\d{3})(\s(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d))?$/;
+// eslint-disable-next-line max-len
+export const DATE_PATTERN = /^(?:(?:31(\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\.)(?:0?[13-9]|1[0-2])\2))(?:(?:19|2\d)\d{2})(?:\s(?:0?[0-9]|1\d|2[0-3]):(?:0[0-9]|[1-5]\d))?$|^(?:29(\.)0?2\3(?:(?:(?:19|2\d)(?:0[48]|[2468][048]|[13579][26])|(?:(?:[2468][048])00))))(?:\s(?:0?[0-9]|1\d|2[0-3]):(?:0[0-9]|[1-5]\d))?$|^(?:0?[1-9]|1\d|2[0-8])(\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:19|2\d)\d{2})(?:\s(?:0?[0-9]|1\d|2[0-3]):(?:0[0-9]|[1-5]\d))?$/;
 const SIM_PATTERN = /^\+7\d{10}$/;
 const IMEI_PATTERN = /^\d{15}$/;
 

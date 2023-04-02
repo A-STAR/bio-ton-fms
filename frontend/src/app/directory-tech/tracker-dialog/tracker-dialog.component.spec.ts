@@ -324,16 +324,8 @@ describe('TrackerDialogComponent', () => {
 
     await saveButton.click();
 
-    const [
-      ,
-      day,
-      month,
-      year,
-      ,
-      hours,
-      minutes
-    ] = testStart
-      .match(DATE_PATTERN)!
+    const [day, month, year, hours, minutes] = testStart
+      .split(/[\.\s:]/)
       .map(Number);
 
     const monthIndex = month - 1;
@@ -427,16 +419,8 @@ describe('TrackerDialogComponent', () => {
 
     await saveButton.click();
 
-    const [
-      ,
-      day,
-      month,
-      year,
-      ,
-      hours,
-      minutes
-    ] = updatedStart
-      .match(DATE_PATTERN)!
+    const [day, month, year, hours, minutes] = updatedStart
+      .split(/[\.\s:]/)
       .map(Number);
 
     const monthIndex = month - 1;
