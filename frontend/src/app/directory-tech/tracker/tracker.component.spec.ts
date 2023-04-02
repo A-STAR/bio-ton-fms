@@ -787,6 +787,28 @@ describe('TrackerComponent', () => {
 
     await updateSensorButtons[0].click();
   });
+
+  it('should duplicate tracker sensor', async () => {
+    const duplicateSensorButtons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        selector: '[mat-icon-button]',
+        text: 'content_copy'
+      })
+    );
+
+    await duplicateSensorButtons[0].click();
+
+    const sensorDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(sensorDialog)
+      .withContext('render a tracker sensor dialog')
+      .toBeDefined();
+
+    await sensorDialog!.close();
+
+    overlayContainer.ngOnDestroy();
+  });
 });
 
 const testParams: Params = {

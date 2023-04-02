@@ -112,6 +112,17 @@ export default class TrackerComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Duplicate a sensor in table.
+   *
+   * @param dataSource Sensor data source.
+   */
+  protected onDuplicateSensor(dataSource: SensorDataSource) {
+    const { id, ...data } = this.#sensors$.value!.find(({ id }) => id === dataSource.id)!;
+
+    this.dialog.open<SensorDialogComponent, SensorDialogData<Omit<Sensor, 'id'>>, Sensor>(SensorDialogComponent, { data });
+  }
+
   #sensors$ = new BehaviorSubject<Sensor[] | undefined>(undefined);
   #subscription: Subscription | undefined;
 
