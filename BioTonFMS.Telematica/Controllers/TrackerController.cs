@@ -26,21 +26,21 @@ namespace BioTonFMS.Telematica.Controllers;
 public class TrackerController : ValidationControllerBase
 {
     private readonly ILogger<TrackerController> _logger;
-    private readonly ITrackerRepository _trackerRepo;
+    private readonly ITrackerRepository _trackerRepository;
     private readonly IValidator<UpdateTrackerDto> _updateValidator;
     private readonly IValidator<TrackersRequest> _trackersRequestValidator;
     private readonly IValidator<CreateTrackerDto> _createValidator;
     private readonly IMapper _mapper;
 
     public TrackerController(
-        ITrackerRepository trackerRepo,
+        ITrackerRepository trackerRepository,
         IMapper mapper,
         ILogger<TrackerController> logger,
         IValidator<UpdateTrackerDto> updateValidator,
         IValidator<CreateTrackerDto> createValidator,
         IValidator<TrackersRequest> trackersRequestValidator)
     {
-        _trackerRepo = trackerRepo;
+        _trackerRepository = trackerRepository;
         _mapper = mapper;
         _logger = logger;
         _updateValidator = updateValidator;
@@ -67,7 +67,7 @@ public class TrackerController : ValidationControllerBase
 
         var filter = _mapper.Map<TrackersFilter>(trackersRequest);
 
-        var trackersPaging = _trackerRepo.GetTrackers(filter);
+        var trackersPaging = _trackerRepository.GetTrackers(filter);
 
         var result = new TrackersResponse
         {
@@ -93,7 +93,7 @@ public class TrackerController : ValidationControllerBase
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetTracker(int id)
     {
-        var tracker = _trackerRepo[id];
+        var tracker = _trackerRepository[id];
         if (tracker is not null)
         {
             var trackerDto = _mapper.Map<TrackerDto>(tracker);
@@ -124,7 +124,7 @@ public class TrackerController : ValidationControllerBase
         var newTracker = _mapper.Map<Tracker>(createTrackerDto);
         try
         {
-            _trackerRepo.Add(newTracker);
+            _trackerRepository.Add(newTracker);
             var trackerDto = _mapper.Map<TrackerDto>(newTracker);
             return Ok(trackerDto);
         }
@@ -154,14 +154,14 @@ public class TrackerController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
-        var tracker = _trackerRepo[id];
+        var tracker = _trackerRepository[id];
         if (tracker is not null)
         {
             _mapper.Map(updateTrackerDto, tracker);
 
             try
             {
-                _trackerRepo.Update(tracker);
+                _trackerRepository.Update(tracker);
             }
             catch (ArgumentException ex)
             {
@@ -188,12 +188,12 @@ public class TrackerController : ValidationControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public IActionResult DeleteTracker(int id)
     {
-        var tracker = _trackerRepo[id];
+        var tracker = _trackerRepository[id];
         if (tracker is not null)
         {
             try
             {
-                _trackerRepo.Remove(tracker);
+                _trackerRepository.Remove(tracker);
                 return Ok();
             }
             catch (ArgumentException ex)
