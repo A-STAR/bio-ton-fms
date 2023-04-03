@@ -144,10 +144,24 @@ describe('SensorDialogComponent', () => {
     component.ngOnInit();
 
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog update title text')
       .toBe('Сводная информация о датчике');
+
+    const { id, ...data } = testSensor;
+
+    component['data'] = data;
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog duplicate title text')
+      .toBe('Новый датчик');
   });
 
   it('should render sensor form', async () => {

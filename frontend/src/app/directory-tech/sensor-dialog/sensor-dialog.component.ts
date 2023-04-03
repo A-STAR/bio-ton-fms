@@ -320,7 +320,7 @@ export class SensorDialogComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
-    this.title = typeof this.data === 'number' ? 'Новый датчик' : 'Сводная информация о датчике';
+    this.title = typeof this.data === 'object' && 'id' in this.data ? 'Сводная информация о датчике' : 'Новый датчик';
 
     this.#setSensorData();
     this.#initSensorForm();

@@ -110,6 +110,7 @@ describe('TrackerDialogComponent', () => {
     component['data'] = testNewTracker;
 
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog update title text')
