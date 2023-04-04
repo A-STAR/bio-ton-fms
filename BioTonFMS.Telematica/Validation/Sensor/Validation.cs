@@ -27,7 +27,7 @@ public static class ValidationExtension
         if (!new Regex("^[a-zA-Z_]+[a-zA-Z_0-9]*$").IsMatch(sensor.Name))
         {
             problemList.Add(new SensorProblemDescription(nameof(sensor.Name),
-                $"Имя датчика должно содержать только латинские буквы цифры и подчеркивание и начинаться с буквы или подчеркивания!"));
+                $"Имя датчика должно содержать только латинские буквы, цифры, символ подчёркивания и начинаться с буквы или символа подчёркивания"));
         }
 
         if (tracker.Sensors.Exists(s => s.Name == sensor.Name && !ReferenceEquals(s, sensor)))
@@ -104,7 +104,7 @@ public static class ValidationExtension
 
         var expressions = tracker.Sensors
             .Select(s => new SensorExpressionProperties(s, s.ValidatorId.HasValue ? sensorById[s.ValidatorId.Value].Name : null));
-        var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.PostprocessAst);
+        var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.AddSensorValidatorToAst);
 
         var cyclePath = graph.FindAnyLoop(sensor.Name);
 
@@ -140,7 +140,7 @@ public static class ValidationExtension
         var sensorById = tracker.Sensors.ToDictionary(s => s.Id);
         var expressions = tracker.Sensors
             .Select(s => new SensorExpressionProperties(s, s.ValidatorId.HasValue ? sensorById[s.ValidatorId.Value].Name : null));
-        var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.PostprocessAst);
+        var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.AddSensorValidatorToAst);
 
         var referencingNodes = graph.Where(node => node.Value.Edges.Contains(sensorToDelete.Name)).ToArray();
         return referencingNodes.Any() ? $"На удаляемый датчик ссылается датчик с именем {referencingNodes[0].Key}" : null;

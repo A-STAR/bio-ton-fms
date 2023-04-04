@@ -73,7 +73,7 @@ public static class MessageProcessing
                 t.Id,
                 t.Sensors
                     .Select(s => new SensorExpressionProperties(s, s.ValidatorId == null ? null : sensorNameById[s.ValidatorId.Value]))
-                    .SortAndBuild(parameterTypesDictionary, Postprocess.PostprocessAst, compilationOptions, exceptionHandler)
+                    .SortAndBuild(parameterTypesDictionary, Postprocess.AddSensorValidatorToAst, compilationOptions, exceptionHandler)
                     .ToArray());
         });
     }

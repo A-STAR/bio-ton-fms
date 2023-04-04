@@ -13,7 +13,7 @@ public static class Postprocess
     /// <param name="properties">Свойства выражения датчика</param>
     /// <returns>Обработанное выражение с добавленным "валидатором"</returns>
     /// <exception cref="Exception">Исключение выбрасывается в том случае, если тип датчика неверен</exception>
-    public static AstNode? PostprocessAst(AstNode? ast, SensorExpressionProperties properties)
+    public static AstNode? AddSensorValidatorToAst(AstNode? ast, SensorExpressionProperties properties)
     {
         if (ast == null)
             return null;
