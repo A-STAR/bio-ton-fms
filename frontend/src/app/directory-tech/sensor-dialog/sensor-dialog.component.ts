@@ -109,7 +109,7 @@ export class SensorDialogComponent implements OnInit {
     }
 
     this.#subscription = sensor$.subscribe((response: Sensor | null) => {
-      const message = typeof this.data === 'number' ? SENSOR_CREATED : SENSOR_UPDATED;
+      const message = typeof this.data === 'object' && 'id' in this.data ? SENSOR_UPDATED : SENSOR_CREATED;
 
       this.snackBar.open(message);
 
