@@ -808,6 +808,17 @@ describe('TrackerComponent', () => {
     await sensorDialog!.close();
 
     overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating sensors. */
+
+    const dialogRef = {
+      afterClosed: () => of(testSensor)
+    } as MatDialogRef<SensorDialogComponent, Sensor>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await duplicateSensorButtons[0].click();
   });
 });
 
