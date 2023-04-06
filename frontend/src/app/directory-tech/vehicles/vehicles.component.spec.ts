@@ -219,13 +219,20 @@ describe('VehiclesComponent', () => {
           MatButtonHarness.with({
             ancestor: '.actions',
             variant: 'icon',
+            text: 'sms'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
             text: 'delete'
           })
         )
       ])
     ));
 
-    actionButtons.forEach(async ([actionButton, updateButton, trackerAnchor, deleteButton], index) => {
+    actionButtons.forEach(async ([actionButton, updateButton, trackerAnchor, commandButton, deleteButton], index) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
@@ -239,20 +246,45 @@ describe('VehiclesComponent', () => {
           .withContext('render GPS tracker anchor')
           .not.toBeNull();
 
-        const anchorEl = await trackerAnchor?.host();
-        const routerLink = await anchorEl?.getAttribute('ng-reflect-router-link');
+        const trackerAnchorEl = await trackerAnchor?.host();
 
-        expect(routerLink)
+        const [trackerRouterLink, trackerAnchorTitle] = await Promise.all([
+          trackerAnchorEl?.getAttribute('ng-reflect-router-link'),
+          trackerAnchorEl?.getAttribute('title')
+        ]);
+
+        expect(trackerRouterLink)
           .withContext('render GPS tracker anchor router link')
           .toBe(
             ['../trackers', testVehicles.vehicles[index].tracker?.id].join()
           );
+
+        expect(trackerAnchorTitle)
+          .withContext('render GPS tracker anchor title')
+          .toBe('GPS-трекер');
 
         trackerAnchor!.hasHarness(
           MatIconHarness.with({
             name: 'location_on'
           })
         );
+
+        expect(commandButton)
+          .withContext('render command GPS tracker button')
+          .not.toBeNull();
+
+        commandButton!.hasHarness(
+          MatIconHarness.with({
+            name: 'sms'
+          })
+        );
+
+        const commandButtonEl = await commandButton?.host();
+        const commandButtonTitle = await commandButtonEl?.getAttribute('title');
+
+        expect(commandButtonTitle)
+          .withContext('render GPS tracker command button title')
+          .toBe('Отправить команду');
       }
 
       expect(deleteButton)
@@ -268,7 +300,8 @@ describe('VehiclesComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
-        }));
+        })
+      );
 
       deleteButton!.hasHarness(
         MatIconHarness.with({

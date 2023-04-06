@@ -256,19 +256,31 @@ describe('TrackersComponent', () => {
             selector: '[bioStopClickPropagation]',
             ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
+            text: 'sms'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            selector: '[bioStopClickPropagation]',
+            ancestor: '.actions[bioStopClickPropagation]',
+            variant: 'icon',
             text: 'delete'
           })
         )
       ])
     ));
 
-    actionButtons.forEach(async ([actionButton, updateButton, deleteButton]) => {
+    actionButtons.forEach(async ([actionButton, updateButton, commandButton, deleteButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
 
       expect(updateButton)
         .withContext('render update button')
+        .not.toBeNull();
+
+      expect(commandButton)
+        .withContext('render command button')
         .not.toBeNull();
 
       expect(deleteButton)
@@ -284,6 +296,12 @@ describe('TrackersComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
+        })
+      );
+
+      commandButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'sms'
         })
       );
 
