@@ -144,7 +144,7 @@ public class SensorController : ValidationControllerBase
 
         var trackerTags = _trackerTagRepository.GetTags();
 
-        var validationResults = tracker.ValidateSensor(trackerTags, newSensor, _logger, _sensorValidator);
+        var validationResults = tracker.ValidateSensor(trackerTags, newSensor, null, null, _logger, _sensorValidator);
 
         var hasValidationErrors = ProcessValidationResults(validationResults);
         if (hasValidationErrors)
@@ -182,43 +182,48 @@ public class SensorController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
-        var updatedSensor = _sensorRepository[id];
-        if (updatedSensor is not null)
-        {
-            _mapper.Map(updateSensorDto, updatedSensor);
-
-            ApplySensorTypeConstraints(updatedSensor);
-            
-            var tracker = _trackerRepository[updatedSensor.TrackerId];
-            if (tracker is null)
-            {
-                return BadRequest($"Трекер с идентификатором {updatedSensor.TrackerId} не существует!");
-            }
-            tracker.Sensors.RemoveAll(s => s.Id == id);
-            tracker.Sensors.Add(updatedSensor);
-
-            var trackerTags = _trackerTagRepository.GetTags();
-
-            var validationResults = tracker.ValidateSensor(trackerTags, updatedSensor, _logger, _sensorValidator);
-
-            var hasValidationErrors = ProcessValidationResults(validationResults);
-            if (hasValidationErrors)
-                return ReturnValidationErrors();
-
-            try
-            {
-                _sensorRepository.Update(updatedSensor);
-            }
-            catch( ArgumentException ex )
-            {
-                return Conflict(new ServiceErrorResult(ex.Message));
-            }
-            return Ok();
-        }
-        else
+        var oldSensor = _sensorRepository[id];
+        if (oldSensor is null)
         {
             return NotFound(new ServiceErrorResult($"Датчик с id = {id} не найден"));
         }
+        var oldTracker = _trackerRepository[oldSensor.TrackerId];
+        if (oldTracker is null)
+        {
+            _logger.LogError($"Внутренняя ошибка. Датчик с id = {id} ссылается на несуществующий трекер");
+            throw new Exception("Внутренняя ошибка.");
+        }
+
+        var updatedSensor = new Sensor();
+        _mapper.Map(updateSensorDto, updatedSensor);
+
+        ApplySensorTypeConstraints(updatedSensor);
+
+        var tracker = _trackerRepository[updatedSensor.TrackerId];
+        if (tracker is null)
+        {
+            return BadRequest($"Трекер с идентификатором {updatedSensor.TrackerId} не существует.");
+        }
+        tracker.Sensors.RemoveAll(s => s.Id == id);
+        tracker.Sensors.Add(updatedSensor);
+
+        var trackerTags = _trackerTagRepository.GetTags();
+
+        var validationResults = tracker.ValidateSensor(trackerTags, updatedSensor, oldSensor, oldTracker, _logger, _sensorValidator);
+
+        var hasValidationErrors = ProcessValidationResults(validationResults);
+        if (hasValidationErrors)
+            return ReturnValidationErrors();
+
+        try
+        {
+            _sensorRepository.Update(updatedSensor);
+        }
+        catch( ArgumentException ex )
+        {
+            return Conflict(new ServiceErrorResult(ex.Message));
+        }
+        return Ok();
     }
 
     /// <summary>

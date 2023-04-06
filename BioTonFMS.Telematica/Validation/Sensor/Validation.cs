@@ -15,8 +15,7 @@ namespace BioTonFMS.Telematica.Expressions;
 public static class ValidationExtension
 {
     public static IEnumerable<SensorProblemDescription> ValidateSensor(this Tracker tracker, IEnumerable<TrackerTag> trackerTags,
-        Sensor sensor,
-        ILogger logger, IValidator<Sensor> sensorValidator)
+        Sensor sensor, Sensor? oldSensor, Tracker? oldTracker, ILogger logger, IValidator<Sensor> sensorValidator)
     {
         Debug.Assert(tracker.Sensors.Contains(sensor));
 
@@ -100,11 +99,21 @@ public static class ValidationExtension
         if (problemList.Count != 0)
             return problemList;
 
-        var sensorById = tracker.Sensors.ToDictionary(s => s.Id);
-
-        var expressions = tracker.Sensors
-            .Select(s => new SensorExpressionProperties(s, s.ValidatorId.HasValue ? sensorById[s.ValidatorId.Value].Name : null));
-        var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.AddSensorValidatorToAst);
+        var graph = BuildGraphAndSensorById(tracker, logger, out var sensorById);
+        if (oldSensor is not null && (oldSensor.Name != sensor.Name || oldSensor.TrackerId != sensor.TrackerId))
+        {
+            Debug.Assert(oldTracker is not null);
+            
+            var oldGraph = BuildGraphAndSensorById(oldTracker, logger, out _);
+            foreach (var node in oldGraph)
+            {
+                if (node.Value.Edges.Contains(oldSensor.Name))
+                {
+                    problemList.Add(new SensorProblemDescription(nameof(Sensor.Name),
+                        "Нельзя изменять имя датчика, на который ссылаются другие датчики или их валидаторы."));
+                }
+            }
+        }
 
         var cyclePath = graph.FindAnyLoop(sensor.Name);
 
@@ -133,6 +142,16 @@ public static class ValidationExtension
         }
 
         return problemList;
+    }
+    
+    private static Graph<ExpressionGraphNode<SensorExpressionProperties>> BuildGraphAndSensorById(Tracker tracker, ILogger logger, out Dictionary<int, Sensor> sensorById)
+    {
+        var sensorByIdLocal = tracker.Sensors.ToDictionary(s => s.Id);
+        var expressions = tracker.Sensors
+            .Select(s => new SensorExpressionProperties(s, s.ValidatorId.HasValue ? sensorByIdLocal[s.ValidatorId.Value].Name : null));
+        var graph = Helpers.BuildExpressionGraph(expressions, new LoggingExceptionHandler(logger), Postprocess.AddSensorValidatorToAst);
+        sensorById = sensorByIdLocal;
+        return graph;
     }
 
     public static string? ValidateSensorRemoval(this Tracker tracker, Sensor sensorToDelete, ILogger logger)

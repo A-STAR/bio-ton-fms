@@ -189,7 +189,7 @@ public class SensorControllerTests
         var sensorDto = new UpdateSensorDto()
         {
             Name = "a", TrackerId = TrackerRepositoryMock.ExistentTrackerId, Description = "description", Formula = "const1",
-            ValidatorId = SensorRepositoryMock.ExistentSensorId, ValidationType = ValidationTypeEnum.LogicalAnd,
+            ValidatorId = SensorRepositoryMock.ReferencedSensorId, ValidationType = ValidationTypeEnum.LogicalAnd,
             SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, UnitId = UnitRepositoryMock.ExistentUnitId,
             DataType = SensorDataTypeEnum.Number, FuelUse = 1, UseLastReceived = false
         };
@@ -206,7 +206,7 @@ public class SensorControllerTests
         SensorRepositoryMock.LastUpdateArgument.TrackerId.Should().Be(TrackerRepositoryMock.ExistentTrackerId);
         SensorRepositoryMock.LastUpdateArgument.Description.Should().Be("description");
         SensorRepositoryMock.LastUpdateArgument.Formula.Should().Be("const1");
-        SensorRepositoryMock.LastUpdateArgument.ValidatorId.Should().Be(SensorRepositoryMock.ExistentSensorId);
+        SensorRepositoryMock.LastUpdateArgument.ValidatorId.Should().Be(SensorRepositoryMock.ReferencedSensorId);
         SensorRepositoryMock.LastUpdateArgument.ValidationType.Should().Be(ValidationTypeEnum.LogicalAnd);
         SensorRepositoryMock.LastUpdateArgument.SensorTypeId.Should().Be(SensorTypeRepositoryMock.ExistentSensorTypeId);
         SensorRepositoryMock.LastUpdateArgument.UnitId.Should().Be(UnitRepositoryMock.MeterUnitId);
