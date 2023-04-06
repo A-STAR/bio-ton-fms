@@ -110,8 +110,7 @@ public class ValidationTests
             new Sensor()
             {
                 Name = "Sensor", Description = new String('a', 501), TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-                UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                Formula = "const1"
+                UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, Formula = "const1"
             },
             new[]
             {
@@ -151,8 +150,7 @@ public class ValidationTests
             new Sensor()
             {
                 Name = "Sensor", Description = "", TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-                UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                Formula = "const1"
+                UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, Formula = "const1"
             },
             Array.Empty<SensorProblemDescription>()
         },
@@ -162,8 +160,7 @@ public class ValidationTests
             new Sensor()
             {
                 Name = "Sensor", Description = null!, TrackerId = TrackerRepositoryMock.ExistentTrackerId,
-                UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId,
-                Formula = "const1"
+                UnitId = UnitRepositoryMock.ExistentUnitId, SensorTypeId = SensorTypeRepositoryMock.ExistentSensorTypeId, Formula = "const1"
             },
             Array.Empty<SensorProblemDescription>()
         },
@@ -210,7 +207,8 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.Formula), "Выражение содержит ссылку на несуществующий параметр трекера или датчик",
+                new SensorProblemDescription(nameof(Sensor.Formula),
+                    "Выражение содержит ссылку на несуществующий параметр трекера или датчик",
                     new Location(9, 5))
             }
         },
@@ -336,9 +334,14 @@ public class ValidationTests
             }
         };
 
-        var validationResults = tracker.ValidateSensor(trackerTags, sensorToValidate, LoggerMock.GetStub<int>(),
-            new SensorValidator(TrackerRepositoryMock.GetStub(), UnitRepositoryMock.GetStub(),
-                SensorTypeRepositoryMock.GetStub())).ToArray();
+        var oldSensor = new Sensor
+        {
+            Formula = "const1", Name = "b"
+        };
+
+        var validationResults = tracker.ValidateSensor(trackerTags, sensorToValidate, oldSensor, tracker, LoggerMock.GetStub<int>(),
+                new SensorValidator(TrackerRepositoryMock.GetStub(), UnitRepositoryMock.GetStub(), SensorTypeRepositoryMock.GetStub()))
+            .ToArray();
 
         CheckValidationResults(referenceProblems, validationResults);
     }
@@ -375,7 +378,8 @@ public class ValidationTests
             },
             new[]
             {
-                new SensorProblemDescription(nameof(Sensor.Formula), "Выражение содержит ссылку на несуществующий параметр трекера или датчик",
+                new SensorProblemDescription(nameof(Sensor.Formula),
+                    "Выражение содержит ссылку на несуществующий параметр трекера или датчик",
                     new Location(1, 1))
             }
         },
@@ -389,6 +393,18 @@ public class ValidationTests
             new[]
             {
                 new SensorProblemDescription(nameof(Sensor.ValidatorId), "Валидатор создаёт цикл: b -> kebab -> b")
+            }
+        },
+        new object[]
+        {
+            "[POSITIVE] Изменение имени датчика при наличии ссылок на него",
+            new Sensor
+            {
+                Formula = "kebab", Name = "newName"
+            },
+            new[]
+            {
+                new SensorProblemDescription(nameof(Sensor.Name), "*изменять имя датчика*")
             }
         },
     };
@@ -418,7 +434,12 @@ public class ValidationTests
             }
         };
 
-        var validationResults = tracker.ValidateSensor(trackerTags, sensorToValidate, LoggerMock.GetStub<int>(),
+        var oldSensor = new Sensor
+        {
+            Formula = "const1", Name = "b"
+        };
+
+        var validationResults = tracker.ValidateSensor(trackerTags, sensorToValidate, oldSensor, tracker, LoggerMock.GetStub<int>(),
             FluentValidatorMock.GetStub<Sensor>()).ToArray();
         CheckValidationResults(referenceProblems, validationResults);
     }
@@ -479,7 +500,7 @@ public class ValidationTests
 
         validationResult.Should().BeNull();
     }
-    
+
     [Fact]
     public void ValidateSensorRemoval_Conflict_ReturnsErrorMessage()
     {
@@ -504,5 +525,5 @@ public class ValidationTests
 
         validationResult.Should().NotBeNull();
         validationResult.Should().Match("*На удаляемый датчик ссылается датчик с именем*");
-    }    
+    }
 }
