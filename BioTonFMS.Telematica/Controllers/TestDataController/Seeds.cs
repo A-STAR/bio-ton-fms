@@ -26,7 +26,7 @@ public static class Seeds
         var sensorId = -1;
         var sensor = new Faker<Sensor>()
             .RuleFor(v => v.Id, (_, _) => sensorId--)
-            .RuleFor(v => v.Name, (f, _) => f.Hacker.Noun() + -sensorId)
+            .RuleFor(v => v.Name, (f, _) => Regex.Replace(f.Hacker.Noun(), "\\s", "_") + -sensorId)
             .RuleFor(v => v.Formula,
                 (f, _) => filteredTrackerTags[f.Random.Int(0, filteredTrackerTags.Length - 1)].Name)
             .RuleFor(v => v.SensorTypeId, (f, _) => sensorTypeIds[f.Random.Int(0, sensorTypeIds.Length - 1)])

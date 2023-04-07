@@ -160,7 +160,7 @@ public class TestDataController : ValidationControllerBase
         var vehicles = _vehicleRepository.GetVehicles(new VehiclesFilter()
         {
             PageSize = 100000
-        });
+        }, hydrate: false);
         foreach (var vehicle in vehicles.Results)
         {
             if (vehicle.Id >= 0)
