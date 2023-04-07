@@ -249,13 +249,13 @@ public class SensorController : ValidationControllerBase
         var tracker = _trackerRepository[sensorToDelete.TrackerId];
         if (tracker is null)
         {
-            return Conflict(new ServiceErrorResult($"Трекер с идентификатором {sensorToDelete.TrackerId} не существует"));
+            return Conflict($"Трекер с идентификатором {sensorToDelete.TrackerId} не существует");
         }
 
         var validationResult = tracker.ValidateSensorRemoval(sensorToDelete, _logger);
         if (!string.IsNullOrEmpty(validationResult))
         {
-            return Conflict(new ServiceErrorResult(validationResult));
+            return Conflict(validationResult);
         }
         
         try
