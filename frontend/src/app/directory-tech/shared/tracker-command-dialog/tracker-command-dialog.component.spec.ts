@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-import { TrackerCommandDialogComponent } from './tracker-command-dialog.component';
+import { TrackerCommandDialogComponent, TrackerCommandDialogData } from './tracker-command-dialog.component';
+
+import { TEST_TRACKER_ID } from '../../tracker.service.spec';
+import { testNewVehicle } from '../../vehicle.service.spec';
 
 describe('TrackerCommandDialogComponent', () => {
   let component: TrackerCommandDialogComponent;
@@ -9,7 +13,13 @@ describe('TrackerCommandDialogComponent', () => {
   beforeEach(async () => {
     await TestBed
       .configureTestingModule({
-        imports: [TrackerCommandDialogComponent]
+        imports: [TrackerCommandDialogComponent],
+        providers: [
+          {
+            provide: MAT_DIALOG_DATA,
+            useValue: testMatDialogData
+          }
+        ]
       })
       .compileComponents();
 
@@ -25,3 +35,8 @@ describe('TrackerCommandDialogComponent', () => {
       .toBeTruthy();
   });
 });
+
+const testMatDialogData: TrackerCommandDialogData = {
+  id: TEST_TRACKER_ID,
+  vehicle: testNewVehicle.name
+};

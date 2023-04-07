@@ -79,6 +79,16 @@ describe('TrackersComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(async () => {
+    const dialogs = await documentRootLoader.getAllHarnesses(MatDialogHarness);
+
+    await Promise.all(
+      dialogs.map(dialog => dialog.close())
+    );
+
+    overlayContainer.ngOnDestroy();
+  });
+
   it('should create', () => {
     expect(component)
       .toBeTruthy();
@@ -443,14 +453,14 @@ describe('TrackersComponent', () => {
   });
 
   it('should create tracker', async () => {
-    const createTrackerButton = await loader.getHarness(
+    const createButton = await loader.getHarness(
       MatButtonHarness.with({
         variant: 'stroked',
         text: 'Добавить GPS-трекер'
       })
     );
 
-    await createTrackerButton.click();
+    await createButton.click();
 
     const trackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
@@ -458,12 +468,8 @@ describe('TrackersComponent', () => {
       .withContext('render a tracker dialog')
       .not.toBeNull();
 
-    await trackerDialog!.close();
-
     expect(trackersSpy)
       .toHaveBeenCalled();
-
-    overlayContainer.ngOnDestroy();
 
     /* Coverage for updating trackers. */
 
@@ -474,11 +480,11 @@ describe('TrackersComponent', () => {
     spyOn(component['dialog'], 'open')
       .and.returnValue(dialogRef);
 
-    await createTrackerButton.click();
+    await createButton.click();
   });
 
   it('should update tracker', async () => {
-    const updateTrackerButtons = await loader.getAllHarnesses(
+    const updateButtons = await loader.getAllHarnesses(
       MatButtonHarness.with({
         ancestor: '.mat-column-action .actions',
         selector: '[mat-icon-button]',
@@ -486,17 +492,13 @@ describe('TrackersComponent', () => {
       })
     );
 
-    await updateTrackerButtons[0].click();
+    await updateButtons[0].click();
 
     const trackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
     expect(trackerDialog)
       .withContext('render a tracker dialog')
       .toBeDefined();
-
-    await trackerDialog!.close();
-
-    overlayContainer.ngOnDestroy();
 
     /* Coverage for updating trackers. */
 
@@ -507,7 +509,25 @@ describe('TrackersComponent', () => {
     spyOn(component['dialog'], 'open')
       .and.returnValue(dialogRef);
 
-    await updateTrackerButtons[0].click();
+    await updateButtons[0].click();
+  });
+
+  it('should render tracker command dialog', async () => {
+    const commandButtons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        selector: '[mat-icon-button]',
+        text: 'sms'
+      })
+    );
+
+    await commandButtons[0].click();
+
+    const commandTrackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(commandTrackerDialog)
+      .withContext('render a tracker command dialog')
+      .toBeDefined();
   });
 
   it('should delete tracker', async () => {
@@ -604,8 +624,6 @@ describe('TrackersComponent', () => {
 
     expect(trackersSpy)
       .toHaveBeenCalled();
-
-    overlayContainer.ngOnDestroy();
   });
 });
 

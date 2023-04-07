@@ -15,6 +15,11 @@ import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, New
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { StopClickPropagationDirective } from 'src/app/shared/stop-click-propagation/stop-click-propagation.directive';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
+import {
+  TrackerCommandDialogComponent,
+  trackerCommandDialogConfig,
+  TrackerCommandDialogData
+} from '../shared/tracker-command-dialog/tracker-command-dialog.component';
 
 import {
   ConfirmationDialogComponent,
@@ -109,7 +114,7 @@ export default class TrackersComponent implements OnInit, OnDestroy {
    * Add a new GPS-tracker to table.
    */
   protected onCreateTracker() {
-    const dialogRef = this.dialog.open<TrackerDialogComponent, any, true | '' | undefined>(TrackerDialogComponent);
+    const dialogRef = this.dialog.open<TrackerDialogComponent, void, true | '' | undefined>(TrackerDialogComponent);
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -148,6 +153,23 @@ export default class TrackersComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.#updateTrackers();
       });
+  }
+
+  /**
+   * Send a command to GPS-tracker.
+   *
+   * @param trackerDataSource Tracker data source.
+   */
+  protected onSendTrackerCommand({ id, vehicle }: TrackerDataSource) {
+    const data: TrackerCommandDialogData = {
+      id,
+      vehicle: vehicle?.value
+    };
+
+    this.dialog.open<TrackerCommandDialogComponent, TrackerCommandDialogData, '' | undefined>(
+      TrackerCommandDialogComponent,
+      { ...trackerCommandDialogConfig, data }
+    );
   }
 
   /**
