@@ -144,10 +144,24 @@ describe('SensorDialogComponent', () => {
     component.ngOnInit();
 
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(titleTextDe.nativeElement.textContent)
       .withContext('render dialog update title text')
       .toBe('Сводная информация о датчике');
+
+    const { id, ...data } = testSensor;
+
+    component['data'] = data;
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(titleTextDe.nativeElement.textContent)
+      .withContext('render dialog duplicate title text')
+      .toBe('Новый датчик');
   });
 
   it('should render sensor form', async () => {
@@ -676,6 +690,89 @@ describe('SensorDialogComponent', () => {
 
     expect(dialogRef.close)
       .toHaveBeenCalledWith(sensor);
+  });
+
+  it('should duplicate create sensor form', async () => {
+    const { id, ...data } = testSensor;
+
+    component['data'] = data;
+
+    component.ngOnInit();
+
+    const nameInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form'
+      })
+    );
+
+    const updatedName = 'Парктроник';
+
+    await nameInput.setValue(updatedName);
+
+    const newSensor: NewSensor = {
+      name: updatedName,
+      trackerId: testSensor.tracker.id,
+      sensorTypeId: testSensor.sensorType.id,
+      dataType: testSensor.dataType,
+      formula: testSensor.formula,
+      unitId: testSensor.unit.id,
+      validatorId: testSensor.validator!.id,
+      validationType: testSensor.validationType,
+      useLastReceived: false,
+      visibility: false,
+      fuelUse: testSensor.fuelUse,
+      description: testSensor.description
+    };
+
+    const testSensorResponse: Sensor = {
+      id: newSensor.trackerId,
+      tracker: {
+        id: newSensor.trackerId,
+        value: 'Galileo Sky'
+      },
+      name: newSensor.name,
+      sensorType: {
+        id: newSensor.sensorTypeId,
+        value: testSensorGroups[1].sensorTypes![0].name
+      },
+      dataType: newSensor.dataType,
+      formula: newSensor.formula,
+      unit: {
+        id: newSensor.unitId,
+        value: testUnits[1].name
+      },
+      useLastReceived: newSensor.useLastReceived,
+      visibility: newSensor.visibility
+    };
+
+    spyOn(sensorService, 'createSensor')
+      .and.callFake(() => of(testSensorResponse));
+
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="sensor-form"]'
+      })
+    );
+
+    await saveButton.click();
+
+    expect(sensorService.createSensor)
+      .toHaveBeenCalledWith(newSensor);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(SENSOR_CREATED);
+
+    await expectAsync(
+      snackBar.hasAction()
+    )
+      .toBeResolvedTo(false);
+
+    expect(dialogRef.close)
+      .toHaveBeenCalledWith(testSensorResponse);
   });
 });
 

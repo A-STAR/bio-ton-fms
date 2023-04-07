@@ -591,17 +591,28 @@ describe('TrackerComponent', () => {
             variant: 'icon',
             text: 'edit'
           })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
+            text: 'content_copy'
+          })
         )
       ])
     ));
 
-    actionButtons.forEach(([actionButton, updateButton]) => {
+    actionButtons.forEach(([actionButton, updateButton, duplicateButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
 
       expect(updateButton)
         .withContext('render update button')
+        .not.toBeNull();
+
+      expect(duplicateButton)
+        .withContext('render duplicate button')
         .not.toBeNull();
 
       actionButton!.hasHarness(
@@ -613,6 +624,12 @@ describe('TrackerComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
+        })
+      );
+
+      duplicateButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'content_copy'
         })
       );
     });
@@ -769,6 +786,39 @@ describe('TrackerComponent', () => {
       .and.returnValue(dialogRef);
 
     await updateSensorButtons[0].click();
+  });
+
+  it('should duplicate tracker sensor', async () => {
+    const duplicateSensorButtons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        selector: '[mat-icon-button]',
+        text: 'content_copy'
+      })
+    );
+
+    await duplicateSensorButtons[0].click();
+
+    const sensorDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(sensorDialog)
+      .withContext('render a tracker sensor dialog')
+      .toBeDefined();
+
+    await sensorDialog!.close();
+
+    overlayContainer.ngOnDestroy();
+
+    /* Coverage for updating sensors. */
+
+    const dialogRef = {
+      afterClosed: () => of(testSensor)
+    } as MatDialogRef<SensorDialogComponent, Sensor>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await duplicateSensorButtons[0].click();
   });
 });
 

@@ -100,25 +100,25 @@ export class SensorDialogComponent implements OnInit {
 
     let sensor$: Observable<Sensor | null>;
 
-    if (typeof this.data === 'number') {
-      sensor$ = this.sensorService.createSensor(newSensor);
-    } else {
+    if (typeof this.data === 'object' && 'id' in this.data) {
       newSensor.id = this.data.id;
 
       sensor$ = this.sensorService.updateSensor(newSensor);
+    } else {
+      sensor$ = this.sensorService.createSensor(newSensor);
     }
 
     this.#subscription = sensor$.subscribe((response: Sensor | null) => {
-      const message = typeof this.data === 'number' ? SENSOR_CREATED : SENSOR_UPDATED;
+      const message = typeof this.data === 'object' && 'id' in this.data ? SENSOR_UPDATED : SENSOR_CREATED;
 
       this.snackBar.open(message);
 
       let sensor: Sensor;
 
-      if (typeof this.data === 'number') {
-        sensor = response!;
-      } else {
+      if (typeof this.data === 'object' && 'id' in this.data) {
         sensor = this.#serializeSensor(newSensor);
+      } else {
+        sensor = response!;
       }
 
       this.dialogRef.close(sensor);
@@ -202,6 +202,47 @@ export class SensorDialogComponent implements OnInit {
   }
 
   /**
+   * Map `Sensor` or `Omit<Sensor, 'id'>` to `NewSensor`.
+   */
+  #deserializeSensor(sensor: Sensor | Omit<Sensor, 'id'>): NewSensor {
+    const {
+      tracker,
+      name,
+      sensorType,
+      dataType,
+      formula,
+      unit,
+      validator,
+      validationType,
+      useLastReceived,
+      visibility,
+      fuelUse,
+      description
+    } = sensor;
+
+    const newSensor: NewSensor = {
+      trackerId: tracker.id,
+      name,
+      sensorTypeId: sensorType.id,
+      dataType,
+      formula,
+      unitId: unit.id,
+      validatorId: validator?.id,
+      validationType,
+      useLastReceived,
+      visibility,
+      fuelUse,
+      description
+    };
+
+    if ('id' in sensor) {
+      newSensor.id = sensor.id;
+    }
+
+    return newSensor;
+  }
+
+  /**
    * Initialize Sensor form.
    */
   #initSensorForm() {
@@ -250,41 +291,6 @@ export class SensorDialogComponent implements OnInit {
   }
 
   /**
-   * Map `Sensor` to `NewSensor`.
-   */
-  #deserializeSensor({
-    id,
-    tracker,
-    name,
-    sensorType,
-    dataType,
-    formula,
-    unit,
-    validator,
-    validationType,
-    useLastReceived,
-    visibility,
-    fuelUse,
-    description
-  }: Sensor): NewSensor {
-    return {
-      id,
-      trackerId: tracker.id,
-      name,
-      sensorTypeId: sensorType.id,
-      dataType,
-      formula,
-      unitId: unit.id,
-      validatorId: validator?.id,
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
-    };
-  }
-
-  /**
    * Get sensor groups, data type, units, sensor types, validation type. Set sensor data.
    */
   #setSensorData() {
@@ -306,7 +312,7 @@ export class SensorDialogComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData<Tracker['id'] | Sensor>,
+    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData<Tracker['id'] | Sensor | Omit<Sensor, 'id'>>,
     private dialogRef: MatDialogRef<SensorDialogComponent, Sensor>,
     private snackBar: MatSnackBar,
     private sensorService: SensorService
@@ -314,14 +320,14 @@ export class SensorDialogComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
-    this.title = typeof this.data === 'number' ? 'Новый датчик' : 'Сводная информация о датчике';
+    this.title = typeof this.data === 'object' && 'id' in this.data ? 'Сводная информация о датчике' : 'Новый датчик';
 
     this.#setSensorData();
     this.#initSensorForm();
   }
 }
 
-export type SensorDialogData<T extends Tracker['id'] | Sensor> = T;
+export type SensorDialogData<T extends Tracker['id'] | Sensor | Omit<Sensor, 'id'>> = T;
 
 type SensorForm = {
   basic: FormGroup<{
