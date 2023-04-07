@@ -28,27 +28,22 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
         {
             get
             {
-                var vehicle = HydratedQuery
+                var vehicle = QueryableProvider
+                    .Fetch(v => v.VehicleGroup)
+                    .Fetch(v => v.FuelType)
+                    .Fetch(v => v.Tracker)
+                    .Linq()
                     .SingleOrDefault(v => v.Id == key);
                 return vehicle;
             }
         }
-        private IQueryable<Vehicle> HydratedQuery
-        {
-            get
-            {
 
-                return QueryableProvider
-                    .Fetch(v => v.VehicleGroup)
-                    .Fetch(v => v.FuelType)
-                    .Fetch(v => v.Tracker)
-                    .Linq();
-            }
-        }
-
-        public PagedResult<Vehicle> GetVehicles(VehiclesFilter filter, bool hydrate = true)
+        public PagedResult<Vehicle> GetVehicles(VehiclesFilter filter)
         {
-            var query = hydrate ? HydratedQuery : QueryableProvider.Linq();
+            var linqProvider = QueryableProvider
+                .Fetch(v => v.VehicleGroup)
+                .Fetch(v => v.FuelType)
+                .Fetch(v => v.Tracker).Linq();
 
             Expression<Func<Vehicle, bool>>? vehiclePredicate = null;
 
@@ -97,7 +92,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 vehiclePredicate = SetPredicate(vehiclePredicate, regNumPredicate);
             }
 
-            var vehicles = vehiclePredicate != null ? query.Where(vehiclePredicate) : query;
+            var vehicles = vehiclePredicate != null ? linqProvider.Where(vehiclePredicate) : linqProvider;
 
             if (filter.SortBy.HasValue)
             {
