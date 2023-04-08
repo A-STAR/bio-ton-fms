@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { By } from '@angular/platform-browser';
+import { MAT_DIALOG_DATA, MatDialogTitle } from '@angular/material/dialog';
 
 import { TrackerCommandDialogComponent, TrackerCommandDialogData } from './tracker-command-dialog.component';
 
@@ -33,6 +34,55 @@ describe('TrackerCommandDialogComponent', () => {
   it('should create', () => {
     expect(component)
       .toBeTruthy();
+  });
+
+  it('should render dialog title', async () => {
+    let titleDe = fixture.debugElement.query(
+      By.directive(MatDialogTitle)
+    );
+
+    expect(titleDe)
+      .withContext('render dialog title element')
+      .not.toBeNull();
+
+    let vehicleDe = titleDe.query(
+      By.css('strong')
+    );
+
+    expect(vehicleDe)
+      .withContext('render dialog vehicle element')
+      .not.toBeNull();
+
+    expect(titleDe.nativeElement.textContent)
+      .withContext('render dialog title text with vehicle')
+      .toBe(`Отправить команду на ${testMatDialogData.vehicle}`);
+
+    fixture = TestBed.createComponent(TrackerCommandDialogComponent);
+
+    component = fixture.componentInstance;
+
+    const { vehicle, ...data } = testMatDialogData;
+
+    component['data'] = data;
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    titleDe = fixture.debugElement.query(
+      By.directive(MatDialogTitle)
+    );
+
+    vehicleDe = titleDe.query(
+      By.css('strong')
+    );
+
+    expect(vehicleDe)
+      .withContext('render no dialog vehicle element')
+      .toBeNull();
+
+    expect(titleDe.nativeElement.textContent)
+      .withContext('render dialog title text without vehicle')
+      .toBe('Отправить команду');
   });
 });
 

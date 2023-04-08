@@ -95,15 +95,15 @@ describe('TrackerDialogComponent', () => {
   });
 
   it('should render dialog title', async () => {
-    const titleTextDe = fixture.debugElement.query(
+    const titleDe = fixture.debugElement.query(
       By.directive(MatDialogTitle)
     );
 
-    expect(titleTextDe)
+    expect(titleDe)
       .withContext('render dialog title element')
       .not.toBeNull();
 
-    expect(titleTextDe.nativeElement.textContent)
+    expect(titleDe.nativeElement.textContent)
       .withContext('render dialog title text')
       .toBe('Добавление GPS-трекера');
 
@@ -112,7 +112,7 @@ describe('TrackerDialogComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(titleTextDe.nativeElement.textContent)
+    expect(titleDe.nativeElement.textContent)
       .withContext('render dialog update title text')
       .toBe('Сводная информация о GPS-трекере');
   });
