@@ -212,7 +212,7 @@ public static class MessageProcessing
     public static void UpdateSensorTags(this IEnumerable<TrackerMessage> messages, TrackerMessage? previousMessage, IEnumerable<Tracker> trackers,
         ICollection<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
-        // Build sensors
+        // Построить по набору выражений датчиков для каждого из трекеров
         Dictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensorsByTrackerId = trackers
             .BuildSensors(trackerTags, exceptionHandler)
             .ToDictionary(t => t.Item1 /* Tracker id */, t => t.Item2);

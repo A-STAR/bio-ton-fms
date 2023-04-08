@@ -150,47 +150,47 @@ public class GalileoskyMessageParserTests
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.CoordLatitudeId,
+                                    TrackerTagId = TagsSeed.LatitudeId,
                                     Value = 49.432023000000001
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.CoordLongitudeId,
+                                    TrackerTagId = TagsSeed.LongitudeId,
                                     Value = 52.556860999999998
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CoordCorrectnessId,
+                                    TrackerTagId = TagsSeed.CorrectnessId,
                                     Value = 0
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CoordSatNumberId,
+                                    TrackerTagId = TagsSeed.SatNumberId,
                                     Value = 12
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CanLogFuelLevelId,
+                                    TrackerTagId = TagsSeed.FuelLevelId,
                                     Value = 100
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
+                                    TrackerTagId = TagsSeed.CoolantTemperatureId,
                                     Value = 45
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CanLogEngineSpeedId,
+                                    TrackerTagId = TagsSeed.EngineSpeedId,
                                     Value = 901
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.VelocitySpeedId,
+                                    TrackerTagId = TagsSeed.SpeedId,
                                     Value = 0
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.VelocityDirectionId,
+                                    TrackerTagId = TagsSeed.DirectionId,
                                     Value = 2.7999999999999998
                                 },
                                 new MessageTagInteger
@@ -288,47 +288,47 @@ public class GalileoskyMessageParserTests
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.CoordLatitudeId,
+                                    TrackerTagId = TagsSeed.LatitudeId,
                                     Value = 49.432023000000001
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.CoordLongitudeId,
+                                    TrackerTagId = TagsSeed.LongitudeId,
                                     Value = 52.556860999999998
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CoordCorrectnessId,
+                                    TrackerTagId = TagsSeed.CorrectnessId,
                                     Value = 0
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CoordSatNumberId,
+                                    TrackerTagId = TagsSeed.SatNumberId,
                                     Value = 12
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CanLogFuelLevelId,
+                                    TrackerTagId = TagsSeed.FuelLevelId,
                                     Value = 100
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CanLogCoolantTemperatureId,
+                                    TrackerTagId = TagsSeed.CoolantTemperatureId,
                                     Value = 45
                                 },
                                 new MessageTagInteger()
                                 {
-                                    TrackerTagId = TagsSeed.CanLogEngineSpeedId,
+                                    TrackerTagId = TagsSeed.EngineSpeedId,
                                     Value = 901
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.VelocitySpeedId,
+                                    TrackerTagId = TagsSeed.SpeedId,
                                     Value = 0
                                 },
                                 new MessageTagDouble()
                                 {
-                                    TrackerTagId = TagsSeed.VelocityDirectionId,
+                                    TrackerTagId = TagsSeed.DirectionId,
                                     Value = 2.7999999999999998
                                 },
                                 new MessageTagInteger
