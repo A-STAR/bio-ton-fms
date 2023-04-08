@@ -52,8 +52,8 @@ public static class VehicleMock
     public static IVehicleRepository GetStub()
     {
         var stub = new Mock<IVehicleRepository>();
-        stub.Setup(x => x.GetVehicles(It.IsAny<VehiclesFilter>()))
-            .Returns(GetVehicles);
+        stub.Setup(x => x.GetVehicles(It.IsAny<VehiclesFilter>(), It.IsAny<bool>()))
+            .Returns((VehiclesFilter filter, bool _) => GetVehicles(filter));
         stub.Setup(x => x[It.IsAny<int>()])
             .Returns((int i) => GetVehicles(new VehiclesFilter()).Results.FirstOrDefault(x => x.Id == i));
         return stub.Object;

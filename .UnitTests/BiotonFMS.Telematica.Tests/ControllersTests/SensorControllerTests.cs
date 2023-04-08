@@ -295,7 +295,9 @@ public class SensorControllerTests
         result.Should().BeOfType<ConflictObjectResult>();
         var badResult = result as ConflictObjectResult;
         badResult!.StatusCode.Should().Be(409);
-        (badResult.Value as string).Should().Match("*ссылается*");
+        var content = badResult.Value.As<ServiceErrorResult>();
+        content.Messages.Length.Should().Be(1);
+        content.Messages[0].Should().Match("*ссылается*");
     }
 
     private static SensorController GetController()
