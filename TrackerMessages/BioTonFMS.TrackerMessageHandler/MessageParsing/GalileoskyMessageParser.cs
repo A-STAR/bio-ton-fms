@@ -87,20 +87,20 @@ public class GalileoskyMessageParser : IMessageParser
                 case CoordsStructCode:
                     var coords = binaryPackage[i..(i + tag.Size)].ParseCoords();
                     message.CoordCorrectness = coords.Correctness;
-                    AddMessageTag((int)coords.Correctness, TagsSeed.CoordCorrectnessId, message);
+                    AddMessageTag((int)coords.Correctness, TagsSeed.CorrectnessId, message);
                     message.SatNumber = coords.SatNumber;
-                    AddMessageTag(coords.SatNumber, TagsSeed.CoordSatNumberId, message);
+                    AddMessageTag(coords.SatNumber, TagsSeed.SatNumberId, message);
                     message.Longitude = coords.Longitude;
-                    AddMessageTag(coords.Longitude, TagsSeed.CoordLongitudeId, message);
+                    AddMessageTag(coords.Longitude, TagsSeed.LongitudeId, message);
                     message.Latitude = coords.Latitude;
-                    AddMessageTag(coords.Latitude, TagsSeed.CoordLatitudeId, message);
+                    AddMessageTag(coords.Latitude, TagsSeed.LatitudeId, message);
                     break;
                 case VelocityStructCode:
                     var velocity = binaryPackage[i..(i + tag.Size)].ParseVelocity();
                     message.Speed = velocity.Speed;
-                    AddMessageTag(velocity.Speed, TagsSeed.VelocitySpeedId, message);
+                    AddMessageTag(velocity.Speed, TagsSeed.SpeedId, message);
                     message.Direction = velocity.Direction;
-                    AddMessageTag(velocity.Direction, TagsSeed.VelocityDirectionId, message);
+                    AddMessageTag(velocity.Direction, TagsSeed.DirectionId, message);
                     break;
                 case AltitudeStructCode:
                     message.Altitude = AddMessageTag<MessageTagInteger>(tag, binaryPackage, i, message).Value;
@@ -108,11 +108,11 @@ public class GalileoskyMessageParser : IMessageParser
                 case CanLogStructCode:
                     var data = binaryPackage[i..(i + tag.Size)].ParseCanLog();
                     message.FuelLevel = data.FuelLevel;
-                    AddMessageTag(data.FuelLevel, TagsSeed.CanLogFuelLevelId, message);
+                    AddMessageTag(data.FuelLevel, TagsSeed.FuelLevelId, message);
                     message.CoolantTemperature = data.CoolantTemperature;
-                    AddMessageTag(data.CoolantTemperature, TagsSeed.CanLogCoolantTemperatureId, message);
+                    AddMessageTag(data.CoolantTemperature, TagsSeed.CoolantTemperatureId, message);
                     message.EngineSpeed = data.EngineSpeed;
-                    AddMessageTag(data.EngineSpeed, TagsSeed.CanLogEngineSpeedId, message);
+                    AddMessageTag(data.EngineSpeed, TagsSeed.EngineSpeedId, message);
                     break;
                 default:
                     if (tag.Tag is not null)

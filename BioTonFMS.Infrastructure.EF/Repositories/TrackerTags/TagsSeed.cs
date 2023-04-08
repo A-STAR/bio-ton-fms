@@ -4,17 +4,17 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 
 public static class TagsSeed
 {
-    public const int CoordLatitudeId = 100;
-    public const int CoordLongitudeId = 101;
-    public const int CoordCorrectnessId = 102;
-    public const int CoordSatNumberId = 103;
+    public const int LatitudeId = 100;
+    public const int LongitudeId = 101;
+    public const int CorrectnessId = 102;
+    public const int SatNumberId = 103;
 
-    public const int CanLogFuelLevelId = 110;
-    public const int CanLogCoolantTemperatureId = 111;
-    public const int CanLogEngineSpeedId = 112;
+    public const int FuelLevelId = 110;
+    public const int CoolantTemperatureId = 111;
+    public const int EngineSpeedId = 112;
     
-    public const int VelocitySpeedId = 120;
-    public const int VelocityDirectionId = 121;
+    public const int SpeedId = 120;
+    public const int DirectionId = 121;
     
     public const int ImeiId = 3;
     public const int DeviceIdId = 4;
@@ -243,117 +243,117 @@ public static class TagsSeed
     {
         new TrackerTag
         {
-            Id = 1, Name = "term_version", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 1, Name = "term_version", DataType = TagDataTypeEnum.Integer,
             Description = "Версия терминала"
         },
         new TrackerTag
         {
-            Id = 2, Name = "soft", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 2, Name = "soft", DataType = TagDataTypeEnum.Integer,
             Description = "Версия прошивки"
         },
         new TrackerTag
         {
-            Id = ImeiId, Name = "imei", DataType = TagDataTypeEnum.String, StructType = null,
+            Id = ImeiId, Name = "imei", DataType = TagDataTypeEnum.String,
             Description = "IMEI"
         },
         new TrackerTag
         {
-            Id = DeviceIdId, Name = "device_id", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = DeviceIdId, Name = "device_id", DataType = TagDataTypeEnum.Integer,
             Description = "Идентификатор устройства"
         },
         new TrackerTag
         {
-            Id = RecSn, Name = "rec_sn", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = RecSn, Name = "rec_sn", DataType = TagDataTypeEnum.Integer,
             Description = "Номер записи в архиве"
         },
         new TrackerTag
         {
-            Id = TrackerDateId, Name = "tracker_date", DataType = TagDataTypeEnum.DateTime, StructType = null,
+            Id = TrackerDateId, Name = "tracker_date", DataType = TagDataTypeEnum.DateTime,
             Description = "Дата и время регистрации на трекере"
         },
         new TrackerTag
         {
-            Id = CoordLatitudeId, Name = "coord_latitude", DataType = TagDataTypeEnum.Double, Description = "Широта в градусах"
+            Id = LatitudeId, Name = "latitude", DataType = TagDataTypeEnum.Double, Description = "Широта в градусах"
         },
         new TrackerTag
         {
-            Id = CoordLongitudeId, Name = "coord_longitude", DataType = TagDataTypeEnum.Double, Description = "Долгота в градусах"
+            Id = LongitudeId, Name = "longitude", DataType = TagDataTypeEnum.Double, Description = "Долгота в градусах"
         },
         new TrackerTag
         {
-            Id = CoordCorrectnessId, Name = "coord_correctness", DataType = TagDataTypeEnum.Integer,
+            Id = CorrectnessId, Name = "correctness", DataType = TagDataTypeEnum.Integer,
             Description = "Признак корректности определения координат"
         },
         new TrackerTag
         {
-            Id = CoordSatNumberId, Name = "coord_sat_number", DataType = TagDataTypeEnum.Integer, Description = "Источник координат"
+            Id = SatNumberId, Name = "sat_number", DataType = TagDataTypeEnum.Integer, Description = "Источник координат"
         },
         new TrackerTag
         {
-            Id = CanLogFuelLevelId, Name = "can_log_fuel_level", DataType = TagDataTypeEnum.Integer, Description = "Уровень топлива, %"
+            Id = FuelLevelId, Name = "fuel_level", DataType = TagDataTypeEnum.Integer, Description = "Уровень топлива, %"
         },
         new TrackerTag
         {
-            Id = CanLogCoolantTemperatureId, Name = "can_log_coolant_temperature", DataType = TagDataTypeEnum.Integer,
+            Id = CoolantTemperatureId, Name = "coolant_temperature", DataType = TagDataTypeEnum.Integer,
             Description = "Температура охлаждающей жидкости, °C"
         },
         new TrackerTag
         {
-            Id = CanLogEngineSpeedId, Name = "can_log_engine_speed", DataType = TagDataTypeEnum.Integer, Description = "Обороты двигателя, об/мин"
+            Id = EngineSpeedId, Name = "engine_speed", DataType = TagDataTypeEnum.Integer, Description = "Обороты двигателя, об/мин"
         },
         new TrackerTag
         {
-            Id = VelocitySpeedId, Name = "velocity_speed", DataType = TagDataTypeEnum.Double, Description = "Скорость"
+            Id = SpeedId, Name = "speed", DataType = TagDataTypeEnum.Double, Description = "Скорость"
         },
         new TrackerTag
         {
-            Id = VelocityDirectionId, Name = "velocity_direction", DataType = TagDataTypeEnum.Double, Description = "Направление"
+            Id = DirectionId, Name = "direction", DataType = TagDataTypeEnum.Double, Description = "Направление"
         },
         new TrackerTag
         {
-            Id = AltitudeId, Name = "altitude", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = AltitudeId, Name = "altitude", DataType = TagDataTypeEnum.Integer,
             Description = "Высота, м"
         },
         new TrackerTag
         {
-            Id = HdopId, Name = "hdop", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = HdopId, Name = "hdop", DataType = TagDataTypeEnum.Byte,
             Description = @"Одно из значений:
 1. HDOP, если источник координат ГЛОНАСС/GPS модуль
 2. Погрешность в метрах, если источник базовые станции GSM-сети"
         },
         new TrackerTag
         {
-            Id = DevStatusId, Name = "dev_status", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = DevStatusId, Name = "dev_status", DataType = TagDataTypeEnum.Integer,
             Description = "Статус устройства"
         },
         new TrackerTag
         {
-            Id = PwrExtId, Name = "pwr_ext", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = PwrExtId, Name = "pwr_ext", DataType = TagDataTypeEnum.Integer,
             Description = "Напряжение питания, мВ"
         },
         new TrackerTag
         {
-            Id = PwrIntId, Name = "pwr_int", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = PwrIntId, Name = "pwr_int", DataType = TagDataTypeEnum.Integer,
             Description = "Напряжение на батарее"
         },
         new TrackerTag
         {
-            Id = TempIntId, Name = "temp_int", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = TempIntId, Name = "temp_int", DataType = TagDataTypeEnum.Integer,
             Description = "Температура внутри терминала, °С"
         },
         new TrackerTag
         {
-            Id = 15, Name = "out", DataType = TagDataTypeEnum.Bits, StructType = null,
+            Id = 15, Name = "out", DataType = TagDataTypeEnum.Bits,
             Description = "Статус выходов"
         },
         new TrackerTag
         {
-            Id = 16, Name = "in", DataType = TagDataTypeEnum.Bits, StructType = null,
+            Id = 16, Name = "in", DataType = TagDataTypeEnum.Bits,
             Description = "Статус входов"
         },
         new TrackerTag
         {
-            Id = 17, Name = "adc1", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 17, Name = "adc1", DataType = TagDataTypeEnum.Integer,
             Description = @"Значение на входе 0.
 В зависимости от настроек один из вариантов:
 1. Напряжение, Мв
@@ -362,7 +362,7 @@ public static class TagsSeed
         },
         new TrackerTag
         {
-            Id = 18, Name = "adc2", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 18, Name = "adc2", DataType = TagDataTypeEnum.Integer,
             Description = @"Значение на входе 1.
 В зависимости от настроек один из вариантов:
 1. Напряжение, Мв
@@ -371,7 +371,7 @@ public static class TagsSeed
         },
         new TrackerTag
         {
-            Id = 19, Name = "adc3", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 19, Name = "adc3", DataType = TagDataTypeEnum.Integer,
             Description = @"Значение на входе 2.
 В зависимости от настроек один из вариантов:
 1. Напряжение, Мв
@@ -380,7 +380,7 @@ public static class TagsSeed
         },
         new TrackerTag
         {
-            Id = Adc4Id, Name = "adc4", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = Adc4Id, Name = "adc4", DataType = TagDataTypeEnum.Integer,
             Description = @"Значение на входе 3.
 В зависимости от настроек один из вариантов:
 1. Напряжение, Мв
@@ -389,82 +389,82 @@ public static class TagsSeed
         },
         new TrackerTag
         {
-            Id = Adc9Id, Name = "adc9", DataType = TagDataTypeEnum.Bits, StructType = null,
+            Id = Adc9Id, Name = "adc9", DataType = TagDataTypeEnum.Bits,
             Description = "RS232 0"
         },
         new TrackerTag
         {
-            Id = Adc10Id, Name = "adc10", DataType = TagDataTypeEnum.Bits, StructType = null,
+            Id = Adc10Id, Name = "adc10", DataType = TagDataTypeEnum.Bits,
             Description = "RS232 1"
         },
         new TrackerTag
         {
-            Id = Rs4850Id, Name = "RS485[0]", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = Rs4850Id, Name = "rs485_0", DataType = TagDataTypeEnum.Integer,
             Description = "RS485[0]. ДУТ с адресом 0"
         },
         new TrackerTag
         {
-            Id = Rs4851Id, Name = "RS485[1]", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = Rs4851Id, Name = "rs485_1", DataType = TagDataTypeEnum.Integer,
             Description = "RS485[1]. ДУТ с адресом 1"
         },
         new TrackerTag
         {
-            Id = CanA0Id, Name = "CAN_A0", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = CanA0Id, Name = "can_a0", DataType = TagDataTypeEnum.Integer,
             Description = @"Данные CAN-шины (CAN_A0) или CAN-LOG.
 Топливо, израсходованное машиной с момента её создания, л"
         },
         new TrackerTag
         {
-            Id = 27, Name = "CAN_B0", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 27, Name = "can_b0", DataType = TagDataTypeEnum.Integer,
             Description = @"Данные CAN-шины (CAN_B0) или CAN-LOG.
 Пробег автомобиля, м."
         },
         new TrackerTag
         {
-            Id = Can8BitR0Id, Name = "CAN8BITR0", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = Can8BitR0Id, Name = "can8_bitr0", DataType = TagDataTypeEnum.Byte,
             Description = @"CAN8BITR0
 или скорость транспортного средства, передаваемая с CAN-LOG’а, км/ч"
         },
         new TrackerTag
         {
-            Id = 29, Name = "CAN8BITR1", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = 29, Name = "can8_bitr1", DataType = TagDataTypeEnum.Byte,
             Description = @"CAN8BITR1
 или второй байт префикса S от CAN-LOG"
         },
         new TrackerTag
         {
-            Id = 30, Name = "CAN8BITR2", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = 30, Name = "can8_bitr2", DataType = TagDataTypeEnum.Byte,
             Description = @"CAN8BITR2
 или первый байт префикса S от CAN-LOG"
         },
         new TrackerTag
         {
-            Id = 31, Name = "CAN8BITR3", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = 31, Name = "can8_bitr3", DataType = TagDataTypeEnum.Byte,
             Description = @"CAN8BITR3
 или младший байт префикса S от CAN-LOG"
         },
         new TrackerTag
         {
-            Id = 32, Name = "CAN8BITR4", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = 32, Name = "can8_bitr4", DataType = TagDataTypeEnum.Byte,
             Description = @"CAN8BITR4
 или третий байт префикса P от CAN-LOG"
         },
         new TrackerTag
         {
-            Id = 33, Name = "CAN8BITR5", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = 33, Name = "can8_bitr5", DataType = TagDataTypeEnum.Byte,
             Description = @"CAN8BITR5
 или второй байт префикса P от CAN-LOG"
         },
         new TrackerTag
         {
-            Id = Can32BitR0Id, Name = "CAN32BITR0", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = Can32BitR0Id, Name = "can32_bitr0", DataType = TagDataTypeEnum.Integer,
             Description = @"В зависимости от настроек один из вариантов:
 CAN32BITR0
 полное время работы двигателя, ч"
         },
         new TrackerTag
         {
-            Id = 35, Name = "Port 4", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 35, Name = "port_4", DataType = TagDataTypeEnum.Integer,
             Description = @"Значение на входе 4.
 В зависимости от настроек один из вариантов:
 1. напряжение, мВ
@@ -473,7 +473,7 @@ CAN32BITR0
         },
         new TrackerTag
         {
-            Id = 36, Name = "Port 5", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 36, Name = "port_5", DataType = TagDataTypeEnum.Integer,
             Description = @"Значение на входе 5.
 В зависимости от настроек один из вариантов:
 1. напряжение, мВ
@@ -482,24 +482,24 @@ CAN32BITR0
         },
         new TrackerTag
         {
-            Id = 37, Name = "iButton 1", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 37, Name = "i_button_1", DataType = TagDataTypeEnum.Integer,
             Description = @"Идентификационный номер первого ключа iButton"
         },
         new TrackerTag
         {
-            Id = 38, Name = "iButton 2", DataType = TagDataTypeEnum.Integer, StructType = null,
+            Id = 38, Name = "i_button_2", DataType = TagDataTypeEnum.Integer,
             Description = @"Идентификационный номер второго ключа iButton"
         },
         new TrackerTag
         {
-            Id = 39, Name = "iButton Keys", DataType = TagDataTypeEnum.Byte, StructType = null,
+            Id = 39, Name = "i_button_keys", DataType = TagDataTypeEnum.Byte,
             Description = @"Состояние ключей iButton, идентификаторы которых заданы командой iButtons.
 Каждый бит соответствует одному ключу.
 Например, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи."
         },
         new TrackerTag
         {
-            Id = 40, Name = "expanded_terminal_status", DataType = TagDataTypeEnum.Bits, StructType = null,
+            Id = 40, Name = "expanded_terminal_status", DataType = TagDataTypeEnum.Bits,
             Description = @"0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.
 1 – статус GPRS сессии. 1- установлена, 0 – нет.
 2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.
@@ -510,7 +510,7 @@ CAN32BITR0
         },
         new TrackerTag
         {
-            Id = 41, Name = "expanded_terminal_status", DataType = TagDataTypeEnum.Bits, StructType = null,
+            Id = 41, Name = "expanded_terminal_status", DataType = TagDataTypeEnum.Bits,
             Description = ""
         },
     };

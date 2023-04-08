@@ -22,11 +22,6 @@ public class TrackerTag : EntityBase, IAggregateRoot
     public TagDataTypeEnum DataType { get; set; }
 
     /// <summary>
-    /// Тип структуры (определяет способ интерпретации данных в структуре)
-    /// </summary>
-    public StructTypeEnum? StructType { get; set; }
-
-    /// <summary>
     /// Описание тега
     /// </summary>
     [MaxLength(500)]
