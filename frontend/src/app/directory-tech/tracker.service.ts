@@ -145,6 +145,19 @@ export enum TrackerTypeEnum {
   WialonIPS = 'wialonIPS'
 }
 
+export enum TrackerCommandTransport {
+  TCP = 'tcp',
+  SMS = 'sms'
+}
+
+export enum TrackerParameterName {
+  Time = 'time',
+  Latitude = 'lat',
+  Longitude = 'long',
+  Altitude = 'alt',
+  Speed = 'speed'
+}
+
 export type TrackersOptions = PaginationOptions & SortOptions<TrackersSortBy>
 
 export type Tracker = {
@@ -168,12 +181,9 @@ export interface Trackers extends Pagination {
   trackers: Tracker[];
 }
 
-export enum TrackerParameterName {
-  Time = 'time',
-  Latitude = 'lat',
-  Longitude = 'long',
-  Altitude = 'alt',
-  Speed = 'speed'
+export type TrackerCommand = {
+  commandText: string;
+  transport: TrackerCommandTransport;
 }
 
 export type TrackerStandardParameter = {

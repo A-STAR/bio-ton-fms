@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -127,7 +127,17 @@ describe('VehicleDialogComponent', () => {
   });
 
   it('should render vehicle form', async () => {
-    const vehicleFormDe = fixture.debugElement.query(By.css('form#vehicle-form'));
+    const dialogContentDe = fixture.debugElement.query(
+      By.directive(MatDialogContent)
+    );
+
+    expect(dialogContentDe)
+      .withContext('render dialog content element')
+      .not.toBeNull();
+
+    const vehicleFormDe = dialogContentDe.query(
+      By.css('form#vehicle-form')
+    );
 
     expect(vehicleFormDe)
       .withContext('render vehicle form element')

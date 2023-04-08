@@ -5,7 +5,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatTabGroupHarness } from '@angular/material/tabs/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
@@ -164,16 +164,6 @@ describe('SensorDialogComponent', () => {
       .toBe('Новый датчик');
   });
 
-  it('should render sensor form', async () => {
-    const sensorFormDe = fixture.debugElement.query(
-      By.css('form#sensor-form')
-    );
-
-    expect(sensorFormDe)
-      .withContext('render sensor form element')
-      .not.toBeNull();
-  });
-
   it('should render tabs', async () => {
     const tabGroup = await loader.getHarnessOrNull(
       MatTabGroupHarness.with({
@@ -194,7 +184,15 @@ describe('SensorDialogComponent', () => {
   });
 
   it('should render sensor form', async () => {
-    const sensorFormDe = fixture.debugElement.query(
+    const dialogContentDe = fixture.debugElement.query(
+      By.directive(MatDialogContent)
+    );
+
+    expect(dialogContentDe)
+      .withContext('render dialog content element')
+      .not.toBeNull();
+
+    const sensorFormDe = dialogContentDe.query(
       By.css('form#sensor-form')
     );
 
@@ -320,7 +318,7 @@ describe('SensorDialogComponent', () => {
       .withContext('render fuel use input with `NumberOnlyDirective`')
       .toBe('Расход л/ч');
 
-    await loader.getHarness(
+    loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#sensor-form',
         placeholder: 'Описание'

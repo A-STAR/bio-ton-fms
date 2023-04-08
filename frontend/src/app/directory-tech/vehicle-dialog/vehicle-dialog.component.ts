@@ -39,7 +39,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     subtype: KeyValue<VehicleSubtype, string>[];
   }>;
 
-  protected vehicleForm!: FormGroup<VehicleForm>;
+  protected vehicleForm!: VehicleForm;
   protected maxManufacturingYear = maxManufacturingYear;
 
   /**
@@ -182,7 +182,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   }
 }
 
-type VehicleForm = {
+type VehicleForm = FormGroup<{
   basic: FormGroup<{
     name: FormControl<NewVehicle['name'] | undefined>;
     make: FormControl<NewVehicle['make'] | undefined>;
@@ -202,7 +202,7 @@ type VehicleForm = {
   additional: FormGroup<{
     description: FormControl<NewVehicle['description'] | undefined>;
   }>;
-}
+}>
 
 const maxManufacturingYear = new Date()
   .getFullYear();

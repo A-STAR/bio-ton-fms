@@ -7,7 +7,7 @@ import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatDialogRef, MatDialogTitle, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogTitle, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -19,14 +19,7 @@ import { Observable, of } from 'rxjs';
 import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
-import {
-  DATE_PATTERN,
-  inputDateFormat,
-  localeID,
-  TrackerDialogComponent,
-  TRACKER_CREATED,
-  TRACKER_UPDATED
-} from './tracker-dialog.component';
+import { inputDateFormat, localeID, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
 
 import { testNewTracker, testTrackerTypeEnum } from '../tracker.service.spec';
 
@@ -118,7 +111,15 @@ describe('TrackerDialogComponent', () => {
   });
 
   it('should render tracker form', async () => {
-    const trackerFormDe = fixture.debugElement.query(
+    const dialogContentDe = fixture.debugElement.query(
+      By.directive(MatDialogContent)
+    );
+
+    expect(dialogContentDe)
+      .withContext('render dialog content element')
+      .not.toBeNull();
+
+    const trackerFormDe = dialogContentDe.query(
       By.css('form#tracker-form')
     );
 

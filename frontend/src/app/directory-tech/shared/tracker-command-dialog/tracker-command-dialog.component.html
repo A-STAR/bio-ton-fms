@@ -3,3 +3,22 @@
 
   <ng-container *ngIf="this.data.vehicle"> на <strong>{{ this.data.vehicle }}</strong></ng-container>
 </h1>
+
+<mat-dialog-content>
+  <form id="command-form" [formGroup]="commandForm">
+    <mat-button-toggle-group vertical aria-label="Протокол передачи" formControlName="transport">
+      <mat-button-toggle [value]="TrackerCommandTransport.TCP">TCP</mat-button-toggle>
+      <mat-button-toggle [value]="TrackerCommandTransport.SMS">SMS</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <div>
+      <label for="message">Сообщение</label>
+
+      <mat-form-field>
+        <textarea matInput id="message" placeholder="Сообщение" formControlName="message"></textarea>
+
+        <mat-error>Обязательное поле</mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>

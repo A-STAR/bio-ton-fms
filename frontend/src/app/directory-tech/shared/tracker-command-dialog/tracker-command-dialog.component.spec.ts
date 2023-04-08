@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { MAT_DIALOG_DATA, MatDialogTitle } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MAT_DIALOG_DATA, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatInputHarness } from '@angular/material/input/testing';
+import { MatButtonToggleGroupHarness, MatButtonToggleHarness } from '@angular/material/button-toggle/testing';
 
 import { TrackerCommandDialogComponent, TrackerCommandDialogData } from './tracker-command-dialog.component';
 
@@ -10,11 +15,15 @@ import { testNewVehicle } from '../../vehicle.service.spec';
 describe('TrackerCommandDialogComponent', () => {
   let component: TrackerCommandDialogComponent;
   let fixture: ComponentFixture<TrackerCommandDialogComponent>;
+  let loader: HarnessLoader;
 
   beforeEach(async () => {
     await TestBed
       .configureTestingModule({
-        imports: [TrackerCommandDialogComponent],
+        imports: [
+          NoopAnimationsModule,
+          TrackerCommandDialogComponent
+        ],
         providers: [
           {
             provide: MAT_DIALOG_DATA,
@@ -25,6 +34,7 @@ describe('TrackerCommandDialogComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(TrackerCommandDialogComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
 
@@ -83,6 +93,60 @@ describe('TrackerCommandDialogComponent', () => {
     expect(titleDe.nativeElement.textContent)
       .withContext('render dialog title text without vehicle')
       .toBe('Отправить команду');
+  });
+
+  it('should render command form', async () => {
+    const dialogContentDe = fixture.debugElement.query(
+      By.directive(MatDialogContent)
+    );
+
+    expect(dialogContentDe)
+      .withContext('render dialog content element')
+      .not.toBeNull();
+
+    const commandFormDe = dialogContentDe.query(
+      By.css('form#command-form')
+    );
+
+    expect(commandFormDe)
+      .withContext('render command form element')
+      .not.toBeNull();
+
+    loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#command-form',
+        placeholder: 'Сообщение'
+      })
+    );
+
+    const transport = await loader.getHarness(
+      MatButtonToggleGroupHarness.with({
+        ancestor: 'form#command-form',
+        selector: '[aria-label="Протокол передачи"]'
+      })
+    );
+
+    await expectAsync(
+      transport.isVertical()
+    )
+      .withContext('render transport toggle vertically')
+      .toBeResolvedTo(true);
+
+    loader.getHarness(
+      MatButtonToggleHarness.with({
+        ancestor: 'form#command-form',
+        text: 'TCP',
+        checked: true
+      })
+    );
+
+    loader.getHarness(
+      MatButtonToggleHarness.with({
+        ancestor: 'form#command-form',
+        text: 'SMS',
+        checked: false
+      })
+    );
   });
 });
 
