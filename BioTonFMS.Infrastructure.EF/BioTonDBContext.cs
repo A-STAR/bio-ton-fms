@@ -31,9 +31,12 @@ namespace BioTonFMS.Infrastructure.EF
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Tracker>()
-              .HasIndex(u => u.ExternalId)
-              .IsUnique();
+                .HasIndex(u => u.ExternalId)
+                .IsUnique();
 
+            modelBuilder.Entity<TrackerTag>()
+                .HasIndex("Name")
+                .IsUnique();
             modelBuilder.Entity<TrackerTag>()
                 .HasData(TagsSeed.TrackerTags);
 

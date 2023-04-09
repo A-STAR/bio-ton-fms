@@ -508,10 +508,5 @@ CAN32BITR0
 5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.
 6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует."
         },
-        new TrackerTag
-        {
-            Id = 41, Name = "expanded_terminal_status", DataType = TagDataTypeEnum.Bits,
-            Description = ""
-        },
     };
 }
