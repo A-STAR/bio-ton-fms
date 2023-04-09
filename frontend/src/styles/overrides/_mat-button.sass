@@ -61,7 +61,7 @@
       box-shadow: $box-shadow
 
 .mat-mdc-icon-button
-  transition: background-color, color 280ms cubic-bezier(0.4, 0, 0.2, 1)
+  transition: color $button-transition
 
   &:hover,
   &:active
@@ -77,8 +77,11 @@
     justify-content: center
     align-items: center
 
-  @at-root .mat-column-action > #{&}:hover .mat-mdc-button-persistent-ripple::before
+  @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
     opacity: 0
+
+  @at-root .actions #{&} span.mat-mdc-button-persistent-ripple::before
+    transition: opacity $button-transition
 
   &.mat-mdc-button-base
     width: map.get($mat-icon-button, size)
