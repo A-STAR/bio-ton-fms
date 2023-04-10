@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -255,6 +255,34 @@ describe('VehicleDialogComponent', () => {
       MatInputHarness.with({
         ancestor: 'form#vehicle-form',
         placeholder: 'Описание'
+      })
+    );
+  });
+
+  it('should render dialog actions', async () => {
+    const cancelButton = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отмена',
+        variant: 'stroked'
+      })
+    );
+
+    expect(cancelButton)
+      .withContext('render close button')
+      .not.toBeNull();
+
+    const dialogCloseDe = fixture.debugElement.query(
+      By.directive(MatDialogClose)
+    );
+
+    expect(dialogCloseDe)
+      .withContext('render dialog close element')
+      .not.toBeNull();
+
+    loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отправить',
+        variant: 'flat'
       })
     );
   });

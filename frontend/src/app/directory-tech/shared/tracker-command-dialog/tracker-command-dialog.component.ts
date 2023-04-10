@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogModule } from '@angular/mate
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
 
 import { Tracker, TrackerCommand, TrackerCommandTransport } from '../../tracker.service';
 import { Vehicle } from '../../vehicle.service';
@@ -18,7 +19,8 @@ import { Vehicle } from '../../vehicle.service';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    MatButtonModule
   ],
   templateUrl: './tracker-command-dialog.component.html',
   styleUrls: ['./tracker-command-dialog.component.sass'],
