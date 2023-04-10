@@ -5,7 +5,7 @@
 </h1>
 
 <mat-dialog-content>
-  <form id="command-form" [formGroup]="commandForm">
+  <form id="command-form" [formGroup]="commandForm" (ngSubmit)="submitCommandForm()">
     <mat-button-toggle-group vertical aria-label="Протокол передачи" formControlName="transport">
       <mat-button-toggle [value]="TrackerCommandTransport.TCP">TCP</mat-button-toggle>
       <mat-button-toggle [value]="TrackerCommandTransport.SMS">SMS</mat-button-toggle>
@@ -20,6 +20,10 @@
         <mat-error>Обязательное поле</mat-error>
       </mat-form-field>
     </div>
+
+    <ng-container *ngIf="commandResponse$ | async as response">
+      <p>{{ response }}</p>
+    </ng-container>
   </form>
 </mat-dialog-content>
 

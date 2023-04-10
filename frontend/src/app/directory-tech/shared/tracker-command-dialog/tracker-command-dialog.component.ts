@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
@@ -7,7 +7,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
 
-import { Tracker, TrackerCommand, TrackerCommandTransport } from '../../tracker.service';
+import { Subject, Subscription } from 'rxjs';
+
+import { Tracker, TrackerCommand, TrackerCommandResponse, TrackerCommandTransport, TrackerService } from '../../tracker.service';
 import { Vehicle } from '../../vehicle.service';
 
 @Component({
@@ -26,9 +28,40 @@ import { Vehicle } from '../../vehicle.service';
   styleUrls: ['./tracker-command-dialog.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TrackerCommandDialogComponent implements OnInit {
+export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   protected commandForm!: CommandForm;
+  protected commandResponse$ = new Subject<TrackerCommandResponse['commandResponse'] | undefined>();
   protected TrackerCommandTransport = TrackerCommandTransport;
+
+  /**
+   * Submit Command form, checking validation state.
+   */
+  protected submitCommandForm() {
+    this.#subscription?.unsubscribe();
+
+    this.commandResponse$.next(undefined);
+
+    const { invalid, value } = this.commandForm;
+
+    if (invalid) {
+      return;
+    }
+
+    const { message, transport } = value;
+
+    const command: TrackerCommand = {
+      commandText: message!,
+      transport: transport!
+    };
+
+    this.#subscription = this.trackerService
+      .sendTrackerCommand(this.data.id, command)
+      .subscribe(({ commandResponse }) => {
+        this.commandResponse$.next(commandResponse);
+      });
+  }
+
+  #subscription: Subscription | undefined;
 
   /**
  * Initialize Command form.
@@ -40,11 +73,20 @@ export class TrackerCommandDialogComponent implements OnInit {
     });
   }
 
-  constructor(private fb: FormBuilder, @Inject(MAT_DIALOG_DATA) protected data: TrackerCommandDialogData) { }
+  constructor(
+    private fb: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) protected data: TrackerCommandDialogData,
+    private trackerService: TrackerService
+  ) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#initCommandForm();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
   }
 }
 

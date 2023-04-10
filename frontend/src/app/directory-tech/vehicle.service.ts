@@ -14,7 +14,7 @@ export class VehicleService {
   /**
    * Get vehicle groups.
    *
-   * @returns An `Observable' of vehicle groups stream.
+   * @returns An `Observable` of vehicle groups stream.
    */
   get vehicleGroups$() {
     return this.httpClient.get<VehicleGroup[]>('/api/telematica/vehiclegroups');
@@ -23,7 +23,7 @@ export class VehicleService {
   /**
    * Get fuel types.
    *
-   * @returns An `Observable' of fuels stream.
+   * @returns An `Observable` of fuels stream.
    */
   get fuels$() {
     return this.httpClient.get<Fuel[]>('/api/telematica/fueltypes');
@@ -32,7 +32,7 @@ export class VehicleService {
   /**
    * Get vehicle type enum.
    *
-   * @returns An `Observable' of vehicle type enum stream.
+   * @returns An `Observable` of vehicle type enum stream.
    */
   get vehicleType$() {
     return this.httpClient.get<KeyValue<VehicleType, string>[]>('/api/telematica/enums/vehicletypeenum');
@@ -41,7 +41,7 @@ export class VehicleService {
   /**
    * Get vehicle subtype enum.
    *
-   * @returns An `Observable' of vehicle sub type enum stream.
+   * @returns An `Observable` of vehicle sub type enum stream.
    */
   get vehicleSubtype$() {
     return this.httpClient.get<KeyValue<VehicleSubtype, string>[]>('/api/telematica/enums/vehiclesubtypeenum');
@@ -52,7 +52,7 @@ export class VehicleService {
    *
    * @param fromObject Vehicles params options.
    *
-   * @returns An `Observable' of vehicles stream.
+   * @returns An `Observable` of vehicles stream.
    */
   getVehicles(fromObject: VehiclesOptions = { pageNum, pageSize }) {
     if (!fromObject.pageNum || !fromObject.pageSize) {
@@ -76,7 +76,7 @@ export class VehicleService {
    *
    * @param vehicle A new vehicle.
    *
-   * @returns An `Observable' of creating vehicle.
+   * @returns An `Observable` of creating vehicle.
    */
   createVehicle(vehicle: NewVehicle) {
     return this.httpClient.post('/api/telematica/vehicle', vehicle);
@@ -87,7 +87,7 @@ export class VehicleService {
    *
    * @param vehicle An updated vehicle.
    *
-   * @returns An `Observable' of updating vehicle.
+   * @returns An `Observable` of updating vehicle.
    */
   updateVehicle(vehicle: NewVehicle) {
     return this.httpClient.put(`/api/telematica/vehicle/${vehicle.id}`, vehicle);
@@ -98,7 +98,7 @@ export class VehicleService {
    *
    * @param id An deleted vehicle ID.
    *
-   * @returns An `Observable' of deleting vehicle.
+   * @returns An `Observable` of deleting vehicle.
    */
   deleteVehicle(id: VehicleDataSource['id']) {
     return this.httpClient.delete(`/api/telematica/vehicle/${id}`);

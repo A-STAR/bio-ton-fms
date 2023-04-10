@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
@@ -8,21 +9,27 @@ import { MatInputHarness } from '@angular/material/input/testing';
 import { MatButtonToggleGroupHarness, MatButtonToggleHarness } from '@angular/material/button-toggle/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 
+import { of } from 'rxjs';
+
+import { TrackerService } from '../../tracker.service';
+
 import { TrackerCommandDialogComponent, TrackerCommandDialogData } from './tracker-command-dialog.component';
 
-import { TEST_TRACKER_ID } from '../../tracker.service.spec';
+import { TEST_TRACKER_ID, testTrackerCommand, testTrackerCommandResponse } from '../../tracker.service.spec';
 import { testNewVehicle } from '../../vehicle.service.spec';
 
 describe('TrackerCommandDialogComponent', () => {
   let component: TrackerCommandDialogComponent;
   let fixture: ComponentFixture<TrackerCommandDialogComponent>;
   let loader: HarnessLoader;
+  let trackerService: TrackerService;
 
   beforeEach(async () => {
     await TestBed
       .configureTestingModule({
         imports: [
           NoopAnimationsModule,
+          HttpClientTestingModule,
           TrackerCommandDialogComponent
         ],
         providers: [
@@ -36,6 +43,7 @@ describe('TrackerCommandDialogComponent', () => {
 
     fixture = TestBed.createComponent(TrackerCommandDialogComponent);
     loader = TestbedHarnessEnvironment.loader(fixture);
+    trackerService = TestBed.inject(TrackerService);
 
     component = fixture.componentInstance;
 
@@ -176,6 +184,83 @@ describe('TrackerCommandDialogComponent', () => {
         variant: 'flat'
       })
     );
+  });
+
+  it('should submit invalid command form', async () => {
+    spyOn(trackerService, 'sendTrackerCommand')
+      .and.callThrough();
+
+    const sendButton = await loader.getHarness(
+      MatButtonHarness.with({
+        text: 'Отправить',
+        variant: 'flat'
+      })
+    );
+
+    await sendButton.click();
+
+    expect(trackerService.sendTrackerCommand)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should submit command form', async () => {
+    const messageInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#command-form',
+        placeholder: 'Сообщение'
+      })
+    );
+
+    const { commandText } = testTrackerCommand;
+
+    await messageInput.setValue(commandText);
+
+    const smsButtonToggle = await loader.getHarness(
+      MatButtonToggleHarness.with({
+        ancestor: 'form#command-form',
+        text: 'SMS'
+      })
+    );
+
+    await smsButtonToggle.check();
+
+    spyOn(trackerService, 'sendTrackerCommand')
+      .and.callFake(() => of(testTrackerCommandResponse));
+
+    const sendButton = await loader.getHarness(
+      MatButtonHarness.with({
+        text: 'Отправить',
+        variant: 'flat'
+      })
+    );
+
+    await sendButton.click();
+
+    expect(trackerService.sendTrackerCommand)
+      .toHaveBeenCalledWith(testMatDialogData.id, testTrackerCommand);
+
+    let responseParagraphDe = fixture.debugElement.query(
+      By.css('p')
+    );
+
+    expect(responseParagraphDe)
+      .withContext('render command response paragraph element')
+      .not.toBeNull();
+
+    expect(responseParagraphDe.nativeElement.textContent)
+      .withContext('render command response paragraph text')
+      .toBe(testTrackerCommandResponse.commandResponse);
+
+    await messageInput.setValue('');
+    await sendButton.click();
+
+    responseParagraphDe = fixture.debugElement.query(
+      By.css('p')
+    );
+
+    expect(responseParagraphDe)
+      .withContext('render no command response paragraph element')
+      .toBeNull();
   });
 });
 

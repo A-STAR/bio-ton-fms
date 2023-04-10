@@ -1,10 +1,19 @@
+@use 'variables' as *
+
 \:host
   display: block
 
 form
   display: flex
+  flex-wrap: wrap
   align-items: flex-start
 
   > div
     flex: 1
     margin-left: 40px
+
+  p
+    flex-basis: 100%
+    margin-bottom: 20px
+    color: $darker-gray
+    text-align: center

@@ -5,13 +5,14 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import {
   Fuel,
   NewVehicle,
-  VehiclesSortBy,
+  Vehicle,
   VehicleGroup,
-  Vehicles,
   VehicleService,
-  VehiclesOptions,
+  VehicleSubtype,
   VehicleType,
-  VehicleSubtype
+  Vehicles,
+  VehiclesOptions,
+  VehiclesSortBy
 } from './vehicle.service';
 
 import { SortDirection } from './shared/sort';
@@ -207,10 +208,10 @@ describe('VehicleService', () => {
 
     service
       .createVehicle(vehicle)
-      .subscribe(response => {
-        expect(response)
-          .withContext('emit response')
-          .toBeNull();
+      .subscribe(vehicle => {
+        expect(vehicle)
+          .withContext('emit new vehicle')
+          .toBe(testVehicle);
 
         done();
       });
@@ -220,7 +221,11 @@ describe('VehicleService', () => {
       url: '/api/telematica/vehicle'
     }, 'create vehicle request');
 
-    createVehicleRequest.flush(null);
+    expect(createVehicleRequest.request.body)
+      .withContext('valid request body')
+      .toBe(vehicle);
+
+    createVehicleRequest.flush(testVehicle);
   });
 
   it('should update vehicle', (done: DoneFn) => {
@@ -238,6 +243,10 @@ describe('VehicleService', () => {
       method: 'PUT',
       url: `/api/telematica/vehicle/${testNewVehicle.id}`
     }, 'update vehicle request');
+
+    expect(updateVehicleRequest.request.body)
+      .withContext('valid request body')
+      .toEqual(testNewVehicle);
 
     updateVehicleRequest.flush(null);
   });
@@ -351,6 +360,32 @@ export const testNewVehicle: NewVehicle = {
   description: 'Пикап с краном'
 };
 
+const testVehicle: Vehicle = {
+  id: testNewVehicle.id!,
+  name: testNewVehicle.name,
+  make: testNewVehicle.make,
+  model: testNewVehicle.model,
+  manufacturingYear: testNewVehicle.manufacturingYear,
+  vehicleGroup: {
+    id: testNewVehicle.id!,
+    value: testVehicleGroups[2].name
+  },
+  type: testVehicleTypeEnum[0],
+  subType:  testVehicleSubtypeEnum[2],
+  fuelType: {
+    id: testNewVehicle.fuelTypeId,
+    value: testFuels[0].name
+  },
+  registrationNumber: testNewVehicle.registrationNumber,
+  inventoryNumber: testNewVehicle.inventoryNumber,
+  serialNumber: testNewVehicle.serialNumber,
+  tracker: {
+    id: testNewVehicle.trackerId!,
+    value: 'Galileo Sky'
+  },
+  description: testNewVehicle.description
+};
+
 export const testVehicles: Vehicles = {
   vehicles: [
     {
@@ -371,7 +406,7 @@ export const testVehicles: Vehicles = {
       description: 'Марьевское',
       tracker: {
         id: 1,
-        value: '18-07-2539'
+        value: 'Galileo Sky'
       }
     },
     {
@@ -412,7 +447,7 @@ export const testVehicles: Vehicles = {
       },
       tracker: {
         id: 2,
-        value: '18-07-2557'
+        value: 'Передатчик уборки зерна'
       }
     }
   ],

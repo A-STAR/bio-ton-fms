@@ -7,10 +7,10 @@ import {
   Sensor,
   SensorDataTypeEnum,
   SensorGroup,
-  Sensors,
   SensorService,
-  SensorsOptions,
   SensorType,
+  Sensors,
+  SensorsOptions,
   Unit,
   ValidationTypeEnum
 } from './sensor.service';
@@ -186,8 +186,8 @@ describe('SensorService', () => {
 
     service
       .createSensor(sensor)
-      .subscribe(response => {
-        expect(response)
+      .subscribe(sensor => {
+        expect(sensor)
           .withContext('emit new sensor')
           .toBe(testSensor);
 
@@ -198,6 +198,10 @@ describe('SensorService', () => {
       method: 'POST',
       url: '/api/telematica/sensor'
     }, 'create sensor request');
+
+    expect(createSensorRequest.request.body)
+      .withContext('valid request body')
+      .toBe(sensor);
 
     createSensorRequest.flush(testSensor);
   });
@@ -217,6 +221,10 @@ describe('SensorService', () => {
       method: 'PUT',
       url: `/api/telematica/sensor/${testNewSensor.id}`
     }, 'update sensor request');
+
+    expect(updateSensorRequest.request.body)
+      .withContext('valid request body')
+      .toBe(testNewSensor);
 
     updateSensorRequest.flush(null);
   });
