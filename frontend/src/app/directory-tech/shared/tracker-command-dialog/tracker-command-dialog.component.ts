@@ -30,7 +30,7 @@ import { Vehicle } from '../../vehicle.service';
 })
 export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   protected commandForm!: CommandForm;
-  protected commandResponse$ = new Subject<TrackerCommandResponse['commandResponse'] | undefined>();
+  protected commandResponse$ = new Subject<TrackerCommandResponse['commandResponse'] | null | undefined>();
   protected TrackerCommandTransport = TrackerCommandTransport;
 
   /**
@@ -39,9 +39,12 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   protected submitCommandForm() {
     this.#subscription?.unsubscribe();
 
-    this.commandResponse$.next(undefined);
-
     const { invalid, value } = this.commandForm;
+
+    const response = invalid ? null : undefined;
+
+    // show/hide command response hidden paragraph without text
+    this.commandResponse$.next(response);
 
     if (invalid) {
       return;

@@ -76,7 +76,7 @@
       padding-left: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       padding-right: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       font-size: map.get($mat-mdc-form-field, font-size)
-      animation: transitionmessages 300ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
+      animation: transitionmessages $text-animation
 
       @keyframes transitionmessages
         from
@@ -229,7 +229,7 @@
 
       &::before,
       &::after
-        content: ""
+        content: ''
         order: 1
         height: 0
 

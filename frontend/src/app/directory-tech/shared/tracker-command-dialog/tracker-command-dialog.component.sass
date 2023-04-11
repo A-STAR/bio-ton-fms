@@ -17,3 +17,14 @@ form
     margin-bottom: 20px
     color: $darker-gray
     text-align: center
+
+    &[hidden]
+      display: block
+      visibility: hidden
+
+      &::before
+        display: inline-block
+        content: ''
+
+    span
+      animation: fadein $text-animation

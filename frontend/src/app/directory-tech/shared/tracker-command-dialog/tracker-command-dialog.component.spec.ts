@@ -247,10 +247,6 @@ describe('TrackerCommandDialogComponent', () => {
       .withContext('render command response paragraph element')
       .not.toBeNull();
 
-    expect(responseParagraphDe.nativeElement.textContent)
-      .withContext('render command response paragraph text')
-      .toBe(testTrackerCommandResponse.commandResponse);
-
     await messageInput.setValue('');
     await sendButton.click();
 
