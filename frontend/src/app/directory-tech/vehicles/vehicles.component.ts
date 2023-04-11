@@ -16,7 +16,6 @@ import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/ta
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 import {
   TrackerCommandDialogComponent,
-  TrackerCommandDialogData,
   trackerCommandDialogConfig
 } from '../shared/tracker-command-dialog/tracker-command-dialog.component';
 
@@ -30,6 +29,8 @@ import {
 import { SortDirection } from '../shared/sort';
 
 import { TableDataSource } from '../shared/table/table.data-source';
+
+import { Tracker } from '../tracker.service';
 
 @Component({
   selector: 'bio-vehicles',
@@ -176,13 +177,10 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    *
    * @param trackerDataSource Tracker data source.
    */
-  protected onSendTrackerCommand({ name, tracker }: VehicleDataSource) {
-    const data: TrackerCommandDialogData = {
-      id: tracker!.id,
-      vehicle: name
-    };
+  protected onSendTrackerCommand({ tracker }: VehicleDataSource) {
+    const data: Tracker['id'] = tracker!.id;
 
-    this.dialog.open<TrackerCommandDialogComponent, TrackerCommandDialogData, '' | undefined>(
+    this.dialog.open<TrackerCommandDialogComponent, Tracker['id'], '' | undefined>(
       TrackerCommandDialogComponent,
       { ...trackerCommandDialogConfig, data }
     );
