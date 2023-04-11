@@ -10,7 +10,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { Subject, Subscription } from 'rxjs';
 
 import { Tracker, TrackerCommand, TrackerCommandResponse, TrackerCommandTransport, TrackerService } from '../../tracker.service';
-import { Vehicle } from '../../vehicle.service';
 
 @Component({
   selector: 'bio-tracker-command-dialog',
@@ -58,7 +57,7 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
     };
 
     this.#subscription = this.trackerService
-      .sendTrackerCommand(this.data.id, command)
+      .sendTrackerCommand(this.data, command)
       .subscribe(({ commandResponse }) => {
         this.commandResponse$.next(commandResponse);
       });
@@ -78,7 +77,7 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) protected data: TrackerCommandDialogData,
+    @Inject(MAT_DIALOG_DATA) protected data: Tracker['id'],
     private trackerService: TrackerService
   ) { }
 
@@ -93,15 +92,11 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   }
 }
 
-export interface TrackerCommandDialogData extends Pick<Tracker, 'id'> {
-  vehicle?: Vehicle['name']
-};
-
 type CommandForm = FormGroup<{
   message: FormControl<TrackerCommand['commandText'] | undefined>;
   transport: FormControl<TrackerCommand['transport']>;
 }>
 
-export const trackerCommandDialogConfig: MatDialogConfig<TrackerCommandDialogData> = {
+export const trackerCommandDialogConfig: MatDialogConfig<Tracker['id']> = {
   width: '730px'
 };
