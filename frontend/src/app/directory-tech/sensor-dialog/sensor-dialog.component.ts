@@ -53,7 +53,7 @@ export class SensorDialogComponent implements OnInit {
   }>;
 
   protected title!: string;
-  protected sensorForm!: FormGroup<SensorForm>;
+  protected sensorForm!: SensorForm;
   protected fuelUseTypeIds: SensorGroup['id'][] = [3, 13, 14];
 
   /**
@@ -329,7 +329,7 @@ export class SensorDialogComponent implements OnInit {
 
 export type SensorDialogData<T extends Tracker['id'] | Sensor | Omit<Sensor, 'id'>> = T;
 
-type SensorForm = {
+type SensorForm = FormGroup<{
   basic: FormGroup<{
     tracker: FormControl<NewSensor['trackerId']>;
     name: FormControl<NewSensor['name'] | undefined>;
@@ -344,7 +344,7 @@ type SensorForm = {
     fuelUse: FormControl<NewSensor['fuelUse'] | undefined>;
     description: FormControl<NewSensor['description'] | undefined>;
   }>;
-}
+}>
 
 const FUEL_USE_PATTERN = /^\d+(?:\.\d{1,2})?$/;
 

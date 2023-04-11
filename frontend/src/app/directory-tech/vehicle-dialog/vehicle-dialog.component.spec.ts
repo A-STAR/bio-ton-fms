@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -106,13 +106,13 @@ describe('VehicleDialogComponent', () => {
   });
 
   it('should render dialog title', async () => {
-    const titleTextDe = fixture.debugElement.query(By.css('[mat-dialog-title]'));
+    const titleDe = fixture.debugElement.query(By.css('[mat-dialog-title]'));
 
-    expect(titleTextDe)
+    expect(titleDe)
       .withContext('render dialog title element')
       .not.toBeNull();
 
-    expect(titleTextDe.nativeElement.textContent)
+    expect(titleDe.nativeElement.textContent)
       .withContext('render dialog title text')
       .toBe('Добавление технического средства');
 
@@ -121,13 +121,23 @@ describe('VehicleDialogComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(titleTextDe.nativeElement.textContent)
+    expect(titleDe.nativeElement.textContent)
       .withContext('render dialog update title text')
       .toBe('Сводная информация о техническом средстве');
   });
 
   it('should render vehicle form', async () => {
-    const vehicleFormDe = fixture.debugElement.query(By.css('form#vehicle-form'));
+    const dialogContentDe = fixture.debugElement.query(
+      By.directive(MatDialogContent)
+    );
+
+    expect(dialogContentDe)
+      .withContext('render dialog content element')
+      .not.toBeNull();
+
+    const vehicleFormDe = dialogContentDe.query(
+      By.css('form#vehicle-form')
+    );
 
     expect(vehicleFormDe)
       .withContext('render vehicle form element')
@@ -245,6 +255,34 @@ describe('VehicleDialogComponent', () => {
       MatInputHarness.with({
         ancestor: 'form#vehicle-form',
         placeholder: 'Описание'
+      })
+    );
+  });
+
+  it('should render dialog actions', async () => {
+    const cancelButton = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отмена',
+        variant: 'stroked'
+      })
+    );
+
+    expect(cancelButton)
+      .withContext('render close button')
+      .not.toBeNull();
+
+    const dialogCloseDe = fixture.debugElement.query(
+      By.directive(MatDialogClose)
+    );
+
+    expect(dialogCloseDe)
+      .withContext('render dialog close element')
+      .not.toBeNull();
+
+    loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отправить',
+        variant: 'flat'
       })
     );
   });

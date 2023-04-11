@@ -285,7 +285,7 @@ describe('TrackerComponent', () => {
       .withContext('render card')
       .not.toBeNull();
 
-    const cardHeader = fixture.debugElement
+    const cardHeaderDe = fixture.debugElement
       .query(
         By.css('mat-card:nth-of-type(2)')
       )
@@ -293,7 +293,7 @@ describe('TrackerComponent', () => {
         By.directive(MatCardHeader)
       );
 
-    expect(cardHeader)
+    expect(cardHeaderDe)
       .withContext('render card header')
       .not.toBeNull();
 
@@ -465,7 +465,7 @@ describe('TrackerComponent', () => {
       .withContext('render card')
       .not.toBeNull();
 
-    const cardHeader = fixture.debugElement
+    const cardHeaderDe = fixture.debugElement
       .query(
         By.css('mat-card:nth-of-type(3)')
       )
@@ -473,7 +473,7 @@ describe('TrackerComponent', () => {
         By.directive(MatCardHeader)
       );
 
-    expect(cardHeader)
+    expect(cardHeaderDe)
       .withContext('render card header')
       .not.toBeNull();
 

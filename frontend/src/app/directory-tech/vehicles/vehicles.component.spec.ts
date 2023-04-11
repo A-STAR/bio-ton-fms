@@ -67,6 +67,16 @@ describe('VehiclesComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(async () => {
+    const dialogs = await documentRootLoader.getAllHarnesses(MatDialogHarness);
+
+    await Promise.all(
+      dialogs.map(dialog => dialog.close())
+    );
+
+    overlayContainer.ngOnDestroy();
+  });
+
   it('should create', () => {
     expect(component)
       .toBeTruthy();
@@ -219,13 +229,20 @@ describe('VehiclesComponent', () => {
           MatButtonHarness.with({
             ancestor: '.actions',
             variant: 'icon',
+            text: 'sms'
+          })
+        ),
+        actionCell.getHarnessOrNull(
+          MatButtonHarness.with({
+            ancestor: '.actions',
+            variant: 'icon',
             text: 'delete'
           })
         )
       ])
     ));
 
-    actionButtons.forEach(async ([actionButton, updateButton, trackerAnchor, deleteButton], index) => {
+    actionButtons.forEach(async ([actionButton, updateButton, trackerAnchor, commandButton, deleteButton], index) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
@@ -239,20 +256,45 @@ describe('VehiclesComponent', () => {
           .withContext('render GPS tracker anchor')
           .not.toBeNull();
 
-        const anchorEl = await trackerAnchor?.host();
-        const routerLink = await anchorEl?.getAttribute('ng-reflect-router-link');
+        const trackerAnchorEl = await trackerAnchor?.host();
 
-        expect(routerLink)
+        const [trackerRouterLink, trackerAnchorTitle] = await Promise.all([
+          trackerAnchorEl?.getAttribute('ng-reflect-router-link'),
+          trackerAnchorEl?.getAttribute('title')
+        ]);
+
+        expect(trackerRouterLink)
           .withContext('render GPS tracker anchor router link')
           .toBe(
             ['../trackers', testVehicles.vehicles[index].tracker?.id].join()
           );
+
+        expect(trackerAnchorTitle)
+          .withContext('render GPS tracker anchor title')
+          .toBe('GPS-трекер');
 
         trackerAnchor!.hasHarness(
           MatIconHarness.with({
             name: 'location_on'
           })
         );
+
+        expect(commandButton)
+          .withContext('render command GPS tracker button')
+          .not.toBeNull();
+
+        commandButton!.hasHarness(
+          MatIconHarness.with({
+            name: 'sms'
+          })
+        );
+
+        const commandButtonEl = await commandButton?.host();
+        const commandButtonTitle = await commandButtonEl?.getAttribute('title');
+
+        expect(commandButtonTitle)
+          .withContext('render GPS tracker command button title')
+          .toBe('Отправить команду');
       }
 
       expect(deleteButton)
@@ -268,7 +310,8 @@ describe('VehiclesComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
-        }));
+        })
+      );
 
       deleteButton!.hasHarness(
         MatIconHarness.with({
@@ -418,12 +461,8 @@ describe('VehiclesComponent', () => {
       .withContext('render a vehicle dialog')
       .toBeDefined();
 
-    await vehicleDialog!.close();
-
     expect(vehiclesSpy)
       .toHaveBeenCalled();
-
-    overlayContainer.ngOnDestroy();
 
     /* Coverage for updating vehicles. */
 
@@ -452,12 +491,8 @@ describe('VehiclesComponent', () => {
       .withContext('render a vehicle dialog')
       .toBeDefined();
 
-    await vehicleDialog!.close();
-
     expect(vehiclesSpy)
       .toHaveBeenCalled();
-
-    overlayContainer.ngOnDestroy();
 
     /* Coverage for updating vehicles. */
 
@@ -469,6 +504,24 @@ describe('VehiclesComponent', () => {
       .and.returnValue(dialogRef);
 
     await updateVehicleButtons[1].click();
+  });
+
+  it('should render GPS tracker command dialog', async () => {
+    const commandButtons = await loader.getAllHarnesses(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        selector: '[mat-icon-button]',
+        text: 'sms'
+      })
+    );
+
+    await commandButtons[0].click();
+
+    const commandTrackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(commandTrackerDialog)
+      .withContext('render a GPS tracker command dialog')
+      .toBeDefined();
   });
 
   it('should delete vehicle', async () => {
@@ -565,7 +618,5 @@ describe('VehiclesComponent', () => {
 
     expect(vehiclesSpy)
       .toHaveBeenCalled();
-
-    overlayContainer.ngOnDestroy();
   });
 });

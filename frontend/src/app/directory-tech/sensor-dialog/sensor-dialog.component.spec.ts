@@ -5,7 +5,7 @@ import { KeyValue } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatTabGroupHarness } from '@angular/material/tabs/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
@@ -127,15 +127,15 @@ describe('SensorDialogComponent', () => {
   });
 
   it('should render dialog title', async () => {
-    const titleTextDe = fixture.debugElement.query(
+    const titleDe = fixture.debugElement.query(
       By.directive(MatDialogTitle)
     );
 
-    expect(titleTextDe)
+    expect(titleDe)
       .withContext('render dialog title element')
       .not.toBeNull();
 
-    expect(titleTextDe.nativeElement.textContent)
+    expect(titleDe.nativeElement.textContent)
       .withContext('render dialog title text')
       .toBe('Новый датчик');
 
@@ -146,7 +146,7 @@ describe('SensorDialogComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(titleTextDe.nativeElement.textContent)
+    expect(titleDe.nativeElement.textContent)
       .withContext('render dialog update title text')
       .toBe('Сводная информация о датчике');
 
@@ -159,19 +159,9 @@ describe('SensorDialogComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(titleTextDe.nativeElement.textContent)
+    expect(titleDe.nativeElement.textContent)
       .withContext('render dialog duplicate title text')
       .toBe('Новый датчик');
-  });
-
-  it('should render sensor form', async () => {
-    const sensorFormDe = fixture.debugElement.query(
-      By.css('form#sensor-form')
-    );
-
-    expect(sensorFormDe)
-      .withContext('render sensor form element')
-      .not.toBeNull();
   });
 
   it('should render tabs', async () => {
@@ -194,7 +184,15 @@ describe('SensorDialogComponent', () => {
   });
 
   it('should render sensor form', async () => {
-    const sensorFormDe = fixture.debugElement.query(
+    const dialogContentDe = fixture.debugElement.query(
+      By.directive(MatDialogContent)
+    );
+
+    expect(dialogContentDe)
+      .withContext('render dialog content element')
+      .not.toBeNull();
+
+    const sensorFormDe = dialogContentDe.query(
       By.css('form#sensor-form')
     );
 
@@ -320,7 +318,7 @@ describe('SensorDialogComponent', () => {
       .withContext('render fuel use input with `NumberOnlyDirective`')
       .toBe('Расход л/ч');
 
-    await loader.getHarness(
+    loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#sensor-form',
         placeholder: 'Описание'
@@ -330,6 +328,34 @@ describe('SensorDialogComponent', () => {
     /* Coverage for `onControlSelectionChange` control disabled state. */
 
     await type.clickOptions();
+  });
+
+  it('should render dialog actions', async () => {
+    const cancelButton = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отмена',
+        variant: 'stroked'
+      })
+    );
+
+    expect(cancelButton)
+      .withContext('render close button')
+      .not.toBeNull();
+
+    const dialogCloseDe = fixture.debugElement.query(
+      By.directive(MatDialogClose)
+    );
+
+    expect(dialogCloseDe)
+      .withContext('render dialog close element')
+      .not.toBeNull();
+
+    loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отправить',
+        variant: 'flat'
+      })
+    );
   });
 
   it('should render update sensor form', async () => {

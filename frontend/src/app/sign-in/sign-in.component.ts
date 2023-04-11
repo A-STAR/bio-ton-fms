@@ -36,7 +36,7 @@ import { AuthService, Credentials } from '../auth.service';
 })
 export default class SignInComponent implements OnInit, OnDestroy {
   protected systemVersion$!: Observable<string>;
-  protected signInForm!: FormGroup<SignInForm>;
+  protected signInForm!: SignInForm;
   protected hidePassword = true;
 
   /**
@@ -121,7 +121,7 @@ export default class SignInComponent implements OnInit, OnDestroy {
   }
 }
 
-type SignInForm = {
+type SignInForm = FormGroup<{
   username: FormControl<string | null>;
   password: FormControl<string | null>;
-}
+}>

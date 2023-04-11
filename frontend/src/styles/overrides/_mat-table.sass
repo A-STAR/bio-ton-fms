@@ -1,14 +1,7 @@
 @use 'variables' as *
 
 mat-table
-  animation: fadein 280ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
-
-  @keyframes fadein
-    from
-      opacity: 0
-
-    to
-      opacity: 1
+  animation: fadein $panel-animation
 
   &.mdc-data-table__table
     min-width: unset

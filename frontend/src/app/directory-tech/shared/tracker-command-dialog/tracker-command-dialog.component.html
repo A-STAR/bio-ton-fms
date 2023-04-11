@@ -1,0 +1,38 @@
+<h1 mat-dialog-title>
+  <ng-container>Отправить команду</ng-container>
+
+  <ng-container *ngIf="this.data.vehicle"> на <strong>{{ this.data.vehicle }}</strong></ng-container>
+</h1>
+
+<mat-dialog-content>
+  <form id="command-form" [formGroup]="commandForm" (ngSubmit)="submitCommandForm()">
+    <mat-button-toggle-group vertical aria-label="Протокол передачи" formControlName="transport">
+      <mat-button-toggle [value]="TrackerCommandTransport.TCP">TCP</mat-button-toggle>
+      <mat-button-toggle [value]="TrackerCommandTransport.SMS">SMS</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <div>
+      <label for="message">Сообщение</label>
+
+      <mat-form-field>
+        <textarea matInput id="message" placeholder="Сообщение" formControlName="message"></textarea>
+
+        <mat-error>Обязательное поле</mat-error>
+      </mat-form-field>
+    </div>
+
+    <ng-container *ngIf="(commandResponse$ | async) !== null">
+      <p [hidden]="(commandResponse$ | async) === undefined">
+        <ng-container *ngIf="commandResponse$ | async as response">
+          <span>{{ response }}</span>
+        </ng-container>
+      </p>
+    </ng-container>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayoutAlign="space-between">
+  <button mat-stroked-button color="accent" mat-dialog-close>Отмена</button>
+
+  <button mat-flat-button type="submit" form="command-form" color="accent">Отправить</button>
+</mat-dialog-actions>

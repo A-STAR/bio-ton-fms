@@ -23,10 +23,15 @@ h1.mdc-dialog__title
   line-height: unset
   letter-spacing: unset
 
-.mat-mdc-dialog-container h1.mdc-dialog__title
-  @extend %heading-with-border
+.mat-mdc-dialog-container
 
-  font-size: 18px
+  h1.mdc-dialog__title
+    @extend %heading-with-border
+
+    font-size: 18px
+
+  mat-dialog-content.mdc-dialog__content
+    color: unset
 
 .mdc-dialog mat-dialog-content.mdc-dialog__content
   font-weight: unset

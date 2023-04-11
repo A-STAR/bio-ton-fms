@@ -16,7 +16,7 @@ export class TrackerService {
   /**
    * Get tracker type enum.
    *
-   * @returns An `Observable' of tracker type enum stream.
+   * @returns An `Observable` of tracker type enum stream.
    */
   get trackerType$() {
     return this.httpClient.get<KeyValue<TrackerTypeEnum, string>[]>('/api/telematica/enums/trackertypeenum');
@@ -27,7 +27,7 @@ export class TrackerService {
    *
    * @param fromObject Trackers params options.
    *
-   * @returns An `Observable' of trackers stream.
+   * @returns An `Observable` of trackers stream.
    */
   getTrackers(fromObject: TrackersOptions = { pageNum, pageSize }) {
     if (!fromObject.pageNum || !fromObject.pageSize) {
@@ -51,7 +51,7 @@ export class TrackerService {
    *
    * @param tracker A new tracker.
    *
-   * @returns An `Observable' of creating tracker stream.
+   * @returns An `Observable` of creating tracker stream.
    */
   createTracker(tracker: NewTracker) {
     return this.httpClient.post('/api/telematica/tracker', tracker);
@@ -62,10 +62,21 @@ export class TrackerService {
    *
    * @param tracker An updated tracker.
    *
-   * @returns An `Observable' of updating tracker stream.
+   * @returns An `Observable` of updating tracker stream.
    */
   updateTracker(tracker: NewTracker) {
     return this.httpClient.put(`/api/telematica/tracker/${tracker.id}`, tracker);
+  }
+
+  /**
+   * Send a command to tracker.
+   *
+   * @param id A tracker ID.
+   *
+   * @returns An `Observable` of command response.
+   */
+  sendTrackerCommand(id: Tracker['id'], command: TrackerCommand) {
+    return this.httpClient.post<TrackerCommandResponse>(`/api/telematica/tracker-command/${id}`, command);
   }
 
   /**
@@ -84,7 +95,7 @@ export class TrackerService {
    *
    * @param id A tracker ID.
    *
-   * @returns An `Observable' of standard parameters stream.
+   * @returns An `Observable` of standard parameters stream.
    */
   getStandardParameters(id: Tracker['id']) {
     return this.httpClient.get<TrackerStandardParameter[]>(`/api/telematica/tracker/standard-parameters/${id}`);
@@ -95,7 +106,7 @@ export class TrackerService {
    *
    * @param id A tracker ID.
    *
-   * @returns An `Observable' of parameters stream.
+   * @returns An `Observable` of parameters stream.
    */
   getParameters(id: Tracker['id']) {
     return this.httpClient.get<TrackerParameter[]>(`/api/telematica/tracker/parameters/${id}`);
@@ -145,6 +156,19 @@ export enum TrackerTypeEnum {
   WialonIPS = 'wialonIPS'
 }
 
+export enum TrackerCommandTransport {
+  TCP = 'tcp',
+  SMS = 'sms'
+}
+
+export enum TrackerParameterName {
+  Time = 'time',
+  Latitude = 'lat',
+  Longitude = 'long',
+  Altitude = 'alt',
+  Speed = 'speed'
+}
+
 export type TrackersOptions = PaginationOptions & SortOptions<TrackersSortBy>
 
 export type Tracker = {
@@ -168,12 +192,13 @@ export interface Trackers extends Pagination {
   trackers: Tracker[];
 }
 
-export enum TrackerParameterName {
-  Time = 'time',
-  Latitude = 'lat',
-  Longitude = 'long',
-  Altitude = 'alt',
-  Speed = 'speed'
+export type TrackerCommand = {
+  commandText: string;
+  transport: TrackerCommandTransport;
+}
+
+export type TrackerCommandResponse = {
+  commandResponse?: string;
 }
 
 export type TrackerStandardParameter = {

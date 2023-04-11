@@ -90,7 +90,7 @@ export class SensorService {
    *
    * @param sensor An updated sensor.
    *
-   * @returns An `Observable' of updating sensor.
+   * @returns An `Observable` of updating sensor.
    */
   updateSensor(sensor: NewSensor) {
     return this.httpClient.put<null>(`/api/telematica/sensor/${sensor.id}`, sensor);

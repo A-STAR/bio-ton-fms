@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatCardContent } from '@angular/material/card';
 import { MatCardHarness } from '@angular/material/card/testing';
 import { MatDividerHarness } from '@angular/material/divider/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
@@ -131,8 +132,18 @@ describe('SignInComponent', () => {
       .toBeResolvedTo(true);
   });
 
-  it('should render Sign in form', async () => {
-    const signInFormDe = fixture.debugElement.query(By.css('form#sign-in-form'));
+  it('should render sign in form', async () => {
+    const cardContentDe = fixture.debugElement.query(
+      By.directive(MatCardContent)
+    );
+
+    expect(cardContentDe)
+      .withContext('render card content element')
+      .not.toBeNull();
+
+    const signInFormDe = cardContentDe.query(
+      By.css('form#sign-in-form')
+    );
 
     expect(signInFormDe)
       .withContext('render Sign in form element')

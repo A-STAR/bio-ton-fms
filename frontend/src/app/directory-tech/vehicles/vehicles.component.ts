@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
@@ -14,6 +14,11 @@ import { NewVehicle, VehiclesSortBy, Vehicle, Vehicles, VehicleService, Vehicles
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
+import {
+  TrackerCommandDialogComponent,
+  TrackerCommandDialogData,
+  trackerCommandDialogConfig
+} from '../shared/tracker-command-dialog/tracker-command-dialog.component';
 
 import {
   ConfirmationDialogData,
@@ -104,7 +109,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    * Create a new vehicle in table.
    */
   protected onCreateVehicle() {
-    const dialogRef = this.dialog.open<VehicleDialogComponent, any, true | '' | undefined>(VehicleDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open<VehicleDialogComponent, void, true | '' | undefined>(VehicleDialogComponent);
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -154,10 +159,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       description
     };
 
-    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | '' | undefined>(
-      VehicleDialogComponent,
-      { ...dialogConfig, data }
-    );
+    const dialogRef = this.dialog.open<VehicleDialogComponent, NewVehicle, true | '' | undefined>(VehicleDialogComponent, { data });
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -167,6 +169,23 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.#updateVehicles();
       });
+  }
+
+  /**
+   * Send a command to GPS-tracker.
+   *
+   * @param trackerDataSource Tracker data source.
+   */
+  protected onSendTrackerCommand({ name, tracker }: VehicleDataSource) {
+    const data: TrackerCommandDialogData = {
+      id: tracker!.id,
+      vehicle: name
+    };
+
+    this.dialog.open<TrackerCommandDialogComponent, TrackerCommandDialogData, '' | undefined>(
+      TrackerCommandDialogComponent,
+      { ...trackerCommandDialogConfig, data }
+    );
   }
 
   /**
@@ -372,8 +391,3 @@ export const vehicleColumns: KeyValue<VehicleColumn, string | undefined>[] = [
 
 const REGISTRATION_NUMBER_PATTERN = /[a-zA-Zа-яА-ЯёЁ]+|[0-9]+/g;
 export const VEHICLE_DELETED = 'Машина удалена';
-
-const dialogConfig: MatDialogConfig<NewVehicle> = {
-  width: '70vw',
-  height: '85vh'
-};

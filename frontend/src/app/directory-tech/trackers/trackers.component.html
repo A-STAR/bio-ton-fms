@@ -42,6 +42,11 @@
             <mat-icon class="md-18">edit</mat-icon>
           </button>
 
+          <button mat-icon-button bioStopClickPropagation title="Отправить команду" color="accent"
+            (click)="onSendTrackerCommand(element)">
+            <mat-icon class="md-18">sms</mat-icon>
+          </button>
+
           <button mat-icon-button bioStopClickPropagation title="Удалить" color="warn"
             (click)="onDeleteTracker(element)">
             <mat-icon class="md-18">delete</mat-icon>

@@ -8,7 +8,7 @@ export class SystemService {
   /**
    * Get system version.
    *
-   * @returns An `Observable' of system version stream.
+   * @returns An `Observable` of system version stream.
    */
   get version$() {
     return this.httpClient.get<string>('/system/get-version');

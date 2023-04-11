@@ -4,17 +4,21 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import {
   NewTracker,
+  TRACKER_PARAMETERS_HISTORY_PAGE_SIZE,
+  Tracker,
+  TrackerCommand,
+  TrackerCommandResponse,
+  TrackerCommandTransport,
   TrackerParameter,
   TrackerParameterName,
   TrackerParametersHistory,
   TrackerParametersHistoryOptions,
-  Trackers,
   TrackerService,
-  TrackersOptions,
-  TrackersSortBy,
   TrackerStandardParameter,
   TrackerTypeEnum,
-  TRACKER_PARAMETERS_HISTORY_PAGE_SIZE
+  Trackers,
+  TrackersOptions,
+  TrackersSortBy
 } from './tracker.service';
 
 import { SortDirection } from './shared/sort';
@@ -168,10 +172,10 @@ describe('TrackerService', () => {
 
     service
       .createTracker(tracker)
-      .subscribe(response => {
-        expect(response)
-          .withContext('emit response')
-          .toBeNull();
+      .subscribe(tracker => {
+        expect(tracker)
+          .withContext('emit new tracker')
+          .toBe(testTracker);
 
         done();
       });
@@ -181,7 +185,11 @@ describe('TrackerService', () => {
       url: '/api/telematica/tracker'
     }, 'create tracker request');
 
-    createTrackerRequest.flush(null);
+    expect(createTrackerRequest.request.body)
+      .withContext('valid request body')
+      .toBe(tracker);
+
+    createTrackerRequest.flush(testTracker);
   });
 
   it('should update tracker', (done: DoneFn) => {
@@ -199,6 +207,10 @@ describe('TrackerService', () => {
       method: 'PUT',
       url: `/api/telematica/tracker/${testNewTracker.id}`
     }, 'update tracker request');
+
+    expect(updateTrackerRequest.request.body)
+      .withContext('valid request body')
+      .toBe(testNewTracker);
 
     updateTrackerRequest.flush(null);
   });
@@ -220,6 +232,29 @@ describe('TrackerService', () => {
     }, 'delete tracker request');
 
     deleteTrackerRequest.flush(null);
+  });
+
+  it('should send tracker command', (done: DoneFn) => {
+    service
+      .sendTrackerCommand(testTrackers.trackers[0].id, testTrackerCommand)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit tracker command response')
+          .toBe(testTrackerCommandResponse);
+
+        done();
+      });
+
+    const trackerCommandRequest = httpTestingController.expectOne({
+      method: 'POST',
+      url: `/api/telematica/tracker-command/${testNewTracker.id}`
+    }, 'tracker command request');
+
+    expect(trackerCommandRequest.request.body)
+      .withContext('valid request body')
+      .toBe(testTrackerCommand);
+
+    trackerCommandRequest.flush(testTrackerCommandResponse);
   });
 
   it('should get standard parameters', (done: DoneFn) => {
@@ -350,6 +385,17 @@ export const testNewTracker: NewTracker = {
   description: 'GPS Ford Focus'
 };
 
+export const testTracker: Tracker = {
+  id: testNewTracker.id!,
+  externalId: testNewTracker.externalId,
+  name: testNewTracker.name,
+  simNumber: testNewTracker.simNumber,
+  imei: testNewTracker.imei,
+  trackerType: testTrackerTypeEnum[0],
+  startDate: testNewTracker.startDate!,
+  description: testNewTracker.description
+};
+
 export const testTrackers: Trackers = {
   trackers: [
     {
@@ -394,6 +440,15 @@ export const testTrackers: Trackers = {
     pageIndex: 1,
     total: 1
   }
+};
+
+export const testTrackerCommand: TrackerCommand = {
+  commandText: 'reset',
+  transport: TrackerCommandTransport.SMS
+};
+
+export const testTrackerCommandResponse: TrackerCommandResponse = {
+  commandResponse: 'Reset of device. Please wait 15 seconds…'
 };
 
 export const testStandardParameters: TrackerStandardParameter[] = [

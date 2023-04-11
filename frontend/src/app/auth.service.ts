@@ -12,7 +12,7 @@ export class AuthService {
   /**
    * Get authenticated state.
    *
-   * @returns An `Observable' of authenticated state stream.
+   * @returns An `Observable` of authenticated state stream.
    */
   get authenticated$(): Observable<boolean> {
     return this.#authenticated$.asObservable();
@@ -21,7 +21,7 @@ export class AuthService {
   /**
    * Sign out user.
    *
-   * @returns An `Observable' of signing out stream.
+   * @returns An `Observable` of signing out stream.
    */
   get signOut$() {
     return of(undefined)
@@ -37,7 +37,7 @@ export class AuthService {
   /**
    * Authenticate user in `AuthGuard` if there's a token.
    *
-   * @returns An `Observable' of authenticate stream.
+   * @returns An `Observable` of authenticate stream.
    */
   authenticate() {
     if (this.tokenService.token) {
@@ -51,7 +51,7 @@ export class AuthService {
   /**
    * Sign in user.
    *
-   * @returns An `Observable' of signing in stream.
+   * @returns An `Observable` of signing in stream.
    */
   signIn({ username, password }: Credentials) {
     const body = {

@@ -99,6 +99,17 @@ export function testSignIn(httpTestingController: HttpTestingController, authSer
     url: '/api/auth/login'
   }, 'login request');
 
+  const { username, password } = testCredentials;
+
+  const credentials = {
+    userName: username,
+    password
+  };
+
+  expect(loginRequest.request.body)
+    .withContext('valid request body')
+    .toEqual(credentials);
+
   loginRequest.flush(testCredentialsResponse);
 
   httpTestingController.verify();
