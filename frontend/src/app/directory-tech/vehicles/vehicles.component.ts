@@ -172,7 +172,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Send a command to GPS-tracker.
+   * Send a command to vehicle GPS-tracker.
    *
    * @param trackerDataSource Tracker data source.
    */
