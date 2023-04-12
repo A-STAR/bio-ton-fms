@@ -29,7 +29,7 @@ Lint-frontend:
       when: always
     - changes:
       - frontend/**/*
-    - if: TrueVar == "true"
+    - if: $TrueVar == "true"
       when: manual
       allow_failure: true       
 
@@ -49,7 +49,7 @@ Build-frontend:
       when: always
     - changes:
       - frontend/**/*
-    - if: TrueVar == "true"
+    - if: $TrueVar == "true"
       when: manual
       allow_failure: true
            
@@ -67,7 +67,7 @@ Test-frontend:
       when: always
     - changes:
       - frontend/**/*
-    - if: TrueVar == "true"
+    - if: $TrueVar == "true"
       when: manual
       allow_failure: true
 
@@ -84,7 +84,7 @@ Deploy-frontend-test.lan.bioton-fms-ru:
     - if: $CI_COMMIT_BRANCH == "MAIN"
       when: always         
 
-    - if: TrueVar == "true"
+    - if: $TrueVar == "true"
       when: manual
       allow_failure: true
   artifacts:
