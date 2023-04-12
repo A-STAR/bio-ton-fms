@@ -1,6 +1,7 @@
 variables:
   GIT_FETCH_EXTRA_FLAGS: --tags
   DOCKER_TAG: $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
+  TRUE: "true"
 
 .node-job:
   before_script:
@@ -28,7 +29,7 @@ Lint-frontend:
       when: always
     - changes:
       - frontend/**/*
-    - if:
+    - if: $TRUE == "true"
       when: manual
       allow_failure: true       
 
@@ -48,7 +49,7 @@ Build-frontend:
       when: always
     - changes:
       - frontend/**/*
-    - if:
+    - if: $TRUE == "true"
       when: manual
       allow_failure: true
            
@@ -66,7 +67,7 @@ Test-frontend:
       when: always
     - changes:
       - frontend/**/*
-    - if:
+    - if: $TRUE == "true"
       when: manual
       allow_failure: true
 
@@ -82,7 +83,7 @@ Deploy-frontend-test.lan.bioton-fms-ru:
   rules:
     - if: $CI_COMMIT_BRANCH == "MAIN"
       when: always         
-    - if:
+    - if: $TRUE == "true"
       when: manual
       allow_failure: true
   artifacts:
