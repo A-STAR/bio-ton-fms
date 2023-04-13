@@ -1,8 +1,4 @@
-<h1 mat-dialog-title>
-  <ng-container>Отправить команду</ng-container>
-
-  <ng-container *ngIf="this.data.vehicle"> на <strong>{{ this.data.vehicle }}</strong></ng-container>
-</h1>
+<h1 mat-dialog-title>Отправить команду</h1>
 
 <mat-dialog-content>
   <form id="command-form" [formGroup]="commandForm" (ngSubmit)="submitCommandForm()">

@@ -17,10 +17,8 @@ import { StopClickPropagationDirective } from 'src/app/shared/stop-click-propaga
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 import {
   TrackerCommandDialogComponent,
-  trackerCommandDialogConfig,
-  TrackerCommandDialogData
+  trackerCommandDialogConfig
 } from '../shared/tracker-command-dialog/tracker-command-dialog.component';
-
 import {
   ConfirmationDialogComponent,
   confirmationDialogConfig,
@@ -156,17 +154,14 @@ export default class TrackersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Send a command to GPS-tracker.
+   * Send a command to vehicle GPS-tracker.
    *
    * @param trackerDataSource Tracker data source.
    */
-  protected onSendTrackerCommand({ id, vehicle }: TrackerDataSource) {
-    const data: TrackerCommandDialogData = {
-      id,
-      vehicle: vehicle?.value
-    };
+  protected onSendTrackerCommand({ id }: TrackerDataSource) {
+    const data: Tracker['id'] = id;
 
-    this.dialog.open<TrackerCommandDialogComponent, TrackerCommandDialogData, '' | undefined>(
+    this.dialog.open<TrackerCommandDialogComponent, Tracker['id'], '' | undefined>(
       TrackerCommandDialogComponent,
       { ...trackerCommandDialogConfig, data }
     );

@@ -13,10 +13,9 @@ import { of } from 'rxjs';
 
 import { TrackerService } from '../../tracker.service';
 
-import { TrackerCommandDialogComponent, TrackerCommandDialogData } from './tracker-command-dialog.component';
+import { TrackerCommandDialogComponent } from './tracker-command-dialog.component';
 
 import { TEST_TRACKER_ID, testTrackerCommand, testTrackerCommandResponse } from '../../tracker.service.spec';
-import { testNewVehicle } from '../../vehicle.service.spec';
 
 describe('TrackerCommandDialogComponent', () => {
   let component: TrackerCommandDialogComponent;
@@ -35,7 +34,7 @@ describe('TrackerCommandDialogComponent', () => {
         providers: [
           {
             provide: MAT_DIALOG_DATA,
-            useValue: testMatDialogData
+            useValue: TEST_TRACKER_ID
           }
         ]
       })
@@ -64,44 +63,9 @@ describe('TrackerCommandDialogComponent', () => {
       .withContext('render dialog title element')
       .not.toBeNull();
 
-    let vehicleDe = titleDe.query(
-      By.css('strong')
-    );
-
-    expect(vehicleDe)
-      .withContext('render dialog vehicle element')
-      .not.toBeNull();
-
     expect(titleDe.nativeElement.textContent)
-      .withContext('render dialog title text with vehicle')
-      .toBe(`Отправить команду на ${testMatDialogData.vehicle}`);
-
-    fixture = TestBed.createComponent(TrackerCommandDialogComponent);
-
-    component = fixture.componentInstance;
-
-    const { vehicle, ...data } = testMatDialogData;
-
-    component['data'] = data;
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    titleDe = fixture.debugElement.query(
-      By.directive(MatDialogTitle)
-    );
-
-    vehicleDe = titleDe.query(
-      By.css('strong')
-    );
-
-    expect(vehicleDe)
-      .withContext('render no dialog vehicle element')
-      .toBeNull();
-
-    expect(titleDe.nativeElement.textContent)
-      .withContext('render dialog title text without vehicle')
-      .toBe('Отправить команду');
+      .withContext('render dialog title text')
+      .toBe(`Отправить команду`);
   });
 
   it('should render command form', async () => {
@@ -237,7 +201,7 @@ describe('TrackerCommandDialogComponent', () => {
     await sendButton.click();
 
     expect(trackerService.sendTrackerCommand)
-      .toHaveBeenCalledWith(testMatDialogData.id, testTrackerCommand);
+      .toHaveBeenCalledWith(TEST_TRACKER_ID, testTrackerCommand);
 
     let responseParagraphDe = fixture.debugElement.query(
       By.css('p')
@@ -259,8 +223,3 @@ describe('TrackerCommandDialogComponent', () => {
       .toBeNull();
   });
 });
-
-const testMatDialogData: TrackerCommandDialogData = {
-  id: TEST_TRACKER_ID,
-  vehicle: testNewVehicle.name
-};
