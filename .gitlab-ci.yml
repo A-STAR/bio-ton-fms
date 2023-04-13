@@ -155,6 +155,8 @@ Build-backend:
     - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
     - docker image push git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
   rules:
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always
     - changes:
       - "frontend/**/*"
       when: manual
@@ -175,6 +177,8 @@ Test-backend:
     - cd .UnitTests/BiotonFMS.Telematica.Tests
     - dotnet test --logger:trx 
   rules:
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always
     - changes:
       - "frontend/**/*"
       when: manual
@@ -280,6 +284,8 @@ Build-TrackerTcpServer:
     - docker image tag fms-tracker-tcp-server:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
     - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
   rules:
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always
     - changes:
       - "frontend/**/*"
       when: manual
@@ -299,6 +305,8 @@ Build-TrackerMessage:
     - docker image tag fms-tracker-message:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
     - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always
     - changes:
       - "frontend/**/*"
       when: manual
