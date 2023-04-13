@@ -305,7 +305,7 @@ Build-TrackerMessage:
     - docker image tag fms-tracker-message:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
     - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:
-    - if: $CI_COMMIT_BRANCH == "MAIN"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: always
     - changes:
       - "frontend/**/*"
