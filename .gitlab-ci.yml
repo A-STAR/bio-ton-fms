@@ -1,6 +1,7 @@
 variables:
   GIT_FETCH_EXTRA_FLAGS: --tags
-  DOCKER_TAG: "latest"
+  DOCKER_TAG: $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
+  TrueVar: "true"
 
 .node-job:
   before_script:
@@ -11,16 +12,7 @@ variables:
     paths:
      - .npm/
 
-.rules-backend: &rules-backend
-  rules:
-    - changes:
-      - frontend/**/*
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: never
-    - when: always
-    - when: manual                  
-    
+        
 stages: 
   - lint 
   - build  
@@ -33,11 +25,13 @@ Lint-frontend:
   script:             
     - npm run lint 
   rules:
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always
     - changes:
       - frontend/**/*
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: never    
-  
+    - if: $TrueVar == "true"
+      when: manual
+      allow_failure: true       
 
 Build-frontend:
   stage: build
@@ -51,10 +45,14 @@ Build-frontend:
     paths:
       - frontend/dist/
   rules:
-      - changes:
-        - frontend/**/*
-      - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-        when: never  
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always
+    - changes:
+      - frontend/**/*
+    - if: $TrueVar == "true"
+      when: manual
+      allow_failure: true
+           
 
 Test-frontend:
   stage: test
@@ -65,10 +63,13 @@ Test-frontend:
     - export CHROME_BIN=/usr/bin/chromium-browser                 
     - npm run test:coverage 
   rules:
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always
     - changes:
       - frontend/**/*
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: never
+    - if: $TrueVar == "true"
+      when: manual
+      allow_failure: true
 
 Deploy-frontend-test.lan.bioton-fms-ru:
   stage: deploy
@@ -80,13 +81,12 @@ Deploy-frontend-test.lan.bioton-fms-ru:
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test.lan.bioton-fms-ru/*
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'    
-      changes:
-        - frontend/**/*    
-      when: always 
-    - changes:
-      - frontend/**/*
-      when: manual 
+    - if: $CI_COMMIT_BRANCH == "MAIN"
+      when: always         
+
+    - if: $TrueVar == "true"
+      when: manual
+      allow_failure: true
   artifacts:
     expire_in: 1 hour
     paths:
@@ -101,10 +101,8 @@ Deploy-frontend-test2.lan.bioton-fms-ru:
     - npm run build:test2    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/*    
-  rules:
-    - changes:
-      - frontend/**/*
-      when: manual 
+  rules:    
+    - when: manual        
   allow_failure: true
   artifacts:
     expire_in: 1 hour
@@ -121,9 +119,7 @@ Deploy-frontend-test3.lan.bioton-fms-ru:
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test3.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test3.lan.bioton-fms-ru/*     
   rules:    
-    - changes:
-      - frontend/**/*
-      when: manual    
+    - when: manual        
   allow_failure: true
   artifacts:
     expire_in: 1 hour
@@ -139,9 +135,7 @@ Deploy-frontend-stage.bioton-fms.ru:
     - npm run build:stage
     - rsync -avu dist/bio-ton-field-management-system/ user@stage.bioton-fms.ru:/var/www/stage   
   rules:    
-    - changes:
-      - frontend/**/*
-      when: manual    
+    - when: manual        
   allow_failure: true
   artifacts:
     expire_in: 1 hour
@@ -150,7 +144,8 @@ Deploy-frontend-stage.bioton-fms.ru:
 
 Build-backend:
   stage: build
-  script:        
+  script:
+    - echo $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA        
     - mkdir dir
     - cd dir
     - git clone git@git.bioton-fms.ru:BioTon/fms.git .
@@ -158,13 +153,19 @@ Build-backend:
     - docker build -t fms-back:$DOCKER_TAG .   
     - docker image tag fms-back:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
-    - docker image push git.bioton-fms.ru:5050/bioton/fms/backend:latest
-  <<: *rules-backend 
+    - docker image push git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
+  rules:
+    - changes:
+      - "frontend/**/*"
+      when: manual
+      allow_failure: true
+    - when: always
+
 
 Test-backend:  
   stage: test
   needs: 
-    - Build-backend
+    - Build-backend  
   script:
     - mkdir dir
     - cd dir
@@ -172,11 +173,20 @@ Test-backend:
     - git checkout ${CI_COMMIT_BRANCH}
     - dotnet build -c release .tools/BioTonFMS.Version
     - cd .UnitTests/BiotonFMS.Telematica.Tests
-    - dotnet test --logger:trx
-  <<: *rules-backend 
+    - dotnet test --logger:trx 
+  rules:
+    - changes:
+      - "frontend/**/*"
+      when: manual
+      allow_failure: true
+    - when: always
 
 Deploy-backend-test.lan.bioton-fms-ru:
-  stage: deploy  
+  stage: deploy
+  needs: 
+    - Test-backend
+    - Build-TrackerTcpServer
+    - Build-TrackerMessage   
   script:
     - docker rm -f fms-backend || true
     - docker run --name fms-backend -p 8080:80 -v /var/log/fms/test:/app/logs -v /etc/fms/test:/app/config --restart always  -d fms-back:$DOCKER_TAG
@@ -187,13 +197,17 @@ Deploy-backend-test.lan.bioton-fms-ru:
   rules:    
     - changes:
       - frontend/**/*        
-      when: never          
+      when: manual          
     - if: '$CI_COMMIT_REF_NAME == "main"'
       when: always
     - when: manual
   
 Deploy-backend-test2.lan.bioton-fms-ru:
   stage: deploy
+  needs: 
+    - Test-backend
+    - Build-TrackerTcpServer
+    - Build-TrackerMessage 
   script:
     - docker rm -f fms-backend-test2 || true
     - docker run --name fms-backend-test2 -p 8081:80 -v /var/log/fms/test2:/app/logs -v /etc/fms/test2:/app/config --restart always  -d fms-back:$DOCKER_TAG      
@@ -201,15 +215,19 @@ Deploy-backend-test2.lan.bioton-fms-ru:
     - docker run --name fms-tracker-tcp-server-test2 -p 8091:6000 -v /var/log/fms/tracker-tcp-server/test2:/app/logs -v /etc/fms/tracker-tcp-server/test2:/app/config --restart always -d git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
     - docker rm -f fms-tracker-message-test2 || true
     - docker run --name fms-tracker-message-test2 -p 8191:6000 -v /var/log/fms/tracker-message/test2:/app/logs -v /etc/fms/tracker-message/test2:/app/config --restart always -d fms-tracker-message:$DOCKER_TAG
-  rules:
+  rules:    
     - changes:
         - frontend/**/*        
-      when: never
-    - when: manual
+      when: manual 
+    - when: manual   
   allow_failure: true 
 
 Deploy-backend-test3.lan.bioton-fms-ru:
   stage: deploy
+  needs: 
+    - Test-backend
+    - Build-TrackerTcpServer
+    - Build-TrackerMessage 
   script:
     - docker rm -f fms-backend-test3 || true
     - docker run --name fms-backend-test3 -p 8082:80 -v /var/log/fms/test3:/app/logs -v /etc/fms/test3:/app/config --restart always  -d fms-back:$DOCKER_TAG   
@@ -220,31 +238,35 @@ Deploy-backend-test3.lan.bioton-fms-ru:
   rules:    
     - changes:
         - frontend/**/*        
-      when: never 
+      when: manual 
     - when: manual   
   allow_failure: true
 
 Deploy-backend-stage.bioton-fms.ru:
-  stage: deploy  
+  stage: deploy
+  needs: 
+    - Test-backend
+    - Build-TrackerTcpServer
+    - Build-TrackerMessage   
   script:
     # Backend
     - ssh user@stage.bioton-fms.ru docker rm -f fms-backend || true
-    - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/backend:latest
-    - ssh user@stage.bioton-fms.ru docker run --name fms-backend -p 8080:80 -v /etc/fms/stage:/app/config -v /var/log/fms/stage:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:latest
+    - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
+    - ssh user@stage.bioton-fms.ru docker run --name fms-backend -p 8080:80 -v /etc/fms/stage:/app/config -v /var/log/fms/stage:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     # Fms-tracker-tcp-server
     - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server
     - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-tcp-server || true
-    - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-tcp-server -p 6000:6000 -v /var/log/fms/tracker-tcp-server:/app/logs -v /etc/fms/tracker-tcp-server:/app/config --network bioton --restart always -d git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:latest
+    - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-tcp-server -p 6000:6000 -v /var/log/fms/tracker-tcp-server:/app/logs -v /etc/fms/tracker-tcp-server:/app/config --network bioton --restart always -d git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
     # Fms-tracker-message
     - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-message
     - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-message || true
-    - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-message --network bioton -v /var/log/fms/tracker-message:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:latest 
+    - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-message --network bioton -v /var/log/fms/tracker-message:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:    
     - changes:
         - frontend/**/*        
-      when: never 
+      when: manual 
     - when: manual   
-  allow_failure: true 
+  allow_failure: true
 
 Build-TrackerTcpServer:
   stage: build  
@@ -256,18 +278,13 @@ Build-TrackerTcpServer:
     - cp TrackerMessages/BioTonFMS.TrackerTcpServer/Dockerfile .
     - docker build -t fms-tracker-tcp-server:$DOCKER_TAG .   
     - docker image tag fms-tracker-tcp-server:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
-    - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:latest
+    - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
   rules:
     - changes:
-        - frontend/**/*        
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: never 
-    - changes:
-      - TrackerMessages/BioTonFMS.TrackerTcpServer/**/*
-      when: always
-    - when: manual
-  allow_failure: true 
+      - "frontend/**/*"
+      when: manual
+      allow_failure: true
+    - when: always 
 
 Build-TrackerMessage:
   stage: build  
@@ -280,15 +297,10 @@ Build-TrackerMessage:
     - rm BioTonFMSApp/appsettings.Development.json BioTonFMSApp/appsettings.json
     - docker build -t fms-tracker-message:$DOCKER_TAG .   
     - docker image tag fms-tracker-message:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
-    - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-message:latest
+    - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:
     - changes:
-        - frontend/**/*        
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: never
-    - changes:
-      - TrackerMessages/BioTonFMS.TrackerMessageHandler/**/*
-      when: always
-    - when: manual
-  allow_failure: true 
+      - "frontend/**/*"
+      when: manual
+      allow_failure: true
+    - when: always 
