@@ -3,6 +3,10 @@ variables:
   DOCKER_TAG: $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
   TrueVar: "true"
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
 .node-job:
   before_script:
   - cd frontend 
@@ -199,12 +203,12 @@ Deploy-backend-test.lan.bioton-fms-ru:
     - docker run --name fms-tracker-tcp-server-test -p 8090:6000 -v /var/log/fms/tracker-tcp-server/test:/app/logs -v /etc/fms/tracker-tcp-server/test:/app/config --restart always  -d fms-tracker-tcp-server:$DOCKER_TAG
     - docker rm -f fms-tracker-message-test || true
     - docker run --name fms-tracker-message-test -p 8190:6000 -v /var/log/fms/tracker-message/test:/app/logs -v /etc/fms/tracker-message/test:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
-  rules:    
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      when: always
     - changes:
       - frontend/**/*        
       when: manual          
-    - if: '$CI_COMMIT_REF_NAME == "main"'
-      when: always
     - when: manual
   
 Deploy-backend-test2.lan.bioton-fms-ru:
