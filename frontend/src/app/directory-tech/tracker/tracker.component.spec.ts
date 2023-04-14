@@ -837,6 +837,24 @@ describe('TrackerComponent', () => {
 
     await duplicateSensorButtons[0].click();
   });
+
+  it('should delete sensor', async () => {
+    let deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        variant: 'icon',
+        text: 'delete'
+      })
+    );
+
+    await deleteButton.click();
+
+    const confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+  });
 });
 
 const testParams: Params = {

@@ -14,8 +14,13 @@ import { Tracker, TrackerParameter, TrackerParameterName, TrackerService, Tracke
 import { Sensor, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
-import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
 import { TrackerParametersHistoryDialogComponent } from '../tracker-parameters-history-dialog/tracker-parameters-history-dialog.component';
+import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
+import {
+  ConfirmationDialogComponent,
+  confirmationDialogConfig,
+  getConfirmationDialogContent
+} from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { TableDataSource } from '../shared/table/table.data-source';
 
@@ -138,6 +143,20 @@ export default class TrackerComponent implements OnInit, OnDestroy {
 
         this.#sensors$.next(sensors);
       });
+  }
+
+  /**
+   * Delete a sensor.
+   *
+   * @param sensorDataSource Sensor data source.
+   */
+  protected async onDeleteSensor({ name }: SensorDataSource) {
+    const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(name);
+
+    this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
+      ConfirmationDialogComponent,
+      { ...confirmationDialogConfig, data }
+    );
   }
 
   #sensors$ = new BehaviorSubject<Sensor[] | undefined>(undefined);

@@ -20,10 +20,7 @@ import {
 } from '../shared/tracker-command-dialog/tracker-command-dialog.component';
 
 import {
-  ConfirmationDialogData,
-  ConfirmationDialogComponent,
-  confirmationDialogConfig,
-  getConfirmationDialogContent
+  ConfirmationDialogComponent, confirmationDialogConfig, getConfirmationDialogContent
 } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { SortDirection } from '../shared/sort';
@@ -192,11 +189,9 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    * @param vehicleDataSource Vehicle data source.
    */
   protected async onDeleteVehicle({ id, name }: VehicleDataSource) {
-    const data: ConfirmationDialogData = {
-      content: getConfirmationDialogContent(name)
-    };
+    const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(name);
 
-    const dialogRef = this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
       ConfirmationDialogComponent,
       { ...confirmationDialogConfig, data }
     );
