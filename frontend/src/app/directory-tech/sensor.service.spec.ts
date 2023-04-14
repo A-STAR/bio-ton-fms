@@ -228,6 +228,25 @@ describe('SensorService', () => {
 
     updateSensorRequest.flush(null);
   });
+
+  it('should delete tracker', (done: DoneFn) => {
+    service
+      .deleteSensor(testSensors.sensors[0].id)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const deleteTrackerRequest = httpTestingController.expectOne({
+      method: 'DELETE',
+      url: `/api/telematica/sensor/${testSensors.sensors[0].id}`
+    }, 'delete tracker request');
+
+    deleteTrackerRequest.flush(null);
+  });
 });
 
 export const testSensorDataTypeEnum: KeyValue<SensorDataTypeEnum, string>[] = [

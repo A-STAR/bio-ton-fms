@@ -1,8 +1,9 @@
-import { LOCALE_ID } from '@angular/core';
+import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, formatNumber, KeyValue, registerLocaleData } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
@@ -18,15 +19,17 @@ import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
 import { Sensor, Sensors, SensorService } from '../sensor.service';
 
-import TrackerComponent, { SensorColumn, sensorColumns, trackerParameterColumns } from './tracker.component';
+import TrackerComponent, { SENSOR_DELETED, SensorColumn, sensorColumns, trackerParameterColumns } from './tracker.component';
 import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
 
+import { environment } from '../../../environments/environment';
 import { localeID } from '../tracker-dialog/tracker-dialog.component';
 import { testParameters, testStandardParameters, TEST_TRACKER_ID } from '../tracker.service.spec';
 import { testSensor, testSensors } from '../sensor.service.spec';
@@ -38,6 +41,7 @@ describe('TrackerComponent', () => {
   let overlayContainer: OverlayContainer;
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
+  let sensorService: SensorService;
 
   let standardParametersSpy: jasmine.Spy<() => Observable<TrackerStandardParameter[]>>;
   let parametersSpy: jasmine.Spy<() => Observable<TrackerParameter[]>>;
@@ -79,7 +83,7 @@ describe('TrackerComponent', () => {
     component = fixture.componentInstance;
 
     const trackerService = TestBed.inject(TrackerService);
-    const sensorService = TestBed.inject(SensorService);
+    sensorService = TestBed.inject(SensorService);
 
     const standardParameters$ = of(testStandardParameters);
     const parameters$ = of(testParameters);
@@ -839,6 +843,9 @@ describe('TrackerComponent', () => {
   });
 
   it('should delete sensor', async () => {
+    const deleteSensorSpy = spyOn(sensorService, 'deleteSensor')
+      .and.callFake(() => of(null));
+
     let deleteButton = await loader.getHarness(
       MatButtonHarness.with({
         ancestor: '.mat-column-action .actions',
@@ -849,11 +856,87 @@ describe('TrackerComponent', () => {
 
     await deleteButton.click();
 
-    const confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+    let confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
 
     expect(confirmationDialog)
       .withContext('render a confirmation dialog')
       .not.toBeNull();
+
+    let confirmButton = await confirmationDialog!.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await confirmButton.click();
+
+    expect(sensorService.deleteSensor)
+      .toHaveBeenCalledWith(testSensors.sensors[0].id);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(SENSOR_DELETED);
+
+    expect(sensorsSpy)
+      .toHaveBeenCalled();
+
+    deleteSensorSpy.calls.reset();
+
+    /* Handle an error although update sensors anyway. */
+
+    const testURL = `${environment.api}/api/telematica/sensor/${testSensors.sensors[1].id}`;
+
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        message: `Http failure response for ${testURL}: 500 Internal Server Error`
+      },
+      status: 500,
+      statusText: 'Internal Server Error',
+      url: testURL
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    spyOn(errorHandler, 'handleError');
+
+    deleteSensorSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '.mat-column-action .actions',
+        variant: 'icon',
+        text: 'delete'
+      })
+    );
+
+    await deleteButton.click();
+
+    confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    confirmButton = await confirmationDialog!.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'mat-dialog-actions',
+        variant: 'flat',
+        text: 'Удалить'
+      })
+    );
+
+    await confirmButton.click();
+
+    expect(sensorService.deleteSensor)
+      .toHaveBeenCalledWith(testSensors.sensors[1].id);
+
+    expect(errorHandler.handleError)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    expect(sensorsSpy)
+      .toHaveBeenCalled();
   });
 });
 

@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Observable, Subscription } from 'rxjs';
 
-import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
+import { NewTracker, Tracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 
@@ -80,7 +80,7 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
       tracker.startDate = startDate;
     }
 
-    const tracker$ = this.data
+    const tracker$: Observable<Tracker | null> = this.data
       ? this.trackerService.updateTracker(tracker)
       : this.trackerService.createTracker(tracker);
 

@@ -14,7 +14,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
+import { Fuel, NewVehicle, Vehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { VehicleDialogComponent, VEHICLE_CREATED, VEHICLE_UPDATED } from './vehicle-dialog.component';
@@ -403,18 +403,7 @@ describe('VehicleDialogComponent', () => {
     await makeInput.setValue(make);
     await modelInput.setValue(model);
 
-    spyOn(vehicleService, 'createVehicle')
-      .and.callFake(() => of({}));
-
-    const saveButton = await loader.getHarness(
-      MatButtonHarness.with({
-        selector: '[form="vehicle-form"]'
-      })
-    );
-
-    await saveButton.click();
-
-    const testVehicle: NewVehicle = {
+    const newVehicle: NewVehicle = {
       id: undefined,
       name: testNewVehicle.name,
       make: testNewVehicle.make,
@@ -431,8 +420,33 @@ describe('VehicleDialogComponent', () => {
       description: undefined
     };
 
+    const testVehicleResponse: Vehicle = {
+      id: testNewVehicle.id!,
+      name: testNewVehicle.name,
+      make: testNewVehicle.make,
+      model: testNewVehicle.model,
+      manufacturingYear: testNewVehicle.manufacturingYear,
+      type: testVehicleTypeEnum[0],
+      subType:  testVehicleSubtypeEnum[2],
+      fuelType: {
+        id: testNewVehicle.fuelTypeId,
+        value: testFuels[0].name
+      }
+    };
+
+    spyOn(vehicleService, 'createVehicle')
+      .and.callFake(() => of(testVehicleResponse));
+
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="vehicle-form"]'
+      })
+    );
+
+    await saveButton.click();
+
     expect(vehicleService.createVehicle)
-      .toHaveBeenCalledWith(testVehicle);
+      .toHaveBeenCalledWith(newVehicle);
 
     const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
 
@@ -510,7 +524,7 @@ describe('VehicleDialogComponent', () => {
     await descriptionInput.setValue(updatedDescription);
 
     spyOn(vehicleService, 'updateVehicle')
-      .and.callFake(() => of({}));
+      .and.callFake(() => of(null));
 
     const saveButton = await loader.getHarness(
       MatButtonHarness.with({

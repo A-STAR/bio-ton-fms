@@ -79,7 +79,7 @@ export class VehicleService {
    * @returns An `Observable` of creating vehicle.
    */
   createVehicle(vehicle: NewVehicle) {
-    return this.httpClient.post('/api/telematica/vehicle', vehicle);
+    return this.httpClient.post<Vehicle>('/api/telematica/vehicle', vehicle);
   }
 
   /**
@@ -90,7 +90,7 @@ export class VehicleService {
    * @returns An `Observable` of updating vehicle.
    */
   updateVehicle(vehicle: NewVehicle) {
-    return this.httpClient.put(`/api/telematica/vehicle/${vehicle.id}`, vehicle);
+    return this.httpClient.put<null>(`/api/telematica/vehicle/${vehicle.id}`, vehicle);
   }
 
   /**
@@ -101,7 +101,7 @@ export class VehicleService {
    * @returns An `Observable` of deleting vehicle.
    */
   deleteVehicle(id: VehicleDataSource['id']) {
-    return this.httpClient.delete(`/api/telematica/vehicle/${id}`);
+    return this.httpClient.delete<null>(`/api/telematica/vehicle/${id}`);
   }
 
   constructor(private httpClient: HttpClient) { }

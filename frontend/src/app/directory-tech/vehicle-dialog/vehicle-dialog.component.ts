@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { forkJoin, map, Observable, Subscription } from 'rxjs';
 
-import { Fuel, NewVehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
+import { Fuel, NewVehicle, Vehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 
@@ -81,7 +81,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       description: description ?? undefined
     };
 
-    const vehicle$ = this.data
+    const vehicle$: Observable<Vehicle | null> = this.data
       ? this.vehicleService.updateVehicle(vehicle)
       : this.vehicleService.createVehicle(vehicle);
 
@@ -89,6 +89,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
 
       this.snackBar.open(message);
+
       this.dialogRef.close(true);
     });
   }
