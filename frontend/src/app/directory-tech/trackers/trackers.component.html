@@ -42,12 +42,10 @@
             <mat-icon class="md-18">edit</mat-icon>
           </button>
 
-          <ng-container *ngIf="element.vehicle">
-            <button mat-icon-button bioStopClickPropagation title="Отправить команду" color="accent"
-              (click)="onSendTrackerCommand(element)">
-              <mat-icon class="md-18">sms</mat-icon>
-            </button>
-          </ng-container>
+          <button mat-icon-button bioStopClickPropagation title="Отправить команду" color="accent"
+            (click)="onSendTrackerCommand(element)">
+            <mat-icon class="md-18">sms</mat-icon>
+          </button>
 
           <button mat-icon-button bioStopClickPropagation title="Удалить" color="warn"
             (click)="onDeleteTracker(element)">
