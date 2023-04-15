@@ -10,7 +10,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { forkJoin, map, Observable, Subscription, tap } from 'rxjs';
+import { forkJoin, map, Observable, share, Subscription, tap } from 'rxjs';
 
 import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
 
@@ -100,8 +100,8 @@ export class SensorDialogComponent implements OnInit {
 
     let sensor$: Observable<Sensor | null>;
 
-    if (typeof this.data === 'object' && 'id' in this.data) {
-      newSensor.id = this.data.id;
+    if (this.data.sensor && 'id' in this.data.sensor) {
+      newSensor.id = this.data.sensor.id;
 
       sensor$ = this.sensorService.updateSensor(newSensor);
     } else {
@@ -109,13 +109,13 @@ export class SensorDialogComponent implements OnInit {
     }
 
     this.#subscription = sensor$.subscribe((response: Sensor | null) => {
-      const message = typeof this.data === 'object' && 'id' in this.data ? SENSOR_UPDATED : SENSOR_CREATED;
+      const message = this.data.sensor && 'id' in this.data.sensor ? SENSOR_UPDATED : SENSOR_CREATED;
 
       this.snackBar.open(message);
 
       let sensor: Sensor;
 
-      if (typeof this.data === 'object' && 'id' in this.data) {
+      if (this.data.sensor && 'id' in this.data.sensor) {
         sensor = this.#serializeSensor(newSensor);
       } else {
         sensor = response!;
@@ -170,7 +170,7 @@ export class SensorDialogComponent implements OnInit {
 
     const sensor: Sensor = {
       id: newSensor.id!,
-      tracker: (this.data as Sensor).tracker,
+      tracker: this.data.sensor!.tracker,
       name,
       sensorType: {
         id: sensorTypeId,
@@ -190,7 +190,7 @@ export class SensorDialogComponent implements OnInit {
     };
 
     if (validatorId) {
-      const validator = this.#sensorTypes.find(({ id }) => id === validatorId)!;
+      const validator = this.data.sensors.find(({ id }) => id === validatorId)!;
 
       sensor.validator = {
         id: validatorId,
@@ -249,12 +249,12 @@ export class SensorDialogComponent implements OnInit {
     let trackerID: Tracker['id'];
     let sensor: NewSensor | undefined;
 
-    if (typeof this.data === 'number') {
-      trackerID = this.data;
+    if (this.data.trackerID) {
+      trackerID = this.data.trackerID;
     } else {
-      trackerID = this.data.tracker.id;
+      trackerID = this.data.sensor!.tracker.id;
 
-      sensor = this.#deserializeSensor(this.data);
+      sensor = this.#deserializeSensor(this.data.sensor!);
     }
 
     this.sensorForm = this.fb.group({
@@ -306,13 +306,14 @@ export class SensorDialogComponent implements OnInit {
           this.#sensorTypes = types;
           this.#units = units;
         }),
-        map(([groups, dataType, units, types, validation]) => ({ groups, dataType, units, types, validation }))
+        map(([groups, dataType, units, types, validation]) => ({ groups, dataType, units, types, validation })),
+        share()
       );
   }
 
   constructor(
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData<Tracker['id'] | Sensor | Omit<Sensor, 'id'>>,
+    @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData,
     private dialogRef: MatDialogRef<SensorDialogComponent, Sensor>,
     private snackBar: MatSnackBar,
     private sensorService: SensorService
@@ -320,14 +321,18 @@ export class SensorDialogComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
-    this.title = typeof this.data === 'object' && 'id' in this.data ? 'Сводная информация о датчике' : 'Новый датчик';
+    this.title = this.data.sensor && 'id' in this.data.sensor ? 'Сводная информация о датчике' : 'Новый датчик';
 
     this.#setSensorData();
     this.#initSensorForm();
   }
 }
 
-export type SensorDialogData<T extends Tracker['id'] | Sensor | Omit<Sensor, 'id'>> = T;
+export type SensorDialogData = {
+  trackerID?: Tracker['id']
+  sensor?: Sensor | Omit<Sensor, 'id'>;
+  sensors: Sensor[];
+};
 
 type SensorForm = FormGroup<{
   basic: FormGroup<{

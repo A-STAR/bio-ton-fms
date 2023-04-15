@@ -451,7 +451,7 @@ export const testSensors: Sensors = {
         value: 'Датчик пробега'
       },
       description: 'Умный цифровой датчик для пробега',
-      formula: '(param1-#param1)/const2',
+      formula: '(param1 - #param1) / const2',
       unit: {
         id: 3,
         value: 'км/ч'
@@ -459,7 +459,7 @@ export const testSensors: Sensors = {
       useLastReceived: true,
       validator: {
         id: 2,
-        value: 'Валидатор пробега'
+        value: 'Разгон'
       },
       fuelUse: 8
     },
@@ -476,15 +476,15 @@ export const testSensors: Sensors = {
         id: 2,
         value: 'Датчик разгона'
       },
-      formula: '(param1+#param1)*const2',
+      formula: '(param1 + #param1) * const2',
       unit: {
         id: 2,
         value: 'мАч'
       },
       useLastReceived: false,
       validator: {
-        id: 1,
-        value: 'Валидатор разгона'
+        id: 3,
+        value: 'Скорость'
       },
       validationType: ValidationTypeEnum.ZeroTest
     },
@@ -528,14 +528,14 @@ export const testSensor: Sensor = {
     value: testSensorGroups[1].sensorTypes![0].name
   },
   dataType: testSensorDataTypeEnum[0].key,
-  formula: '(param1+param2)*param3',
+  formula: '(param1 + param2) * param3',
   unit: {
     id: testUnits[1].id,
     value: testUnits[1].name
   },
   validator: {
-    id: testSensorTypes[0].id,
-    value: testSensorTypes[0].name
+    id: testSensors.sensors[1].id,
+    value: testSensors.sensors[1].name
   },
   validationType: testValidationTypeEnum[0].key,
   useLastReceived: false,
@@ -552,7 +552,7 @@ export const testNewSensor: NewSensor = {
   dataType: testSensor.dataType,
   formula: testSensor.formula,
   unitId: testSensor.unit.id,
-  validatorId: testSensor.validator?.id,
+  validatorId: testSensors.sensors[1].id,
   validationType: testSensor.validationType,
   useLastReceived: testSensor.useLastReceived,
   visibility: testSensor.visibility,

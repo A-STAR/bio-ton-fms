@@ -76,24 +76,26 @@
                 <mat-error>Обязательное поле</mat-error>
               </mat-form-field>
             </div>
+          </ng-container>
 
-            <div>
-              <label>Валидатор</label>
+          <div>
+            <label>Валидатор</label>
 
-              <mat-form-field>
-                <mat-select placeholder="Валидатор" formControlName="validator"
-                  (selectionChange)="onControlSelectionChange($event, 'basic.validationType')">
-                  <mat-option>Валидатор</mat-option>
+            <mat-form-field>
+              <mat-select placeholder="Валидатор" formControlName="validator"
+                (selectionChange)="onControlSelectionChange($event, 'basic.validationType')">
+                <mat-option>Валидатор</mat-option>
 
-                  <mat-option [value]="validator.id" *ngFor="let validator of sensorData$.types">
-                    {{ validator.name }}
-                  </mat-option>
-                </mat-select>
+                <mat-option [value]="validator.id" *ngFor="let validator of this.data.sensors">
+                  {{ validator.name }}
+                </mat-option>
+              </mat-select>
 
-                <mat-error>Обязательное поле</mat-error>
-              </mat-form-field>
-            </div>
+              <mat-error>Обязательное поле</mat-error>
+            </mat-form-field>
+          </div>
 
+          <ng-container *ngIf="sensorData$ | async as sensorData$">
             <div>
               <label>Тип валидации</label>
 

@@ -176,8 +176,8 @@ export type Sensor = {
     value: Unit['name'];
   };
   validator?: {
-    id: SensorType['id'];
-    value: SensorType['name'];
+    id: Sensor['id'];
+    value: Sensor['name'];
   };
   validationType?: ValidationTypeEnum;
   useLastReceived: boolean;

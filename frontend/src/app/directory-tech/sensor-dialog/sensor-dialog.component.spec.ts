@@ -21,8 +21,6 @@ import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { SensorDialogComponent, SensorDialogData, SENSOR_CREATED, SENSOR_UPDATED } from './sensor-dialog.component';
 
-import { Tracker } from '../tracker.service';
-
 import { TEST_TRACKER_ID } from '../tracker.service.spec';
 import {
   testNewSensor,
@@ -30,6 +28,7 @@ import {
   testSensorDataTypeEnum,
   testSensorGroups,
   testSensorTypes,
+  testSensors,
   testUnits,
   testValidationTypeEnum
 } from '../sensor.service.spec';
@@ -139,7 +138,7 @@ describe('SensorDialogComponent', () => {
       .withContext('render dialog title text')
       .toBe('Новый датчик');
 
-    component['data'] = testSensor;
+    component['data'] = testUpdateMatDialogData;
 
     component.ngOnInit();
 
@@ -150,9 +149,7 @@ describe('SensorDialogComponent', () => {
       .withContext('render dialog update title text')
       .toBe('Сводная информация о датчике');
 
-    const { id, ...data } = testSensor;
-
-    component['data'] = data;
+    component['data'] = testDuplicateMatDialogData;
 
     component.ngOnInit();
 
@@ -256,7 +253,7 @@ describe('SensorDialogComponent', () => {
       .toBeResolvedTo(true);
 
     await validator.clickOptions({
-      text: testSensorTypes[0].name
+      text: testSensors.sensors[1].name
     });
 
     await expectAsync(
@@ -359,7 +356,7 @@ describe('SensorDialogComponent', () => {
   });
 
   it('should render update sensor form', async () => {
-    component['data'] = testSensor;
+    component['data'] = testUpdateMatDialogData;
 
     component.ngOnInit();
 
@@ -384,7 +381,7 @@ describe('SensorDialogComponent', () => {
       typeSelect.getValueText()
     )
       .withContext('render type select text')
-      .toBeResolvedTo(testSensorTypes[2].name);
+      .toBeResolvedTo(testSensorGroups[1].sensorTypes![0].name);
 
     const dataTypeSelect = await loader.getHarness(
       MatSelectHarness.with({
@@ -430,8 +427,8 @@ describe('SensorDialogComponent', () => {
     await expectAsync(
       validatorSelect.getValueText()
     )
-      .withContext('render type select text')
-      .toBeResolvedTo(testSensorTypes[0].name);
+      .withContext('render validator select text')
+      .toBeResolvedTo(testSensors.sensors[1].name);
 
     const validationTypeSelect = await loader.getHarness(
       MatSelectHarness.with({
@@ -443,7 +440,7 @@ describe('SensorDialogComponent', () => {
     await expectAsync(
       validationTypeSelect.getValueText()
     )
-      .withContext('render type select text')
+      .withContext('render validation type select text')
       .toBeResolvedTo(testValidationTypeEnum[0].value);
 
     await expectAsync(
@@ -617,7 +614,7 @@ describe('SensorDialogComponent', () => {
   });
 
   it('should submit update sensor form', async () => {
-    component['data'] = testSensor;
+    component['data'] = testUpdateMatDialogData;
 
     component.ngOnInit();
 
@@ -719,9 +716,7 @@ describe('SensorDialogComponent', () => {
   });
 
   it('should duplicate create sensor form', async () => {
-    const { id, ...data } = testSensor;
-
-    component['data'] = data;
+    component['data'] = testDuplicateMatDialogData;
 
     component.ngOnInit();
 
@@ -735,40 +730,16 @@ describe('SensorDialogComponent', () => {
 
     await nameInput.setValue(updatedName);
 
+    const { id, ...sensor } = testNewSensor;
+
     const newSensor: NewSensor = {
-      name: updatedName,
-      trackerId: testSensor.tracker.id,
-      sensorTypeId: testSensor.sensorType.id,
-      dataType: testSensor.dataType,
-      formula: testSensor.formula,
-      unitId: testSensor.unit.id,
-      validatorId: testSensor.validator!.id,
-      validationType: testSensor.validationType,
-      useLastReceived: false,
-      visibility: false,
-      fuelUse: testSensor.fuelUse,
-      description: testSensor.description
+      ...sensor,
+      name: updatedName
     };
 
     const testSensorResponse: Sensor = {
-      id: newSensor.trackerId,
-      tracker: {
-        id: newSensor.trackerId,
-        value: 'Galileo Sky'
-      },
-      name: newSensor.name,
-      sensorType: {
-        id: newSensor.sensorTypeId,
-        value: testSensorGroups[1].sensorTypes![0].name
-      },
-      dataType: newSensor.dataType,
-      formula: newSensor.formula,
-      unit: {
-        id: newSensor.unitId,
-        value: testUnits[1].name
-      },
-      useLastReceived: newSensor.useLastReceived,
-      visibility: newSensor.visibility
+      ...testSensor,
+      name: newSensor.name
     };
 
     spyOn(sensorService, 'createSensor')
@@ -802,4 +773,19 @@ describe('SensorDialogComponent', () => {
   });
 });
 
-const testMatDialogData: SensorDialogData<Tracker['id']> = TEST_TRACKER_ID;
+const testMatDialogData: SensorDialogData = {
+  trackerID: TEST_TRACKER_ID,
+  sensors: testSensors.sensors
+};
+
+const testUpdateMatDialogData: SensorDialogData = {
+  sensor: testSensor,
+  sensors: testSensors.sensors.filter(sensor => sensor.id !== testSensor.id)
+};
+
+const { id, ...sensor } = testSensor;
+
+const testDuplicateMatDialogData: SensorDialogData = {
+  sensor,
+  sensors: testSensors.sensors
+};
