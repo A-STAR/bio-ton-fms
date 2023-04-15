@@ -5,7 +5,7 @@ import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
 
-import { ConfirmationDialogComponent, ConfirmationDialogData, getConfirmationDialogContent } from './confirmation-dialog.component';
+import { ConfirmationDialogComponent, getConfirmationDialogContent } from './confirmation-dialog.component';
 
 import { testNewVehicle } from 'src/app/directory-tech/vehicle.service.spec';
 
@@ -13,7 +13,7 @@ describe('ConfirmationDialogComponent', () => {
   let component: ConfirmationDialogComponent;
   let fixture: ComponentFixture<ConfirmationDialogComponent>;
   let loader: HarnessLoader;
-  let data: ConfirmationDialogData;
+  let data: InnerHTML['innerHTML'];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -21,7 +21,7 @@ describe('ConfirmationDialogComponent', () => {
       providers: [
         {
           provide: MAT_DIALOG_DATA,
-          useValue: testMatDialogData
+          useValue: getConfirmationDialogContent(testNewVehicle.name)
         }
       ]
     })
@@ -125,7 +125,3 @@ describe('ConfirmationDialogComponent', () => {
       .toBe('true');
   });
 });
-
-const testMatDialogData: ConfirmationDialogData = {
-  content: getConfirmationDialogContent(testNewVehicle.name)
-};

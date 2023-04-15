@@ -18,6 +18,7 @@ import {
 import { SortDirection } from './shared/sort';
 
 import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
+import { testDataSource } from './shared/table/table.data-source.spec';
 
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
@@ -253,7 +254,7 @@ describe('VehicleService', () => {
 
   it('should delete vehicle', (done: DoneFn) => {
     service
-      .deleteVehicle(testVehicles.vehicles[0].id)
+      .deleteVehicle(testVehicle.id)
       .subscribe(response => {
         expect(response)
           .withContext('emit response')
@@ -264,7 +265,7 @@ describe('VehicleService', () => {
 
     const deleteVehicleRequest = httpTestingController.expectOne({
       method: 'DELETE',
-      url: `/api/telematica/vehicle/${testNewVehicle.id}`
+      url: `/api/telematica/vehicle/${testVehicle.id}`
     }, 'delete vehicle request');
 
     deleteVehicleRequest.flush(null);

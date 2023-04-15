@@ -526,7 +526,7 @@ describe('VehiclesComponent', () => {
 
   it('should delete vehicle', async () => {
     const deleteVehicleSpy = spyOn(vehicleService, 'deleteVehicle')
-      .and.callFake(() => of({}));
+      .and.callFake(() => of(null));
 
     let deleteButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -586,6 +586,7 @@ describe('VehiclesComponent', () => {
 
     spyOn(console, 'error');
     spyOn(errorHandler, 'handleError');
+
     deleteVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
 
     [, deleteButton] = await loader.getAllHarnesses(

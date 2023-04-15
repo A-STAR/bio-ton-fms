@@ -16,14 +16,10 @@ import { MatButtonModule } from '@angular/material/button';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmationDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) protected data: ConfirmationDialogData) { }
+  constructor(@Inject(MAT_DIALOG_DATA) protected data: InnerHTML['innerHTML']) { }
 }
 
-export type ConfirmationDialogData = {
-  content: InnerHTML['innerHTML'];
-}
-
-export const confirmationDialogConfig: MatDialogConfig<ConfirmationDialogData> = {
+export const confirmationDialogConfig: MatDialogConfig<InnerHTML['innerHTML']> = {
   width: '630px'
 };
 

@@ -22,7 +22,6 @@ import {
 import {
   ConfirmationDialogComponent,
   confirmationDialogConfig,
-  ConfirmationDialogData,
   getConfirmationDialogContent
 } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
@@ -170,14 +169,12 @@ export default class TrackersComponent implements OnInit, OnDestroy {
   /**
    * Delete a GPS-tracker in table.
    *
-   * @param vehicleDataSource Tracker data source.
+   * @param trackerDataSource Tracker data source.
    */
   protected async onDeleteTracker({ id, name }: TrackerDataSource) {
-    const data: ConfirmationDialogData = {
-      content: getConfirmationDialogContent(name)
-    };
+    const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(name);
 
-    const dialogRef = this.dialog.open<ConfirmationDialogComponent, ConfirmationDialogData, boolean | undefined>(
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
       ConfirmationDialogComponent,
       { ...confirmationDialogConfig, data }
     );

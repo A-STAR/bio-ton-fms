@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -7,15 +7,21 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, filter, map, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, filter, map, mergeMap, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 
 import { Tracker, TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
 import { Sensor, SensorService } from '../sensor.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
-import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
 import { TrackerParametersHistoryDialogComponent } from '../tracker-parameters-history-dialog/tracker-parameters-history-dialog.component';
+import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
+import {
+  ConfirmationDialogComponent,
+  confirmationDialogConfig,
+  getConfirmationDialogContent
+} from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { TableDataSource } from '../shared/table/table.data-source';
 
@@ -140,8 +146,56 @@ export default class TrackerComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Delete a sensor.
+   *
+   * @param sensorDataSource Sensor data source.
+   */
+  protected async onDeleteSensor({ id, name }: SensorDataSource) {
+    const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(name);
+
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
+      ConfirmationDialogComponent,
+      { ...confirmationDialogConfig, data }
+    );
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        mergeMap(() => this.sensorService.deleteSensor(id))
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open(SENSOR_DELETED);
+
+          this.#deleteSensor(id);
+        },
+        error: error => {
+          this.errorHandler.handleError(error);
+
+          this.#deleteSensor(id);
+        }
+      });
+  }
+
   #sensors$ = new BehaviorSubject<Sensor[] | undefined>(undefined);
   #subscription: Subscription | undefined;
+
+  /**
+   * Delete a sensor in table.
+   *
+   * @param id Sensor ID.
+   */
+  #deleteSensor(id: Sensor['id']) {
+    const sensors = Array.from(this.#sensors$.value!);
+
+    const index = sensors.findIndex(sensor => sensor.id === id);
+
+    sensors.splice(index, 1);
+
+    this.#sensors$.next(sensors);
+  }
 
   /**
    * Map standard parameters data source.
@@ -279,8 +333,10 @@ export default class TrackerComponent implements OnInit, OnDestroy {
   }
 
   constructor(
+    private errorHandler: ErrorHandler,
     private route: ActivatedRoute,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private trackerService: TrackerService,
     private sensorService: SensorService
   ) { }
@@ -322,7 +378,7 @@ interface ParameterDataSource {
   value: TrackerParameter['lastValueDateTime'] | TrackerStandardParameter['lastValueDecimal'] | TrackerParameter['lastValueString'];
 }
 
-interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'visibility'> {
+export interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'visibility'> {
   type: Sensor['sensorType'],
   parameter: Sensor['formula']
 }
@@ -368,3 +424,5 @@ export const sensorColumns: KeyValue<SensorColumn, string | undefined>[] = [
     value: 'Видимость'
   }
 ];
+
+export const SENSOR_DELETED = 'Датчик удален';

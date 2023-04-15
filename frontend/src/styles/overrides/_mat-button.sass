@@ -18,10 +18,6 @@
 .mat-mdc-unelevated-button,
 .mat-mdc-outlined-button
 
-  &:hover:not(:disabled)
-    background-color: $green
-    color: $white
-
   &.mat-mdc-button-base
     height: 30px
 
@@ -44,15 +40,12 @@
 
 .mat-mdc-outlined-button
 
-  &:hover:not(:disabled)
+  &.mat-accent:hover:not(:disabled)
     background-color: $green
     color: $white
 
   @at-root button#{&}:not(:disabled)
     border-color: $green
-
-  span.mat-mdc-button-persistent-ripple::before
-    background-color: $white
 
   mat-card-actions &,
   mat-dialog-actions &

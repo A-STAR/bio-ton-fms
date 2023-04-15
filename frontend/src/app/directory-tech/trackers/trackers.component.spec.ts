@@ -532,7 +532,7 @@ describe('TrackersComponent', () => {
 
   it('should delete tracker', async () => {
     const deleteTrackerSpy = spyOn(trackerService, 'deleteTracker')
-      .and.callFake(() => of({}));
+      .and.callFake(() => of(null));
 
     let deleteButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -592,6 +592,7 @@ describe('TrackersComponent', () => {
 
     spyOn(console, 'error');
     spyOn(errorHandler, 'handleError');
+
     deleteTrackerSpy.and.callFake(() => throwError(() => testErrorResponse));
 
     [, deleteButton] = await loader.getAllHarnesses(

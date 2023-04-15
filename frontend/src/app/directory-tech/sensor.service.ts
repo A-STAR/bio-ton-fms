@@ -3,6 +3,7 @@ import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http'
 import { KeyValue } from '@angular/common';
 
 import { Tracker } from './tracker.service';
+import { SensorDataSource } from './tracker/tracker.component';
 
 import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from './shared/pagination';
 
@@ -94,6 +95,17 @@ export class SensorService {
    */
   updateSensor(sensor: NewSensor) {
     return this.httpClient.put<null>(`/api/telematica/sensor/${sensor.id}`, sensor);
+  }
+
+  /**
+   * Delete a sensor.
+   *
+   * @param id An deleted sensor ID.
+   *
+   * @returns An `Observable` of deleting sensor.
+   */
+  deleteSensor(id: SensorDataSource['id']) {
+    return this.httpClient.delete<null>(`/api/telematica/sensor/${id}`);
   }
 
   constructor(private httpClient: HttpClient) { }

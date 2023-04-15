@@ -16,7 +16,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { NewTracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
+import { NewTracker, Tracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { inputDateFormat, localeID, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
@@ -343,17 +343,6 @@ describe('TrackerDialogComponent', () => {
     await simInput.setValue(simNumber);
     await imeiInput.setValue(imei);
 
-    spyOn(trackerService, 'createTracker')
-      .and.callFake(() => of({}));
-
-    const saveButton = await loader.getHarness(
-      MatButtonHarness.with({
-        selector: '[form="tracker-form"]'
-      })
-    );
-
-    await saveButton.click();
-
     const [day, month, year, hours, minutes] = testStart
       .split(/[\.\s:]/)
       .map(Number);
@@ -363,7 +352,7 @@ describe('TrackerDialogComponent', () => {
     const startDate = new Date(year, monthIndex, day, hours, minutes)
       .toISOString();
 
-    const testTracker: NewTracker = {
+    const newTracker: NewTracker = {
       id: undefined,
       externalId: testNewTracker.externalId,
       name: testNewTracker.name,
@@ -374,8 +363,29 @@ describe('TrackerDialogComponent', () => {
       description: undefined
     };
 
+    const testTrackerResponse: Tracker = {
+      id: testNewTracker.id!,
+      externalId: testNewTracker.externalId,
+      name: testNewTracker.name,
+      simNumber: testNewTracker.simNumber,
+      imei: testNewTracker.imei,
+      trackerType: testTrackerTypeEnum[0],
+      startDate: testNewTracker.startDate!
+    };
+
+    spyOn(trackerService, 'createTracker')
+      .and.callFake(() => of(testTrackerResponse));
+
+    const saveButton = await loader.getHarness(
+      MatButtonHarness.with({
+        selector: '[form="tracker-form"]'
+      })
+    );
+
+    await saveButton.click();
+
     expect(trackerService.createTracker)
-      .toHaveBeenCalledWith(testTracker);
+      .toHaveBeenCalledWith(newTracker);
 
     const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
 
@@ -439,7 +449,7 @@ describe('TrackerDialogComponent', () => {
     await descriptionInput.setValue(updatedDescription);
 
     spyOn(trackerService, 'updateTracker')
-      .and.callFake(() => of({}));
+      .and.callFake(() => of(null));
 
     const saveButton = await loader.getHarness(
       MatButtonHarness.with({

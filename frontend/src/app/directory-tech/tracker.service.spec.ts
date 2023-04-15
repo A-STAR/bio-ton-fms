@@ -217,7 +217,7 @@ describe('TrackerService', () => {
 
   it('should delete tracker', (done: DoneFn) => {
     service
-      .deleteTracker(testTrackers.trackers[0].id)
+      .deleteTracker(testTracker.id)
       .subscribe(response => {
         expect(response)
           .withContext('emit response')
@@ -228,7 +228,7 @@ describe('TrackerService', () => {
 
     const deleteTrackerRequest = httpTestingController.expectOne({
       method: 'DELETE',
-      url: `/api/telematica/tracker/${testNewTracker.id}`
+      url: `/api/telematica/tracker/${testTracker.id}`
     }, 'delete tracker request');
 
     deleteTrackerRequest.flush(null);

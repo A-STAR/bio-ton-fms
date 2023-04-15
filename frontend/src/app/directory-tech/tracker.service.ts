@@ -54,7 +54,7 @@ export class TrackerService {
    * @returns An `Observable` of creating tracker stream.
    */
   createTracker(tracker: NewTracker) {
-    return this.httpClient.post('/api/telematica/tracker', tracker);
+    return this.httpClient.post<Tracker>('/api/telematica/tracker', tracker);
   }
 
   /**
@@ -65,7 +65,7 @@ export class TrackerService {
    * @returns An `Observable` of updating tracker stream.
    */
   updateTracker(tracker: NewTracker) {
-    return this.httpClient.put(`/api/telematica/tracker/${tracker.id}`, tracker);
+    return this.httpClient.put<null>(`/api/telematica/tracker/${tracker.id}`, tracker);
   }
 
   /**
@@ -87,7 +87,7 @@ export class TrackerService {
    * @returns An `Observable` of deleting tracker stream.
    */
   deleteTracker(id: TrackerDataSource['id']) {
-    return this.httpClient.delete(`/api/telematica/tracker/${id}`);
+    return this.httpClient.delete<null>(`/api/telematica/tracker/${id}`);
   }
 
   /**
