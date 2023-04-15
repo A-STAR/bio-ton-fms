@@ -280,7 +280,7 @@ describe('TrackersComponent', () => {
       ])
     ));
 
-    actionButtons.forEach(async ([actionButton, updateButton, commandButton, deleteButton], index) => {
+    actionButtons.forEach(async ([actionButton, updateButton, commandButton, deleteButton]) => {
       expect(actionButton)
         .withContext('render action button')
         .not.toBeNull();
@@ -289,24 +289,9 @@ describe('TrackersComponent', () => {
         .withContext('render update button')
         .not.toBeNull();
 
-      if (testTrackers.trackers[index].vehicle) {
-        expect(commandButton)
-          .withContext('render command button')
-          .not.toBeNull();
-
-        commandButton!.hasHarness(
-          MatIconHarness.with({
-            name: 'sms'
-          })
-        );
-
-        const commandButtonEl = await commandButton?.host();
-        const commandButtonTitle = await commandButtonEl?.getAttribute('title');
-
-        expect(commandButtonTitle)
-          .withContext('render command button title')
-          .toBe('Отправить команду');
-      }
+      expect(commandButton)
+        .withContext('render command button')
+        .not.toBeNull();
 
       expect(deleteButton)
         .withContext('render delete button')
@@ -321,6 +306,12 @@ describe('TrackersComponent', () => {
       updateButton!.hasHarness(
         MatIconHarness.with({
           name: 'edit'
+        })
+      );
+
+      commandButton!.hasHarness(
+        MatIconHarness.with({
+          name: 'sms'
         })
       );
 
