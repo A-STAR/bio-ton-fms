@@ -16,7 +16,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
+import { NewSensor, Sensor, SensorGroup, SensorService, Unit } from '../sensor.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { SensorDialogComponent, SensorDialogData, SENSOR_CREATED, SENSOR_UPDATED } from './sensor-dialog.component';
@@ -27,7 +27,6 @@ import {
   testSensor,
   testSensorDataTypeEnum,
   testSensorGroups,
-  testSensorTypes,
   testSensors,
   testUnits,
   testValidationTypeEnum
@@ -45,7 +44,6 @@ describe('SensorDialogComponent', () => {
   let sensorGroupsSpy: jasmine.Spy<(this: SensorService) => Observable<SensorGroup[]>>;
   let unitsSpy: jasmine.Spy<(this: SensorService) => Observable<Unit[]>>;
   let sensorDataTypeSpy: jasmine.Spy<(this: SensorService) => Observable<KeyValue<string, string>[]>>;
-  let sensorTypesSpy: jasmine.Spy<(this: SensorService) => Observable<SensorType[]>>;
   let validationTypeSpy: jasmine.Spy<(this: SensorService) => Observable<KeyValue<string, string>[]>>;
 
   beforeEach(async () => {
@@ -80,7 +78,6 @@ describe('SensorDialogComponent', () => {
     const sensorGroups$ = of(testSensorGroups);
     const units$ = of(testUnits);
     const sensorDataType$ = of(testSensorDataTypeEnum);
-    const sensorTypes$ = of(testSensorTypes);
     const validationType$ = of(testValidationTypeEnum);
 
     sensorGroupsSpy = spyOnProperty(sensorService, 'sensorGroups$')
@@ -91,9 +88,6 @@ describe('SensorDialogComponent', () => {
 
     sensorDataTypeSpy = spyOnProperty(sensorService, 'sensorDataType$')
       .and.returnValue(sensorDataType$);
-
-    sensorTypesSpy = spyOnProperty(sensorService, 'sensorTypes$')
-      .and.returnValue(sensorTypes$);
 
     validationTypeSpy = spyOnProperty(sensorService, 'validationType$')
       .and.returnValue(validationType$);
@@ -106,14 +100,11 @@ describe('SensorDialogComponent', () => {
       .toBeTruthy();
   });
 
-  it('should get sensor groups, units, types', () => {
+  it('should get sensor groups, units', () => {
     expect(sensorGroupsSpy)
       .toHaveBeenCalled();
 
     expect(unitsSpy)
-      .toHaveBeenCalled();
-
-    expect(sensorTypesSpy)
       .toHaveBeenCalled();
   });
 

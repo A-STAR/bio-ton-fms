@@ -21,15 +21,6 @@ export class SensorService {
   }
 
   /**
-   * Get sensor types.
-   *
-   * @returns An `Observable` of sensor types stream.
-   */
-  get sensorTypes$() {
-    return this.httpClient.get<SensorType[]>('/api/telematica/sensortypes');
-  }
-
-  /**
    * Get units.
    *
    * @returns An `Observable` of units stream.

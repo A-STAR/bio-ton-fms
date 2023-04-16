@@ -8,7 +8,6 @@ import {
   SensorDataTypeEnum,
   SensorGroup,
   SensorService,
-  SensorType,
   Sensors,
   SensorsOptions,
   Unit,
@@ -117,20 +116,6 @@ describe('SensorService', () => {
     const sensorGroupsRequest = httpTestingController.expectOne('/api/telematica/sensorgroups', 'sensor groups request');
 
     sensorGroupsRequest.flush(testSensorGroups);
-  });
-
-  it('should get sensor types', (done: DoneFn) => {
-    service.sensorTypes$.subscribe(sensorTypes => {
-      expect(sensorTypes)
-        .withContext('emit sensor types')
-        .toEqual(testSensorTypes);
-
-      done();
-    });
-
-    const sensorTypesRequest = httpTestingController.expectOne('/api/telematica/sensortypes', 'sensor types request');
-
-    sensorTypesRequest.flush(testSensorTypes);
   });
 
   it('should get units', (done: DoneFn) => {
@@ -301,79 +286,6 @@ export const testUnits: Unit[] = [
   }
 ];
 
-export const testSensorTypes: SensorType[] = [
-  {
-    id: 1,
-    name: 'Датчик пробега',
-    description: 'Датчик, показывающий пройденное объектом расстояние.',
-    sensorGroup: {
-      key: 1,
-      value: 'Пробег'
-    },
-    dataType: SensorDataTypeEnum.Number,
-    unit: {
-      key: testUnits[1].id,
-      value: testUnits[1].name
-    }
-  },
-  {
-    id: 2,
-    name: 'Относительный одометр',
-    description: 'Датчик, показывающий расстояние, пройденное объектом.',
-    sensorGroup: {
-      key: 1,
-      value: 'Пробег'
-    },
-    dataType: SensorDataTypeEnum.Number,
-    unit: {
-      key: testUnits[1].id,
-      value: testUnits[1].name
-    }
-  },
-  {
-    id: 3,
-    name: 'Датчик зажигания',
-    description: 'Датчик, показывающий, включено или выключено зажигание.',
-    sensorGroup: {
-      key: 2,
-      value: 'Цифровые'
-    },
-    dataType: SensorDataTypeEnum.Boolean,
-    unit: {
-      key: testUnits[0].id,
-      value: testUnits[0].name
-    }
-  },
-  {
-    id: 4,
-    name: 'Тревожная кнопка',
-    description: 'Датчик, ненулевое значение которого позволяет отмечать сообщение как тревожное (SOS).',
-    sensorGroup: {
-      key: 2,
-      value: 'Цифровые'
-    },
-    dataType: SensorDataTypeEnum.Number,
-    unit: {
-      key: testUnits[0].id,
-      value: testUnits[0].name
-    }
-  },
-  {
-    id: 5,
-    name: 'Датчик мгновенного определения движения',
-    description: 'Датчик, определяющий состояние движения объектов в реальном времени.',
-    sensorGroup: {
-      key: 2,
-      value: 'Цифровые'
-    },
-    dataType: SensorDataTypeEnum.Boolean,
-    unit: {
-      key: testUnits[0].id,
-      value: testUnits[0].name
-    }
-  }
-];
-
 export const testSensorGroups: SensorGroup[] = [
   {
     id: 1,
@@ -381,21 +293,21 @@ export const testSensorGroups: SensorGroup[] = [
     description: 'Группа пробега',
     sensorTypes: [
       {
-        id: testSensorTypes[0].id,
-        name: testSensorTypes[0].name,
-        description: testSensorTypes[0].description,
-        sensorGroupId: testSensorTypes[0].sensorGroup.key,
-        dataType: testSensorTypes[0].dataType,
-        unitId: testSensorTypes[0].unit.key
+        id: 1,
+        name: 'Относительный одометр',
+        description: 'Датчик, показывающий расстояние, пройденное объектом.',
+        sensorGroupId: 1,
+        dataType: SensorDataTypeEnum.Number,
+        unitId: testUnits[1].id
       },
       {
-        id: testSensorTypes[1].id,
-        name: testSensorTypes[1].name,
-        description: testSensorTypes[1].description,
-        sensorGroupId: testSensorTypes[1].sensorGroup.key,
-        dataType: testSensorTypes[1].dataType,
-        unitId: testSensorTypes[1].unit.key
-      },
+        id: 2,
+        name: 'Датчик пробега',
+        description: 'Датчик, показывающий пройденное объектом расстояние.',
+        sensorGroupId: 1,
+        dataType: SensorDataTypeEnum.Number,
+        unitId: testUnits[1].id
+      }
     ]
   },
   {
@@ -403,28 +315,28 @@ export const testSensorGroups: SensorGroup[] = [
     name: 'Цифровые',
     sensorTypes: [
       {
-        id: testSensorTypes[2].id,
-        name: testSensorTypes[2].name,
-        description: testSensorTypes[2].description,
-        sensorGroupId: testSensorTypes[2].sensorGroup.key,
-        dataType: testSensorTypes[2].dataType,
-        unitId: testSensorTypes[2].unit.key
+        id: 3,
+        name: 'Датчик зажигания',
+        description: 'Датчик, показывающий, включено или выключено зажигание.',
+        sensorGroupId: 2,
+        dataType: SensorDataTypeEnum.Boolean,
+        unitId: testUnits[0].id
       },
       {
-        id: testSensorTypes[3].id,
-        name: testSensorTypes[3].name,
-        description: testSensorTypes[3].description,
-        sensorGroupId: testSensorTypes[3].sensorGroup.key,
-        dataType: testSensorTypes[3].dataType,
-        unitId: testSensorTypes[3].unit.key
+        id: 4,
+        name: 'Тревожная кнопка',
+        description: 'Датчик, ненулевое значение которого позволяет отмечать сообщение как тревожное (SOS).',
+        sensorGroupId: 2,
+        dataType: SensorDataTypeEnum.Number,
+        unitId: testUnits[0].id
       },
       {
-        id: testSensorTypes[4].id,
-        name: testSensorTypes[4].name,
-        description: testSensorTypes[4].description,
-        sensorGroupId: testSensorTypes[4].sensorGroup.key,
-        dataType: testSensorTypes[4].dataType,
-        unitId: testSensorTypes[4].unit.key
+        id: 5,
+        name: 'Датчик мгновенного определения движения',
+        description: 'Датчик, определяющий состояние движения объектов в реальном времени.',
+        sensorGroupId: 2,
+        dataType: SensorDataTypeEnum.Boolean,
+        unitId: testUnits[0].id
       }
     ]
   },

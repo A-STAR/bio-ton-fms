@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { forkJoin, map, Observable, share, Subscription, tap } from 'rxjs';
 
-import { NewSensor, Sensor, SensorGroup, SensorService, SensorType, Unit } from '../sensor.service';
+import { NewSensor, Sensor, SensorGroup, SensorService, Unit } from '../sensor.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 
@@ -48,7 +48,6 @@ export class SensorDialogComponent implements OnInit {
     groups: SensorGroup[];
     dataType: KeyValue<string, string>[];
     units: Unit[];
-    types: SensorType[];
     validation: KeyValue<string, string>[];
   }>;
 
@@ -139,7 +138,7 @@ export class SensorDialogComponent implements OnInit {
       : control?.enable();
   }
 
-  #sensorTypes!: SensorType[];
+  #sensorGroups!: SensorGroup[];
   #units!: Unit[];
   #subscription: Subscription | undefined;
 
@@ -165,7 +164,10 @@ export class SensorDialogComponent implements OnInit {
       description
     } = newSensor;
 
-    const type = this.#sensorTypes.find(({ id }) => id === sensorTypeId)!;
+    const type = this.#sensorGroups
+      .flatMap(({ sensorTypes = [] }) => sensorTypes)
+      .find(({ id }) => id === sensorTypeId)!;
+
     const unit = this.#units.find(({ id }) => id === unitId)!;
 
     const sensor: Sensor = {
@@ -298,15 +300,14 @@ export class SensorDialogComponent implements OnInit {
       this.sensorService.sensorGroups$,
       this.sensorService.sensorDataType$,
       this.sensorService.units$,
-      this.sensorService.sensorTypes$,
       this.sensorService.validationType$
     ])
       .pipe(
-        tap(([, , units, types]) => {
-          this.#sensorTypes = types;
+        tap(([groups, , units]) => {
+          this.#sensorGroups = groups;
           this.#units = units;
         }),
-        map(([groups, dataType, units, types, validation]) => ({ groups, dataType, units, types, validation })),
+        map(([groups, dataType, units, validation]) => ({ groups, dataType, units, validation })),
         share()
       );
   }
