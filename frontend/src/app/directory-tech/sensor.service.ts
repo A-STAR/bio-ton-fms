@@ -21,15 +21,6 @@ export class SensorService {
   }
 
   /**
-   * Get sensor types.
-   *
-   * @returns An `Observable` of sensor types stream.
-   */
-  get sensorTypes$() {
-    return this.httpClient.get<SensorType[]>('/api/telematica/sensortypes');
-  }
-
-  /**
    * Get units.
    *
    * @returns An `Observable` of units stream.
@@ -176,8 +167,8 @@ export type Sensor = {
     value: Unit['name'];
   };
   validator?: {
-    id: SensorType['id'];
-    value: SensorType['name'];
+    id: Sensor['id'];
+    value: Sensor['name'];
   };
   validationType?: ValidationTypeEnum;
   useLastReceived: boolean;

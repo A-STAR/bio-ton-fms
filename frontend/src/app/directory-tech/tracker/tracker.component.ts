@@ -72,11 +72,15 @@ export default class TrackerComponent implements OnInit, OnDestroy {
    * Add a new sensor to sensor table.
    */
   protected onCreateSensor() {
-    const data: SensorDialogData<Tracker['id']> = Number(
+    const trackerID = Number(
       this.route.snapshot.paramMap.get('id')!
     );
 
-    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData<Tracker['id']>, Sensor>(SensorDialogComponent, { data });
+    const sensors = Object.assign([], this.#sensors$.value);
+
+    const data: SensorDialogData = { trackerID, sensors };
+
+    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData, Sensor>(SensorDialogComponent, { data });
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -98,9 +102,12 @@ export default class TrackerComponent implements OnInit, OnDestroy {
    * @param sensorDataSource Sensor data source.
    */
   protected onUpdateSensor({ id }: SensorDataSource) {
-    const data: SensorDialogData<Sensor> = this.#sensors$.value!.find(sensor => sensor.id === id)!;
+    const sensor = this.#sensors$.value!.find(sensor => sensor.id === id)!;
+    const sensors = this.#sensors$.value!.filter(sensor => sensor.id !== id);
 
-    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData<Sensor>, Sensor>(SensorDialogComponent, { data });
+    const data: SensorDialogData = { sensor, sensors };
+
+    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData, Sensor>(SensorDialogComponent, { data });
 
     this.#subscription = dialogRef
       .afterClosed()
@@ -124,13 +131,14 @@ export default class TrackerComponent implements OnInit, OnDestroy {
    * @param dataSource Sensor data source.
    */
   protected onDuplicateSensor(dataSource: SensorDataSource) {
-    const { id, ...data } = this.#sensors$.value!.find(({ id }) => id === dataSource.id)!;
+    const { id, ...sensor } = this.#sensors$.value!.find(({ id }) => id === dataSource.id)!;
 
-    const dialogRef = this.dialog.open<
-      SensorDialogComponent,
-      SensorDialogData<Omit<Sensor, 'id'>>,
-      Sensor
-    >(SensorDialogComponent, { data });
+    const data: SensorDialogData = {
+      sensor,
+      sensors: this.#sensors$.value!
+    };
+
+    const dialogRef = this.dialog.open<SensorDialogComponent, SensorDialogData, Sensor>(SensorDialogComponent, { data });
 
     this.#subscription = dialogRef
       .afterClosed()
