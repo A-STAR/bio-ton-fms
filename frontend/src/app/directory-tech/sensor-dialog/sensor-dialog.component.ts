@@ -282,7 +282,11 @@ export class SensorDialogComponent implements OnInit {
             value: sensor?.fuelUse,
             disabled: !(sensor?.sensorTypeId && this.fuelUseTypeIds.includes(sensor.sensorTypeId))
           },
-          Validators.pattern(FUEL_USE_PATTERN)
+          [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER),
+            Validators.pattern(FUEL_USE_PATTERN)
+          ]
         ),
         description: this.fb.nonNullable.control(
           sensor?.description,

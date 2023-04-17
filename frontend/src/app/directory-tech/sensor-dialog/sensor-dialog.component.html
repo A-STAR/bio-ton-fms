@@ -132,7 +132,16 @@
                 Обязательное поле
               </mat-error>
 
-              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['pattern']">
+              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['min'] as error">
+                Поле должно быть не менее {{ error.min }}
+              </mat-error>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['max'] as error">
+                Поле должно быть не более {{ error.max }}
+              </mat-error>
+
+              <mat-error
+                *ngIf="!sensorForm.controls.basic.controls.fuelUse.errors?.['max'] && sensorForm.controls.basic.controls.fuelUse.errors?.['pattern']">
                 Должно быть максимум 2 числа после запятой
               </mat-error>
             </mat-form-field>
