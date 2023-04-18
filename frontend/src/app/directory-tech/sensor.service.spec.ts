@@ -373,7 +373,11 @@ export const testSensors: Sensors = {
         id: 2,
         value: 'Разгон'
       },
-      fuelUse: 8
+      fuelUse: 8,
+      startTimeout: 5,
+      fixErrors: true,
+      fuelUseCalculation: true,
+      fuelUseTimeCalculation: true
     },
     {
       id: 2,
@@ -398,7 +402,13 @@ export const testSensors: Sensors = {
         id: 3,
         value: 'Скорость'
       },
-      validationType: ValidationTypeEnum.ZeroTest
+      validationType: ValidationTypeEnum.ZeroTest,
+      minRefueling: 10,
+      refuelingTimeout: 3600,
+      fullRefuelingTimeout: 300,
+      refuelingLookup: true,
+      refuelingCalculation: true,
+      refuelingRawCalculation: false
     },
     {
       id: 3,
@@ -419,7 +429,13 @@ export const testSensors: Sensors = {
         value: 'мАч'
       },
       useLastReceived: true,
-      fuelUse: 7
+      fuelUse: 7,
+      minDrain: 2.75,
+      drainTimeout: 1800,
+      drainStopTimeout: 900,
+      drainLookup: false,
+      drainCalculation: false,
+      drainRawCalculation: true
     }
   ],
   pagination: {
