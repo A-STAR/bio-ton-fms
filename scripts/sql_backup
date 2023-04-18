@@ -1,0 +1,2 @@
+#!/bin/bash
+/bin/bash /app/backup.sh -p 5433 -u bioton -h db.lan.bioton-fms-ru  --db Bioton_test --db Bioton_test2 --db Bioton_test3 --db Bioton_msg_test -d /app/backup/ -r 7
