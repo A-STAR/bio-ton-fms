@@ -23,7 +23,7 @@ namespace BioTonFMS.Telematica.Mapping
                 .ForMember(dest => dest.Vehicle,
                     opt =>
                     {
-                        opt.PreCondition(src => src.Vehicle != null);
+                        opt.PreCondition(src => src.Vehicle is not null);
                         opt.MapFrom(src => new ForeignKeyValue<int, string>(src.Vehicle!.Id, src.Vehicle.Name));
                     });
         }
