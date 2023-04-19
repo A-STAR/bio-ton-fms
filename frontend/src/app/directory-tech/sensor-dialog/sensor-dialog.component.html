@@ -125,7 +125,7 @@
             <label for="fuelUse">Расход л/ч</label>
 
             <mat-form-field>
-              <input matInput bioNumberOnlyInput id="fuelUse" type="number" placeholder="Расход л/ч" step="0.01"
+              <input matInput bioNumberOnlyInput id="fuelUse" type="number" placeholder="Расход л/ч" step="0.01" min="0"
                 formControlName="fuelUse">
 
               <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['required']">
@@ -142,7 +142,7 @@
 
               <mat-error
                 *ngIf="!sensorForm.controls.basic.controls.fuelUse.errors?.['max'] && sensorForm.controls.basic.controls.fuelUse.errors?.['pattern']">
-                Должно быть максимум 2 числа после запятой
+                Должно быть не более 2 цифр после запятой
               </mat-error>
             </mat-form-field>
           </div>
