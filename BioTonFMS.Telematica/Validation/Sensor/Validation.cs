@@ -54,7 +54,7 @@ public static class ValidationExtension
         }
 
         Variable[]? parameters = null;
-        if (ast != null)
+        if (ast is not null)
         {
             parameters = ast.GetVariables().ToArray();
             foreach (var parameter in parameters)
@@ -67,7 +67,7 @@ public static class ValidationExtension
             }
         }
 
-        if (sensor.ValidatorId != null)
+        if (sensor.ValidatorId is not null)
         {
             if (!sensor.ValidationType.HasValue)
             {
@@ -130,7 +130,7 @@ public static class ValidationExtension
                 problemList.Add(new SensorProblemDescription(nameof(Sensor.ValidatorId),
                     $"Валидатор создаёт цикл: {string.Join(" -> ", cyclePath)} -> {sensor.Name}"));
             }
-            if (parameters != null)
+            if (parameters is not null)
             {
                 var conflictingParameters = parameters.Where(p => p.Name == cyclePath[1]).ToArray();
                 if (conflictingParameters.Length != 0)

@@ -112,7 +112,7 @@ public static class MessageProcessing
             .ToDictionary(p => p.Key, p => p.Value);
 
         // Add arguments for previous message
-        if (previousMessageTags != null)
+        if (previousMessageTags is not null)
             foreach (var pair in previousMessageTags.CalcArguments(tagNameByIdDict))
                 argumentsByNames.Add("#" + pair.Key, pair.Value);
 

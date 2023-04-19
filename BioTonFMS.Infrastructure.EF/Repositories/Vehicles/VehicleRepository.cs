@@ -97,7 +97,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 vehiclePredicate = SetPredicate(vehiclePredicate, regNumPredicate);
             }
 
-            var vehicles = vehiclePredicate != null ? query.Where(vehiclePredicate) : query;
+            var vehicles = vehiclePredicate is not null ? query.Where(vehiclePredicate) : query;
 
             if (filter.SortBy.HasValue)
             {

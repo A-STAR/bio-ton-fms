@@ -82,6 +82,7 @@ public class TrackerControllerTests
         Assert.Equal(content.StartDate, request.StartDate);
         Assert.Equal(content.TrackerType.Value, request.TrackerType.GetDescription());
         Assert.Equal(content.SimNumber, request.SimNumber);
+        content.Vehicle.Should().BeNull();
     }
 
     #endregion
@@ -105,7 +106,6 @@ public class TrackerControllerTests
         };
 
         var result = (OkResult)controller.UpdateTracker(ExistingEntityId, request);
-
         result.StatusCode.Should().Be(200);
     }
 

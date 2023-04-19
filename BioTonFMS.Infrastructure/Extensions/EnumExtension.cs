@@ -9,10 +9,10 @@ public static class EnumExtension
     {
         var type = value.GetType();
         string? name = Enum.GetName(type, value);
-        if (name != null)
+        if (name is not null)
         {
             FieldInfo? field = type.GetField(name);
-            if (field != null)
+            if (field is not null)
             {
                 if (Attribute.GetCustomAttribute(field,
                         typeof(DescriptionAttribute)) is DescriptionAttribute attr)
@@ -48,7 +48,7 @@ public static class EnumExtension
         var name = Enum.GetName(typeof(T), value);
         var description = value.GetDescription();
 
-        if (name != null && description != null)
+        if (name is not null && description is not null)
         {
             return new KeyValuePair(name, description);
         }

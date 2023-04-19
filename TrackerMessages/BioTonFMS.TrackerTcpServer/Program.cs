@@ -65,7 +65,7 @@ app.Lifetime.ApplicationStarted.Register(() =>
 {
     var server = app.Services.GetService<IServer>();
     
-    if (server != null)
+    if (server is not null)
     {
         var addresses = server.Features.Get<IServerAddressesFeature>()!.Addresses;
         Console.WriteLine(String.Join(Environment.NewLine, addresses));

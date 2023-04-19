@@ -19,7 +19,7 @@ internal class MessageBusMux : IMessageBus
     public void Publish(byte[] message)
     {
         _primaryBus.Publish(message);
-        if (_secondaryBus != null)
+        if (_secondaryBus is not null)
         {
             _retryPolicy.Execute(() => _secondaryBus.Publish(message));
         }

@@ -21,8 +21,8 @@ namespace BioTonFMSApp.Startup.Swagger
         {
             if (_xmlComments == null) return;
 
-            if (schema.Enum != null && schema.Enum.Count > 0 &&
-                context.Type != null && context.Type.IsEnum)
+            if (schema.Enum is not null && schema.Enum.Count > 0 &&
+                context.Type is not null && context.Type.IsEnum)
             {
                 schema.Description += "<p>Элементы:</p><ul>";
 

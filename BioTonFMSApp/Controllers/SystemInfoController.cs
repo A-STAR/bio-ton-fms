@@ -61,7 +61,7 @@ namespace BioTonFMSApp.Controllers
         private static string GetVersionString()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            var versionString = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "";
+            var versionString = version is not null ? $"{version.Major}.{version.Minor}.{version.Build}" : "";
             return versionString;
         }
 

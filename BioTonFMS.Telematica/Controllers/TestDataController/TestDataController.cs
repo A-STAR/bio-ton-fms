@@ -122,14 +122,14 @@ public class TestDataController : ValidationControllerBase
                 continue;
             _trackerRepository.Add(trackerData.Tracker);
         }
-        foreach (var message in trackerDatas.Where(t => t.Messages != null).SelectMany(t => t.Messages!))
+        foreach (var message in trackerDatas.Where(t => t.Messages is not null).SelectMany(t => t.Messages!))
         {
             _trackerMessageRepository.Add(message);
         }
 
         var vehicleGroupIds = _vehicleGroupRepository.GetVehicleGroups().Select(v => v.Id);
         var fuelTypeIds = _fuelTypeRepository.GetFuelTypes().Select(v => v.Id);
-        var vehicles = Seeds.GenerateVehicles(trackerDatas.Where(td => td.Tracker != null)
+        var vehicles = Seeds.GenerateVehicles(trackerDatas.Where(td => td.Tracker is not null)
             .Select(td => td.Tracker!).ToArray(), vehicleGroupIds.ToArray(), fuelTypeIds.ToArray());
         foreach (var vehicle in vehicles)
         {

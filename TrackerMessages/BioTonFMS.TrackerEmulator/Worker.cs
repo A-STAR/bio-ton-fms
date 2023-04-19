@@ -44,7 +44,7 @@ public class EmulatorWorker : BackgroundService
 
         NetworkStream stream = client.GetStream();
 
-        if (_parameters.ScriptPath != null)
+        if (_parameters.ScriptPath is not null)
         {
             foreach (var line in File.ReadAllLines(_parameters.ScriptPath))
             {

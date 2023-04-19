@@ -68,7 +68,7 @@ namespace BioTonFMS.Infrastructure.Models
         /// </remarks>
         public static bool Equals(IEntity<int>? entityA, IEntity<int>? entityB)
         {
-            if (entityA == null || entityB == null)
+            if (entityA == null ^ entityB == null)
             {
                 return false;
             }
@@ -83,12 +83,12 @@ namespace BioTonFMS.Infrastructure.Models
                 return false;
             }
 
-            if (entityA.Id == 0 && entityB.Id == 0)
+            if (entityA.Id == 0 && entityB!.Id == 0)
             {
                 return ReferenceEquals(entityA, entityB);
             }
 
-            return entityA.Id == entityB.Id;
+            return entityA.Id == entityB!.Id;
         }
 
         /// <summary>

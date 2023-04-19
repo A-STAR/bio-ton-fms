@@ -141,7 +141,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 trackerPredicate = SetPredicate(trackerPredicate, simNumberPredicate);
             }
 
-            trackers = trackerPredicate != null
+            trackers = trackerPredicate is not null
                 ? trackers.Where(trackerPredicate)
                 : trackers;
 
