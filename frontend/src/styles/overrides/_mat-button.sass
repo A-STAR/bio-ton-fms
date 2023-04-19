@@ -38,11 +38,14 @@
     &.mat-mdc-button-base
       height: 40px
 
-.mat-mdc-outlined-button
+.mat-mdc-unelevated-button.mat-unthemed,
+.mat-mdc-outlined-button.mat-accent
 
-  &.mat-accent:hover:not(:disabled)
+  &:hover:not(:disabled)
     background-color: $green
     color: $white
+
+.mat-mdc-outlined-button
 
   @at-root button#{&}:not(:disabled)
     border-color: $green
