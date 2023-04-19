@@ -291,7 +291,29 @@ export class SensorDialogComponent implements OnInit {
         description: this.fb.nonNullable.control(
           sensor?.description,
           Validators.maxLength(500)
-        )
+        ),
+        general: this.fb.group({
+          startTimeout: this.fb.nonNullable.control(sensor?.startTimeout),
+          fixErrors: this.fb.nonNullable.control(sensor?.fixErrors),
+          fuelUseCalculation: this.fb.nonNullable.control(sensor?.fuelUseCalculation),
+          fuelUseTimeCalculation: this.fb.nonNullable.control(sensor?.fuelUseTimeCalculation)
+        }),
+        refueling: this.fb.group({
+          min: this.fb.nonNullable.control(sensor?.minRefueling),
+          timeout: this.fb.nonNullable.control(sensor?.refuelingTimeout),
+          fullTimeout: this.fb.nonNullable.control(sensor?.fullRefuelingTimeout),
+          lookup: this.fb.nonNullable.control(sensor?.refuelingLookup),
+          calculation: this.fb.nonNullable.control(sensor?.refuelingCalculation),
+          rawCalculation: this.fb.nonNullable.control(sensor?.refuelingRawCalculation)
+        }),
+        drain: this.fb.group({
+          min: this.fb.nonNullable.control(sensor?.minDrain),
+          timeout: this.fb.nonNullable.control(sensor?.drainTimeout),
+          stopTimeout: this.fb.nonNullable.control(sensor?.drainStopTimeout),
+          lookup: this.fb.nonNullable.control(sensor?.drainLookup),
+          calculation: this.fb.nonNullable.control(sensor?.drainCalculation),
+          rawCalculation: this.fb.nonNullable.control(sensor?.drainRawCalculation)
+        })
       })
     });
   }
@@ -353,6 +375,28 @@ type SensorForm = FormGroup<{
     visibility: FormControl<NewSensor['visibility'] | undefined>;
     fuelUse: FormControl<NewSensor['fuelUse'] | undefined>;
     description: FormControl<NewSensor['description'] | undefined>;
+    general: FormGroup<{
+      startTimeout: FormControl<NewSensor['startTimeout'] | undefined>;
+      fixErrors: FormControl<NewSensor['fixErrors'] | undefined>;
+      fuelUseCalculation: FormControl<NewSensor['fuelUseCalculation'] | undefined>;
+      fuelUseTimeCalculation: FormControl<NewSensor['fuelUseTimeCalculation'] | undefined>;
+    }>,
+    refueling: FormGroup<{
+      min: FormControl<NewSensor['minRefueling'] | undefined>;
+      timeout: FormControl<NewSensor['refuelingTimeout'] | undefined>;
+      fullTimeout: FormControl<NewSensor['fullRefuelingTimeout'] | undefined>;
+      lookup: FormControl<NewSensor['refuelingLookup'] | undefined>;
+      calculation: FormControl<NewSensor['refuelingCalculation'] | undefined>;
+      rawCalculation: FormControl<NewSensor['refuelingRawCalculation'] | undefined>;
+    }>,
+    drain: FormGroup<{
+      min: FormControl<NewSensor['minDrain'] | undefined>;
+      timeout: FormControl<NewSensor['drainTimeout'] | undefined>;
+      stopTimeout: FormControl<NewSensor['drainStopTimeout'] | undefined>;
+      lookup: FormControl<NewSensor['drainLookup'] | undefined>;
+      calculation: FormControl<NewSensor['drainCalculation'] | undefined>;
+      rawCalculation: FormControl<NewSensor['drainRawCalculation'] | undefined>;
+    }>
   }>;
 }>
 
