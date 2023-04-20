@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -30,6 +31,7 @@ import { Tracker } from '../tracker.service';
     MatInputModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatExpansionModule,
     MatButtonModule,
     NumberOnlyInputDirective
   ],

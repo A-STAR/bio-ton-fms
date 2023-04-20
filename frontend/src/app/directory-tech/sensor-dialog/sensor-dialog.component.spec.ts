@@ -10,6 +10,7 @@ import { MatTabGroupHarness } from '@angular/material/tabs/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
+import { MatAccordionHarness, MatExpansionPanelHarness } from '@angular/material/expansion/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
@@ -313,40 +314,45 @@ describe('SensorDialogComponent', () => {
       })
     );
 
+    const accordion = await loader.getHarnessOrNull(MatAccordionHarness);
+
+    expect(accordion)
+      .withContext('render settings accordion')
+      .not.toBeNull();
+
+    await expectAsync(
+      accordion!.isMulti()
+    )
+      .withContext('render settings accordion `multi` attribute')
+      .toBeResolvedTo(true);
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Общие настройки',
+        expanded: false
+      })
+    );
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки заправки',
+        expanded: false
+      })
+    );
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки слива',
+        expanded: false
+      })
+    );
+
     /* Coverage for `onControlSelectionChange` control disabled state. */
 
     await type.clickOptions();
   });
 
-  it('should render dialog actions', async () => {
-    const cancelButton = await loader.getHarnessOrNull(
-      MatButtonHarness.with({
-        text: 'Отмена',
-        variant: 'stroked'
-      })
-    );
-
-    expect(cancelButton)
-      .withContext('render close button')
-      .not.toBeNull();
-
-    const dialogCloseDe = fixture.debugElement.query(
-      By.directive(MatDialogClose)
-    );
-
-    expect(dialogCloseDe)
-      .withContext('render dialog close element')
-      .not.toBeNull();
-
-    loader.getHarnessOrNull(
-      MatButtonHarness.with({
-        text: 'Отправить',
-        variant: 'flat'
-      })
-    );
-  });
-
-  it('should render update sensor form', async () => {
+  it('should render update, duplicate sensor form', async () => {
     component['data'] = testUpdateMatDialogData;
 
     component.ngOnInit();
@@ -469,6 +475,55 @@ describe('SensorDialogComponent', () => {
     )
       .withContext('render fuel use control enabled')
       .toBeResolvedTo(false);
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Общие настройки',
+        expanded: true
+      })
+    );
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки заправки',
+        expanded: true
+      })
+    );
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки слива',
+        expanded: true
+      })
+    );
+  });
+
+  it('should render dialog actions', async () => {
+    const cancelButton = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отмена',
+        variant: 'stroked'
+      })
+    );
+
+    expect(cancelButton)
+      .withContext('render close button')
+      .not.toBeNull();
+
+    const dialogCloseDe = fixture.debugElement.query(
+      By.directive(MatDialogClose)
+    );
+
+    expect(dialogCloseDe)
+      .withContext('render dialog close element')
+      .not.toBeNull();
+
+    loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отправить',
+        variant: 'flat'
+      })
+    );
   });
 
   it('should submit invalid sensor form', async () => {
@@ -706,7 +761,7 @@ describe('SensorDialogComponent', () => {
       .toHaveBeenCalledWith(sensor);
   });
 
-  it('should duplicate create sensor form', async () => {
+  it('should submit duplicate sensor form', async () => {
     component['data'] = testDuplicateMatDialogData;
 
     component.ngOnInit();

@@ -408,7 +408,13 @@ export const testSensors: Sensors = {
       fullRefuelingTimeout: 300,
       refuelingLookup: true,
       refuelingCalculation: true,
-      refuelingRawCalculation: false
+      refuelingRawCalculation: false,
+      minDrain: 2.75,
+      drainTimeout: 1800,
+      drainStopTimeout: 900,
+      drainLookup: false,
+      drainCalculation: false,
+      drainRawCalculation: true
     },
     {
       id: 3,
@@ -429,13 +435,7 @@ export const testSensors: Sensors = {
         value: 'мАч'
       },
       useLastReceived: true,
-      fuelUse: 7,
-      minDrain: 2.75,
-      drainTimeout: 1800,
-      drainStopTimeout: 900,
-      drainLookup: false,
-      drainCalculation: false,
-      drainRawCalculation: true
+      fuelUse: 7
     }
   ],
   pagination: {
