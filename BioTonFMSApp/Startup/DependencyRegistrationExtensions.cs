@@ -8,6 +8,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
@@ -90,7 +91,11 @@ public static class DependencyRegistrationExtensions
         services.AddTransient<IKeyValueProvider<ProtocolTag, int>, KeyValueProvider<ProtocolTag, BioTonDBContext, int>>();
         services.AddTransient<IQueryableProvider<ProtocolTag>, QueryableProvider<ProtocolTag, BioTonDBContext>>();
         services.AddTransient<IProtocolTagRepository, ProtocolTagRepository>();
-            
+
+        services.AddTransient<IKeyValueProvider<TrackerCommand, int>, KeyValueProvider<TrackerCommand, BioTonDBContext, int>>();
+        services.AddTransient<IQueryableProvider<TrackerCommand>, QueryableProvider<TrackerCommand, BioTonDBContext>>();
+        services.AddTransient<ITrackerCommandRepository, TrackerCommandRepository>();
+
         return services;
     }
 
