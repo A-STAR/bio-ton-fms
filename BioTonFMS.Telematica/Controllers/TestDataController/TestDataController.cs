@@ -217,7 +217,14 @@ public class TestDataController : ValidationControllerBase
         }
         var trackerTags = _trackerTagRepository.GetTags().ToArray();
         var exceptionHandler = new LoggingExceptionHandler(_logger);
-        messages.UpdateSensorTags(previousMessage: null, pageWithTrackers.Results, trackerTags, exceptionHandler);
+        try
+        {
+            messages.UpdateSensorTags(previousMessage: null, pageWithTrackers.Results, trackerTags, exceptionHandler);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при обновлении тегов датчиков");
+        }
         foreach (var message in messages)
         {
             _messageRepository.Update(message);
