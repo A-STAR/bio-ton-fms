@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BioTonFMS.TrackerCommands;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("config/appsettings.json", true);
@@ -39,6 +40,8 @@ builder.Services.AddDbContext<MessagesDBContext>(
             x => x.MigrationsAssembly("BioTonFMS.MessagesMigrations"))
         .UseSnakeCaseNamingConvention()
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
+
+builder.Services.AddCommands(builder.Configuration);
 
 builder.Services
     .AddMappingProfiles()

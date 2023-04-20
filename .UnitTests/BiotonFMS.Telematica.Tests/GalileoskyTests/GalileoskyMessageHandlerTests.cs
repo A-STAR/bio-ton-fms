@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using BiotonFMS.Telematica.Tests.Mocks;
 using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
@@ -60,7 +61,7 @@ public class GalileoskyMessageHandlerTests
             .Select(x => byte.Parse(x, NumberStyles.HexNumber))
             .ToArray();
 
-        var resp = handler.HandleMessage(bytes).Select(x => x.ToString("X"));
+        var resp = handler.HandleMessage(bytes, IPAddress.None, 0).Select(x => x.ToString("X"));
         
         _testOutputHelper.WriteLine($"Response for tracker: {string.Join(' ', resp)}");
 

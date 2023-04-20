@@ -1,7 +1,7 @@
-﻿using System.Net;
-using BioTonFMS.Domain;
+﻿using BioTonFMS.Domain;
 using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 using Microsoft.AspNetCore.Connections;
+using System.Net;
 
 namespace BioTonFMS.TrackerTcpServer;
 
@@ -23,10 +23,10 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
         _logger.LogInformation("{Id} connected", connection.ConnectionId);
 
         if (connection.RemoteEndPoint is IPEndPoint ipEndPoint)
-        { 
+        {
             _logger.LogInformation("Получен запрос от {Address}:{Port}", ipEndPoint.Address, ipEndPoint.Port);
         }
-            
+
         List<byte> message = new();
         while (true)
         {
@@ -46,15 +46,26 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
                 // больше чем length быть не должно, так как трекер отослав пакет ожидает ответ
                 // и только потом шлёт новые данные
                 {
-                    _logger.LogDebug("message.count = {MessageCount} length = {Length} for {Id}", message.Count, length, connection.ConnectionId);
-                    var resp = _handler.HandleMessage(message.ToArray());
+                    _logger.LogDebug("message.count = {MessageCount} length = {Length} for {Id}", message.Count, length,
+                        connection.ConnectionId);
+
+                    byte[] resp;
+                    if (connection.RemoteEndPoint is IPEndPoint endpoint)
+                    {
+                        resp = _handler.HandleMessage(message.ToArray(), endpoint.Address, endpoint.Port);
+                    }
+                    else
+                    {
+                        resp = _handler.HandleMessage(message.ToArray(), ip: IPAddress.None, port: 0);
+                    }
+
                     await connection.Transport.Output.WriteAsync(resp);
                     message = new();
                 }
             }
             else
             {
-                _logger.LogDebug("Возможная проблема с сообщением {Message}, продолжаем приём данных для {Id}", 
+                _logger.LogDebug("Возможная проблема с сообщением {Message}, продолжаем приём данных для {Id}",
                     string.Join(' ', message.Select(x => x.ToString("X"))), connection.ConnectionId);
             }
 
@@ -63,6 +74,7 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
                 _logger.LogDebug("result.IsCompleted for {Id}", connection.ConnectionId);
                 break;
             }
+
             connection.Transport.Input.AdvanceTo(buffer.End);
         }
 

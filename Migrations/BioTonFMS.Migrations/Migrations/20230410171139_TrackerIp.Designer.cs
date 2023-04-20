@@ -3,6 +3,7 @@ using System;
 using BioTonFMS.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMS.Migrations.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    partial class BioTonDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230410171139_TrackerIp")]
+    partial class TrackerIp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1001,49 +1003,6 @@ namespace BioTonFMS.Migrations.Migrations
                     b.ToTable("trackers", (string)null);
                 });
 
-            modelBuilder.Entity("BioTonFMS.Domain.TrackerCommand", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<byte[]>("BinaryResponse")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("bytea")
-                        .HasColumnName("binary_response");
-
-                    b.Property<string>("CommandText")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("command_text");
-
-                    b.Property<int>("ResponseText")
-                        .HasMaxLength(200)
-                        .HasColumnType("integer")
-                        .HasColumnName("response_text");
-
-                    b.Property<int>("SentDateTime")
-                        .HasColumnType("integer")
-                        .HasColumnName("sent_date_time");
-
-                    b.Property<int>("TrackerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tracker_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_tracker_command");
-
-                    b.HasIndex("TrackerId")
-                        .HasDatabaseName("ix_tracker_command_tracker_id");
-
-                    b.ToTable("tracker_command", (string)null);
-                });
-
             modelBuilder.Entity("BioTonFMS.Domain.TrackerTag", b =>
                 {
                     b.Property<int>("Id")
@@ -1068,12 +1027,12 @@ namespace BioTonFMS.Migrations.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
 
+                    b.Property<int?>("StructType")
+                        .HasColumnType("integer")
+                        .HasColumnName("struct_type");
+
                     b.HasKey("Id")
                         .HasName("pk_tracker_tags");
-
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_tracker_tags_name");
 
                     b.ToTable("tracker_tags", (string)null);
 
@@ -1125,63 +1084,63 @@ namespace BioTonFMS.Migrations.Migrations
                             Id = 100,
                             DataType = (byte)4,
                             Description = "Широта в градусах",
-                            Name = "latitude"
+                            Name = "coord_latitude"
                         },
                         new
                         {
                             Id = 101,
                             DataType = (byte)4,
                             Description = "Долгота в градусах",
-                            Name = "longitude"
+                            Name = "coord_longitude"
                         },
                         new
                         {
                             Id = 102,
                             DataType = (byte)1,
                             Description = "Признак корректности определения координат",
-                            Name = "correctness"
+                            Name = "coord_correctness"
                         },
                         new
                         {
                             Id = 103,
                             DataType = (byte)1,
                             Description = "Источник координат",
-                            Name = "sat_number"
+                            Name = "coord_sat_number"
                         },
                         new
                         {
                             Id = 110,
                             DataType = (byte)1,
                             Description = "Уровень топлива, %",
-                            Name = "fuel_level"
+                            Name = "can_log_fuel_level"
                         },
                         new
                         {
                             Id = 111,
                             DataType = (byte)1,
                             Description = "Температура охлаждающей жидкости, °C",
-                            Name = "coolant_temperature"
+                            Name = "can_log_coolant_temperature"
                         },
                         new
                         {
                             Id = 112,
                             DataType = (byte)1,
                             Description = "Обороты двигателя, об/мин",
-                            Name = "engine_speed"
+                            Name = "can_log_engine_speed"
                         },
                         new
                         {
                             Id = 120,
                             DataType = (byte)4,
                             Description = "Скорость",
-                            Name = "speed"
+                            Name = "velocity_speed"
                         },
                         new
                         {
                             Id = 121,
                             DataType = (byte)4,
                             Description = "Направление",
-                            Name = "direction"
+                            Name = "velocity_direction"
                         },
                         new
                         {
@@ -1286,118 +1245,125 @@ namespace BioTonFMS.Migrations.Migrations
                             Id = 23,
                             DataType = (byte)1,
                             Description = "RS485[0]. ДУТ с адресом 0",
-                            Name = "rs485_0"
+                            Name = "RS485[0]"
                         },
                         new
                         {
                             Id = 24,
                             DataType = (byte)1,
                             Description = "RS485[1]. ДУТ с адресом 1",
-                            Name = "rs485_1"
+                            Name = "RS485[1]"
                         },
                         new
                         {
                             Id = 25,
                             DataType = (byte)1,
                             Description = "Данные CAN-шины (CAN_A0) или CAN-LOG.\nТопливо, израсходованное машиной с момента её создания, л",
-                            Name = "can_a0"
+                            Name = "CAN_A0"
                         },
                         new
                         {
                             Id = 27,
                             DataType = (byte)1,
                             Description = "Данные CAN-шины (CAN_B0) или CAN-LOG.\nПробег автомобиля, м.",
-                            Name = "can_b0"
+                            Name = "CAN_B0"
                         },
                         new
                         {
                             Id = 28,
                             DataType = (byte)3,
                             Description = "CAN8BITR0\nили скорость транспортного средства, передаваемая с CAN-LOG’а, км/ч",
-                            Name = "can8_bitr0"
+                            Name = "CAN8BITR0"
                         },
                         new
                         {
                             Id = 29,
                             DataType = (byte)3,
                             Description = "CAN8BITR1\nили второй байт префикса S от CAN-LOG",
-                            Name = "can8_bitr1"
+                            Name = "CAN8BITR1"
                         },
                         new
                         {
                             Id = 30,
                             DataType = (byte)3,
                             Description = "CAN8BITR2\nили первый байт префикса S от CAN-LOG",
-                            Name = "can8_bitr2"
+                            Name = "CAN8BITR2"
                         },
                         new
                         {
                             Id = 31,
                             DataType = (byte)3,
                             Description = "CAN8BITR3\nили младший байт префикса S от CAN-LOG",
-                            Name = "can8_bitr3"
+                            Name = "CAN8BITR3"
                         },
                         new
                         {
                             Id = 32,
                             DataType = (byte)3,
                             Description = "CAN8BITR4\nили третий байт префикса P от CAN-LOG",
-                            Name = "can8_bitr4"
+                            Name = "CAN8BITR4"
                         },
                         new
                         {
                             Id = 33,
                             DataType = (byte)3,
                             Description = "CAN8BITR5\nили второй байт префикса P от CAN-LOG",
-                            Name = "can8_bitr5"
+                            Name = "CAN8BITR5"
                         },
                         new
                         {
                             Id = 34,
                             DataType = (byte)1,
                             Description = "В зависимости от настроек один из вариантов:\nCAN32BITR0\nполное время работы двигателя, ч",
-                            Name = "can32_bitr0"
+                            Name = "CAN32BITR0"
                         },
                         new
                         {
                             Id = 35,
                             DataType = (byte)1,
                             Description = "Значение на входе 4.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
-                            Name = "port_4"
+                            Name = "Port 4"
                         },
                         new
                         {
                             Id = 36,
                             DataType = (byte)1,
                             Description = "Значение на входе 5.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
-                            Name = "port_5"
+                            Name = "Port 5"
                         },
                         new
                         {
                             Id = 37,
                             DataType = (byte)1,
                             Description = "Идентификационный номер первого ключа iButton",
-                            Name = "i_button_1"
+                            Name = "iButton 1"
                         },
                         new
                         {
                             Id = 38,
                             DataType = (byte)1,
                             Description = "Идентификационный номер второго ключа iButton",
-                            Name = "i_button_2"
+                            Name = "iButton 2"
                         },
                         new
                         {
                             Id = 39,
                             DataType = (byte)3,
                             Description = "Состояние ключей iButton, идентификаторы которых заданы командой iButtons.\nКаждый бит соответствует одному ключу.\nНапример, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи.",
-                            Name = "i_button_keys"
+                            Name = "iButton Keys"
                         },
                         new
                         {
                             Id = 40,
                             DataType = (byte)2,
                             Description = "0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.\n1 – статус GPRS сессии. 1- установлена, 0 – нет.\n2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.\n3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.\n4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.\n5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.\n6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует.",
+                            Name = "expanded_terminal_status"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            DataType = (byte)2,
+                            Description = "",
                             Name = "expanded_terminal_status"
                         });
                 });
@@ -1805,18 +1771,6 @@ namespace BioTonFMS.Migrations.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("BioTonFMS.Domain.TrackerCommand", b =>
-                {
-                    b.HasOne("BioTonFMS.Domain.Tracker", "Tracker")
-                        .WithMany("Commands")
-                        .HasForeignKey("TrackerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_tracker_command_trackers_tracker_id");
-
-                    b.Navigation("Tracker");
-                });
-
             modelBuilder.Entity("BioTonFMS.Domain.Vehicle", b =>
                 {
                     b.HasOne("BioTonFMS.Domain.FuelType", "FuelType")
@@ -1907,8 +1861,6 @@ namespace BioTonFMS.Migrations.Migrations
 
             modelBuilder.Entity("BioTonFMS.Domain.Tracker", b =>
                 {
-                    b.Navigation("Commands");
-
                     b.Navigation("Sensors");
 
                     b.Navigation("Vehicle");

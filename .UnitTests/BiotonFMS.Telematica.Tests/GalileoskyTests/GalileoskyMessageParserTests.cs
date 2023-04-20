@@ -356,9 +356,9 @@ public class GalileoskyMessageParserTests
 
     [Theory, MemberData(nameof(Data))]
     public void ParseMessage_ValidTagsValues_ShouldParseCorrectly(
-        string sourseDescription, string messageAsText, TrackerMessage[] expected)
+        string sourceDescription, string messageAsText, TrackerMessage[] expected)
     {
-        _testOutputHelper.WriteLine(sourseDescription);
+        _testOutputHelper.WriteLine(sourceDescription);
         _testOutputHelper.WriteLine(messageAsText);
 
         var parser = SetupGalileoskyMessageParser();

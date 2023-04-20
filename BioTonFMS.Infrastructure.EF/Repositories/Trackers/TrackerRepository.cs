@@ -161,6 +161,17 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 filter.PageNum, filter.PageSize);
         }
 
+        public Tracker? FindTracker(string? imei, int? externalId)
+        {
+            if (imei is null && externalId is null)
+            {
+                throw new ArgumentException("Один из входных параметров должен быть не пустым");
+            }
+
+            return QueryableProvider.Linq()
+                .FirstOrDefault(x => x.ExternalId == externalId || x.Imei == imei);
+        }
+
         private static Expression<Func<Tracker, bool>> SetPredicate(
             Expression<Func<Tracker, bool>>? trackerPredicate,
             Expression<Func<Tracker, bool>> customPredicate)

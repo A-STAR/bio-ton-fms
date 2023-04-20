@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Diagnostics;
+using BioTonFMS.Common.Constants;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
@@ -19,9 +20,6 @@ public class GalileoskyMessageParser : IMessageParser
     private const int AltitudeStructCode = 0x34;
     private const int CanLogStructCode = 0xC1;
 
-    private const int CheckSumLength = 2;
-    private const int HeaderLength = 3;
-
     private readonly IProtocolTagRepository _protocolTagRepository;
     private readonly ILogger<GalileoskyMessageParser> _logger;
 
@@ -36,7 +34,7 @@ public class GalileoskyMessageParser : IMessageParser
     public IEnumerable<TrackerMessage> ParseMessage(byte[] binaryPackage, Guid packageUid)
     {
         var i = 0;
-        i += HeaderLength;
+        i += Galileosky.HeaderLength;
 
         var tags = _protocolTagRepository.GetTagsForTrackerType(TrackerTypeEnum.GalileoSkyV50)
             .ToDictionary(x => x.ProtocolTagCode);
@@ -46,7 +44,7 @@ public class GalileoskyMessageParser : IMessageParser
             PackageUID = packageUid
         };
 
-        while (i < binaryPackage.Length - CheckSumLength)
+        while (i < binaryPackage.Length - Galileosky.CheckSumLength)
         {
             if (!tags.TryGetValue(binaryPackage[i], out ProtocolTag? tag))
             {
