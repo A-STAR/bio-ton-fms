@@ -46,7 +46,14 @@ public class TrackerMessageHandler : IBusMessageHandler
         TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
             .ToArray();
 
-        CalculateSensorTags(messages);
+        try
+        {
+            CalculateSensorTags(messages);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при вычислении тегов датчиков");
+        }
 
         foreach (var trackerMessage in messages)
         {
