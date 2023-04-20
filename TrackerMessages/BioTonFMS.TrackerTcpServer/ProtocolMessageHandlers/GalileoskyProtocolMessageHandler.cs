@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using System.Text.Json;
+using BioTonFMS.Common.Constants;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Messaging;
 using BioTonFMS.Infrastructure.MessageBus;
@@ -19,11 +21,11 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
         _logger = logger;
     }
 
-    public byte[] HandleMessage(byte[] message)
+    public byte[] HandleMessage(byte[] message, IPAddress ip, int port)
     {
         _logger.LogInformation("Получено сообщение длиной {Len} байт", message.Length);
         _logger.LogDebug("Текст сообщения {Message}", string.Join(' ', message.Select(x => x.ToString("X"))));
-        var counted = GetCrc(message[..^2], message.Length - 2);
+        ushort counted = Galileosky.GetCrc(message[..^2], message.Length - Galileosky.CheckSumLength);
 
         var received = BitConverter.ToUInt16(message[^2..], 0);
 
@@ -33,7 +35,9 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
             {
                 RawMessage = message,
                 TrackerType = TrackerTypeEnum.GalileoSkyV50,
-                PackageUID = Guid.NewGuid()
+                PackageUID = Guid.NewGuid(),
+                IpAddress = ip.ToString(),
+                Port = port
             };
             _messageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
             _logger.LogInformation("Сообщение опубликовано. Len = {Length} PackageUID = {PackageUID}", message.Length, raw.PackageUID);
@@ -43,7 +47,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
             _logger.LogDebug("Ошибка проверки CRC. Ожидается {Expected} насчитано {Calculated}. Сообщение не опубликовано", received.ToString("X"), counted.ToString("X"));
         }
 
-        var response = GetResponseForTracker(counted);
+        byte[] response = GetResponseForTracker(counted);
         _logger.LogDebug("Текст ответа {Response}", string.Join(' ', response.Select(x => x.ToString("X"))));
         return response;
     }
@@ -77,30 +81,5 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
             bytes[0], // Контрольная сумма
             bytes[1] // полученного пакета 
         };
-    }
-
-    private static ushort GetCrc(byte[] buf, int len)
-    {
-        ushort crc = 0xFFFF;
-
-        for (var pos = 0; pos < len; pos++)
-        {
-            crc ^= buf[pos];
-
-            for (var i = 8; i != 0; i--)
-            {
-                if ((crc & 0x0001) != 0)
-                {
-                    crc >>= 1;
-                    crc ^= 0xA001;
-                }
-                else
-                {
-                    crc >>= 1;
-                }
-            }
-        }
-
-        return crc;
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using BioTonFMS.Expressions;
+﻿using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.Ast;
 using BioTonFMS.Expressions.Parsing;
 using FluentAssertions;

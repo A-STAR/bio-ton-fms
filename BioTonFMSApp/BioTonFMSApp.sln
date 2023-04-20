@@ -49,7 +49,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".SolutionItems", ".Solution
 		..\Dockerfile = ..\Dockerfile
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BioTonFMS.MessageProcessing", "..\BioTonFMS.MessageProcessing\BioTonFMS.MessageProcessing.csproj", "{A02A9D21-B39D-4924-BDF8-7923DB044AC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.MessageProcessing", "..\BioTonFMS.MessageProcessing\BioTonFMS.MessageProcessing.csproj", "{A02A9D21-B39D-4924-BDF8-7923DB044AC9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.TrackerCommands", "..\BioTonFMS.Infrastructure.TrackerCommands\BioTonFMS.TrackerCommands.csproj", "{7686E246-9909-44FF-91FF-A0A443FD9ABD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +162,12 @@ Global
 		{A02A9D21-B39D-4924-BDF8-7923DB044AC9}.Production|Any CPU.Build.0 = Debug|Any CPU
 		{A02A9D21-B39D-4924-BDF8-7923DB044AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A02A9D21-B39D-4924-BDF8-7923DB044AC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7686E246-9909-44FF-91FF-A0A443FD9ABD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7686E246-9909-44FF-91FF-A0A443FD9ABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7686E246-9909-44FF-91FF-A0A443FD9ABD}.Production|Any CPU.ActiveCfg = Debug|Any CPU
+		{7686E246-9909-44FF-91FF-A0A443FD9ABD}.Production|Any CPU.Build.0 = Debug|Any CPU
+		{7686E246-9909-44FF-91FF-A0A443FD9ABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7686E246-9909-44FF-91FF-A0A443FD9ABD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,5 +8,6 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
     public interface ITrackerRepository : IRepository<Tracker>
     {
         PagedResult<Tracker> GetTrackers(TrackersFilter filter, bool forUpdate = false);
+        Tracker? FindTracker(string? imei, int? externalId);
     }
 }

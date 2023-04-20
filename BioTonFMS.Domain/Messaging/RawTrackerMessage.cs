@@ -1,14 +1,16 @@
+using System.Net;
+
 namespace BioTonFMS.Domain.Messaging;
 
 public class RawTrackerMessage
 {
     /// <summary>
-    /// тип протокола
+    /// Тип протокола
     /// </summary>
     public TrackerTypeEnum TrackerType { get; set; }
 
     /// <summary>
-    /// сообщение от трекера
+    /// Сообщение от трекера
     /// </summary>
     public byte[] RawMessage { get; set; } = null!;
 
@@ -16,4 +18,14 @@ public class RawTrackerMessage
     /// Идентификатор пакета данных трекера
     /// </summary>
     public Guid PackageUID { get; set; }
+
+    /// <summary>
+    /// IP адрес трекера
+    /// </summary>
+    public string IpAddress { get; set; } = "";
+    
+    /// <summary>
+    /// Порт трекера
+    /// </summary>
+    public int Port { get; set; }
 }

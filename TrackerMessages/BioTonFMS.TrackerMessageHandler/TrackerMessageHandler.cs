@@ -38,12 +38,12 @@ public class TrackerMessageHandler : IBusMessageHandler
         var messageText = Encoding.UTF8.GetString(binaryMessage);
         _logger.LogDebug("Получен пакет {MessageText}", messageText);
 
-        var deserialized = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
+        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
             ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", nameof(binaryMessage));
 
-        if (_messageRepository.ExistsByUid(deserialized.PackageUID)) return Task.CompletedTask;
+        if (_messageRepository.ExistsByUid(rawMessage.PackageUID)) return Task.CompletedTask;
 
-        TrackerMessage[] messages = _parserProvider(deserialized.TrackerType).ParseMessage(deserialized.RawMessage, deserialized.PackageUID)
+        TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
             .ToArray();
 
         CalculateSensorTags(messages);
@@ -52,14 +52,19 @@ public class TrackerMessageHandler : IBusMessageHandler
         {
             _messageRepository.Add(trackerMessage);
             _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}",
-                deserialized.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
+                rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
+
+            var tracker = _trackerRepository.FindTracker(trackerMessage.Imei, trackerMessage.ExternalTrackerId);
+            if (tracker is null) continue;
+            tracker.SetTrackerAddress(rawMessage.IpAddress, rawMessage.Port);
+            _trackerRepository.Update(tracker);
         }
 
         return Task.CompletedTask;
     }
     private void CalculateSensorTags(TrackerMessage[] messages)
     {
-        if (messages.Length <= 0) return;;
+        if (messages.Length <= 0) return;
 
         TrackerMessage oneOfMessages = messages[0];
         if (string.IsNullOrEmpty(oneOfMessages.Imei) && oneOfMessages.ExternalTrackerId == 0) return;

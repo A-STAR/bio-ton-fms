@@ -12,11 +12,14 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit.Abstractions;
 
-namespace BiotonFMS.Telematica.Tests.RepoTests;
+namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
 public class TrackerRepositoryTests
 {
     private const int ExistentExternalId = 111;
+    private const int NonexistentExternalId = -111;
+    private const string ExistentImei = "12341";
+    private const string NonexistentImei = "bla-bla";
     private readonly ITestOutputHelper _testOutputHelper;
 
     public TrackerRepositoryTests(ITestOutputHelper testOutputHelper)
@@ -257,7 +260,39 @@ public class TrackerRepositoryTests
                          $"регистрационный номер - {vehicle.RegistrationNumber})");
     }
 
-    private static TrackerRepository CreateTrackerRepository(ICollection<Tracker> trackers,
+    [Theory]
+    [InlineData(ExistentImei, null)]
+    [InlineData(ExistentImei, ExistentExternalId)]
+    [InlineData(null, ExistentExternalId)]
+    public void FindTracker_TrackerExists_ShouldReturnTracker(string? imei, int? externalId)
+    {
+        var repo = CreateTrackerRepository(SampleTrackers, SampleVehicles);
+        
+        var result = repo.FindTracker(imei, externalId);
+
+        result.Should().NotBeNull();
+    }
+    
+    [Theory]
+    [InlineData(NonexistentImei, null)]
+    [InlineData(NonexistentImei, NonexistentExternalId)]
+    [InlineData(null, NonexistentExternalId)]
+    public void FindTracker_TrackerNotExists_ShouldReturnNull(string? imei, int? externalId)
+    {
+        var repo = CreateTrackerRepository(SampleTrackers, SampleVehicles);
+        
+        repo.FindTracker(imei, externalId).Should().BeNull();
+    }
+
+    [Fact]
+    public void FindTracker_NullParameters_ShouldThrowException()
+    {
+        var repo = CreateTrackerRepository(SampleTrackers, SampleVehicles);
+
+        Assert.Throws<ArgumentException>(() => repo.FindTracker(null, null));
+    }
+    
+    private static ITrackerRepository CreateTrackerRepository(ICollection<Tracker> trackers,
         ICollection<Vehicle> vehicles)
     {
         IKeyValueProvider<Tracker, int> keyValueProviderMock = new KeyValueProviderMock<Tracker, int>(trackers);
@@ -331,7 +366,7 @@ public class TrackerRepositoryTests
             Id = 1,
             Name = "трекер GalileoSky",
             Description = "Описание 1",
-            Imei = "12341",
+            Imei = ExistentImei,
             ExternalId = ExistentExternalId,
             StartDate = DateTime.MinValue,
             TrackerType = TrackerTypeEnum.GalileoSkyV50,

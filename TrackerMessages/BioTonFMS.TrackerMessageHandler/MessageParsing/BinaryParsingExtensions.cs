@@ -78,6 +78,7 @@ internal static class BinaryParsingExtensions
 
         return coords;
     }
+
     internal static CanLog ParseCanLog(this byte[] bytes)
 
     {

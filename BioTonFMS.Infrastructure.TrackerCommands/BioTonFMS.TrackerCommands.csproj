@@ -7,15 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Pegasus" Version="4.2.0-alpha0003" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Expressions.peg.g" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PegGrammar Include="Parsing\Expressions.peg.g" />
+      <ProjectReference Include="..\BioTonFMS.Common\BioTonFMS.Common.csproj" />
+      <ProjectReference Include="..\BioTonFMS.Domain\BioTonFMS.Domain.csproj" />
     </ItemGroup>
 
 </Project>
