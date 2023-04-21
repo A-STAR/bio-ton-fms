@@ -273,7 +273,7 @@ describe('SensorDialogComponent', () => {
     const fuelUseInput = await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#sensor-form',
-        placeholder: 'Расход л/ч'
+        placeholder: 'Расход, л/ч'
       })
     );
 
@@ -305,7 +305,7 @@ describe('SensorDialogComponent', () => {
 
     expect(fuelUseInputDe.nativeElement.placeholder)
       .withContext('render fuel use input with `NumberOnlyDirective`')
-      .toBe('Расход л/ч');
+      .toBe('Расход, л/ч');
 
     loader.getHarness(
       MatInputHarness.with({
@@ -326,24 +326,145 @@ describe('SensorDialogComponent', () => {
       .withContext('render settings accordion `multi` attribute')
       .toBeResolvedTo(true);
 
-    loader.getHarness(
+    const generalSettingsPanel = await loader.getHarness(
       MatExpansionPanelHarness.with({
         title: 'Общие настройки',
         expanded: false
       })
     );
 
-    loader.getHarness(
+    generalSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут начала движения, с'
+      })
+    );
+
+    generalSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт расхода топлива по датчику',
+        checked: false
+      })
+    );
+
+    generalSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Замена ошибочных значений',
+        checked: false
+      })
+    );
+
+    generalSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт расхода топлива по времени',
+        checked: false
+      })
+    );
+
+    const refuelingSettingsPanel = await loader.getHarness(
       MatExpansionPanelHarness.with({
         title: 'Настройки заправки',
         expanded: false
       })
     );
 
-    loader.getHarness(
+    refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Минимальный объём заправки, л'
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут разделения заправок, с'
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут полного объема заправки, с'
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Поиск заправок при остановке',
+        checked: false
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт заправок по времени',
+        checked: false
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт заправки по сырым данным',
+        checked: false
+      })
+    );
+
+    const drainSettingsPanel = await loader.getHarness(
       MatExpansionPanelHarness.with({
         title: 'Настройки слива',
         expanded: false
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Минимальный объем слива, л'
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут слива при остановки, с'
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут разделения сливов, с'
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Поиск сливов в движении',
+        checked: false
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт сливов по времени',
+        checked: false
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт слива по сырым данным',
+        checked: false
       })
     );
 
@@ -465,7 +586,7 @@ describe('SensorDialogComponent', () => {
     const fuelInput = await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#sensor-form',
-        placeholder: 'Расход л/ч',
+        placeholder: 'Расход, л/ч',
         value: testNewSensor.fuelUse?.toString()
       })
     );
