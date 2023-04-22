@@ -287,7 +287,7 @@ export class SensorDialogComponent implements OnInit {
           [
             Validators.min(0),
             Validators.max(Number.MAX_SAFE_INTEGER),
-            Validators.pattern(FUEL_USE_PATTERN)
+            Validators.pattern(FUEL_PATTERN)
           ]
         ),
         description: this.fb.nonNullable.control(
@@ -295,23 +295,46 @@ export class SensorDialogComponent implements OnInit {
           Validators.maxLength(500)
         ),
         general: this.fb.group({
-          startTimeout: this.fb.nonNullable.control(sensor?.startTimeout),
+          startTimeout: this.fb.nonNullable.control(sensor?.startTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
           fixErrors: this.fb.nonNullable.control(sensor?.fixErrors),
           fuelUseCalculation: this.fb.nonNullable.control(sensor?.fuelUseCalculation),
           fuelUseTimeCalculation: this.fb.nonNullable.control(sensor?.fuelUseTimeCalculation)
         }),
         refueling: this.fb.group({
-          min: this.fb.nonNullable.control(sensor?.minRefueling),
-          timeout: this.fb.nonNullable.control(sensor?.refuelingTimeout),
-          fullTimeout: this.fb.nonNullable.control(sensor?.fullRefuelingTimeout),
+          min: this.fb.nonNullable.control(sensor?.minRefueling, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER),
+            Validators.pattern(FUEL_PATTERN)
+          ]),
+          timeout: this.fb.nonNullable.control(sensor?.refuelingTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
+          fullTimeout: this.fb.nonNullable.control(sensor?.fullRefuelingTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
           lookup: this.fb.nonNullable.control(sensor?.refuelingLookup),
           calculation: this.fb.nonNullable.control(sensor?.refuelingCalculation),
           rawCalculation: this.fb.nonNullable.control(sensor?.refuelingRawCalculation)
         }),
         drain: this.fb.group({
-          min: this.fb.nonNullable.control(sensor?.minDrain),
-          timeout: this.fb.nonNullable.control(sensor?.drainTimeout),
-          stopTimeout: this.fb.nonNullable.control(sensor?.drainStopTimeout),
+          min: this.fb.nonNullable.control(sensor?.minDrain, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER),
+            Validators.pattern(FUEL_PATTERN)
+          ]),
+          timeout: this.fb.nonNullable.control(sensor?.drainTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
+          stopTimeout: this.fb.nonNullable.control(sensor?.drainStopTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
           lookup: this.fb.nonNullable.control(sensor?.drainLookup),
           calculation: this.fb.nonNullable.control(sensor?.drainCalculation),
           rawCalculation: this.fb.nonNullable.control(sensor?.drainRawCalculation)
@@ -402,7 +425,7 @@ type SensorForm = FormGroup<{
   }>;
 }>
 
-const FUEL_USE_PATTERN = /^\d+(?:\.\d{1,2})?$/;
+const FUEL_PATTERN = /^\d+(?:\.\d{1,2})?$/;
 
 export const SENSOR_CREATED = 'Датчик создан';
 export const SENSOR_UPDATED = 'Датчик обновлён';
