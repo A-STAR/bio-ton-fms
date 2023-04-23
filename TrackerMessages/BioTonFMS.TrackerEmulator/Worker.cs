@@ -13,7 +13,8 @@ public class EmulatorWorker : BackgroundService
     private readonly ClientParams _parameters;
     private readonly ILogger<EmulatorWorker> _logger;
 
-    public EmulatorWorker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<EmulatorWorker> logger)
+    public EmulatorWorker(IOptions<ClientOptions> options,
+        ClientParams parameters, ILogger<EmulatorWorker> logger)
     {
         _options = options.Value;
         _parameters = parameters;
@@ -28,11 +29,13 @@ public class EmulatorWorker : BackgroundService
         _logger.LogInformation("Параметры корректны");
 
         using var client = new TcpClient();
-
+        client.ReceiveTimeout = _options.TimeoutSeconds * 1000;
+            
         try
         {
             client.Connect(_options.Host, _options.Port);
-            _logger.LogInformation("Установлено соединение по адресу {Host}:{Port}", _options.Host, _options.Port);
+            _logger.LogInformation("Установлено соединение по адресу {Host}:{Port}",
+                _options.Host, _options.Port);
         }
         catch (Exception e)
         {
@@ -55,14 +58,13 @@ public class EmulatorWorker : BackgroundService
             return Task.CompletedTask;
         }
 
-        if (_parameters is { MessagePath: { }, ResultPath: { } })
+        if (_parameters is not { MessagePath: not null, ResultPath: not null }) return Task.CompletedTask;
+        
+        for (var i = 0; i < _parameters.RepeatCount; i++)
         {
-            for (var i = 0; i < _parameters.RepeatCount; i++)
-            {
-                SendRequest(_parameters.MessagePath, _parameters.ResultPath, stream);
-            }
-
-            return Task.CompletedTask;
+            Thread.Sleep(_options.DelaySeconds * 1000);
+            if (stoppingToken.IsCancellationRequested) break;
+            SendRequest(_parameters.MessagePath, _parameters.ResultPath, stream);
         }
 
         return Task.CompletedTask;
