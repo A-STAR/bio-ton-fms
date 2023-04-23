@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -40,6 +40,8 @@ import { Tracker } from '../tracker.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SensorDialogComponent implements OnInit {
+  @ViewChildren(MatExpansionPanel) private settingsPanels!: QueryList<MatExpansionPanel>;
+
   protected get hiddenFuelUse() {
     const type = this.sensorForm.get('basic.type')?.value;
 
@@ -66,6 +68,18 @@ export class SensorDialogComponent implements OnInit {
     const { invalid, value } = this.sensorForm;
 
     if (invalid) {
+      const settingsGroupPaths = ['general', 'refueling', 'drain'];
+
+      settingsGroupPaths.forEach((path, index) => {
+        const settingsGroup = this.sensorForm.get(`basic.${path}`);
+
+        if (settingsGroup!.invalid) {
+          this.settingsPanels
+            .get(index)!
+            .open();
+        }
+      });
+
       return;
     }
 

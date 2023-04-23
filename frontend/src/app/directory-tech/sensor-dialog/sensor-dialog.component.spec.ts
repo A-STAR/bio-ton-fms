@@ -651,6 +651,22 @@ describe('SensorDialogComponent', () => {
     spyOn(sensorService, 'createSensor')
       .and.callThrough();
 
+    const refuelingSettingsPanel = await loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки заправки',
+        expanded: false
+      })
+    );
+
+    const minRefuellingInput = await refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Минимальный объём заправки, л'
+      })
+    );
+
+    await minRefuellingInput.setValue('0.875');
+
     const saveButton = await loader.getHarness(
       MatButtonHarness.with({
         selector: '[form="sensor-form"]',
@@ -659,6 +675,12 @@ describe('SensorDialogComponent', () => {
     );
 
     await saveButton.click();
+
+    await expectAsync(
+      refuelingSettingsPanel.isExpanded()
+    )
+      .withContext('render expanded refuelling panel')
+      .toBeResolvedTo(true);
 
     expect(sensorService.createSensor)
       .not.toHaveBeenCalled();
