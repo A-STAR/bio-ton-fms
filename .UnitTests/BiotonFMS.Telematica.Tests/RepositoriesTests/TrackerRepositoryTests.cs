@@ -267,12 +267,23 @@ public class TrackerRepositoryTests
     public void FindTracker_TrackerExists_ShouldReturnTracker(string? imei, int? externalId)
     {
         var repo = CreateTrackerRepository(SampleTrackers, SampleVehicles);
-        
-        var result = repo.FindTracker(imei, externalId);
 
-        result.Should().NotBeNull();
+        var actual = repo.FindTracker(imei, externalId);
+
+        actual.Should().NotBeNull();
+
+        var expected = SampleTrackers.Single(x => x.Imei == imei || x.ExternalId == externalId);
+        
+        actual!.Id.Should().Be(expected.Id);
+        actual.Name.Should().Be(expected.Name);
+        actual.Description.Should().Be(expected.Description);
+        actual.Imei.Should().Be(expected.Imei);
+        actual.ExternalId.Should().Be(expected.ExternalId);
+        actual.StartDate.Should().Be(expected.StartDate);
+        actual.TrackerType.Should().Be(expected.TrackerType);
+        actual.SimNumber.Should().Be(expected.SimNumber);
     }
-    
+
     [Theory]
     [InlineData(NonexistentImei, null)]
     [InlineData(NonexistentImei, NonexistentExternalId)]
@@ -280,7 +291,7 @@ public class TrackerRepositoryTests
     public void FindTracker_TrackerNotExists_ShouldReturnNull(string? imei, int? externalId)
     {
         var repo = CreateTrackerRepository(SampleTrackers, SampleVehicles);
-        
+
         repo.FindTracker(imei, externalId).Should().BeNull();
     }
 
@@ -291,7 +302,7 @@ public class TrackerRepositoryTests
 
         Assert.Throws<ArgumentException>(() => repo.FindTracker(null, null));
     }
-    
+
     private static ITrackerRepository CreateTrackerRepository(ICollection<Tracker> trackers,
         ICollection<Vehicle> vehicles)
     {
