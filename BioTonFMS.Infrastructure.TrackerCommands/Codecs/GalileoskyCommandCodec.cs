@@ -28,7 +28,7 @@ public class GalileoskyCommandCodec : ICommandCodec
         result.AddRange(externalId);
 
         result.Add(CommandNumberTag);
-        byte[] cmdNum = BitConverter.GetBytes(new Random().Next());
+        byte[] cmdNum = BitConverter.GetBytes(0);
         if (!BitConverter.IsLittleEndian)
             Array.Reverse(cmdNum);
         result.AddRange(cmdNum);
