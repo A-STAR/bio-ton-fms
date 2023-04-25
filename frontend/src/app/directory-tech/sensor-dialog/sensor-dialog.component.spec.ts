@@ -729,7 +729,23 @@ describe('SensorDialogComponent', () => {
       useLastReceived: false,
       visibility: false,
       fuelUse: undefined,
-      description: undefined
+      description: undefined,
+      startTimeout: undefined,
+      fixErrors: undefined,
+      fuelUseCalculation: undefined,
+      fuelUseTimeCalculation: undefined,
+      minRefueling: undefined,
+      refuelingTimeout: undefined,
+      fullRefuelingTimeout: undefined,
+      refuelingLookup: undefined,
+      refuelingCalculation: undefined,
+      refuelingRawCalculation: undefined,
+      minDrain: undefined,
+      drainTimeout: undefined,
+      drainStopTimeout: undefined,
+      drainLookup: undefined,
+      drainCalculation: undefined,
+      drainRawCalculation: undefined
     };
 
     const testSensorResponse: Sensor = {
@@ -779,8 +795,29 @@ describe('SensorDialogComponent', () => {
     )
       .toBeResolvedTo(false);
 
+    // TODO: remove local settings
+    const testSensor = {
+      ...testSensorResponse,
+      startTimeout: undefined,
+      fixErrors: undefined,
+      fuelUseCalculation: undefined,
+      fuelUseTimeCalculation: undefined,
+      minRefueling: undefined,
+      refuelingTimeout: undefined,
+      fullRefuelingTimeout: undefined,
+      refuelingLookup: undefined,
+      refuelingCalculation: undefined,
+      refuelingRawCalculation: undefined,
+      minDrain: undefined,
+      drainTimeout: undefined,
+      drainStopTimeout: undefined,
+      drainLookup: undefined,
+      drainCalculation: undefined,
+      drainRawCalculation: undefined
+    };
+
     expect(dialogRef.close)
-      .toHaveBeenCalledWith(testSensorResponse);
+      .toHaveBeenCalledWith(testSensor);
 
     /* Test fuel control validation. */
 

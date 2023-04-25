@@ -469,7 +469,23 @@ export const testSensor: Sensor = {
   useLastReceived: false,
   visibility: false,
   fuelUse: 10,
-  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.'
+  description: 'Устройство с отличным функционалом для парковки в плохих условиях видимости.',
+  startTimeout: 5,
+  fixErrors: true,
+  fuelUseCalculation: true,
+  fuelUseTimeCalculation: true,
+  minRefueling: 10,
+  refuelingTimeout: 3600,
+  fullRefuelingTimeout: 300,
+  refuelingLookup: true,
+  refuelingCalculation: true,
+  refuelingRawCalculation: false,
+  minDrain: 2.75,
+  drainTimeout: 1800,
+  drainStopTimeout: 900,
+  drainLookup: false,
+  drainCalculation: false,
+  drainRawCalculation: true
 };
 
 export const testNewSensor: NewSensor = {
@@ -485,5 +501,21 @@ export const testNewSensor: NewSensor = {
   useLastReceived: testSensor.useLastReceived,
   visibility: testSensor.visibility,
   fuelUse: testSensor.fuelUse,
-  description: testSensor.description
+  description: testSensor.description,
+  startTimeout: testSensor.startTimeout,
+  fixErrors: testSensor.fixErrors,
+  fuelUseCalculation: testSensor.fuelUseCalculation,
+  fuelUseTimeCalculation: testSensor.fuelUseTimeCalculation,
+  minRefueling: testSensor.minRefueling,
+  refuelingTimeout: testSensor.refuelingTimeout,
+  fullRefuelingTimeout: testSensor.fullRefuelingTimeout,
+  refuelingLookup: testSensor.refuelingLookup,
+  refuelingCalculation: testSensor.refuelingCalculation,
+  refuelingRawCalculation: testSensor.refuelingRawCalculation,
+  minDrain: testSensor.minDrain,
+  drainTimeout: testSensor.drainTimeout,
+  drainStopTimeout: testSensor.drainStopTimeout,
+  drainLookup: testSensor.drainLookup,
+  drainCalculation: testSensor.drainCalculation,
+  drainRawCalculation: testSensor.drainRawCalculation
 };

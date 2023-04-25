@@ -95,8 +95,13 @@ export class SensorDialogComponent implements OnInit {
       lastReceived,
       visibility,
       fuelUse,
-      description
+      description,
+      general,
+      refueling,
+      drain
     } = value.basic!;
+
+    const { startTimeout, fixErrors, fuelUseCalculation, fuelUseTimeCalculation } = general!;
 
     const newSensor: NewSensor = {
       trackerId: tracker!,
@@ -110,7 +115,23 @@ export class SensorDialogComponent implements OnInit {
       useLastReceived: lastReceived ?? false,
       visibility: visibility ?? false,
       fuelUse: fuelUse ?? undefined,
-      description: description ?? undefined
+      description: description ?? undefined,
+      startTimeout: startTimeout ?? undefined,
+      fixErrors: fixErrors ?? undefined,
+      fuelUseCalculation: fuelUseCalculation ?? undefined,
+      fuelUseTimeCalculation: fuelUseTimeCalculation ?? undefined,
+      minRefueling: refueling?.min ?? undefined,
+      refuelingTimeout: refueling?.timeout ?? undefined,
+      fullRefuelingTimeout: refueling?.fullTimeout ?? undefined,
+      refuelingLookup: refueling?.lookup ?? undefined,
+      refuelingCalculation: refueling?.calculation ?? undefined,
+      refuelingRawCalculation: refueling?.rawCalculation ?? undefined,
+      minDrain: drain?.min ?? undefined,
+      drainTimeout: drain?.timeout ?? undefined,
+      drainStopTimeout: drain?.stopTimeout ?? undefined,
+      drainLookup: drain?.lookup ?? undefined,
+      drainCalculation: drain?.calculation ?? undefined,
+      drainRawCalculation: drain?.rawCalculation ?? undefined
     };
 
     let sensor$: Observable<Sensor | null>;
@@ -133,7 +154,26 @@ export class SensorDialogComponent implements OnInit {
       if (this.data.sensor && 'id' in this.data.sensor) {
         sensor = this.#serializeSensor(newSensor);
       } else {
-        sensor = response!;
+        // TODO: remove local settings
+        sensor = {
+          ...response!,
+          startTimeout: startTimeout ?? undefined,
+          fixErrors: fixErrors ?? undefined,
+          fuelUseCalculation: fuelUseCalculation ?? undefined,
+          fuelUseTimeCalculation: fuelUseTimeCalculation ?? undefined,
+          minRefueling: refueling?.min ?? undefined,
+          refuelingTimeout: refueling?.timeout ?? undefined,
+          fullRefuelingTimeout: refueling?.fullTimeout ?? undefined,
+          refuelingLookup: refueling?.lookup ?? undefined,
+          refuelingCalculation: refueling?.calculation ?? undefined,
+          refuelingRawCalculation: refueling?.rawCalculation ?? undefined,
+          minDrain: drain?.min ?? undefined,
+          drainTimeout: drain?.timeout ?? undefined,
+          drainStopTimeout: drain?.stopTimeout ?? undefined,
+          drainLookup: drain?.lookup ?? undefined,
+          drainCalculation: drain?.calculation ?? undefined,
+          drainRawCalculation: drain?.rawCalculation ?? undefined
+        };
       }
 
       this.dialogRef.close(sensor);
@@ -166,19 +206,7 @@ export class SensorDialogComponent implements OnInit {
    * @returns `Sensor` sensor.
    */
   #serializeSensor(newSensor: NewSensor) {
-    const {
-      name,
-      sensorTypeId,
-      dataType,
-      formula,
-      unitId,
-      validatorId,
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
-    } = newSensor;
+    const { id, trackerId, sensorTypeId, unitId, validatorId, ...rest } = newSensor;
 
     const type = this.#sensorGroups
       .flatMap(({ sensorTypes = [] }) => sensorTypes)
@@ -187,24 +215,17 @@ export class SensorDialogComponent implements OnInit {
     const unit = this.#units.find(({ id }) => id === unitId)!;
 
     const sensor: Sensor = {
-      id: newSensor.id!,
+      id: id!,
       tracker: this.data.sensor!.tracker,
-      name,
       sensorType: {
         id: sensorTypeId,
         value: type.name,
       },
-      dataType,
-      formula,
       unit: {
         id: unitId,
         value: unit.name
       },
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
+      ...rest
     };
 
     if (validatorId) {
@@ -223,39 +244,15 @@ export class SensorDialogComponent implements OnInit {
    * Map `Sensor` or `Omit<Sensor, 'id'>` to `NewSensor`.
    */
   #deserializeSensor(sensor: Sensor | Omit<Sensor, 'id'>): NewSensor {
-    const {
-      tracker,
-      name,
-      sensorType,
-      dataType,
-      formula,
-      unit,
-      validator,
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
-    } = sensor;
+    const { tracker, sensorType, unit, validator, ...rest } = sensor;
 
     const newSensor: NewSensor = {
       trackerId: tracker.id,
-      name,
       sensorTypeId: sensorType.id,
-      dataType,
-      formula,
       unitId: unit.id,
       validatorId: validator?.id,
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
+      ...rest
     };
-
-    if ('id' in sensor) {
-      newSensor.id = sensor.id;
-    }
 
     return newSensor;
   }
