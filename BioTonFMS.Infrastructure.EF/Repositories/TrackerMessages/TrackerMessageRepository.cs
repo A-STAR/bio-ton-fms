@@ -42,13 +42,13 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     }
 
     public bool ExistsByUid(Guid uid) =>
-        QueryableProvider.Linq().Any(x => x.PackageUID == uid);
+        QueryableProvider.Linq().AsNoTracking().Any(x => x.PackageUID == uid);
 
     public TrackerStandardParameters GetStandardParameters(int externalId, string imei)
     {
         var stdParams = new TrackerStandardParameters();
 
-        var last = QueryableProvider.Linq()
+        var last = QueryableProvider.Linq().AsNoTracking()
             .Where(x => x.ExternalTrackerId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault();
@@ -82,7 +82,13 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
     public IList<TrackerParameter> GetParameters(int externalId, string imei)
     {
-        IList<MessageTag>? lastTags = QueryableProvider.Fetch(x => x.Tags).Linq()
+        if (string.IsNullOrEmpty(imei) && externalId == 0)
+        {
+            return new List<TrackerParameter>();
+        }
+        
+        IList<MessageTag>? lastTags = HydratedQuery
+            .AsNoTracking()
             .Where(x => x.ExternalTrackerId == externalId || x.Imei == imei)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Tags;
@@ -151,7 +157,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         Dictionary<int, string> tagNames = _tagsRepository.GetTags()
             .ToDictionary(x => x.Id, x => x.Name);
 
-        var page = QueryableProvider.Fetch(x => x.Tags).Linq()
+        var page = HydratedQuery
+            .AsNoTracking()
             .Where(x => x.Imei == filter.Imei || x.ExternalTrackerId == filter.ExternalId)
             .GetPagedQueryable(filter.PageNum, filter.PageSize);
 
