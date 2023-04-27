@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace BioTonFMS.Telematica.Controllers.TestData;
+namespace BioTonFMS.Telematica.Controllers.TestDataController;
 
 /// <summary>
 /// Сервис тестовых данных. Генерирует и добавляет в базу тестовые данные.

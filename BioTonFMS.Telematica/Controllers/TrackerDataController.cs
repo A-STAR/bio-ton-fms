@@ -44,7 +44,7 @@ public class TrackerDataController : ValidationControllerBase
     {
         var tracker = _trackerRepository[trackerId];
 
-        if (tracker is null) return NotFound();
+        if (tracker is null) return NotFound(new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
 
         var parameters = _messageRepository.GetStandardParameters(tracker.ExternalId, tracker.Imei);
         return Ok(parameters.GetArray());
@@ -63,7 +63,7 @@ public class TrackerDataController : ValidationControllerBase
     {
         Tracker? tracker = _trackerRepository[trackerId];
 
-        if (tracker is null) return NotFound();
+        if (tracker is null) return NotFound(new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
 
         IList<TrackerParameter> parameters = _messageRepository.GetParameters(tracker.ExternalId, tracker.Imei);
         return Ok(parameters);
@@ -82,7 +82,7 @@ public class TrackerDataController : ValidationControllerBase
     {
         Tracker? tracker = _trackerRepository[request.TrackerId];
 
-        if (tracker is null) return NotFound();
+        if (tracker is null) return NotFound(new ServiceErrorResult($"Трекер с id = {request.TrackerId} не найден"));
 
         PagedResult<ParametersHistoryRecord> history = _messageRepository.GetParametersHistory(
             new ParametersHistoryFilter
