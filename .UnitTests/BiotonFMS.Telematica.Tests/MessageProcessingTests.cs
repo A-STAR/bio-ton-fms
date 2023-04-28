@@ -69,7 +69,7 @@ public class MessageProcessingTests
         {
             new()
             {
-                Id = 111, Sensors = new List<Sensor>
+                Id = 111, ExternalId = 1234431, Sensors = new List<Sensor>
                 {
                     new()
                     {
@@ -96,7 +96,7 @@ public class MessageProcessingTests
         };
         var result = trackers.BuildSensors(trackerTags).ToArray();
         result.Length.Should().Be(1);
-        result[0].Item1.Should().Be(111);
+        result[0].Item1.Should().Be(1234431);
         result[0].Item2.Length.Should().Be(3);
 
         result[0].Item2[0].Properties.Name.Should().Be("b");
@@ -234,7 +234,7 @@ public class MessageProcessingTests
         {
             new TrackerMessage
             {
-                ExternalTrackerId = 111, Tags = new List<MessageTag>
+                ExternalTrackerId = 111111, Tags = new List<MessageTag>
                 {
                     new MessageTagDouble
                     {
@@ -245,17 +245,38 @@ public class MessageProcessingTests
                         TagType = TagDataTypeEnum.Double, IsFallback = false, SensorId = 12332, Value = 2345
                     }
                 }
+            },
+            new TrackerMessage
+            {
+                ExternalTrackerId = 234532 /* несуществующий трекер */, Tags = new List<MessageTag>
+                {
+                    new MessageTagDouble
+                    {
+                        TagType = TagDataTypeEnum.Double, IsFallback = false, TrackerTagId = 123, Value = 22
+                    },
+                }
             }
+            
         };
         var trackers = new Tracker[]
         {
             new()
             {
-                Id = 111, Sensors = new List<Sensor>
+                Id = 111, ExternalId = 111111, Sensors = new List<Sensor>
                 {
                     new()
                     {
                         Id = 222, Formula = "a + const2"
+                    }
+                }
+            },
+            new()
+            {
+                Id = 112, Sensors = new List<Sensor>
+                {
+                    new()
+                    {
+                        Id = 223, Formula = "a + const2"
                     }
                 }
             }
@@ -269,9 +290,9 @@ public class MessageProcessingTests
         };
 
 
-        messages.UpdateSensorTags(previousMessage: null, trackers, trackerTags);
+        messages.UpdateSensorTags(previousMessages: new Dictionary<int, TrackerMessage>(), trackers, trackerTags);
 
-        messages.Length.Should().Be(1);
+        messages.Length.Should().Be(2);
         messages[0].Tags.Count.Should().Be(2);
 
         messages[0].Tags[0].Should().BeOfType<MessageTagDouble>();
@@ -282,5 +303,11 @@ public class MessageProcessingTests
         messages[0].Tags[1].TrackerTagId.Should().BeNull();
         messages[0].Tags[1].SensorId.Should().Be(222);
         (messages[0].Tags[1] as MessageTagDouble)!.Value.Should().Be(24);
+        
+        messages[1].Tags.Count.Should().Be(1);
+
+        messages[1].Tags[0].Should().BeOfType<MessageTagDouble>();
+        messages[1].Tags[0].SensorId.Should().BeNull();
+        messages[1].Tags[0].TrackerTagId.Should().Be(123);
     }
 }

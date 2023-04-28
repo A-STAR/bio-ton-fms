@@ -11,6 +11,6 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     IList<TrackerMessage> GetMessages(bool forUpdate = false);
     TrackerStandardParameters GetStandardParameters(int externalId, string imei);
     IList<TrackerParameter> GetParameters(int externalId, string imei);
-    TrackerMessage? GetLastMessageFor(TrackerMessage trackerMessage);
+    IDictionary<int, TrackerMessage> GetLastMessagesFor(ICollection<int> externalTrackerIds);
     PagedResult<ParametersHistoryRecord> GetParametersHistory(ParametersHistoryFilter filter);
 }
