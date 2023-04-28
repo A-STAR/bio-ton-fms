@@ -10,6 +10,7 @@ import { MatTabGroupHarness } from '@angular/material/tabs/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
+import { MatAccordionHarness, MatExpansionPanelHarness } from '@angular/material/expansion/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
@@ -272,7 +273,7 @@ describe('SensorDialogComponent', () => {
     const fuelUseInput = await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#sensor-form',
-        placeholder: 'Расход л/ч'
+        placeholder: 'Расход, л/ч'
       })
     );
 
@@ -304,7 +305,7 @@ describe('SensorDialogComponent', () => {
 
     expect(fuelUseInputDe.nativeElement.placeholder)
       .withContext('render fuel use input with `NumberOnlyDirective`')
-      .toBe('Расход л/ч');
+      .toBe('Расход, л/ч');
 
     loader.getHarness(
       MatInputHarness.with({
@@ -313,40 +314,166 @@ describe('SensorDialogComponent', () => {
       })
     );
 
+    const accordion = await loader.getHarnessOrNull(MatAccordionHarness);
+
+    expect(accordion)
+      .withContext('render settings accordion')
+      .not.toBeNull();
+
+    await expectAsync(
+      accordion!.isMulti()
+    )
+      .withContext('render settings accordion `multi` attribute')
+      .toBeResolvedTo(true);
+
+    const generalSettingsPanel = await loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Общие настройки',
+        expanded: false
+      })
+    );
+
+    generalSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут начала движения, с'
+      })
+    );
+
+    generalSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт расхода топлива по датчику',
+        checked: false
+      })
+    );
+
+    generalSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Замена ошибочных значений',
+        checked: false
+      })
+    );
+
+    generalSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт расхода топлива по времени',
+        checked: false
+      })
+    );
+
+    const refuelingSettingsPanel = await loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки заправки',
+        expanded: false
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Минимальный объём заправки, л'
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут разделения заправок, с'
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут полного объема заправки, с'
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Поиск заправок при остановке',
+        checked: false
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт заправок по времени',
+        checked: false
+      })
+    );
+
+    refuelingSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт заправки по сырым данным',
+        checked: false
+      })
+    );
+
+    const drainSettingsPanel = await loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки слива',
+        expanded: false
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Минимальный объем слива, л'
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут слива при остановки, с'
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Таймаут разделения сливов, с'
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Поиск сливов в движении',
+        checked: false
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт сливов по времени',
+        checked: false
+      })
+    );
+
+    drainSettingsPanel.getHarness(
+      MatSlideToggleHarness.with({
+        ancestor: 'form#sensor-form',
+        label: 'Расчёт слива по сырым данным',
+        checked: false
+      })
+    );
+
     /* Coverage for `onControlSelectionChange` control disabled state. */
 
     await type.clickOptions();
   });
 
-  it('should render dialog actions', async () => {
-    const cancelButton = await loader.getHarnessOrNull(
-      MatButtonHarness.with({
-        text: 'Отмена',
-        variant: 'stroked'
-      })
-    );
-
-    expect(cancelButton)
-      .withContext('render close button')
-      .not.toBeNull();
-
-    const dialogCloseDe = fixture.debugElement.query(
-      By.directive(MatDialogClose)
-    );
-
-    expect(dialogCloseDe)
-      .withContext('render dialog close element')
-      .not.toBeNull();
-
-    loader.getHarnessOrNull(
-      MatButtonHarness.with({
-        text: 'Отправить',
-        variant: 'flat'
-      })
-    );
-  });
-
-  it('should render update sensor form', async () => {
+  it('should render update, duplicate sensor form', async () => {
     component['data'] = testUpdateMatDialogData;
 
     component.ngOnInit();
@@ -459,7 +586,7 @@ describe('SensorDialogComponent', () => {
     const fuelInput = await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#sensor-form',
-        placeholder: 'Расход л/ч',
+        placeholder: 'Расход, л/ч',
         value: testNewSensor.fuelUse?.toString()
       })
     );
@@ -469,11 +596,76 @@ describe('SensorDialogComponent', () => {
     )
       .withContext('render fuel use control enabled')
       .toBeResolvedTo(false);
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Общие настройки',
+        expanded: true
+      })
+    );
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки заправки',
+        expanded: true
+      })
+    );
+
+    loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки слива',
+        expanded: true
+      })
+    );
+  });
+
+  it('should render dialog actions', async () => {
+    const cancelButton = await loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отмена',
+        variant: 'stroked'
+      })
+    );
+
+    expect(cancelButton)
+      .withContext('render close button')
+      .not.toBeNull();
+
+    const dialogCloseDe = fixture.debugElement.query(
+      By.directive(MatDialogClose)
+    );
+
+    expect(dialogCloseDe)
+      .withContext('render dialog close element')
+      .not.toBeNull();
+
+    loader.getHarnessOrNull(
+      MatButtonHarness.with({
+        text: 'Отправить',
+        variant: 'flat'
+      })
+    );
   });
 
   it('should submit invalid sensor form', async () => {
     spyOn(sensorService, 'createSensor')
       .and.callThrough();
+
+    const refuelingSettingsPanel = await loader.getHarness(
+      MatExpansionPanelHarness.with({
+        title: 'Настройки заправки',
+        expanded: false
+      })
+    );
+
+    const minRefuellingInput = await refuelingSettingsPanel.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#sensor-form',
+        placeholder: 'Минимальный объём заправки, л'
+      })
+    );
+
+    await minRefuellingInput.setValue('0.875');
 
     const saveButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -483,6 +675,12 @@ describe('SensorDialogComponent', () => {
     );
 
     await saveButton.click();
+
+    await expectAsync(
+      refuelingSettingsPanel.isExpanded()
+    )
+      .withContext('render expanded refuelling panel')
+      .toBeResolvedTo(true);
 
     expect(sensorService.createSensor)
       .not.toHaveBeenCalled();
@@ -531,7 +729,23 @@ describe('SensorDialogComponent', () => {
       useLastReceived: false,
       visibility: false,
       fuelUse: undefined,
-      description: undefined
+      description: undefined,
+      startTimeout: undefined,
+      fixErrors: undefined,
+      fuelUseCalculation: undefined,
+      fuelUseTimeCalculation: undefined,
+      minRefueling: undefined,
+      refuelingTimeout: undefined,
+      fullRefuelingTimeout: undefined,
+      refuelingLookup: undefined,
+      refuelingCalculation: undefined,
+      refuelingRawCalculation: undefined,
+      minDrain: undefined,
+      drainTimeout: undefined,
+      drainStopTimeout: undefined,
+      drainLookup: undefined,
+      drainCalculation: undefined,
+      drainRawCalculation: undefined
     };
 
     const testSensorResponse: Sensor = {
@@ -581,8 +795,29 @@ describe('SensorDialogComponent', () => {
     )
       .toBeResolvedTo(false);
 
+    // TODO: remove local settings
+    const testSensor = {
+      ...testSensorResponse,
+      startTimeout: undefined,
+      fixErrors: undefined,
+      fuelUseCalculation: undefined,
+      fuelUseTimeCalculation: undefined,
+      minRefueling: undefined,
+      refuelingTimeout: undefined,
+      fullRefuelingTimeout: undefined,
+      refuelingLookup: undefined,
+      refuelingCalculation: undefined,
+      refuelingRawCalculation: undefined,
+      minDrain: undefined,
+      drainTimeout: undefined,
+      drainStopTimeout: undefined,
+      drainLookup: undefined,
+      drainCalculation: undefined,
+      drainRawCalculation: undefined
+    };
+
     expect(dialogRef.close)
-      .toHaveBeenCalledWith(testSensorResponse);
+      .toHaveBeenCalledWith(testSensor);
 
     /* Test fuel control validation. */
 
@@ -706,7 +941,7 @@ describe('SensorDialogComponent', () => {
       .toHaveBeenCalledWith(sensor);
   });
 
-  it('should duplicate create sensor form', async () => {
+  it('should submit duplicate sensor form', async () => {
     component['data'] = testDuplicateMatDialogData;
 
     component.ngOnInit();

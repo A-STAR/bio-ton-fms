@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace BioTonFMS.Telematica.Controllers.TestData;
+namespace BioTonFMS.Telematica.Controllers.TestDataController;
 
 public class TrackerData
 {
