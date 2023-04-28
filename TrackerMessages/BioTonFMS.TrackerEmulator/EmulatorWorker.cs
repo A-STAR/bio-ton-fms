@@ -1,9 +1,9 @@
-using System.Globalization;
-using System.Net.Sockets;
-using System.Text.Json;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Globalization;
+using System.Net.Sockets;
+using System.Text.Json;
 
 namespace BioTonFMS.TrackerEmulator;
 
@@ -13,14 +13,15 @@ public class EmulatorWorker : BackgroundService
     private readonly ClientParams _parameters;
     private readonly ILogger<EmulatorWorker> _logger;
 
-    public EmulatorWorker(IOptions<ClientOptions> options, ClientParams parameters, ILogger<EmulatorWorker> logger)
+    public EmulatorWorker(IOptions<ClientOptions> options,
+        ClientParams parameters, ILogger<EmulatorWorker> logger)
     {
         _options = options.Value;
         _parameters = parameters;
         _logger = logger;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Эмулятор запущен");
         ValidateParams();
@@ -28,11 +29,13 @@ public class EmulatorWorker : BackgroundService
         _logger.LogInformation("Параметры корректны");
 
         using var client = new TcpClient();
+        client.ReceiveTimeout = _options.TimeoutSeconds * 1000;
 
         try
         {
             client.Connect(_options.Host, _options.Port);
-            _logger.LogInformation("Установлено соединение по адресу {Host}:{Port}", _options.Host, _options.Port);
+            _logger.LogInformation("Установлено соединение по адресу {Host}:{Port}",
+                _options.Host, _options.Port);
         }
         catch (Exception e)
         {
@@ -49,32 +52,31 @@ public class EmulatorWorker : BackgroundService
             foreach (var line in File.ReadAllLines(_parameters.ScriptPath))
             {
                 var paths = line.Split(' ');
-                SendRequest(paths[0], paths[1], stream);
+                await SendRequest(paths[0], paths[1], stream, stoppingToken);
             }
 
-            return Task.CompletedTask;
+            return;
         }
 
-        if (_parameters is { MessagePath: { }, ResultPath: { } })
+        if (_parameters is not { MessagePath: not null, ResultPath: not null }) return;
+
+        for (var i = 0; i < _parameters.RepeatCount; i++)
         {
-            for (var i = 0; i < _parameters.RepeatCount; i++)
-            {
-                SendRequest(_parameters.MessagePath, _parameters.ResultPath, stream);
-            }
-
-            return Task.CompletedTask;
+            await SendRequest(_parameters.MessagePath, _parameters.ResultPath, stream, stoppingToken);
+            if (stoppingToken.IsCancellationRequested) break;
+            Thread.Sleep(_options.DelaySeconds * 1000);
         }
 
-        return Task.CompletedTask;
+        return;
     }
 
-    private void SendRequest(string messageFile, string resultFile, Stream stream)
+    private async Task SendRequest(string messageFile, string resultFile, Stream stream, CancellationToken stoppingToken)
     {
         try
         {
             byte[] data = ReadMessageFromFile(messageFile);
 
-            stream.Write(data, 0, data.Length);
+            await stream.WriteAsync(data, 0, data.Length, stoppingToken);
             _logger.LogInformation("Отправлено: '{Message}'",
                 string.Join(' ', data.Select(x => x.ToString("X"))));
         }
@@ -90,7 +92,7 @@ public class EmulatorWorker : BackgroundService
         try
         {
             var respBuf = new byte[10];
-            int readCount = stream.Read(respBuf, 0, 10);
+            int readCount = await stream.ReadAsync(respBuf, 0, 10, stoppingToken);
             responseData = string.Join(' ', respBuf.Take(readCount)
                 .Select(x => x.ToString("X")));
 
