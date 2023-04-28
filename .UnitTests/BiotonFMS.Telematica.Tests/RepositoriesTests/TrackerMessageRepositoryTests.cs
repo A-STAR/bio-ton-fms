@@ -203,6 +203,7 @@ public class TrackerMessageRepositoryTests
 
         history.Results.Count.Should().Be(2);
         history.Should().BeAssignableTo<PagedResult<ParametersHistoryRecord>>();
+        history.Results.First().Time.Should().BeAfter(history.Results.Last().Time);
     }
 
     public static IEnumerable<object[]> Data =>

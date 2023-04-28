@@ -156,10 +156,11 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     {
         Dictionary<int, string> tagNames = _tagsRepository.GetTags()
             .ToDictionary(x => x.Id, x => x.Name);
-
+        
         var page = HydratedQuery
             .AsNoTracking()
             .Where(x => x.Imei == filter.Imei || x.ExternalTrackerId == filter.ExternalId)
+            .OrderByDescending(x => x.ServerDateTime)
             .GetPagedQueryable(filter.PageNum, filter.PageSize);
 
         return new PagedResult<ParametersHistoryRecord>
