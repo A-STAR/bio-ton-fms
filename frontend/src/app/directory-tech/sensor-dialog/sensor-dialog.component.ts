@@ -84,7 +84,6 @@ export class SensorDialogComponent implements OnInit {
     }
 
     const {
-      tracker,
       name,
       type,
       dataType,
@@ -104,7 +103,7 @@ export class SensorDialogComponent implements OnInit {
     const { startTimeout, fixErrors, fuelUseCalculation, fuelUseTimeCalculation } = general!;
 
     const newSensor: NewSensor = {
-      trackerId: tracker!,
+      trackerId: this.data.trackerID ?? this.data.sensor!.tracker.id,
       name: name!,
       sensorTypeId: type!,
       dataType: dataType!,
@@ -261,20 +260,14 @@ export class SensorDialogComponent implements OnInit {
    * Initialize Sensor form.
    */
   #initSensorForm() {
-    let trackerID: Tracker['id'];
     let sensor: NewSensor | undefined;
 
-    if (this.data.trackerID) {
-      trackerID = this.data.trackerID;
-    } else {
-      trackerID = this.data.sensor!.tracker.id;
-
+    if (this.data.sensor) {
       sensor = this.#deserializeSensor(this.data.sensor!);
     }
 
     this.sensorForm = this.fb.group({
       basic: this.fb.group({
-        tracker: this.fb.nonNullable.control(trackerID, Validators.required),
         name: this.fb.nonNullable.control(sensor?.name, [
           Validators.required,
           Validators.maxLength(100)
@@ -399,7 +392,6 @@ export type SensorDialogData = {
 
 type SensorForm = FormGroup<{
   basic: FormGroup<{
-    tracker: FormControl<NewSensor['trackerId']>;
     name: FormControl<NewSensor['name'] | undefined>;
     type: FormControl<NewSensor['sensorTypeId'] | undefined>;
     dataType: FormControl<NewSensor['dataType'] | undefined>;
