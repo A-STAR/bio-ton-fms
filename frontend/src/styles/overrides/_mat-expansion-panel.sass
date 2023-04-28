@@ -1,0 +1,65 @@
+@use 'variables' as *
+
+.mat-expansion-panel
+  background: unset
+
+  @at-root .mat-accordion mat-expansion-panel#{&}
+
+    &:first-of-type
+      border-top-right-radius: unset
+      border-top-left-radius: unset
+
+    &:last-of-type
+      border-bottom-right-radius: unset
+      border-bottom-left-radius: unset
+
+  &:not([class*=mat-elevation-z])
+    box-shadow: unset
+
+mat-expansion-panel-header
+  margin-bottom: 20px
+
+mat-expansion-panel.mat-expansion-panel-spacing
+  margin: unset
+
+mat-expansion-panel-header
+  border-bottom: 1px solid $lighter-gray
+
+.mat-expansion-panel-header
+
+  &,
+  &.mat-expanded
+    height: 36px
+
+  @at-root mat-expansion-panel-header#{&}
+    padding-bottom: 10px
+    padding-left: unset
+    padding-right: unset
+
+  .mat-expansion-panel:not(.mat-expanded) &:hover:not([aria-disabled=true])
+    background: unset
+
+mat-panel-title
+  font-weight: 500
+
+.mat-expansion-panel-header-title
+  color: $green
+
+.mat-expansion-indicator
+  width: 12px
+
+  .mat-expanded &
+    $mat-expansion-indicator-height: 16px
+    $rotation-height-compensation: 0.875 * $mat-expansion-indicator-height
+
+    height: $mat-expansion-indicator-height + $rotation-height-compensation
+
+  &::after
+    position: relative
+    left: 2px
+    color: $gray
+
+div.mat-expansion-panel-body
+  padding-bottom: unset
+  padding-left: unset
+  padding-right: unset

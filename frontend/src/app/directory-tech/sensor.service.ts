@@ -175,6 +175,22 @@ export type Sensor = {
   visibility?: boolean;
   fuelUse?: number;
   description?: string;
+  startTimeout?: number;
+  fixErrors?: boolean;
+  fuelUseCalculation?: boolean;
+  fuelUseTimeCalculation?: boolean;
+  minRefueling?: number;
+  refuelingTimeout?: number;
+  fullRefuelingTimeout?: number;
+  refuelingLookup?: boolean;
+  refuelingCalculation?: boolean;
+  refuelingRawCalculation?: boolean;
+  minDrain?: number;
+  drainTimeout?: number;
+  drainStopTimeout?: number;
+  drainLookup?: boolean;
+  drainCalculation?: boolean;
+  drainRawCalculation?: boolean;
 }
 
 export interface Sensors extends Pagination {
@@ -183,7 +199,10 @@ export interface Sensors extends Pagination {
 
 export interface NewSensor extends Partial<Pick<Sensor, 'id'>>, Pick<
   Sensor,
-  'name' | 'dataType' | 'formula' | 'validationType' | 'useLastReceived' | 'visibility' | 'fuelUse' | 'description'
+  'name' | 'dataType' | 'formula' | 'validationType' | 'useLastReceived' | 'visibility' | 'fuelUse' | 'description' | 'startTimeout'
+  | 'fixErrors' | 'fuelUseCalculation' | 'fuelUseTimeCalculation' | 'minRefueling' | 'refuelingTimeout' | 'fullRefuelingTimeout'
+  | 'refuelingLookup' | 'refuelingCalculation' | 'refuelingRawCalculation' | 'minDrain' | 'drainTimeout' | 'drainStopTimeout'
+  | 'drainLookup' | 'drainCalculation' | 'drainRawCalculation'
 > {
   trackerId: Tracker['id'];
   sensorTypeId: SensorType['id'];

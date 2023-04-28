@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -30,6 +31,7 @@ import { Tracker } from '../tracker.service';
     MatInputModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatExpansionModule,
     MatButtonModule,
     NumberOnlyInputDirective
   ],
@@ -38,6 +40,8 @@ import { Tracker } from '../tracker.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SensorDialogComponent implements OnInit {
+  @ViewChildren(MatExpansionPanel) private settingsPanels!: QueryList<MatExpansionPanel>;
+
   protected get hiddenFuelUse() {
     const type = this.sensorForm.get('basic.type')?.value;
 
@@ -64,6 +68,18 @@ export class SensorDialogComponent implements OnInit {
     const { invalid, value } = this.sensorForm;
 
     if (invalid) {
+      const settingsGroupPaths = ['general', 'refueling', 'drain'];
+
+      settingsGroupPaths.forEach((path, index) => {
+        const settingsGroup = this.sensorForm.get(`basic.${path}`);
+
+        if (settingsGroup!.invalid) {
+          this.settingsPanels
+            .get(index)!
+            .open();
+        }
+      });
+
       return;
     }
 
@@ -79,8 +95,13 @@ export class SensorDialogComponent implements OnInit {
       lastReceived,
       visibility,
       fuelUse,
-      description
+      description,
+      general,
+      refueling,
+      drain
     } = value.basic!;
+
+    const { startTimeout, fixErrors, fuelUseCalculation, fuelUseTimeCalculation } = general!;
 
     const newSensor: NewSensor = {
       trackerId: tracker!,
@@ -94,7 +115,23 @@ export class SensorDialogComponent implements OnInit {
       useLastReceived: lastReceived ?? false,
       visibility: visibility ?? false,
       fuelUse: fuelUse ?? undefined,
-      description: description ?? undefined
+      description: description ?? undefined,
+      startTimeout: startTimeout ?? undefined,
+      fixErrors: fixErrors ?? undefined,
+      fuelUseCalculation: fuelUseCalculation ?? undefined,
+      fuelUseTimeCalculation: fuelUseTimeCalculation ?? undefined,
+      minRefueling: refueling?.min ?? undefined,
+      refuelingTimeout: refueling?.timeout ?? undefined,
+      fullRefuelingTimeout: refueling?.fullTimeout ?? undefined,
+      refuelingLookup: refueling?.lookup ?? undefined,
+      refuelingCalculation: refueling?.calculation ?? undefined,
+      refuelingRawCalculation: refueling?.rawCalculation ?? undefined,
+      minDrain: drain?.min ?? undefined,
+      drainTimeout: drain?.timeout ?? undefined,
+      drainStopTimeout: drain?.stopTimeout ?? undefined,
+      drainLookup: drain?.lookup ?? undefined,
+      drainCalculation: drain?.calculation ?? undefined,
+      drainRawCalculation: drain?.rawCalculation ?? undefined
     };
 
     let sensor$: Observable<Sensor | null>;
@@ -117,7 +154,26 @@ export class SensorDialogComponent implements OnInit {
       if (this.data.sensor && 'id' in this.data.sensor) {
         sensor = this.#serializeSensor(newSensor);
       } else {
-        sensor = response!;
+        // TODO: remove local settings
+        sensor = {
+          ...response!,
+          startTimeout: startTimeout ?? undefined,
+          fixErrors: fixErrors ?? undefined,
+          fuelUseCalculation: fuelUseCalculation ?? undefined,
+          fuelUseTimeCalculation: fuelUseTimeCalculation ?? undefined,
+          minRefueling: refueling?.min ?? undefined,
+          refuelingTimeout: refueling?.timeout ?? undefined,
+          fullRefuelingTimeout: refueling?.fullTimeout ?? undefined,
+          refuelingLookup: refueling?.lookup ?? undefined,
+          refuelingCalculation: refueling?.calculation ?? undefined,
+          refuelingRawCalculation: refueling?.rawCalculation ?? undefined,
+          minDrain: drain?.min ?? undefined,
+          drainTimeout: drain?.timeout ?? undefined,
+          drainStopTimeout: drain?.stopTimeout ?? undefined,
+          drainLookup: drain?.lookup ?? undefined,
+          drainCalculation: drain?.calculation ?? undefined,
+          drainRawCalculation: drain?.rawCalculation ?? undefined
+        };
       }
 
       this.dialogRef.close(sensor);
@@ -150,19 +206,7 @@ export class SensorDialogComponent implements OnInit {
    * @returns `Sensor` sensor.
    */
   #serializeSensor(newSensor: NewSensor) {
-    const {
-      name,
-      sensorTypeId,
-      dataType,
-      formula,
-      unitId,
-      validatorId,
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
-    } = newSensor;
+    const { id, trackerId, sensorTypeId, unitId, validatorId, ...rest } = newSensor;
 
     const type = this.#sensorGroups
       .flatMap(({ sensorTypes = [] }) => sensorTypes)
@@ -171,24 +215,17 @@ export class SensorDialogComponent implements OnInit {
     const unit = this.#units.find(({ id }) => id === unitId)!;
 
     const sensor: Sensor = {
-      id: newSensor.id!,
+      id: id!,
       tracker: this.data.sensor!.tracker,
-      name,
       sensorType: {
         id: sensorTypeId,
         value: type.name,
       },
-      dataType,
-      formula,
       unit: {
         id: unitId,
         value: unit.name
       },
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
+      ...rest
     };
 
     if (validatorId) {
@@ -207,39 +244,15 @@ export class SensorDialogComponent implements OnInit {
    * Map `Sensor` or `Omit<Sensor, 'id'>` to `NewSensor`.
    */
   #deserializeSensor(sensor: Sensor | Omit<Sensor, 'id'>): NewSensor {
-    const {
-      tracker,
-      name,
-      sensorType,
-      dataType,
-      formula,
-      unit,
-      validator,
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
-    } = sensor;
+    const { tracker, sensorType, unit, validator, ...rest } = sensor;
 
     const newSensor: NewSensor = {
       trackerId: tracker.id,
-      name,
       sensorTypeId: sensorType.id,
-      dataType,
-      formula,
       unitId: unit.id,
       validatorId: validator?.id,
-      validationType,
-      useLastReceived,
-      visibility,
-      fuelUse,
-      description
+      ...rest
     };
-
-    if ('id' in sensor) {
-      newSensor.id = sensor.id;
-    }
 
     return newSensor;
   }
@@ -285,13 +298,58 @@ export class SensorDialogComponent implements OnInit {
           [
             Validators.min(0),
             Validators.max(Number.MAX_SAFE_INTEGER),
-            Validators.pattern(FUEL_USE_PATTERN)
+            Validators.pattern(FUEL_PATTERN)
           ]
         ),
         description: this.fb.nonNullable.control(
           sensor?.description,
           Validators.maxLength(500)
-        )
+        ),
+        general: this.fb.group({
+          startTimeout: this.fb.nonNullable.control(sensor?.startTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
+          fixErrors: this.fb.nonNullable.control(sensor?.fixErrors),
+          fuelUseCalculation: this.fb.nonNullable.control(sensor?.fuelUseCalculation),
+          fuelUseTimeCalculation: this.fb.nonNullable.control(sensor?.fuelUseTimeCalculation)
+        }),
+        refueling: this.fb.group({
+          min: this.fb.nonNullable.control(sensor?.minRefueling, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER),
+            Validators.pattern(FUEL_PATTERN)
+          ]),
+          timeout: this.fb.nonNullable.control(sensor?.refuelingTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
+          fullTimeout: this.fb.nonNullable.control(sensor?.fullRefuelingTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
+          lookup: this.fb.nonNullable.control(sensor?.refuelingLookup),
+          calculation: this.fb.nonNullable.control(sensor?.refuelingCalculation),
+          rawCalculation: this.fb.nonNullable.control(sensor?.refuelingRawCalculation)
+        }),
+        drain: this.fb.group({
+          min: this.fb.nonNullable.control(sensor?.minDrain, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER),
+            Validators.pattern(FUEL_PATTERN)
+          ]),
+          timeout: this.fb.nonNullable.control(sensor?.drainTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
+          stopTimeout: this.fb.nonNullable.control(sensor?.drainStopTimeout, [
+            Validators.min(0),
+            Validators.max(Number.MAX_SAFE_INTEGER)
+          ]),
+          lookup: this.fb.nonNullable.control(sensor?.drainLookup),
+          calculation: this.fb.nonNullable.control(sensor?.drainCalculation),
+          rawCalculation: this.fb.nonNullable.control(sensor?.drainRawCalculation)
+        })
       })
     });
   }
@@ -353,10 +411,32 @@ type SensorForm = FormGroup<{
     visibility: FormControl<NewSensor['visibility'] | undefined>;
     fuelUse: FormControl<NewSensor['fuelUse'] | undefined>;
     description: FormControl<NewSensor['description'] | undefined>;
+    general: FormGroup<{
+      startTimeout: FormControl<NewSensor['startTimeout'] | undefined>;
+      fixErrors: FormControl<NewSensor['fixErrors'] | undefined>;
+      fuelUseCalculation: FormControl<NewSensor['fuelUseCalculation'] | undefined>;
+      fuelUseTimeCalculation: FormControl<NewSensor['fuelUseTimeCalculation'] | undefined>;
+    }>,
+    refueling: FormGroup<{
+      min: FormControl<NewSensor['minRefueling'] | undefined>;
+      timeout: FormControl<NewSensor['refuelingTimeout'] | undefined>;
+      fullTimeout: FormControl<NewSensor['fullRefuelingTimeout'] | undefined>;
+      lookup: FormControl<NewSensor['refuelingLookup'] | undefined>;
+      calculation: FormControl<NewSensor['refuelingCalculation'] | undefined>;
+      rawCalculation: FormControl<NewSensor['refuelingRawCalculation'] | undefined>;
+    }>,
+    drain: FormGroup<{
+      min: FormControl<NewSensor['minDrain'] | undefined>;
+      timeout: FormControl<NewSensor['drainTimeout'] | undefined>;
+      stopTimeout: FormControl<NewSensor['drainStopTimeout'] | undefined>;
+      lookup: FormControl<NewSensor['drainLookup'] | undefined>;
+      calculation: FormControl<NewSensor['drainCalculation'] | undefined>;
+      rawCalculation: FormControl<NewSensor['drainRawCalculation'] | undefined>;
+    }>
   }>;
 }>
 
-const FUEL_USE_PATTERN = /^\d+(?:\.\d{1,2})?$/;
+const FUEL_PATTERN = /^\d+(?:\.\d{1,2})?$/;
 
 export const SENSOR_CREATED = 'Датчик создан';
 export const SENSOR_UPDATED = 'Датчик обновлён';
