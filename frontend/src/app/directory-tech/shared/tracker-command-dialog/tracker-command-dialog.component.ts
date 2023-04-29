@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { Subject, Subscription } from 'rxjs';
 
@@ -21,7 +22,8 @@ import { Tracker, TrackerCommand, TrackerCommandResponse, TrackerCommandTranspor
     MatFormFieldModule,
     MatInputModule,
     MatButtonToggleModule,
-    MatButtonModule
+    MatButtonModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './tracker-command-dialog.component.html',
   styleUrls: ['./tracker-command-dialog.component.sass'],

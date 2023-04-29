@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -8,6 +8,7 @@ import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogTitle } fro
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatButtonToggleGroupHarness, MatButtonToggleHarness } from '@angular/material/button-toggle/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
 
 import { of } from 'rxjs';
 
@@ -163,11 +164,17 @@ describe('TrackerCommandDialogComponent', () => {
 
     await sendButton.click();
 
+    const progressSpinner = await sendButton.getHarnessOrNull(MatProgressSpinnerHarness);
+
+    expect(progressSpinner)
+      .withContext('render send button without progress spinner')
+      .toBeNull();
+
     expect(trackerService.sendTrackerCommand)
       .not.toHaveBeenCalled();
   });
 
-  it('should submit command form', async () => {
+  it('should submit command form', fakeAsync(async () => {
     const messageInput = await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#command-form',
@@ -188,9 +195,6 @@ describe('TrackerCommandDialogComponent', () => {
 
     await smsButtonToggle.check();
 
-    spyOn(trackerService, 'sendTrackerCommand')
-      .and.callFake(() => of(testTrackerCommandResponse));
-
     const sendButton = await loader.getHarness(
       MatButtonHarness.with({
         text: 'Отправить',
@@ -198,6 +202,15 @@ describe('TrackerCommandDialogComponent', () => {
       })
     );
 
+    // test for tracker command request in progress state
+    await sendButton.click();
+
+    await sendButton.getHarness(MatProgressSpinnerHarness);
+
+    spyOn(trackerService, 'sendTrackerCommand')
+      .and.callFake(() => of(testTrackerCommandResponse));
+
+    // test for the git tracker command request response
     await sendButton.click();
 
     expect(trackerService.sendTrackerCommand)
@@ -221,5 +234,5 @@ describe('TrackerCommandDialogComponent', () => {
     expect(responseParagraphDe)
       .withContext('render no command response paragraph element')
       .toBeNull();
-  });
+  }));
 });
