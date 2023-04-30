@@ -1,6 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ErrorHandler } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -8,13 +10,15 @@ import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogTitle } fro
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatButtonToggleGroupHarness, MatButtonToggleHarness } from '@angular/material/button-toggle/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/testing';
 
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { TrackerService } from '../../tracker.service';
 
 import { TrackerCommandDialogComponent } from './tracker-command-dialog.component';
 
+import { environment } from '../../../../environments/environment';
 import { TEST_TRACKER_ID, testTrackerCommand, testTrackerCommandResponse } from '../../tracker.service.spec';
 
 describe('TrackerCommandDialogComponent', () => {
@@ -163,11 +167,17 @@ describe('TrackerCommandDialogComponent', () => {
 
     await sendButton.click();
 
+    const progressSpinner = await sendButton.getHarnessOrNull(MatProgressSpinnerHarness);
+
+    expect(progressSpinner)
+      .withContext('render send button without progress spinner')
+      .toBeNull();
+
     expect(trackerService.sendTrackerCommand)
       .not.toHaveBeenCalled();
   });
 
-  it('should submit command form', async () => {
+  it('should submit command form', fakeAsync(async () => {
     const messageInput = await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#command-form',
@@ -188,9 +198,6 @@ describe('TrackerCommandDialogComponent', () => {
 
     await smsButtonToggle.check();
 
-    spyOn(trackerService, 'sendTrackerCommand')
-      .and.callFake(() => of(testTrackerCommandResponse));
-
     const sendButton = await loader.getHarness(
       MatButtonHarness.with({
         text: 'Отправить',
@@ -198,18 +205,34 @@ describe('TrackerCommandDialogComponent', () => {
       })
     );
 
+    // test for tracker command request in progress state
+    await sendButton.click();
+
+    await sendButton.getHarness(MatProgressSpinnerHarness);
+
+    const sendTrackerCommandSpy = spyOn(trackerService, 'sendTrackerCommand')
+      .and.callFake(() => of(testTrackerCommandResponse));
+
+    // test for the git tracker command request response
     await sendButton.click();
 
     expect(trackerService.sendTrackerCommand)
       .toHaveBeenCalledWith(TEST_TRACKER_ID, testTrackerCommand);
+
+    /* Coverage for continuing showing message hidden paragraph without text */
+    await sendButton.click();
 
     let responseParagraphDe = fixture.debugElement.query(
       By.css('p')
     );
 
     expect(responseParagraphDe)
-      .withContext('render command response paragraph element')
+      .withContext('render message paragraph element')
       .not.toBeNull();
+
+    expect(responseParagraphDe.nativeElement.textContent)
+      .withContext('render message paragraph text')
+      .toBe(testTrackerCommandResponse.commandResponse);
 
     await messageInput.setValue('');
     await sendButton.click();
@@ -219,7 +242,38 @@ describe('TrackerCommandDialogComponent', () => {
     );
 
     expect(responseParagraphDe)
-      .withContext('render no command response paragraph element')
+      .withContext('render no message paragraph element')
       .toBeNull();
-  });
+
+    await messageInput.setValue(commandText);
+
+    sendTrackerCommandSpy.calls.reset();
+
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        messages: ['IP адрес трекера устарел или не был установлен']
+      },
+      status: 409,
+      statusText: 'Conflict',
+      url: `${environment.api}/api/api/telematica/tracker-command/${TEST_TRACKER_ID}`
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    spyOn(errorHandler, 'handleError');
+
+    sendTrackerCommandSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    // test for the tracker command request error response
+    await sendButton.click();
+
+    responseParagraphDe = fixture.debugElement.query(
+      By.css('p')
+    );
+
+    expect(responseParagraphDe)
+      .withContext('render no message paragraph element')
+      .toBeNull();
+  }));
 });

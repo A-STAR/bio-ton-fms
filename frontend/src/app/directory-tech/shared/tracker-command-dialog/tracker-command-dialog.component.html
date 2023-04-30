@@ -17,10 +17,10 @@
       </mat-form-field>
     </div>
 
-    <ng-container *ngIf="(commandResponse$ | async) !== null">
-      <p [hidden]="(commandResponse$ | async) === undefined">
-        <ng-container *ngIf="commandResponse$ | async as response">
-          <span>{{ response }}</span>
+    <ng-container *ngIf="(commandResponse$ | async)?.message !== null">
+      <p [hidden]="commandResponse$.value.message === undefined">
+        <ng-container *ngIf="commandResponse$.value.message as message">
+          <span>{{ message }}</span>
         </ng-container>
       </p>
     </ng-container>
@@ -30,5 +30,9 @@
 <mat-dialog-actions fxLayoutAlign="space-between">
   <button mat-stroked-button color="accent" mat-dialog-close>Отмена</button>
 
-  <button mat-flat-button type="submit" form="command-form" color="accent">Отправить</button>
+  <button mat-flat-button type="submit" form="command-form" color="accent">
+    <mat-spinner [diameter]="20" *ngIf="(commandResponse$ | async)?.progress"></mat-spinner>
+
+    <span>Отправить</span>
+  </button>
 </mat-dialog-actions>

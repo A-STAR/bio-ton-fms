@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ErrorHandler, Inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
@@ -6,8 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { Tracker, TrackerCommand, TrackerCommandResponse, TrackerCommandTransport, TrackerService } from '../../tracker.service';
 
@@ -21,7 +22,8 @@ import { Tracker, TrackerCommand, TrackerCommandResponse, TrackerCommandTranspor
     MatFormFieldModule,
     MatInputModule,
     MatButtonToggleModule,
-    MatButtonModule
+    MatButtonModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './tracker-command-dialog.component.html',
   styleUrls: ['./tracker-command-dialog.component.sass'],
@@ -29,7 +31,14 @@ import { Tracker, TrackerCommand, TrackerCommandResponse, TrackerCommandTranspor
 })
 export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   protected commandForm!: CommandForm;
-  protected commandResponse$ = new Subject<TrackerCommandResponse['commandResponse'] | null | undefined>();
+
+  protected commandResponse$ = new BehaviorSubject<{
+    message: TrackerCommandResponse['commandResponse'] | null | undefined,
+    progress?: boolean
+  }>({
+    message: null
+  });
+
   protected TrackerCommandTransport = TrackerCommandTransport;
 
   /**
@@ -40,12 +49,12 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
 
     const { invalid, value } = this.commandForm;
 
-    const response = invalid ? null : undefined;
-
-    // show/hide command response hidden paragraph without text
-    this.commandResponse$.next(response);
-
     if (invalid) {
+      // hide message paragraph
+      this.commandResponse$.next({
+        message: null
+      });
+
       return;
     }
 
@@ -56,10 +65,28 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
       transport: transport!
     };
 
+    // show/hide message hidden paragraph without text and set progress
+    this.commandResponse$.next({
+      message: this.commandResponse$.value?.message ? undefined : null,
+      progress: true
+    });
+
     this.#subscription = this.trackerService
       .sendTrackerCommand(this.data, command)
-      .subscribe(({ commandResponse }) => {
-        this.commandResponse$.next(commandResponse);
+      .subscribe({
+        next: ({ commandResponse }) => {
+          this.commandResponse$.next({
+            message: commandResponse
+          });
+        },
+        error: error => {
+          // hide message paragraph
+          this.commandResponse$.next({
+            message: null
+          });
+
+          this.errorHandler.handleError(error);
+        }
       });
   }
 
@@ -76,6 +103,7 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   }
 
   constructor(
+    private errorHandler: ErrorHandler,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) protected data: Tracker['id'],
     private trackerService: TrackerService
