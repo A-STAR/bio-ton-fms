@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 import { catchError, mergeMap, Observable, of, tap, throwError } from 'rxjs';
 
 import { TokenService } from './token.service';
 import { AuthService } from './auth.service';
-import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -30,6 +31,8 @@ export class AuthInterceptor implements HttpInterceptor {
               case 403:
                 error$ = this.authService.signOut$.pipe(
                   tap(async () => {
+                    this.dialog.closeAll();
+
                     await this.router.navigate(['/sign-in'], {
                       replaceUrl: true
                     });
@@ -45,5 +48,5 @@ export class AuthInterceptor implements HttpInterceptor {
       );
   }
 
-  constructor(private router: Router, private tokenService: TokenService, private authService: AuthService) { }
+  constructor(private router: Router, private dialog: MatDialog, private tokenService: TokenService, private authService: AuthService) { }
 }

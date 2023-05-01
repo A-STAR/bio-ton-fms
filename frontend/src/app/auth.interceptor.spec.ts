@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { catchError, EMPTY, of } from 'rxjs';
 
@@ -19,7 +20,10 @@ describe('AuthInterceptor', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MatDialogModule
+      ],
       providers: [
         {
           provide: HTTP_INTERCEPTORS,
@@ -94,12 +98,14 @@ describe('AuthInterceptor', () => {
 
   it('should sign out on `401` and `403` error response', (done: DoneFn) => {
     const router = TestBed.inject(Router);
+    const dialog = TestBed.inject(MatDialog);
     const authService = TestBed.inject(AuthService);
-
-    spyOn(router, 'navigate');
 
     const signOutSpy = spyOnProperty(authService, 'signOut$')
       .and.callFake(() => of(undefined));
+
+    const navigateSpy = spyOn(router, 'navigate');
+    const closeAllSpy = spyOn(dialog, 'closeAll');
 
     spyOnProperty(tokenService, 'token')
       .and.returnValue(testCredentialsResponse.accessToken);
@@ -152,12 +158,19 @@ describe('AuthInterceptor', () => {
     testRequest.flush(testErrorResponse, testRequestErrorOptions);
 
     expect(signOutSpy)
-      .toHaveBeenCalled();
+      .toHaveBeenCalledBefore(closeAllSpy);
 
-    expect(router.navigate)
+    expect(closeAllSpy)
+      .toHaveBeenCalledBefore(navigateSpy);
+
+    expect(navigateSpy)
       .toHaveBeenCalledWith(['/sign-in'], {
         replaceUrl: true
       });
+
+    signOutSpy.calls.reset();
+    closeAllSpy.calls.reset();
+    navigateSpy.calls.reset();
 
     testErrorResponse.message = 'Forbidden';
     testRequestErrorOptions.status = 403;
@@ -172,5 +185,16 @@ describe('AuthInterceptor', () => {
     testRequest = httpTestingController.expectOne(testRequestURL, 'test API request');
 
     testRequest.flush(testErrorResponse, testRequestErrorOptions);
+
+    expect(signOutSpy)
+      .toHaveBeenCalledBefore(closeAllSpy);
+
+    expect(closeAllSpy)
+      .toHaveBeenCalledBefore(navigateSpy);
+
+    expect(navigateSpy)
+      .toHaveBeenCalledWith(['/sign-in'], {
+        replaceUrl: true
+      });
   });
 });
