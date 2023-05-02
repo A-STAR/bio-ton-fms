@@ -5,7 +5,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
@@ -39,7 +39,6 @@ import { TableDataSource } from '../shared/table/table.data-source';
     MatSortModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule,
     TableActionsTriggerDirective,
     StopClickPropagationDirective
   ],

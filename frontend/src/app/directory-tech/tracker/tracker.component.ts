@@ -6,7 +6,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { BehaviorSubject, filter, map, mergeMap, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
@@ -35,7 +35,6 @@ import { TableDataSource } from '../shared/table/table.data-source';
     MatButtonModule,
     MatIconModule,
     MatSlideToggleModule,
-    MatDialogModule,
     TableActionsTriggerDirective
   ],
   templateUrl: './tracker.component.html',

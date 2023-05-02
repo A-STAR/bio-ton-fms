@@ -13,7 +13,7 @@ import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
@@ -46,6 +46,7 @@ describe('TrackersComponent', () => {
           HttpClientTestingModule,
           RouterTestingModule,
           MatSnackBarModule,
+          MatDialogModule,
           TrackersComponent
         ],
         providers: [

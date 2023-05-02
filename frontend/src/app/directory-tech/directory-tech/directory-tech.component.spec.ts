@@ -8,6 +8,7 @@ import { parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import DirectoryTechComponent, { navigation } from './directory-tech.component';
 
@@ -25,6 +26,7 @@ describe('DirectoryTechComponent', () => {
           HttpClientTestingModule,
           RouterTestingModule.withRoutes(routes[0].children!),
           MatSnackBarModule,
+          MatDialogModule,
           DirectoryTechComponent
         ]
       })

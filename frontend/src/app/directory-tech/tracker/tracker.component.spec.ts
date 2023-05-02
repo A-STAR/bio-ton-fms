@@ -16,7 +16,7 @@ import { MatTableHarness } from '@angular/material/table/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
@@ -54,6 +54,7 @@ describe('TrackerComponent', () => {
           NoopAnimationsModule,
           HttpClientTestingModule,
           MatSnackBarModule,
+          MatDialogModule,
           TrackerComponent
         ],
         providers: [
