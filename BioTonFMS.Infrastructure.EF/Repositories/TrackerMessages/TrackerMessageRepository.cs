@@ -44,12 +44,12 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     public bool ExistsByUid(Guid uid) =>
         QueryableProvider.Linq().AsNoTracking().Any(x => x.PackageUID == uid);
 
-    public TrackerStandardParameters GetStandardParameters(int externalId, string imei)
+    public TrackerStandardParameters GetStandardParameters(int externalId)
     {
         var stdParams = new TrackerStandardParameters();
 
         var last = QueryableProvider.Linq().AsNoTracking()
-            .Where(x => x.ExternalTrackerId == externalId || x.Imei == imei)
+            .Where(x => x.ExternalTrackerId == externalId)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault();
 
@@ -58,38 +58,38 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         stdParams.Time = last.ServerDateTime;
 
         stdParams.Long = last.Longitude ?? QueryableProvider.Linq()
-            .Where(x => x.Longitude != null && x.ExternalTrackerId == externalId || x.Imei == imei)
+            .Where(x => x.Longitude != null && x.ExternalTrackerId == externalId)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Longitude;
 
         stdParams.Lat = last.Latitude ?? QueryableProvider.Linq()
-            .Where(x => x.Latitude != null && x.ExternalTrackerId == externalId || x.Imei == imei)
+            .Where(x => x.Latitude != null && x.ExternalTrackerId == externalId)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Latitude;
 
         stdParams.Speed = last.Speed ?? QueryableProvider.Linq()
-            .Where(x => x.Speed != null && x.ExternalTrackerId == externalId || x.Imei == imei)
+            .Where(x => x.Speed != null && x.ExternalTrackerId == externalId)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Speed;
 
         stdParams.Alt = last.Altitude ?? QueryableProvider.Linq()
-            .Where(x => x.Altitude != null && x.ExternalTrackerId == externalId || x.Imei == imei)
+            .Where(x => x.Altitude != null && x.ExternalTrackerId == externalId)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Altitude;
 
         return stdParams;
     }
 
-    public IList<TrackerParameter> GetParameters(int externalId, string imei)
+    public IList<TrackerParameter> GetParameters(int externalId)
     {
-        if (string.IsNullOrEmpty(imei) && externalId == 0)
+        if (externalId == 0)
         {
             return new List<TrackerParameter>();
         }
-        
+
         IList<MessageTag>? lastTags = HydratedQuery
             .AsNoTracking()
-            .Where(x => x.ExternalTrackerId == externalId || x.Imei == imei)
+            .Where(x => x.ExternalTrackerId == externalId)
             .OrderByDescending(x => x.ServerDateTime)
             .FirstOrDefault()?.Tags;
 
@@ -133,22 +133,15 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return result;
     }
 
-    public TrackerMessage? GetLastMessageFor(TrackerMessage trackerMessage)
+    public IDictionary<int, TrackerMessage> GetLastMessagesFor(ICollection<int> externalTrackerIds)
     {
-        if (string.IsNullOrEmpty(trackerMessage.Imei) && trackerMessage.ExternalTrackerId == 0)
-            return null;
-        
-        var query = HydratedQuery
-            .AsNoTracking();
+        var lastIds = QueryableProvider.Linq().Where(m => externalTrackerIds.Contains(m.ExternalTrackerId))
+            .GroupBy(m => m.ExternalTrackerId).Select(g => g.Max(m => m.Id));
+        var lastMessage = HydratedQuery
+            .AsNoTracking()
+            .Where(m => lastIds.Contains(m.Id))
+            .ToDictionary(m => m.ExternalTrackerId);
 
-        query = trackerMessage.ExternalTrackerId == 0 
-            ? query.Where(m => m.Imei == trackerMessage.Imei) 
-            : query.Where(m => m.ExternalTrackerId == trackerMessage.ExternalTrackerId);
-        
-        var lastMessage = query
-            .OrderByDescending(m => m.Id)
-            .FirstOrDefault();
-        
         return lastMessage;
     }
 
@@ -156,10 +149,10 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     {
         Dictionary<int, string> tagNames = _tagsRepository.GetTags()
             .ToDictionary(x => x.Id, x => x.Name);
-        
+
         var page = HydratedQuery
             .AsNoTracking()
-            .Where(x => x.Imei == filter.Imei || x.ExternalTrackerId == filter.ExternalId)
+            .Where(x => x.ExternalTrackerId == filter.ExternalId)
             .OrderByDescending(x => x.ServerDateTime)
             .GetPagedQueryable(filter.PageNum, filter.PageSize);
 

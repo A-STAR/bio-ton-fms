@@ -46,11 +46,24 @@ public class TrackerMessageHandler : IBusMessageHandler
         TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
             .ToArray();
 
+        var trackers = new HashSet<Tracker>();
+        foreach (var trackerMessage in messages)
+        {
+            var tracker = _trackerRepository.FindTracker(trackerMessage.Imei, trackerMessage.ExternalTrackerId);
+            if (tracker is null) continue;
+            trackers.Add(tracker);
+            
+            tracker.SetTrackerAddress(rawMessage.IpAddress, rawMessage.Port);
+            _trackerRepository.Update(tracker);
+            
+            trackerMessage.ExternalTrackerId = tracker.ExternalId;
+        }
+
         try
         {
-            CalculateSensorTags(messages);
+            CalculateSensorTags(trackers, messages);
         }
-        catch (Exception ex)
+        catch( Exception ex )
         {
             _logger.LogError(ex, "Ошибка при вычислении тегов датчиков");
         }
@@ -60,43 +73,20 @@ public class TrackerMessageHandler : IBusMessageHandler
             _messageRepository.Add(trackerMessage);
             _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}",
                 rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
-
-            var tracker = _trackerRepository.FindTracker(trackerMessage.Imei, trackerMessage.ExternalTrackerId);
-            if (tracker is null) continue;
-            tracker.SetTrackerAddress(rawMessage.IpAddress, rawMessage.Port);
-            _trackerRepository.Update(tracker);
         }
 
         return Task.CompletedTask;
     }
-    private void CalculateSensorTags(TrackerMessage[] messages)
+    
+    private void CalculateSensorTags(ISet<Tracker> trackers, TrackerMessage[] messages)
     {
-        if (messages.Length <= 0) return;
+        if (trackers.Count == 0 || messages.Length == 0) return;
 
-        TrackerMessage oneOfMessages = messages[0];
-        if (string.IsNullOrEmpty(oneOfMessages.Imei) && oneOfMessages.ExternalTrackerId == 0) return;
-
-        TrackerMessage? previousMessage = _messageRepository.GetLastMessageFor(oneOfMessages);
+        var externalTrackerIds = trackers.Where(t => t.ExternalId != 0).Select(t => t.ExternalId).ToArray();
+        IDictionary<int, TrackerMessage> previousMessages = _messageRepository.GetLastMessagesFor(externalTrackerIds);
+        
         TrackerTag[] trackerTags = _trackerTagRepository.GetTags().ToArray();
 
-        var trackerFilter = oneOfMessages.ExternalTrackerId == 0
-            ? new TrackersFilter
-            {
-                Imei = oneOfMessages.Imei
-            }
-            : new TrackersFilter
-            {
-                ExternalId = oneOfMessages.ExternalTrackerId
-            };
-
-        var trackers = _trackerRepository.GetTrackers(trackerFilter);
-
-        if (trackers.Results.Count != 1) return;
-
-        messages.UpdateSensorTags(previousMessage, new[]
-            {
-                trackers.Results[0]
-            },
-            trackerTags, new LoggingExceptionHandler(_logger));
+        messages.UpdateSensorTags(previousMessages, trackers, trackerTags, new LoggingExceptionHandler(_logger));
     }
 }

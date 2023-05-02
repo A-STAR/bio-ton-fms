@@ -61,7 +61,7 @@ public static class Seeds
                 result.ForEach(s => { s.TrackerId = v.Id; });
                 return result;
             })
-            .RuleFor(v => v.ExternalId, (_, v) => v.Id)
+            .RuleFor(v => v.ExternalId, (f, _) => f.Random.Int(0, 100000000))
             .RuleFor(v => v.TrackerType, (f, _) => f.Random.Enum<TrackerTypeEnum>())
             .RuleFor(v => v.SimNumber, (f, _) => f.Random.ReplaceNumbers("############"))
             .RuleFor(v => v.Imei, (f, _) => f.Random.ReplaceNumbers("###############"));
@@ -74,7 +74,7 @@ public static class Seeds
                 var result = message.Generate(10);
                 result.ForEach(s =>
                 {
-                    s.ExternalTrackerId = v.Tracker!.Id;
+                    s.ExternalTrackerId = v.Tracker!.ExternalId;
                     s.Imei = v.Tracker.Imei;
                 });
                 return result.ToArray();

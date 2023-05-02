@@ -1,4 +1,5 @@
 ﻿using BioTonFMS.Domain.Identity;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
@@ -47,7 +48,7 @@ public class TestDataController : ValidationControllerBase
         ILogger<TestDataController> logger, UserManager<AppUser> userManager, IConfiguration configuration,
         ITrackerMessageRepository messageRepository,
         ITrackerRepository trackerRepository, ISensorTypeRepository sensorTypeRepository,
-        IVehicleRepository vehicleRepository, IUnitRepository unitRepository, 
+        IVehicleRepository vehicleRepository, IUnitRepository unitRepository,
         ITrackerTagRepository trackerTagRepository, IVehicleGroupRepository vehicleGroupRepository,
         ITrackerMessageRepository trackerMessageRepository, IFuelTypeRepository fuelTypeRepository)
     {
@@ -82,9 +83,7 @@ public class TestDataController : ValidationControllerBase
         }
         var user = new AppUser
         {
-            FirstName = "Иван",
-            LastName = "Тестов",
-            UserName = "test",
+            FirstName = "Иван", LastName = "Тестов", UserName = "test",
         };
 
         var result = await _userManager.CreateAsync(user, "test");
@@ -217,7 +216,8 @@ public class TestDataController : ValidationControllerBase
         }
         var trackerTags = _trackerTagRepository.GetTags().ToArray();
         var exceptionHandler = new LoggingExceptionHandler(_logger);
-        messages.UpdateSensorTags(previousMessage: null, pageWithTrackers.Results, trackerTags, exceptionHandler);
+        messages.UpdateSensorTags(previousMessages: new Dictionary<int, TrackerMessage>(), pageWithTrackers.Results, trackerTags,
+            exceptionHandler);
 
         foreach (var message in messages)
         {

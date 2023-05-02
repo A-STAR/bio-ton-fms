@@ -13,7 +13,6 @@ namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 public class TrackerMessageRepositoryTests
 {
     #region ExistsByUid
-
     [Fact]
     public void ExistsByUid_MessageExists_ShouldReturnTrue()
     {
@@ -31,19 +30,15 @@ public class TrackerMessageRepositoryTests
 
         result.Should().BeFalse();
     }
-
     #endregion
 
     #region GetParameters
-
     [Theory]
-    [InlineData("123", 2552)]
-    [InlineData("", 2552)]
-    [InlineData("123", 0)]
-    public void GetParameters_ShouldReturnParameters(string imei, int externalId)
+    [InlineData(2552)]
+    public void GetParameters_ShouldReturnParameters(int externalId)
     {
         var repo = GetRepo(Messages);
-        var parameters = repo.GetParameters(externalId, imei);
+        var parameters = repo.GetParameters(externalId);
         parameters.Count.Should().Be(3);
         parameters.First(x => x.ParamName == "hdop").LastValueDecimal.Should().Be(6);
         parameters.First(x => x.ParamName == "rec_sn").LastValueDecimal.Should().Be(12345);
@@ -51,15 +46,12 @@ public class TrackerMessageRepositoryTests
     }
 
     [Theory]
-    [InlineData(null, 0)]
-    [InlineData("", 0)]
-    [InlineData("", 32)]
-    [InlineData("1", 32)]
-    [InlineData("1", 0)]
-    public void GetParameters_NoMessages_ShouldReturnEmptyCollection(string imei, int externalId)
+    [InlineData(0)]
+    [InlineData(32)]
+    public void GetParameters_NoMessages_ShouldReturnEmptyCollection(int externalId)
     {
         var repo = GetRepo(Messages);
-        var parameters = repo.GetParameters(externalId, imei);
+        var parameters = repo.GetParameters(externalId);
 
         parameters.Should().Equal(Enumerable.Empty<TrackerParameter>());
     }
@@ -78,33 +70,45 @@ public class TrackerMessageRepositoryTests
                 {
                     new MessageTagBits
                     {
-                        TrackerTagId = 15, Value = new BitArray(5, true), TagType = TagDataTypeEnum.Bits
+                        TrackerTagId = 15,
+                        Value = new BitArray(5, true),
+                        TagType = TagDataTypeEnum.Bits
                     },
                     new MessageTagByte
                     {
-                        TrackerTagId = 10, Value = 5, TagType = TagDataTypeEnum.Byte
+                        TrackerTagId = 10,
+                        Value = 5,
+                        TagType = TagDataTypeEnum.Byte
                     },
                     new MessageTagInteger
                     {
-                        TrackerTagId = 111, Value = 40, TagType = TagDataTypeEnum.Integer
+                        TrackerTagId = 111,
+                        Value = 40,
+                        TagType = TagDataTypeEnum.Integer
                     },
                     new MessageTagDouble
                     {
-                        TrackerTagId = 121, Value = 13.32, TagType = TagDataTypeEnum.Double
+                        TrackerTagId = 121,
+                        Value = 13.32,
+                        TagType = TagDataTypeEnum.Double
                     },
                     new MessageTagString
                     {
-                        TrackerTagId = 3, Value = "123", TagType = TagDataTypeEnum.String
+                        TrackerTagId = 3,
+                        Value = "123",
+                        TagType = TagDataTypeEnum.String
                     },
                     new MessageTagDateTime
                     {
-                        TrackerTagId = 6, Value = DateTime.UnixEpoch, TagType = TagDataTypeEnum.DateTime
+                        TrackerTagId = 6,
+                        Value = DateTime.UnixEpoch,
+                        TagType = TagDataTypeEnum.DateTime
                     }
                 }
             }
         };
         var repo = GetRepo(messages);
-        var parameters = repo.GetParameters(2552, "123");
+        var parameters = repo.GetParameters(2552);
 
         parameters.Count.Should().Be(6);
         parameters.First(x => x.ParamName == "out").LastValueString.Should().Be("11111");
@@ -114,19 +118,15 @@ public class TrackerMessageRepositoryTests
         parameters.First(x => x.ParamName == "imei").LastValueString.Should().Be("123");
         parameters.First(x => x.ParamName == "tracker_date").LastValueDateTime.Should().Be(DateTime.UnixEpoch);
     }
-
     #endregion
 
     #region GetStandardParameters
-
     [Theory]
-    [InlineData("123", 2552)]
-    [InlineData("", 2552)]
-    [InlineData("123", 0)]
-    public void GetStandardParameters_ShouldReturnStandardParameters(string imei, int externalId)
+    [InlineData(2552)]
+    public void GetStandardParameters_ShouldReturnStandardParameters(int externalId)
     {
         var repo = GetRepo(Messages);
-        var parameters = repo.GetStandardParameters(externalId, imei);
+        var parameters = repo.GetStandardParameters(externalId);
         parameters.Speed.Should().Be(12.1);
         parameters.Alt.Should().Be(97.0);
         parameters.Long.Should().Be(52.556861);
@@ -135,15 +135,12 @@ public class TrackerMessageRepositoryTests
     }
 
     [Theory]
-    [InlineData(null, 0)]
-    [InlineData("", 0)]
-    [InlineData("", 32)]
-    [InlineData("1", 32)]
-    [InlineData("1", 0)]
-    public void GetStandardParameters_NoMessages_ShouldReturnModelWithNulls(string imei, int externalId)
+    [InlineData(0)]
+    [InlineData(32)]
+    public void GetStandardParameters_NoMessages_ShouldReturnModelWithNulls(int externalId)
     {
         var repo = GetRepo(Messages);
-        var parameters = repo.GetStandardParameters(externalId, imei);
+        var parameters = repo.GetStandardParameters(externalId);
         parameters.Speed.Should().BeNull();
         parameters.Alt.Should().BeNull();
         parameters.Long.Should().BeNull();
@@ -152,11 +149,8 @@ public class TrackerMessageRepositoryTests
     }
 
     [Theory]
-    [InlineData("123", 2552)]
-    [InlineData("", 2552)]
-    [InlineData("123", 0)]
-    public void GetStandardParameters_MessagesWithNullParameters_ShouldReturnModelWithNulls
-        (string imei, int externalId)
+    [InlineData(2552)]
+    public void GetStandardParameters_MessagesWithNullParameters_ShouldReturnModelWithNulls(int externalId)
     {
         var messages = new TrackerMessage[]
         {
@@ -176,28 +170,26 @@ public class TrackerMessageRepositoryTests
             }
         };
         var repo = GetRepo(messages);
-        var parameters = repo.GetStandardParameters(externalId, imei);
+        var parameters = repo.GetStandardParameters(externalId);
         parameters.Speed.Should().BeNull();
         parameters.Alt.Should().BeNull();
         parameters.Long.Should().BeNull();
         parameters.Lat.Should().BeNull();
         parameters.Time.Should().NotBeNull();
     }
-
     #endregion
 
     #region GetParametersHistory
-
     [Theory]
-    [InlineData("123", 2552)]
-    [InlineData("", 2552)]
-    [InlineData("123", 0)]
-    public void GetParametersHistory_ShouldReturnParametersHistory(string imei, int externalId)
+    [InlineData(2552)]
+    public void GetParametersHistory_ShouldReturnParametersHistory(int externalId)
     {
         var repo = GetRepo(Messages);
         var filter = new ParametersHistoryFilter
         {
-            Imei = imei, ExternalId = externalId, PageNum = 1, PageSize = 10
+            ExternalId = externalId,
+            PageNum = 1,
+            PageSize = 10
         };
         var history = repo.GetParametersHistory(filter);
 
@@ -213,7 +205,11 @@ public class TrackerMessageRepositoryTests
             {
                 new MessageTag[]
                 {
-                    new MessageTagString { TrackerTagId = 3, Value = "123" }
+                    new MessageTagString
+                    {
+                        TrackerTagId = 3,
+                        Value = "123"
+                    }
                 },
                 "imei=123,"
             },
@@ -221,7 +217,11 @@ public class TrackerMessageRepositoryTests
             {
                 new MessageTag[]
                 {
-                    new MessageTagBits { TrackerTagId = 16, Value = new BitArray(4, true) }
+                    new MessageTagBits
+                    {
+                        TrackerTagId = 16,
+                        Value = new BitArray(4, true)
+                    }
                 },
                 "in=1111,"
             },
@@ -229,7 +229,11 @@ public class TrackerMessageRepositoryTests
             {
                 new MessageTag[]
                 {
-                    new MessageTagInteger { TrackerTagId = 111, Value = 40 }
+                    new MessageTagInteger
+                    {
+                        TrackerTagId = 111,
+                        Value = 40
+                    }
                 },
                 "coolant_temperature=40,"
             },
@@ -237,7 +241,11 @@ public class TrackerMessageRepositoryTests
             {
                 new MessageTag[]
                 {
-                    new MessageTagDouble { TrackerTagId = 121, Value = 14.1 }
+                    new MessageTagDouble
+                    {
+                        TrackerTagId = 121,
+                        Value = 14.1
+                    }
                 },
                 "direction=14.1,"
             },
@@ -245,7 +253,11 @@ public class TrackerMessageRepositoryTests
             {
                 new MessageTag[]
                 {
-                    new MessageTagByte { TrackerTagId = 10, Value = 5 }
+                    new MessageTagByte
+                    {
+                        TrackerTagId = 10,
+                        Value = 5
+                    }
                 },
                 "hdop=5,"
             },
@@ -253,7 +265,11 @@ public class TrackerMessageRepositoryTests
             {
                 new MessageTag[]
                 {
-                    new MessageTagDateTime { TrackerTagId = 6, Value = DateTime.UnixEpoch }
+                    new MessageTagDateTime
+                    {
+                        TrackerTagId = 6,
+                        Value = DateTime.UnixEpoch
+                    }
                 },
                 "tracker_date=01/01/1970 00:00:00,",
             },
@@ -261,12 +277,36 @@ public class TrackerMessageRepositoryTests
             {
                 new MessageTag[]
                 {
-                    new MessageTagDateTime { TrackerTagId = 6, Value = DateTime.UnixEpoch },
-                    new MessageTagByte { TrackerTagId = 10, Value = 5 },
-                    new MessageTagDouble { TrackerTagId = 121, Value = 14.1 },
-                    new MessageTagInteger { TrackerTagId = 111, Value = 40 },
-                    new MessageTagBits { TrackerTagId = 16, Value = new BitArray(4, true) },
-                    new MessageTagString { TrackerTagId = 3, Value = "123" }
+                    new MessageTagDateTime
+                    {
+                        TrackerTagId = 6,
+                        Value = DateTime.UnixEpoch
+                    },
+                    new MessageTagByte
+                    {
+                        TrackerTagId = 10,
+                        Value = 5
+                    },
+                    new MessageTagDouble
+                    {
+                        TrackerTagId = 121,
+                        Value = 14.1
+                    },
+                    new MessageTagInteger
+                    {
+                        TrackerTagId = 111,
+                        Value = 40
+                    },
+                    new MessageTagBits
+                    {
+                        TrackerTagId = 16,
+                        Value = new BitArray(4, true)
+                    },
+                    new MessageTagString
+                    {
+                        TrackerTagId = 3,
+                        Value = "123"
+                    }
                 },
                 "tracker_date=01/01/1970 00:00:00,hdop=5,direction=14.1,coolant_temperature=40,in=1111,imei=123,"
             }
@@ -277,54 +317,54 @@ public class TrackerMessageRepositoryTests
     {
         var messages = new TrackerMessage[]
         {
-            new() { Id = 0, ExternalTrackerId = 2552, Imei = "123", Tags = tags }
+            new()
+            {
+                Id = 0,
+                ExternalTrackerId = 2552,
+                Imei = "123",
+                Tags = tags
+            }
         };
         var repo = GetRepo(messages);
         var filter = new ParametersHistoryFilter
         {
-            Imei = "123", ExternalId = 2552, PageNum = 1, PageSize = 10
+            ExternalId = 2552,
+            PageNum = 1,
+            PageSize = 10
         };
         var history = repo.GetParametersHistory(filter);
 
         history.Results.First().Parameters.Should().Be(aggregated);
     }
-
     #endregion
 
     #region GetLastMessageFor
-
     [Theory]
-    [InlineData(null, 0)]
-    [InlineData("", 0)]
-    [InlineData("", 32)]
-    [InlineData("1", 32)]
-    [InlineData("1", 0)]
-    public void GetLastMessageFor_EmptyOrNonexistentParams_ShouldReturnNull(string imei, int externalId)
+    [InlineData(0)]
+    [InlineData(32)]
+    public void GetLastMessageFor_EmptyOrNonexistentParams_ShouldReturnNull(int externalId)
     {
         var repo = GetRepo(Messages);
-        var msg = new TrackerMessage { Imei = imei, ExternalTrackerId = externalId };
-        var last = repo.GetLastMessageFor(msg);
-
-        last.Should().BeNull();
-    }
-
-    [Theory]
-    [InlineData("123", 2552)]
-    [InlineData("", 2552)]
-    [InlineData("123", 0)]
-    public void GetLastMessageFor_ExistentParams_ShouldReturnLastMessage(string imei, int externalId)
-    {
-        var repo = GetRepo(Messages);
-        var msg = new TrackerMessage { Imei = imei, ExternalTrackerId = externalId };
-        var last = repo.GetLastMessageFor(msg);
+        var last = repo.GetLastMessagesFor(new[] { externalId });
 
         last.Should().NotBeNull();
-        last!.Imei.Should().Be("123");
-        last.ExternalTrackerId.Should().Be(2552);
-        last.Speed.Should().Be(12.1);
-        last.PackageUID.Should().Be(Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"));
+        last.Count.Should().Be(0);
     }
 
+    [Theory]
+    [InlineData(2552)]
+    public void GetLastMessageFor_ExistentParams_ShouldReturnLastMessage(int externalId)
+    {
+        var repo = GetRepo(Messages);
+        var last = repo.GetLastMessagesFor(new[] { externalId });
+
+        last.Should().NotBeNull();
+        last.Count.Should().Be(1);
+        last[externalId]!.Imei.Should().Be("123");
+        last[externalId].ExternalTrackerId.Should().Be(2552);
+        last[externalId].Speed.Should().Be(12.1);
+        last[externalId].PackageUID.Should().Be(Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"));
+    }
     #endregion
 
     private static ITrackerMessageRepository GetRepo(ICollection<TrackerMessage> messages)

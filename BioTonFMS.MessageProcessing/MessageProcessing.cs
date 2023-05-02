@@ -53,8 +53,8 @@ public static class MessageProcessing
     /// <remarks>This static method parses sensor formulas, sorts them by their dependencies and compiles their
     /// ASTs to sorted sequences of runnable lambda expressions. Resulting sequences are paired with ids of their
     /// trackers</remarks>
-    /// <returns>One sequence of compiled sensor formulas per tracker: (tracker1, {(name1, expression1), ...}), (tracker2, {}), ...</returns>
-    public static IEnumerable<(int TrackerId, CompiledExpression<SensorExpressionProperties>[])> BuildSensors(
+    /// <returns>A sequence of compiled sensor formulas per tracker: (externalTrackerId1, {(name1, expression1), ...}), (externalTrackerId2, {}), ...</returns>
+    public static IEnumerable<(int ExternalTrackerId, CompiledExpression<SensorExpressionProperties>[])> BuildSensors(
         this IEnumerable<Tracker> trackers,
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
@@ -70,7 +70,7 @@ public static class MessageProcessing
         {
             var sensorNameById = t.Sensors.ToDictionary(s => s.Id, s => s.Name);
             return (
-                t.Id,
+                t.ExternalId,
                 t.Sensors
                     .Select(s => new SensorExpressionProperties(s, s.ValidatorId == null ? null : sensorNameById[s.ValidatorId.Value]))
                     .SortAndBuild(parameterTypesDictionary, Postprocess.AddSensorValidatorToAst, compilationOptions, exceptionHandler)
@@ -177,13 +177,15 @@ public static class MessageProcessing
     /// <param name="message">Message which contains sensor expression arguments and which will be
     ///     modified by removing old sensor tags and then adding sensor tags with new sensor values</param>
     /// <param name="previousMessage"></param>
-    /// <param name="builtSensors">Previously built sensor expressions</param>
+    /// <param name="builtSensorsByExternalTrackerId">Dictionary of previously built sensor expressions by external tracker ID</param>
     /// <param name="tagNameByIdDict">Dictionary which maps tracker tag ids to respective tag names</param>
     private static void UpdateSensorTags(this TrackerMessage message, TrackerMessage? previousMessage,
-        IDictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensors, IDictionary<int, string> tagNameByIdDict)
+        IDictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensorsByExternalTrackerId,
+        IDictionary<int, string> tagNameByIdDict)
     {
         // Get sequence of built sensors for tracker 
-        var builtTrackerSensors = builtSensors[message.ExternalTrackerId];
+        if (!builtSensorsByExternalTrackerId.TryGetValue(message.ExternalTrackerId, out var builtTrackerSensors))
+            return;
 
         // Calculate sensor values and put the values to message tags
         var newTags = builtTrackerSensors
@@ -204,16 +206,18 @@ public static class MessageProcessing
     /// </summary>
     /// <param name="messages">Sequence of messages for which sensor values will be calculated. They will be
     /// modified by removing old sensor tags and then adding tags with new sensor values</param>
-    /// <param name="previousMessage">Сообщение предшествующее последовательности обрабатываемых сообщений</param>
+    /// <param name="previousMessages">Сообщения предшествующие последовательности обрабатываемых сообщений
+    /// для каждого из трекеров</param>
     /// <param name="trackers">Trackers for messages. Should contain all trackers which are
     /// referenced by the messages</param>
     /// <param name="trackerTags">Tracker tags used to determine names, types and values of sensor parameters</param>
     /// <param name="exceptionHandler">Object which handles exception thrown during parsing, compiling or execution.</param>
-    public static void UpdateSensorTags(this IEnumerable<TrackerMessage> messages, TrackerMessage? previousMessage, IEnumerable<Tracker> trackers,
+    public static void UpdateSensorTags(this IEnumerable<TrackerMessage> messages, IDictionary<int, TrackerMessage> previousMessages,
+        IEnumerable<Tracker> trackers,
         ICollection<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
         // Построить по набору выражений датчиков для каждого из трекеров
-        Dictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensorsByTrackerId = trackers
+        Dictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensorsByExternalTrackerId = trackers
             .BuildSensors(trackerTags, exceptionHandler)
             .ToDictionary(t => t.Item1 /* Tracker id */, t => t.Item2);
 
@@ -226,8 +230,9 @@ public static class MessageProcessing
         // Update sensor tags for all messages in sequence
         foreach (var message in messages)
         {
-            message.UpdateSensorTags(previousMessage, builtSensorsByTrackerId, tagNameById);
-            previousMessage = message;
+            previousMessages.TryGetValue(message.ExternalTrackerId, out var previousMessage);
+            message.UpdateSensorTags(previousMessage, builtSensorsByExternalTrackerId, tagNameById);
+            previousMessages[message.ExternalTrackerId] = message;
         }
     }
 }
