@@ -6,7 +6,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import localeRu from '@angular/common/locales/ru';
 import { provideRouter } from '@angular/router';
 import { MatSnackBarConfig, MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
-import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldDefaultOptions, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 import { ErrorHandler as ErrorHandlerClass } from './app/error.handler';
@@ -35,7 +35,7 @@ const formFieldOptions: MatFormFieldDefaultOptions = {
 
 const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(BrowserAnimationsModule, HttpClientModule, MatSnackBarModule),
+    importProvidersFrom(BrowserAnimationsModule, HttpClientModule, MatSnackBarModule, MatDialogModule),
     {
       provide: ErrorHandler,
       useClass: ErrorHandlerClass
