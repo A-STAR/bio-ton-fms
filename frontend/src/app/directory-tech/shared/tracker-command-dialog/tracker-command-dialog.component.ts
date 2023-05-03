@@ -34,7 +34,8 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
 
   protected commandResponse$ = new BehaviorSubject<{
     message: TrackerCommandResponse['commandResponse'] | null | undefined,
-    progress?: boolean
+    error?: true,
+    progress?: true
   }>({
     message: null
   });
@@ -80,12 +81,21 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
           });
         },
         error: error => {
-          // hide message paragraph
-          this.commandResponse$.next({
-            message: null
-          });
+          const isAuthError = [401, 403].includes(error.status);
 
-          this.errorHandler.handleError(error);
+          if (isAuthError) {
+            // hide message paragraph
+            this.commandResponse$.next({
+              message: null
+            });
+
+            this.errorHandler.handleError(error);
+          } else {
+            this.commandResponse$.next({
+              message: error.error.messages.join(' '),
+              error: true
+            });
+          }
         }
       });
   }
