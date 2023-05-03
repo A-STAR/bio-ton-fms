@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
 using System.Globalization;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Threading;
 
 namespace BioTonFMS.TrackerEmulator;
 
@@ -29,11 +31,10 @@ public class EmulatorWorker : BackgroundService
         _logger.LogInformation("Параметры корректны");
 
         using var client = new TcpClient();
-        client.ReceiveTimeout = _options.TimeoutSeconds * 1000;
 
         try
         {
-            client.Connect(_options.Host, _options.Port);
+            await client.ConnectAsync(_options.Host, _options.Port);
             _logger.LogInformation("Установлено соединение по адресу {Host}:{Port}",
                 _options.Host, _options.Port);
         }
@@ -54,7 +55,6 @@ public class EmulatorWorker : BackgroundService
                 var paths = line.Split(' ');
                 await SendRequest(paths[0], paths[1], stream, stoppingToken);
             }
-
             return;
         }
 
@@ -64,9 +64,8 @@ public class EmulatorWorker : BackgroundService
         {
             await SendRequest(_parameters.MessagePath, _parameters.ResultPath, stream, stoppingToken);
             if (stoppingToken.IsCancellationRequested) break;
-            Thread.Sleep(_options.DelaySeconds * 1000);
+            await Task.Delay(_options.DelaySeconds * 1000, stoppingToken);
         }
-
         return;
     }
 
@@ -88,11 +87,19 @@ public class EmulatorWorker : BackgroundService
         }
 
         string responseData;
-
         try
         {
             var respBuf = new byte[10];
-            int readCount = await stream.ReadAsync(respBuf, 0, 10, stoppingToken);
+
+            var readCount = 0;
+            var readTask = Task.Run(async () => { readCount = await stream.ReadAsync(respBuf, 0, 10, stoppingToken); });
+            var timeoutTask = Task.Delay(_options.TimeoutSeconds * 1000);
+            var success = await Task.WhenAny(readTask, timeoutTask) == readTask;
+            if (!success)
+            {
+                throw new Exception("Read timeout");
+            }
+
             responseData = string.Join(' ', respBuf.Take(readCount)
                 .Select(x => x.ToString("X")));
 
