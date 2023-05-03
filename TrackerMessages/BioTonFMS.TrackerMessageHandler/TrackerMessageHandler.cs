@@ -10,7 +10,6 @@ using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
-using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 
 namespace BioTonFMS.TrackerMessageHandler;
 
@@ -46,26 +45,32 @@ public class TrackerMessageHandler : IBusMessageHandler
         TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
             .ToArray();
 
-        var trackers = new HashSet<Tracker>();
+        Tracker? tracker = null;
         foreach (var trackerMessage in messages)
         {
-            var tracker = _trackerRepository.FindTracker(trackerMessage.Imei, trackerMessage.ExternalTrackerId);
+            tracker = _trackerRepository.FindTracker(trackerMessage.Imei, trackerMessage.ExternalTrackerId);
             if (tracker is null) continue;
-            trackers.Add(tracker);
-            
+
             tracker.SetTrackerAddress(rawMessage.IpAddress, rawMessage.Port);
             _trackerRepository.Update(tracker);
-            
+
             trackerMessage.ExternalTrackerId = tracker.ExternalId;
         }
 
-        try
+        if (tracker is not null)
         {
-            CalculateSensorTags(trackers, messages);
+            try
+            {
+                CalculateSensorTags(tracker, messages);
+            }
+            catch( Exception ex )
+            {
+                _logger.LogError(ex, "Ошибка при вычислении тегов датчиков");
+            }
         }
-        catch( Exception ex )
+        else
         {
-            _logger.LogError(ex, "Ошибка при вычислении тегов датчиков");
+            _logger.LogWarning("Пропущен расчет датчиков из-за того, что не удалось найти трекер");
         }
 
         foreach (var trackerMessage in messages)
@@ -77,16 +82,14 @@ public class TrackerMessageHandler : IBusMessageHandler
 
         return Task.CompletedTask;
     }
-    
-    private void CalculateSensorTags(ISet<Tracker> trackers, TrackerMessage[] messages)
-    {
-        if (trackers.Count == 0 || messages.Length == 0) return;
 
-        var externalTrackerIds = trackers.Where(t => t.ExternalId != 0).Select(t => t.ExternalId).ToArray();
-        IDictionary<int, TrackerMessage> previousMessages = _messageRepository.GetLastMessagesFor(externalTrackerIds);
-        
+    private void CalculateSensorTags(Tracker tracker, TrackerMessage[] messages)
+    {
+        TrackerMessage? previousMessage = _messageRepository.GetLastMessageFor(tracker.ExternalId);
+
         TrackerTag[] trackerTags = _trackerTagRepository.GetTags().ToArray();
 
-        messages.UpdateSensorTags(previousMessages, trackers, trackerTags, new LoggingExceptionHandler(_logger));
+        messages.UpdateSensorTags(new Dictionary<int, TrackerMessage>() { { previousMessage.ExternalTrackerId, previousMessage } },
+            new[] { tracker }, trackerTags, new LoggingExceptionHandler(_logger));
     }
 }

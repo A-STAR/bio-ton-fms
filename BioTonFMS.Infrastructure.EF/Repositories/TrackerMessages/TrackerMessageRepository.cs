@@ -133,18 +133,18 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return result;
     }
 
-    public IDictionary<int, TrackerMessage> GetLastMessagesFor(ICollection<int> externalTrackerIds)
+    public TrackerMessage? GetLastMessageFor(int externalTrackerId)
     {
-        var lastIds = QueryableProvider.Linq().Where(m => externalTrackerIds.Contains(m.ExternalTrackerId))
-            .GroupBy(m => m.ExternalTrackerId).Select(g => g.Max(m => m.Id));
-        var lastMessage = HydratedQuery
+        if (externalTrackerId == 0)
+            return null;
+
+        return HydratedQuery
             .AsNoTracking()
-            .Where(m => lastIds.Contains(m.Id))
-            .ToDictionary(m => m.ExternalTrackerId);
-
-        return lastMessage;
+            .Where(m => m.ExternalTrackerId == externalTrackerId)
+            .OrderByDescending(m => m.Id)
+            .FirstOrDefault();
     }
-
+    
     public PagedResult<ParametersHistoryRecord> GetParametersHistory(ParametersHistoryFilter filter)
     {
         Dictionary<int, string> tagNames = _tagsRepository.GetTags()
