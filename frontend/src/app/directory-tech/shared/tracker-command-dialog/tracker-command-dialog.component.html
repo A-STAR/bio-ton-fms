@@ -18,7 +18,7 @@
     </div>
 
     <ng-container *ngIf="(commandResponse$ | async)?.message !== null">
-      <p [hidden]="commandResponse$.value.message === undefined">
+      <p [class.error]="commandResponse$.value.error" [hidden]="commandResponse$.value.message === undefined">
         <ng-container *ngIf="commandResponse$.value.message as message">
           <span>{{ message }}</span>
         </ng-container>

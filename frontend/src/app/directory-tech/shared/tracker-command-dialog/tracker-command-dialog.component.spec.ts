@@ -1,5 +1,5 @@
 import { ErrorHandler } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -177,7 +177,7 @@ describe('TrackerCommandDialogComponent', () => {
       .not.toHaveBeenCalled();
   });
 
-  it('should submit command form', fakeAsync(async () => {
+  it('should submit command form', async () => {
     const messageInput = await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#command-form',
@@ -213,13 +213,14 @@ describe('TrackerCommandDialogComponent', () => {
     const sendTrackerCommandSpy = spyOn(trackerService, 'sendTrackerCommand')
       .and.callFake(() => of(testTrackerCommandResponse));
 
-    // test for the git tracker command request response
+    // test for the tracker command request response
     await sendButton.click();
 
     expect(trackerService.sendTrackerCommand)
       .toHaveBeenCalledWith(TEST_TRACKER_ID, testTrackerCommand);
 
-    /* Coverage for continuing showing message hidden paragraph without text */
+    /* Coverage for continuing showing message paragraph */
+
     await sendButton.click();
 
     let responseParagraphDe = fixture.debugElement.query(
@@ -247,21 +248,21 @@ describe('TrackerCommandDialogComponent', () => {
 
     await messageInput.setValue(commandText);
 
-    sendTrackerCommandSpy.calls.reset();
+    const url = `${environment.api}/api/api/telematica/tracker-command/${TEST_TRACKER_ID}`;
 
-    const testErrorResponse = new HttpErrorResponse({
+    let testErrorResponse = new HttpErrorResponse({
       error: {
         messages: ['IP адрес трекера устарел или не был установлен']
       },
       status: 409,
       statusText: 'Conflict',
-      url: `${environment.api}/api/api/telematica/tracker-command/${TEST_TRACKER_ID}`
+      url
     });
 
     const errorHandler = TestBed.inject(ErrorHandler);
 
     spyOn(console, 'error');
-    spyOn(errorHandler, 'handleError');
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
 
     sendTrackerCommandSpy.and.callFake(() => throwError(() => testErrorResponse));
 
@@ -273,7 +274,45 @@ describe('TrackerCommandDialogComponent', () => {
     );
 
     expect(responseParagraphDe)
+      .withContext('render message paragraph element')
+      .not.toBeNull();
+
+    expect(
+      responseParagraphDe.nativeElement.getAttribute('class')
+    )
+      .withContext('render message paragraph error class')
+      .toContain('error');
+
+    expect(responseParagraphDe.nativeElement.textContent)
+      .withContext('render message paragraph text')
+      .toBe(testErrorResponse.error.messages[0]);
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
+
+    handleErrorSpy.calls.reset();
+
+    /* Coverage for authorization error response */
+
+    testErrorResponse = new HttpErrorResponse({
+      status: 401,
+      statusText: 'Unauthorized',
+      url
+    });
+
+    sendTrackerCommandSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    await sendButton.click();
+
+    responseParagraphDe = fixture.debugElement.query(
+      By.css('p')
+    );
+
+    expect(responseParagraphDe)
       .withContext('render no message paragraph element')
       .toBeNull();
-  }));
+
+    expect(handleErrorSpy)
+      .toHaveBeenCalledWith(testErrorResponse);
+  });
 });
