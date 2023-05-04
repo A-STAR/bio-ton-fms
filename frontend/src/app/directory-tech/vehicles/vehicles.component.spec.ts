@@ -24,7 +24,7 @@ import { Vehicles, VehicleService } from '../vehicle.service';
 import VehiclesComponent, { vehicleColumns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
-import { environment } from '../../../../src/environments/environment';
+import { environment } from '../../../environments/environment';
 import { testVehicles } from '../vehicle.service.spec';
 import { testDataSource as testVehiclesDataSource } from '../shared/table/table.data-source.spec';
 
