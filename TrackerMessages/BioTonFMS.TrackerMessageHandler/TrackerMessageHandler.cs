@@ -45,20 +45,24 @@ public class TrackerMessageHandler : IBusMessageHandler
         TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
             .ToArray();
 
+        
         Tracker? tracker = null;
-        foreach (var trackerMessage in messages)
+        if (messages.Length > 0)
         {
-            tracker = _trackerRepository.FindTracker(trackerMessage.Imei, trackerMessage.ExternalTrackerId);
-            if (tracker is null) continue;
-
-            tracker.SetTrackerAddress(rawMessage.IpAddress, rawMessage.Port);
-            _trackerRepository.Update(tracker);
-
-            trackerMessage.ExternalTrackerId = tracker.ExternalId;
+            var firstMessge = messages[0];
+            tracker = _trackerRepository.FindTracker(firstMessge.Imei, firstMessge.ExternalTrackerId);
         }
-
+        
         if (tracker is not null)
         {
+            foreach (var trackerMessage in messages)
+            {
+                tracker.SetTrackerAddress(rawMessage.IpAddress, rawMessage.Port);
+                _trackerRepository.Update(tracker);
+
+                trackerMessage.ExternalTrackerId = tracker.ExternalId;
+            }
+
             try
             {
                 CalculateSensorTags(tracker, messages);
@@ -89,7 +93,10 @@ public class TrackerMessageHandler : IBusMessageHandler
 
         TrackerTag[] trackerTags = _trackerTagRepository.GetTags().ToArray();
 
-        messages.UpdateSensorTags(new Dictionary<int, TrackerMessage>() { { previousMessage.ExternalTrackerId, previousMessage } },
-            new[] { tracker }, trackerTags, new LoggingExceptionHandler(_logger));
+        if (previousMessage is not null)
+        {
+            messages.UpdateSensorTags(new Dictionary<int, TrackerMessage>() { { previousMessage.ExternalTrackerId, previousMessage } },
+                new[] { tracker }, trackerTags, new LoggingExceptionHandler(_logger));
+        }
     }
 }
