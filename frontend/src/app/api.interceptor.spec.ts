@@ -4,7 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { APIInterceptor } from './api.interceptor';
 
-import { environment } from 'src/environments/environment';
+import { environment } from '../environments/environment';
 
 describe('APIInterceptor', () => {
   beforeEach(() => TestBed.configureTestingModule({
