@@ -345,10 +345,9 @@ public class TrackerMessageRepositoryTests
     public void GetLastMessageFor_EmptyOrNonexistentParams_ShouldReturnNull(int externalId)
     {
         var repo = GetRepo(Messages);
-        var last = repo.GetLastMessagesFor(new[] { externalId });
+        var last = repo.GetLastMessageFor(externalId);
 
-        last.Should().NotBeNull();
-        last.Count.Should().Be(0);
+        last.Should().BeNull();
     }
 
     [Theory]
@@ -356,14 +355,13 @@ public class TrackerMessageRepositoryTests
     public void GetLastMessageFor_ExistentParams_ShouldReturnLastMessage(int externalId)
     {
         var repo = GetRepo(Messages);
-        var last = repo.GetLastMessagesFor(new[] { externalId });
+        var last = repo.GetLastMessageFor(externalId);
 
         last.Should().NotBeNull();
-        last.Count.Should().Be(1);
-        last[externalId]!.Imei.Should().Be("123");
-        last[externalId].ExternalTrackerId.Should().Be(2552);
-        last[externalId].Speed.Should().Be(12.1);
-        last[externalId].PackageUID.Should().Be(Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"));
+        last!.Imei.Should().Be("123");
+        last.ExternalTrackerId.Should().Be(2552);
+        last.Speed.Should().Be(12.1);
+        last.PackageUID.Should().Be(Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"));
     }
     #endregion
 
