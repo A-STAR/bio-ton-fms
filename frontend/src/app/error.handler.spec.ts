@@ -101,7 +101,7 @@ describe('ErrorHandler', () => {
       error: {
         errors: {
           manufacturingYear: ['Год производства должен быть не более текущего', 'Год производства введён некорректно'],
-          trakerId: ['Трекер с ID 10 не найден']
+          trackerId: ['Трекер с ID 10 не найден']
         },
         message: 'Произошла ошибка валидации запроса'
       },
@@ -114,14 +114,14 @@ describe('ErrorHandler', () => {
 
     const [
       [manufacturingYearMaxErrorMessage, manufacturingYearPatternErrorMessage],
-      [trakerIDErrorMessage]
+      [trackerIDErrorMessage]
     ] = Object.values(testErrorResponse.error.errors as {
       [key: string]: string[]
     });
 
     expect(snackBarSpy.open)
       .toHaveBeenCalledWith(
-        `${manufacturingYearMaxErrorMessage} ${manufacturingYearPatternErrorMessage} ${trakerIDErrorMessage}`,
+        `${manufacturingYearMaxErrorMessage} ${manufacturingYearPatternErrorMessage} ${trackerIDErrorMessage}`,
         ERROR_ACTION,
         snackBarConfig
       );
