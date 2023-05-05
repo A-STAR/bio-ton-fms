@@ -10,6 +10,7 @@ namespace BioTonFMS.Telematica.Mapping
     {
         public SensorMappingProfile()
         {
+            CreateMap<Sensor, Sensor>();
             CreateMap<SensorsRequest, SensorsFilter>();
             CreateMap<CreateSensorDto, Sensor>()
                 .ForMember(dst => dst.IsVisible, opt => opt.MapFrom(s => s.Visibility));
