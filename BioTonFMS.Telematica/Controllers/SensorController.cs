@@ -182,42 +182,43 @@ public class SensorController : ValidationControllerBase
             return ReturnValidationErrors(validationResult);
         }
 
-        var oldSensor = _sensorRepository[id];
-        if (oldSensor is null)
+        var sensor = _sensorRepository[id];
+        if (sensor is null)
         {
             return NotFound(new ServiceErrorResult($"Датчик с id = {id} не найден"));
         }
+
+        var oldSensor  = new Sensor();
+        _mapper.Map(sensor, oldSensor);
         var oldTracker = _trackerRepository[oldSensor.TrackerId];
         if (oldTracker is null)
         {
             _logger.LogError($"Внутренняя ошибка. Датчик с id = {id} ссылается на несуществующий трекер");
             throw new Exception("Внутренняя ошибка.");
         }
-
-        var updatedSensor = new Sensor();
-        _mapper.Map(updateSensorDto, updatedSensor);
-
-        ApplySensorTypeConstraints(updatedSensor);
-
-        var tracker = _trackerRepository[updatedSensor.TrackerId];
+        
+        _mapper.Map(updateSensorDto, sensor);
+        ApplySensorTypeConstraints(sensor);
+        
+        var tracker = _trackerRepository[sensor.TrackerId];
         if (tracker is null)
         {
-            return BadRequest($"Трекер с идентификатором {updatedSensor.TrackerId} не существует.");
+            return BadRequest($"Трекер с идентификатором {sensor.TrackerId} не существует.");
         }
         tracker.Sensors.RemoveAll(s => s.Id == id);
-        tracker.Sensors.Add(updatedSensor);
-
+        tracker.Sensors.Add(sensor);
+        
         var trackerTags = _trackerTagRepository.GetTags();
-
-        var validationResults = tracker.ValidateSensor(trackerTags, updatedSensor, oldSensor, oldTracker, _logger, _sensorValidator);
-
+        
+        var validationResults = tracker.ValidateSensor(trackerTags, sensor, oldSensor, oldTracker, _logger, _sensorValidator);
+        
         var hasValidationErrors = ProcessValidationResults(validationResults);
         if (hasValidationErrors)
             return ReturnValidationErrors();
 
         try
         {
-            _sensorRepository.Update(updatedSensor);
+            _sensorRepository.Update(sensor);
         }
         catch( ArgumentException ex )
         {
@@ -269,15 +270,15 @@ public class SensorController : ValidationControllerBase
         }
     }
 
-    private void ApplySensorTypeConstraints(Sensor newSensor)
+    private void ApplySensorTypeConstraints(Sensor sensor)
     {
-        var sensorType = _sensorTypeRepository[newSensor.SensorTypeId];
+        var sensorType = _sensorTypeRepository[sensor.SensorTypeId];
         if (sensorType is null)
             return;
         if (sensorType.UnitId.HasValue)
-            newSensor.UnitId = sensorType.UnitId.Value;
+            sensor.UnitId = sensorType.UnitId.Value;
         if (sensorType.DataType.HasValue)
-            newSensor.DataType = sensorType.DataType.Value;
+            sensor.DataType = sensorType.DataType.Value;
     }
     
     private bool ProcessValidationResults(IEnumerable<SensorProblemDescription> validationResults)
