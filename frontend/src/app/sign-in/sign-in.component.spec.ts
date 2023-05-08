@@ -242,7 +242,7 @@ describe('SignInComponent', () => {
     expect(authService.signIn)
       .toHaveBeenCalledWith(testMalformedCredentials);
 
-    let loginRequest = httpTestingController.expectOne({
+    const loginRequest = httpTestingController.expectOne({
       method: 'POST',
       url: '/api/auth/login'
     }, 'error login request');

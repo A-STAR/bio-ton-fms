@@ -80,11 +80,11 @@ describe('DirectoryTechComponent', () => {
       By.directive(RouterLink)
     );
 
-    let navigationLinkAttributes = navigationLinkDes.map(
+    const navigationLinkAttributes = navigationLinkDes.map(
       linkDe => linkDe.nativeElement.getAttribute('ng-reflect-router-link')
     );
 
-    let testNavigation = navigation.map(({ link }) => link);
+    const testNavigation = navigation.map(({ link }) => link);
 
     expect(navigationLinkAttributes)
       .withContext('render navigation link attributes')

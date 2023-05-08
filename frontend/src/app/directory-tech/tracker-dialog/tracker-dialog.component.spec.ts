@@ -333,7 +333,7 @@ describe('TrackerDialogComponent', () => {
     const testDate = new Date();
     const testLocaleTime = testDate.toLocaleTimeString(localeID);
 
-    let testStart = `${testDate.toLocaleDateString(localeID)} ${testLocaleTime.slice(0, -3)}`;
+    const testStart = `${testDate.toLocaleDateString(localeID)} ${testLocaleTime.slice(0, -3)}`;
 
     await startInput.setValue(testStart);
 

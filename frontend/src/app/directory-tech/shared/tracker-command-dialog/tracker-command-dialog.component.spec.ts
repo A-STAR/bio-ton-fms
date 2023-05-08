@@ -59,7 +59,7 @@ describe('TrackerCommandDialogComponent', () => {
   });
 
   it('should render dialog title', async () => {
-    let titleDe = fixture.debugElement.query(
+    const titleDe = fixture.debugElement.query(
       By.directive(MatDialogTitle)
     );
 

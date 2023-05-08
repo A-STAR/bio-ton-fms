@@ -161,7 +161,7 @@ describe('VehiclesComponent', () => {
 
     const [sort] = sorts;
 
-    let sortHeaders = await sort.getSortHeaders({
+    const sortHeaders = await sort.getSortHeaders({
       sortDirection: ''
     });
 
