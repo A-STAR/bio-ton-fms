@@ -7,7 +7,7 @@ import { DEFAULT_ERROR_MESSAGE, ErrorHandler as ErrorHandlerClass, ERROR_ACTION,
 
 describe('ErrorHandler', () => {
   let handler: ErrorHandler;
-  let snackBarSpy = jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']);
+  const snackBarSpy = jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
