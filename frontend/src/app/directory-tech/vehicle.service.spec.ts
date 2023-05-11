@@ -18,7 +18,6 @@ import {
 import { SortDirection } from './shared/sort';
 
 import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
-import { testDataSource } from './shared/table/table.data-source.spec';
 
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
