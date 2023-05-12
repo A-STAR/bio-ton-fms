@@ -165,13 +165,7 @@
           }
         ],
         "spaced-comment": [
-          "error",
-          "always",
-          {
-            "exceptions": [
-              "*"
-            ]
-          }
+          "error"
         ]
       }
     },
