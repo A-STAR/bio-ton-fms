@@ -24,7 +24,7 @@ export default class DirectoryTechComponent {
 type NavigationItem = {
   title: string;
   link: string;
-}
+};
 
 export const navigation: NavigationItem[] = [
   {

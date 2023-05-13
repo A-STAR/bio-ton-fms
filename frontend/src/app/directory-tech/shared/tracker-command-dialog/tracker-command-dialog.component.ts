@@ -133,7 +133,7 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
 type CommandForm = FormGroup<{
   message: FormControl<TrackerCommand['commandText'] | undefined>;
   transport: FormControl<TrackerCommand['transport']>;
-}>
+}>;
 
 export const trackerCommandDialogConfig: MatDialogConfig<Tracker['id']> = {
   width: '730px'

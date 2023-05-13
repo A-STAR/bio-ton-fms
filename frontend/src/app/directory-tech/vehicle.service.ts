@@ -131,17 +131,17 @@ export enum VehicleSubtype {
   Tractor = 'tractor'
 }
 
-export type VehiclesOptions = PaginationOptions & SortOptions<VehiclesSortBy>
+export type VehiclesOptions = PaginationOptions & SortOptions<VehiclesSortBy>;
 
 export type VehicleGroup = {
   id: number;
   name: string;
-}
+};
 
 export type Fuel = {
   id: number;
   name: string;
-}
+};
 
 export type Vehicle = {
   id: number;
@@ -167,7 +167,7 @@ export type Vehicle = {
     value: string
   };
   description?: string;
-}
+};
 
 export interface NewVehicle extends Partial<Pick<Vehicle, 'id'>>, Pick<
   Vehicle,

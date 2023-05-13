@@ -203,7 +203,7 @@ type VehicleForm = FormGroup<{
   additional: FormGroup<{
     description: FormControl<NewVehicle['description'] | undefined>;
   }>;
-}>
+}>;
 
 const maxManufacturingYear = new Date()
   .getFullYear();
