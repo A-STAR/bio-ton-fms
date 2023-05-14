@@ -88,7 +88,7 @@ export class AuthService {
 export type Credentials = {
   username: string;
   password: string;
-}
+};
 
 export type CredentialsResponse = {
   accessToken: string;

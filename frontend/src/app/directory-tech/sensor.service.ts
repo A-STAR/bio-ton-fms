@@ -116,7 +116,7 @@ export enum ValidationTypeEnum {
 
 export type SensorsOptions = PaginationOptions & Partial<{
   trackerId: number;
-}>
+}>;
 
 export type SensorTypeNested = {
   id: number;
@@ -125,14 +125,14 @@ export type SensorTypeNested = {
   sensorGroupId: number;
   dataType: SensorDataTypeEnum;
   unitId?: number;
-}
+};
 
 export type SensorGroup = {
   id: number;
   name: string;
   sensorTypes?: SensorTypeNested[];
   description?: string;
-}
+};
 
 export type SensorType = {
   id: number;
@@ -141,13 +141,13 @@ export type SensorType = {
   sensorGroup: KeyValue<SensorGroup['id'], SensorGroup['name']>;
   dataType: SensorDataTypeEnum;
   unit: KeyValue<Unit['id'], Unit['name']>;
-}
+};
 
 export type Unit = {
   id: number;
   name: string;
   abbreviated?: string;
-}
+};
 
 export type Sensor = {
   id: number;
@@ -191,7 +191,7 @@ export type Sensor = {
   drainLookup?: boolean;
   drainCalculation?: boolean;
   drainRawCalculation?: boolean;
-}
+};
 
 export interface Sensors extends Pagination {
   sensors: Sensor[];

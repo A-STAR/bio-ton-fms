@@ -94,6 +94,9 @@
             ]
           }
         ],
+        "@typescript-eslint/semi": [
+          "error"
+        ],
         "eol-last": [
           "error"
         ],
@@ -151,10 +154,6 @@
           {
             "allowTemplateLiterals": true
           }
-        ],
-        "semi": [
-          "error",
-          "always"
         ],
         "space-before-blocks": "error",
         "space-before-function-paren": [

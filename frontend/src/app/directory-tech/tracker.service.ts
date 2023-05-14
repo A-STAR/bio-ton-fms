@@ -169,7 +169,7 @@ export enum TrackerParameterName {
   Speed = 'speed'
 }
 
-export type TrackersOptions = PaginationOptions & SortOptions<TrackersSortBy>
+export type TrackersOptions = PaginationOptions & SortOptions<TrackersSortBy>;
 
 export type Tracker = {
   id: number;
@@ -181,7 +181,7 @@ export type Tracker = {
   startDate: string,
   description?: string,
   vehicle?: KeyValue<Vehicle['id'], Vehicle['name']>;
-}
+};
 
 export interface NewTracker extends Partial<Pick<Tracker, 'id' | 'startDate'>>,
   Pick<Tracker, 'externalId' | 'name' | 'simNumber' | 'imei' | 'description'> {
@@ -195,29 +195,29 @@ export interface Trackers extends Pagination {
 export type TrackerCommand = {
   commandText: string;
   transport: TrackerCommandTransport;
-}
+};
 
 export type TrackerCommandResponse = {
   commandResponse?: string;
-}
+};
 
 export type TrackerStandardParameter = {
   name: string;
   paramName: TrackerParameterName;
   lastValueDateTime?: string;
   lastValueDecimal?: number;
-}
+};
 
 export type TrackerParameter = {
   paramName: TrackerParameterName.Time | string;
   lastValueDateTime?: string;
   lastValueDecimal?: number;
   lastValueString?: string;
-}
+};
 
 export type TrackerParametersHistoryOptions = PaginationOptions & Partial<{
   trackerId: number;
-}>
+}>;
 
 export type TrackerParameterHistory = {
   time: string;
@@ -226,7 +226,7 @@ export type TrackerParameterHistory = {
   longitude?: number;
   altitude?: number;
   parameters: string;
-}
+};
 
 export interface TrackerParametersHistory extends Pagination {
   parameters: TrackerParameterHistory[];

@@ -9,4 +9,4 @@ export enum SortDirection {
 export type SortOptions<SortBy> = Partial<{
   sortBy: SortBy;
   sortDirection: SortDirection;
-}>
+}>;

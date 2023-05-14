@@ -426,7 +426,7 @@ type SensorForm = FormGroup<{
       rawCalculation: FormControl<NewSensor['drainRawCalculation'] | undefined>;
     }>
   }>;
-}>
+}>;
 
 const FUEL_PATTERN = /^\d+(?:\.\d{1,2})?$/;
 
