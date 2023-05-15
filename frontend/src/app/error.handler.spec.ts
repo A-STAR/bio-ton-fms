@@ -116,7 +116,7 @@ describe('ErrorHandler', () => {
       [manufacturingYearMaxErrorMessage, manufacturingYearPatternErrorMessage],
       [trackerIDErrorMessage]
     ] = Object.values(testErrorResponse.error.errors as {
-      [key: string]: string[]
+      [key: string]: string[];
     });
 
     expect(snackBarSpy.open)

@@ -148,23 +148,23 @@ export type Vehicle = {
   name: string;
   type: KeyValue<VehicleType, string>;
   vehicleGroup?: {
-    id: VehicleGroup['id'],
-    value: VehicleGroup['name']
+    id: VehicleGroup['id'];
+    value: VehicleGroup['name'];
   };
   make: string;
   model: string;
   subType: KeyValue<VehicleSubtype, string>;
   fuelType: {
-    id: Fuel['id'],
-    value: Fuel['name']
+    id: Fuel['id'];
+    value: Fuel['name'];
   };
   manufacturingYear?: number;
   registrationNumber?: string;
   inventoryNumber?: string;
   serialNumber?: string;
   tracker?: {
-    id: number,
-    value: string
+    id: number;
+    value: string;
   };
   description?: string;
 };

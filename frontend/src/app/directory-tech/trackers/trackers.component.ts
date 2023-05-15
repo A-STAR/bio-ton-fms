@@ -292,10 +292,10 @@ export enum TrackerColumn {
 }
 
 export interface TrackerDataSource extends Pick<Tracker, 'id' | 'name' | 'imei' | 'description' | 'vehicle'> {
-  external: Tracker['externalId'],
-  type: Tracker['trackerType'],
-  sim: Tracker['simNumber'],
-  start: Tracker['startDate']
+  external: Tracker['externalId'];
+  type: Tracker['trackerType'];
+  sim: Tracker['simNumber'];
+  start: Tracker['startDate'];
 }
 
 export const trackerColumns: KeyValue<TrackerColumn, string | undefined>[] = [

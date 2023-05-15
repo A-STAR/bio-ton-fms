@@ -33,9 +33,9 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   protected commandForm!: CommandForm;
 
   protected commandResponse$ = new BehaviorSubject<{
-    message: TrackerCommandResponse['commandResponse'] | null | undefined,
-    error?: true,
-    progress?: true
+    message: TrackerCommandResponse['commandResponse'] | null | undefined;
+    error?: true;
+    progress?: true;
   }>({
     message: null
   });
