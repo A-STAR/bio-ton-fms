@@ -35,6 +35,18 @@
             "style": "kebab-case"
           }
         ],
+        "@typescript-eslint/member-delimiter-style": [
+          "error",
+          {
+            "multiline": {
+              "delimiter": "semi"
+            },
+            "singleline": {
+              "delimiter": "semi",
+              "requireLast": true
+            }
+          }
+        ],
         "@typescript-eslint/member-ordering": [
           "error",
           {
