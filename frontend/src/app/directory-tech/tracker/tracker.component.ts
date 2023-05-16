@@ -386,8 +386,8 @@ interface ParameterDataSource {
 }
 
 export interface SensorDataSource extends Pick<Sensor, 'id' | 'name' | 'unit' | 'visibility'> {
-  type: Sensor['sensorType'],
-  parameter: Sensor['formula']
+  type: Sensor['sensorType'];
+  parameter: Sensor['formula'];
 }
 
 export const trackerParameterColumns: KeyValue<TrackerParameterColumn, string>[] = [

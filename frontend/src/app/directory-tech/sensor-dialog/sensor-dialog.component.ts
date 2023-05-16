@@ -385,7 +385,7 @@ export class SensorDialogComponent implements OnInit {
 }
 
 export type SensorDialogData = {
-  trackerID?: Tracker['id']
+  trackerID?: Tracker['id'];
   sensor?: Sensor | Omit<Sensor, 'id'>;
   sensors: Sensor[];
 };
@@ -408,7 +408,7 @@ type SensorForm = FormGroup<{
       fixErrors: FormControl<NewSensor['fixErrors'] | undefined>;
       fuelUseCalculation: FormControl<NewSensor['fuelUseCalculation'] | undefined>;
       fuelUseTimeCalculation: FormControl<NewSensor['fuelUseTimeCalculation'] | undefined>;
-    }>,
+    }>;
     refueling: FormGroup<{
       min: FormControl<NewSensor['minRefueling'] | undefined>;
       timeout: FormControl<NewSensor['refuelingTimeout'] | undefined>;
@@ -416,7 +416,7 @@ type SensorForm = FormGroup<{
       lookup: FormControl<NewSensor['refuelingLookup'] | undefined>;
       calculation: FormControl<NewSensor['refuelingCalculation'] | undefined>;
       rawCalculation: FormControl<NewSensor['refuelingRawCalculation'] | undefined>;
-    }>,
+    }>;
     drain: FormGroup<{
       min: FormControl<NewSensor['minDrain'] | undefined>;
       timeout: FormControl<NewSensor['drainTimeout'] | undefined>;
@@ -424,7 +424,7 @@ type SensorForm = FormGroup<{
       lookup: FormControl<NewSensor['drainLookup'] | undefined>;
       calculation: FormControl<NewSensor['drainCalculation'] | undefined>;
       rawCalculation: FormControl<NewSensor['drainRawCalculation'] | undefined>;
-    }>
+    }>;
   }>;
 }>;
 

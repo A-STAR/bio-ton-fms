@@ -39,7 +39,7 @@ export class ErrorHandler implements ErrorHandlerClass {
    * @returns Combined error message.
    */
   #getErrorsMessage(errors: {
-    [key: string]: string[]
+    [key: string]: string[];
   }) {
     return Object
       .values(errors)

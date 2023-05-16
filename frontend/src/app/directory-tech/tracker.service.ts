@@ -177,9 +177,9 @@ export type Tracker = {
   name: string;
   simNumber: string;
   imei: string;
-  trackerType: KeyValue<TrackerTypeEnum, string>,
-  startDate: string,
-  description?: string,
+  trackerType: KeyValue<TrackerTypeEnum, string>;
+  startDate: string;
+  description?: string;
   vehicle?: KeyValue<Vehicle['id'], Vehicle['name']>;
 };
 

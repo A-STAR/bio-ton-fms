@@ -106,7 +106,7 @@ interface ParameterHistoryDataSource extends Pick<TrackerParameterHistory, 'time
   coordinates: {
     latitude: TrackerParameterHistory['latitude'];
     longitude: TrackerParameterHistory['longitude'];
-  }
+  };
 }
 
 export const trackerParameterHistoryColumns: KeyValue<ParameterHistoryColumn, string>[] = [
