@@ -109,10 +109,9 @@ describe('TableActionsTriggerDirective', () => {
     MatIconModule,
     TableActionsTriggerDirective
   ],
-  template: `
-    <button mat-icon-button bioTableActionsTrigger>
-      <mat-icon>more_horiz</mat-icon>
-    </button>
-  `
+  template: `<button mat-icon-button bioTableActionsTrigger>
+  <mat-icon>more_horiz</mat-icon>
+</button>
+`
 })
 class TestActionButtonComponent { }
