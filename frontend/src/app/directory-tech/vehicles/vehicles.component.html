@@ -1,7 +1,6 @@
 <button mat-stroked-button color="accent" (click)="onCreateVehicle()">Добавить технику</button>
 
-<mat-table matSort [dataSource]="vehiclesDataSource" *ngIf="vehiclesData$ | async"
-  (matSortChange)="onSortChange($event)">
+<mat-table matSort [dataSource]="vehiclesDataSource" *ngIf="vehiclesData$ | async" (matSortChange)="onSortChange($event)">
   <ng-container [matColumnDef]="column.key" *ngFor="let column of columns">
     <ng-container [ngSwitch]="column.key">
       <ng-container *ngSwitchCase="VehicleColumn.Action">

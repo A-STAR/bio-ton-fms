@@ -43,13 +43,9 @@
 
           <mat-hint><em>31.12.2023 23:59</em></mat-hint>
 
-          <mat-error *ngIf="trackerForm.controls.basic.controls.start.errors?.['required']">
-            Обязательное поле
-          </mat-error>
+          <mat-error *ngIf="trackerForm.controls.basic.controls.start.errors?.['required']">Обязательное поле</mat-error>
 
-          <mat-error *ngIf="trackerForm.controls.basic.controls.start.errors?.['pattern']">
-            Поле введено некорректно
-          </mat-error>
+          <mat-error *ngIf="trackerForm.controls.basic.controls.start.errors?.['pattern']">Поле введено некорректно</mat-error>
         </mat-form-field>
       </div>
     </fieldset>
@@ -61,12 +57,10 @@
         <label for="external">Внешний ID</label>
 
         <mat-form-field>
-          <input matInput bioNumberOnlyInput id="external" type="number" placeholder="Внешний ID" min="1"
-            max="99999999999" formControlName="external">
+          <input matInput bioNumberOnlyInput id="external" type="number" placeholder="Внешний ID" min="1" max="99999999999"
+            formControlName="external">
 
-          <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['required']">
-            Обязательное поле
-          </mat-error>
+          <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['required']">Обязательное поле</mat-error>
 
           <mat-error *ngIf="trackerForm.controls.registration.controls.external.errors?.['min'] as error">
             Поле должно быть не менее {{ error.min }}
@@ -87,13 +81,9 @@
 
           <mat-hint><em>+78462777727</em></mat-hint>
 
-          <mat-error *ngIf="trackerForm.controls.registration.controls.sim.errors?.['required']">
-            Обязательное поле
-          </mat-error>
+          <mat-error *ngIf="trackerForm.controls.registration.controls.sim.errors?.['required']">Обязательное поле</mat-error>
 
-          <mat-error *ngIf="trackerForm.controls.registration.controls.sim.errors?.['pattern']">
-            Поле введёно некорректно
-          </mat-error>
+          <mat-error *ngIf="trackerForm.controls.registration.controls.sim.errors?.['pattern']">Поле введёно некорректно</mat-error>
         </mat-form-field>
       </div>
 
@@ -106,13 +96,9 @@
 
           <mat-hint><em>527111404753054</em></mat-hint>
 
-          <mat-error *ngIf="trackerForm.controls.registration.controls.imei.errors?.['required']">
-            Обязательное поле
-          </mat-error>
+          <mat-error *ngIf="trackerForm.controls.registration.controls.imei.errors?.['required']">Обязательное поле</mat-error>
 
-          <mat-error *ngIf="trackerForm.controls.registration.controls.imei.errors?.['pattern']">
-            Поле введено некорректно
-          </mat-error>
+          <mat-error *ngIf="trackerForm.controls.registration.controls.imei.errors?.['pattern']">Поле введено некорректно</mat-error>
         </mat-form-field>
       </div>
     </fieldset>

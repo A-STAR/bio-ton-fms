@@ -1,6 +1,4 @@
-<h1 mat-dialog-title>{{
-  this.data ? 'Сводная информация о техническом средстве' : 'Добавление технического средства'
-  }}</h1>
+<h1 mat-dialog-title>{{ this.data ? 'Сводная информация о техническом средстве' : 'Добавление технического средства' }}</h1>
 
 <mat-dialog-content>
   <form id="vehicle-form" [formGroup]="vehicleForm" (ngSubmit)="submitVehicleForm()">
@@ -41,9 +39,7 @@
         <mat-form-field>
           <input matInput id="model" placeholder="Модель" formControlName="model">
 
-          <mat-error *ngIf="vehicleForm.controls.basic.controls.model.errors?.['required']">
-            Обязательное поле
-          </mat-error>
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.model.errors?.['required']">Обязательное поле</mat-error>
 
           <mat-error *ngIf="vehicleForm.controls.basic.controls.model.errors?.['maxlength'] as error">
             Поле должно быть не более {{ error.requiredLength }} символов
@@ -55,16 +51,14 @@
         <label for="year">Год производства</label>
 
         <mat-form-field>
-          <input matInput bioNumberOnlyInput id="year" type="number" placeholder="Год производства"
-            formControlName="year" [max]="maxManufacturingYear">
+          <input matInput bioNumberOnlyInput id="year" type="number" placeholder="Год производства" formControlName="year"
+            [max]="maxManufacturingYear">
 
           <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['max'] as error">
             Поле должно быть не более {{ error.max }}
           </mat-error>
 
-          <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['pattern']">
-            Поле введёно некорректно
-          </mat-error>
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.year.errors?.['pattern']">Поле введёно некорректно</mat-error>
         </mat-form-field>
       </div>
 
@@ -102,9 +96,7 @@
             <mat-select placeholder="Подтип машины" formControlName="subtype">
               <mat-option>Подтип машины</mat-option>
 
-              <mat-option [value]="subtype.key" *ngFor="let subtype of vehicleData.subtype">
-                {{ subtype.value }}
-              </mat-option>
+              <mat-option [value]="subtype.key" *ngFor="let subtype of vehicleData.subtype">{{ subtype.value }}</mat-option>
             </mat-select>
 
             <mat-error>Обязательное поле</mat-error>
@@ -142,10 +134,8 @@
             Поле должно быть не более {{ error.requiredLength }} символов
           </mat-error>
 
-          <mat-error
-            *ngIf="!vehicleForm.controls.registration.controls.registration.errors?.['maxlength'] && vehicleForm.controls.registration.controls.registration.errors?.['pattern']">
-            Поле введено некорректно
-          </mat-error>
+          <mat-error *ngIf="!vehicleForm.controls.registration.controls.registration.errors?.['maxlength']
+            && vehicleForm.controls.registration.controls.registration.errors?.['pattern']">Поле введено некорректно</mat-error>
         </mat-form-field>
       </div>
 
@@ -177,8 +167,7 @@
         <label for="tracker">GPS-трекер</label>
 
         <mat-form-field>
-          <input matInput bioNumberOnlyInput id="tracker" type="number" placeholder="GPS-трекер"
-            formControlName="tracker">
+          <input matInput bioNumberOnlyInput id="tracker" type="number" placeholder="GPS-трекер" formControlName="tracker">
         </mat-form-field>
       </div>
     </fieldset>
