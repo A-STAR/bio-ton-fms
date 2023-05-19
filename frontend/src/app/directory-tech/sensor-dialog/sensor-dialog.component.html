@@ -11,9 +11,7 @@
             <mat-form-field class="full-width">
               <input matInput id="name" placeholder="Наименование датчика" formControlName="name">
 
-              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">
-                Обязательное поле
-              </mat-error>
+              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">Обязательное поле</mat-error>
 
               <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['maxlength'] as error">
                 Поле должно быть не более {{ error.requiredLength }} символов
@@ -31,7 +29,7 @@
                   <mat-option>Тип датчика</mat-option>
 
                   <mat-optgroup *ngFor="let group of sensorData$.groups" [label]="group.name">
-                    <mat-option *ngFor="let type of group.sensorTypes" [value]="type.id">{{type.name}}</mat-option>
+                    <mat-option *ngFor="let type of group.sensorTypes" [value]="type.id">{{ type.name }}</mat-option>
                   </mat-optgroup>
                 </mat-select>
 
@@ -86,9 +84,7 @@
                 (selectionChange)="onControlSelectionChange($event, 'basic.validationType')">
                 <mat-option>Валидатор</mat-option>
 
-                <mat-option [value]="validator.id" *ngFor="let validator of this.data.sensors">
-                  {{ validator.name }}
-                </mat-option>
+                <mat-option [value]="validator.id" *ngFor="let validator of this.data.sensors">{{ validator.name }}</mat-option>
               </mat-select>
 
               <mat-error>Обязательное поле</mat-error>
@@ -103,9 +99,7 @@
                 <mat-select placeholder="Тип валидации" formControlName="validationType">
                   <mat-option>Тип валидации</mat-option>
 
-                  <mat-option [value]="validation.key" *ngFor="let validation of sensorData$.validation">
-                    {{ validation.value }}
-                  </mat-option>
+                  <mat-option [value]="validation.key" *ngFor="let validation of sensorData$.validation">{{ validation.value }}</mat-option>
                 </mat-select>
 
                 <mat-error>Обязательное поле</mat-error>
@@ -125,12 +119,10 @@
             <label for="fuel-use">Расход, л/ч</label>
 
             <mat-form-field>
-              <input matInput bioNumberOnlyInput id="fuel-use" type="number" placeholder="Расход, л/ч" step="0.01"
-                min="0" formControlName="fuelUse">
+              <input matInput bioNumberOnlyInput id="fuel-use" type="number" placeholder="Расход, л/ч" step="0.01" min="0"
+                formControlName="fuelUse">
 
-              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['required']">
-                Обязательное поле
-              </mat-error>
+              <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['required']">Обязательное поле</mat-error>
 
               <mat-error *ngIf="sensorForm.controls.basic.controls.fuelUse.errors?.['min'] as error">
                 Поле должно быть не менее {{ error.min }}
@@ -140,10 +132,8 @@
                 Поле должно быть не более {{ error.max }}
               </mat-error>
 
-              <mat-error
-                *ngIf="!sensorForm.controls.basic.controls.fuelUse.errors?.['max'] && sensorForm.controls.basic.controls.fuelUse.errors?.['pattern']">
-                Должно быть не более 2 цифр после запятой
-              </mat-error>
+              <mat-error *ngIf="!sensorForm.controls.basic.controls.fuelUse.errors?.['max']
+                && sensorForm.controls.basic.controls.fuelUse.errors?.['pattern']">Должно быть не более 2 цифр после запятой</mat-error>
             </mat-form-field>
           </div>
 
@@ -170,25 +160,21 @@
                   <label for="startTimeout">Таймаут начала движения, с</label>
 
                   <mat-form-field>
-                    <input matInput bioNumberOnlyInput id="start-timeout" type="number"
-                      placeholder="Таймаут начала движения, с" formControlName="startTimeout" min="0">
+                    <input matInput bioNumberOnlyInput id="start-timeout" type="number" placeholder="Таймаут начала движения, с"
+                      formControlName="startTimeout" min="0">
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.general.controls.startTimeout.errors?.['min'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.general.controls.startTimeout.errors?.['min'] as error">
                       Поле должно быть не менее {{ error.min }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.general.controls.startTimeout.errors?.['max'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.general.controls.startTimeout.errors?.['max'] as error">
                       Поле должно быть не более {{ error.max }}
                     </mat-error>
                   </mat-form-field>
                 </div>
 
                 <div>
-                  <mat-slide-toggle formControlName="fuelUseCalculation">
-                    Расчёт расхода топлива по датчику
-                  </mat-slide-toggle>
+                  <mat-slide-toggle formControlName="fuelUseCalculation">Расчёт расхода топлива по датчику</mat-slide-toggle>
                 </div>
 
                 <div>
@@ -196,9 +182,7 @@
                 </div>
 
                 <div>
-                  <mat-slide-toggle formControlName="fuelUseTimeCalculation">
-                    Расчёт расхода топлива по времени
-                  </mat-slide-toggle>
+                  <mat-slide-toggle formControlName="fuelUseTimeCalculation">Расчёт расхода топлива по времени</mat-slide-toggle>
                 </div>
               </fieldset>
             </mat-expansion-panel>
@@ -213,21 +197,19 @@
                   <label for="min-refueling">Минимальный объём заправки, л</label>
 
                   <mat-form-field>
-                    <input matInput bioNumberOnlyInput id="min-refueling" type="number"
-                      placeholder="Минимальный объём заправки, л" formControlName="min" step="0.01" min="0">
+                    <input matInput bioNumberOnlyInput id="min-refueling" type="number" placeholder="Минимальный объём заправки, л"
+                      formControlName="min" step="0.01" min="0">
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.refueling.controls.min.errors?.['min'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.refueling.controls.min.errors?.['min'] as error">
                       Поле должно быть не менее {{ error.min }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.refueling.controls.min.errors?.['max'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.refueling.controls.min.errors?.['max'] as error">
                       Поле должно быть не более {{ error.max }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="!sensorForm.controls.basic.controls.refueling.controls.min.errors?.['max'] && sensorForm.controls.basic.controls.refueling.controls.min.errors?.['pattern']">
+                    <mat-error *ngIf="!sensorForm.controls.basic.controls.refueling.controls.min.errors?.['max']
+                      && sensorForm.controls.basic.controls.refueling.controls.min.errors?.['pattern']">
                       Должно быть не более 2 цифр после запятой
                     </mat-error>
                   </mat-form-field>
@@ -237,15 +219,14 @@
                   <label for="refueling-timeout">Таймаут разделения заправок, с</label>
 
                   <mat-form-field>
-                    <input matInput bioNumberOnlyInput id="refueling-timeout" type="number" placeholder="Таймаут разделения заправок, с" formControlName="timeout" min="0">
+                    <input matInput bioNumberOnlyInput id="refueling-timeout" type="number" placeholder="Таймаут разделения заправок, с"
+                      formControlName="timeout" min="0">
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.refueling.controls.timeout.errors?.['min'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.refueling.controls.timeout.errors?.['min'] as error">
                       Поле должно быть не менее {{ error.min }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.refueling.controls.timeout.errors?.['max'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.refueling.controls.timeout.errors?.['max'] as error">
                       Поле должно быть не более {{ error.max }}
                     </mat-error>
                   </mat-form-field>
@@ -255,15 +236,14 @@
                   <label for="full-refueling-timeout">Таймаут полного объема заправки, с</label>
 
                   <mat-form-field>
-                    <input matInput bioNumberOnlyInput id="full-refueling-timeout" type="number" placeholder="Таймаут полного объема заправки, с" formControlName="fullTimeout" min="0">
+                    <input matInput bioNumberOnlyInput id="full-refueling-timeout" type="number"
+                      placeholder="Таймаут полного объема заправки, с" formControlName="fullTimeout" min="0">
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.refueling.controls.fullTimeout.errors?.['min'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.refueling.controls.fullTimeout.errors?.['min'] as error">
                       Поле должно быть не менее {{ error.min }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.refueling.controls.fullTimeout.errors?.['max'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.refueling.controls.fullTimeout.errors?.['max'] as error">
                       Поле должно быть не более {{ error.max }}
                     </mat-error>
                   </mat-form-field>
@@ -293,8 +273,8 @@
                   <label for="min-drain">Минимальный объем слива, л</label>
 
                   <mat-form-field>
-                    <input matInput bioNumberOnlyInput id="min-drain" type="number"
-                      placeholder="Минимальный объем слива, л" formControlName="min" step="0.01" min="0">
+                    <input matInput bioNumberOnlyInput id="min-drain" type="number" placeholder="Минимальный объем слива, л"
+                      formControlName="min" step="0.01" min="0">
 
                     <mat-error *ngIf="sensorForm.controls.basic.controls.drain.controls.min.errors?.['min'] as error">
                       Поле должно быть не менее {{ error.min }}
@@ -304,8 +284,8 @@
                       Поле должно быть не более {{ error.max }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="!sensorForm.controls.basic.controls.drain.controls.min.errors?.['max'] && sensorForm.controls.basic.controls.drain.controls.min.errors?.['pattern']">
+                    <mat-error *ngIf="!sensorForm.controls.basic.controls.drain.controls.min.errors?.['max']
+                      && sensorForm.controls.basic.controls.drain.controls.min.errors?.['pattern']">
                       Должно быть не более 2 цифр после запятой
                     </mat-error>
                   </mat-form-field>
@@ -315,16 +295,14 @@
                   <label for="drain-stop-timeout">Таймаут слива при остановки, с</label>
 
                   <mat-form-field>
-                    <input matInput bioNumberOnlyInput id="drain-stop-timeout" type="number"
-                      placeholder="Таймаут слива при остановки, с" formControlName="stopTimeout" min="0">
+                    <input matInput bioNumberOnlyInput id="drain-stop-timeout" type="number" placeholder="Таймаут слива при остановки, с"
+                      formControlName="stopTimeout" min="0">
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.drain.controls.stopTimeout.errors?.['min'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.drain.controls.stopTimeout.errors?.['min'] as error">
                       Поле должно быть не менее {{ error.min }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.drain.controls.stopTimeout.errors?.['max'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.drain.controls.stopTimeout.errors?.['max'] as error">
                       Поле должно быть не более {{ error.max }}
                     </mat-error>
                   </mat-form-field>
@@ -334,16 +312,14 @@
                   <label for="drain-timeout">Таймаут разделения сливов, с</label>
 
                   <mat-form-field>
-                    <input matInput bioNumberOnlyInput id="drain-timeout" type="number"
-                      placeholder="Таймаут разделения сливов, с" formControlName="timeout" min="0">
+                    <input matInput bioNumberOnlyInput id="drain-timeout" type="number" placeholder="Таймаут разделения сливов, с"
+                      formControlName="timeout" min="0">
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.drain.controls.timeout.errors?.['min'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.drain.controls.timeout.errors?.['min'] as error">
                       Поле должно быть не менее {{ error.min }}
                     </mat-error>
 
-                    <mat-error
-                      *ngIf="sensorForm.controls.basic.controls.drain.controls.timeout.errors?.['max'] as error">
+                    <mat-error *ngIf="sensorForm.controls.basic.controls.drain.controls.timeout.errors?.['max'] as error">
                       Поле должно быть не более {{ error.max }}
                     </mat-error>
                   </mat-form-field>

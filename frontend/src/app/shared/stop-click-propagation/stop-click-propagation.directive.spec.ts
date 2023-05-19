@@ -45,9 +45,8 @@ describe('StopClickPropagationDirective', () => {
 @Component({
   standalone: true,
   imports: [StopClickPropagationDirective],
-  template: `
-    <button bioStopClickPropagation></button>
-  `,
+  template: `<button bioStopClickPropagation></button>
+`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 class TestButtonComponent { }

@@ -4,8 +4,8 @@
 
     <div class="logo">
       <a title="Bio-Ton Field Management System" routerLink="/">
-        <img src="assets/images/bio-ton-field-management-system-logo-green.svg" alt="Bio-Ton Field Management System"
-          width="149" height="44">
+        <img src="assets/images/bio-ton-field-management-system-logo-green.svg" alt="Bio-Ton Field Management System" width="149"
+          height="44">
       </a>
 
       <ng-container *ngIf="systemVersion$ | async as version">
@@ -37,20 +37,17 @@
       <label for="password">Пароль</label>
 
       <mat-form-field>
-        <input matInput id="password" placeholder="Пароль" formControlName="password"
-          [type]="hidePassword ? 'password' : 'text'">
+        <input matInput id="password" placeholder="Пароль" formControlName="password" [type]="hidePassword ? 'password' : 'text'">
 
-        <button mat-icon-button matIconSuffix type="button" aria-label="Скрыть пароль" color="accent"
-          [attr.aria-pressed]="hidePassword" (click)="togglePasswordVisibility($event)">
+        <button mat-icon-button matIconSuffix type="button" aria-label="Скрыть пароль" color="accent" [attr.aria-pressed]="hidePassword"
+          (click)="togglePasswordVisibility($event)">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
 
         <mat-error>Обязательное поле</mat-error>
       </mat-form-field>
 
-      <mat-error *ngIf="(signInForm.statusChanges | async) && signInForm.errors?.['serverError'] as error">
-        {{ error.message }}
-      </mat-error>
+      <mat-error *ngIf="(signInForm.statusChanges | async) && signInForm.errors?.['serverError'] as error">{{ error.message }}</mat-error>
     </form>
   </mat-card-content>
 

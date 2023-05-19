@@ -70,9 +70,8 @@ describe('NumberOnlyInputDirective', () => {
 @Component({
   standalone: true,
   imports: [NumberOnlyInputDirective],
-  template: `
-    <input type="number" bioNumberOnlyInput>
-  `,
+  template: `<input type="number" bioNumberOnlyInput>
+`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 class TestNumberInputComponent { }

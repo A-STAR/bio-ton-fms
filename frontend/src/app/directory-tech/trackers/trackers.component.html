@@ -37,18 +37,15 @@
         </button>
 
         <div class="actions" bioStopClickPropagation>
-          <button mat-icon-button bioStopClickPropagation title="Редактировать" color="accent"
-            (click)="onUpdateTracker(element)">
+          <button mat-icon-button bioStopClickPropagation title="Редактировать" color="accent" (click)="onUpdateTracker(element)">
             <mat-icon class="md-18">edit</mat-icon>
           </button>
 
-          <button mat-icon-button bioStopClickPropagation title="Отправить команду" color="accent"
-            (click)="onSendTrackerCommand(element)">
+          <button mat-icon-button bioStopClickPropagation title="Отправить команду" color="accent" (click)="onSendTrackerCommand(element)">
             <mat-icon class="md-18">sms</mat-icon>
           </button>
 
-          <button mat-icon-button bioStopClickPropagation title="Удалить" color="warn"
-            (click)="onDeleteTracker(element)">
+          <button mat-icon-button bioStopClickPropagation title="Удалить" color="warn" (click)="onDeleteTracker(element)">
             <mat-icon class="md-18">delete</mat-icon>
           </button>
         </div>
@@ -57,15 +54,12 @@
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="TrackerColumn.Type"></ng-container>
 
       <ng-container *ngSwitchCase="TrackerColumn.Sim">
-        <ng-container *ngIf="element[column.key]">{{
-          element[column.key].slice(0, 2) + '&nbsp;(' + element[column.key].slice(2, 5) + ')&nbsp;'
-          + element[column.key].slice(4)
-          }}</ng-container>
+        <ng-container *ngIf="element[column.key]">
+          {{ element[column.key].slice(0, 2) + '&nbsp;(' + element[column.key].slice(2, 5) + ')&nbsp;' + element[column.key].slice(4) }}
+        </ng-container>
       </ng-container>
 
-      <ng-container *ngSwitchCase="TrackerColumn.Start">
-        {{ element[column.key] | date }}
-      </ng-container>
+      <ng-container *ngSwitchCase="TrackerColumn.Start">{{ element[column.key] | date }}</ng-container>
 
       <ng-container [ngTemplateOutlet]="value" *ngSwitchCase="TrackerColumn.Vehicle"></ng-container>
 
