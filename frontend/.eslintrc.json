@@ -6,6 +6,30 @@
   "overrides": [
     {
       "files": [
+        "*.ts",
+        "*.html"
+      ],
+      "rules": {
+        "eol-last": "error",
+        "max-len": [
+          "error",
+          {
+            "code": 140
+          }
+        ],
+        "no-multiple-empty-lines": [
+          "error",
+          {
+            "max": 1,
+            "maxBOF": 0,
+            "maxEOF": 1
+          }
+        ],
+        "no-trailing-spaces": "error"
+      }
+    },
+    {
+      "files": [
         "*.ts"
       ],
       "parserOptions": {
@@ -109,9 +133,6 @@
         "@typescript-eslint/semi": [
           "error"
         ],
-        "eol-last": [
-          "error"
-        ],
         "func-call-spacing": [
           "error",
           "never"
@@ -133,21 +154,6 @@
             "exceptAfterSingleLine": true
           }
         ],
-        "max-len": [
-          "warn",
-          {
-            "code": 140
-          }
-        ],
-        "no-multiple-empty-lines": [
-          "error",
-          {
-            "max": 1,
-            "maxBOF": 0,
-            "maxEOF": 0
-          }
-        ],
-        "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
         "padded-blocks": [
           "error",
@@ -186,8 +192,7 @@
       ],
       "extends": [
         "plugin:@angular-eslint/template/recommended"
-      ],
-      "rules": {}
+      ]
     }
   ]
 }
