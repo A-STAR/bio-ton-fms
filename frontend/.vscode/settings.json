@@ -1,5 +1,12 @@
 {
   "cSpell.language": "en-US,ru-RU",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.unicodeHighlight.allowedLocales": {
+    "ru": true
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
   "gitlens.remotes": [
     {
       "domain": "git.bioton-fms.ru",
@@ -18,5 +25,7 @@
         "fileRange": "#L${start}-L${end}"
       }
     }
-  ]
+  ],
+  "html.format.maxPreserveNewLines": 1,
+  "html.format.wrapLineLength": 140
 }
