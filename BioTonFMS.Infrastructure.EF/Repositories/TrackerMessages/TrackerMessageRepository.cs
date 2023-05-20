@@ -87,7 +87,9 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             return new List<TrackerParameter>();
         }
 
-        IList<MessageTag>? lastTags = HydratedQuery
+        IList<MessageTag>? lastTags = QueryableProvider
+            .Fetch(m => m.Tags.Where(x => x.SensorId == null))
+            .Linq()
             .AsNoTracking()
             .Where(x => x.ExternalTrackerId == externalId)
             .OrderByDescending(x => x.ServerDateTime)
@@ -150,7 +152,9 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         Dictionary<int, string> tagNames = _tagsRepository.GetTags()
             .ToDictionary(x => x.Id, x => x.Name);
 
-        var page = HydratedQuery
+        var page = QueryableProvider
+            .Fetch(m => m.Tags.Where(x => x.SensorId == null))
+            .Linq()
             .AsNoTracking()
             .Where(x => x.ExternalTrackerId == filter.ExternalId)
             .OrderByDescending(x => x.ServerDateTime)
