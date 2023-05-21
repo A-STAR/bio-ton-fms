@@ -51,6 +51,8 @@ export class AuthService {
   /**
    * Sign in user.
    *
+   * @param credentials Credentials.
+   *
    * @returns An `Observable` of signing in stream.
    */
   signIn({ username, password }: Credentials) {

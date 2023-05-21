@@ -96,8 +96,8 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
   #subscription: Subscription | undefined;
 
   /**
- * Initialize Tracker form.
- */
+   * Initialize Tracker form.
+   */
   #initTrackerForm() {
     const startValidators = [
       Validators.pattern(DATE_PATTERN)

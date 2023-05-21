@@ -153,7 +153,7 @@ describe('TrackersComponent', () => {
         );
     });
 
-    /* Supress 'Spec has no expectations.' warning. */
+    /* Suppress 'Spec has no expectations.' warning. */
 
     const rowEl = await rows[1].host();
     const routerLink = await rowEl.getAttribute('ng-reflect-router-link');
