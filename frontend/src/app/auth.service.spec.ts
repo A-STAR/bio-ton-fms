@@ -89,6 +89,12 @@ export const testCredentialsResponse: CredentialsResponse = {
 
 /* eslint-enable max-len */
 
+/**
+ * Mock sign in process.
+ *
+ * @param httpTestingController `HttpTestingController`.
+ * @param authService `AuthService`.
+ */
 export function testSignIn(httpTestingController: HttpTestingController, authService: AuthService) {
   const signIn$ = authService.signIn(testCredentials);
 

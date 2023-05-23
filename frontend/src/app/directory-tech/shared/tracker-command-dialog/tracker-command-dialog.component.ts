@@ -103,8 +103,8 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
   #subscription: Subscription | undefined;
 
   /**
- * Initialize Command form.
- */
+   * Initialize Command form.
+   */
   #initCommandForm() {
     this.commandForm = this.fb.group({
       message: this.fb.nonNullable.control<TrackerCommand['commandText'] | undefined>(undefined, Validators.required),

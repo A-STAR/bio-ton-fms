@@ -25,6 +25,15 @@ export const confirmationDialogConfig: MatDialogConfig<InnerHTML['innerHTML']> =
 
 export const confirmationDialogContentPartials: [string, string] = ['Вы действительно хотите удалить ', '?'];
 
+/**
+ * Construct confirmation dialog content.
+ *
+ * @param name Entity name for action confirmation.
+ * @param isTextContent HTML or plain text content flag.
+ * @param contentPartials Text content start, end partials.
+ *
+ * @returns Confirmation dialog content.
+ */
 export function getConfirmationDialogContent<T extends boolean | undefined = undefined>(
   name: string,
   isTextContent?: T,

@@ -240,7 +240,11 @@ export class SensorDialogComponent implements OnInit {
   }
 
   /**
-   * Map `Sensor` or `Omit<Sensor, 'id'>` to `NewSensor`.
+   * Map `Sensor | Omit<Sensor, 'id'>` to `NewSensor`.
+   *
+   * @param sensor `Sensor | Omit<Sensor, 'id'>` Sensor.
+   *
+   * @returns `NewSensor` sensor.
    */
   #deserializeSensor(sensor: Sensor | Omit<Sensor, 'id'>): NewSensor {
     const { tracker, sensorType, unit, validator, ...rest } = sensor;

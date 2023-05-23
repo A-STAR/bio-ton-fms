@@ -4,7 +4,7 @@ export enum SortDirection {
 }
 
 /**
- * Sort options accept custom `SortBy` `enum` generic.
+ * Sort options accept custom `SortBy` enum generic.
  */
 export type SortOptions<SortBy> = Partial<{
   sortBy: SortBy;

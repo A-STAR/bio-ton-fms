@@ -40,7 +40,8 @@
       },
       "extends": [
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:jsdoc/recommended-typescript-error"
       ],
       "rules": {
         "@angular-eslint/directive-selector": [
@@ -136,6 +137,51 @@
         "func-call-spacing": [
           "error",
           "never"
+        ],
+        "jsdoc/check-line-alignment": "error",
+        "jsdoc/check-param-names": [
+          "error",
+          {
+            "checkDestructured": false
+          }
+        ],
+        "jsdoc/no-bad-blocks": "error",
+        "jsdoc/require-description": "error",
+        "jsdoc/require-description-complete-sentence": [
+          "error",
+          {
+            "newlineBeforeCapsAssumesBadSentenceEnd": true
+          }
+        ],
+        "jsdoc/require-param": [
+          "error",
+          {
+            "checkDestructured": false
+          }
+        ],
+        "jsdoc/sort-tags": [
+          "error",
+          {
+            "tagSequence": [
+              {
+                "tags": [
+                  "param"
+                ]
+              },
+              {
+                "tags": [
+                  "returns"
+                ]
+              }
+            ]
+          }
+        ],
+        "jsdoc/tag-lines": [
+          "error",
+          "any",
+          {
+            "startLines": 1
+          }
         ],
         "indent": [
           "error",

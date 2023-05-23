@@ -6,6 +6,8 @@ import { Injectable } from '@angular/core';
 export class TokenService {
   /**
    * Access token.
+   *
+   * @returns Token.
    */
   get token() {
     return localStorage.getItem(TokenKey.Token);
@@ -30,7 +32,7 @@ export class TokenService {
   }
 
   /**
-   * Clear access and refresh
+   * Clear access and refresh.
    */
   clear() {
     localStorage.removeItem(TokenKey.Token);

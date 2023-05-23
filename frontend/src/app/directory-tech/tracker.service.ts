@@ -72,6 +72,7 @@ export class TrackerService {
    * Send a command to tracker.
    *
    * @param id A tracker ID.
+   * @param command A tracker command.
    *
    * @returns An `Observable` of command response.
    */
