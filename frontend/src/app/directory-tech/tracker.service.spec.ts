@@ -92,7 +92,7 @@ describe('TrackerService', () => {
     let subscription = service
       .getTrackers({
         sortBy: TrackersSortBy.Name,
-        sortDirection: SortDirection.Acending
+        sortDirection: SortDirection.Ascending
       })
       .subscribe(trackers => {
         expect(trackers)
@@ -103,7 +103,7 @@ describe('TrackerService', () => {
     const URL = '/api/telematica/trackers';
 
     let trackersRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${TrackersSortBy.Name}&sortDirection=${SortDirection.Acending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${TrackersSortBy.Name}&sortDirection=${SortDirection.Ascending}`,
       'sorted by name trackers request'
     );
 
@@ -124,7 +124,7 @@ describe('TrackerService', () => {
 
     trackersRequest = httpTestingController.expectOne(
       `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${TrackersSortBy.Start}&sortDirection=${SortDirection.Descending}`,
-      'descendingly sorted by start date trackers request'
+      'sorted in descending order by start date trackers request'
     );
 
     trackersRequest.flush(testTrackers);

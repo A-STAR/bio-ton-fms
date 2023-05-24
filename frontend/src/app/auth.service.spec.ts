@@ -34,7 +34,7 @@ describe('AuthService', () => {
 
   it('should initialize authenticated state', async () => {
     await expectAsync(firstValueFrom(service.authenticated$))
-      .withContext('initialize `autnenticated$`')
+      .withContext('initialize `authenticated$`')
       .toBeResolvedTo(false);
   });
 
@@ -49,7 +49,7 @@ describe('AuthService', () => {
     firstValueFrom(authenticate$);
 
     await expectAsync(firstValueFrom(service.authenticated$))
-      .withContext('set `autnenticated$` to `true` if there\'s token')
+      .withContext('set `authenticated$` to `true` if there\'s token')
       .toBeResolvedTo(true);
   });
 
@@ -57,7 +57,7 @@ describe('AuthService', () => {
     testSignIn(httpTestingController, service);
 
     await expectAsync(firstValueFrom(service.authenticated$))
-      .withContext('set `autnenticated$` to `true`')
+      .withContext('set `authenticated$` to `true`')
       .toBeResolvedTo(true);
   });
 
@@ -70,7 +70,7 @@ describe('AuthService', () => {
     await firstValueFrom(service.signOut$);
 
     await expectAsync(firstValueFrom(service.authenticated$))
-      .withContext('set `autnenticated$` to `false`')
+      .withContext('set `authenticated$` to `false`')
       .toBeResolvedTo(false);
   });
 });

@@ -117,7 +117,7 @@ export enum VehiclesSortBy {
 
 export enum VehicleType {
   Transport = 'transport',
-  Argo = 'argo'
+  Agro = 'agro'
 }
 
 export enum VehicleSubtype {

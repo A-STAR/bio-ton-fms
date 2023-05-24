@@ -50,19 +50,19 @@ describe('AppComponent', () => {
 
   it('should set authenticated state', async () => {
     await expectAsync(firstValueFrom(app.authenticated$))
-      .withContext('initialize `autnenticated$`')
+      .withContext('initialize `authenticated$`')
       .toBeResolvedTo(false);
 
     testSignIn(httpTestingController, authService);
 
     await expectAsync(firstValueFrom(app.authenticated$))
-      .withContext('set `autnenticated$` to `true`')
+      .withContext('set `authenticated$` to `true`')
       .toBeResolvedTo(true);
 
     await firstValueFrom(authService.signOut$);
 
     await expectAsync(firstValueFrom(app.authenticated$))
-      .withContext('set `autnenticated$` to `false`')
+      .withContext('set `authenticated$` to `false`')
       .toBeResolvedTo(false);
   });
 
