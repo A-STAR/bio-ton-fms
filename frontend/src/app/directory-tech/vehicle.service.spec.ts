@@ -85,7 +85,7 @@ describe('VehicleService', () => {
     let subscription = service
       .getVehicles({
         sortBy: VehiclesSortBy.Name,
-        sortDirection: SortDirection.Acending
+        sortDirection: SortDirection.Ascending
       })
       .subscribe(vehicles => {
         expect(vehicles)
@@ -96,7 +96,7 @@ describe('VehicleService', () => {
     const URL = '/api/telematica/vehicles';
 
     let vehiclesRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${VehiclesSortBy.Name}&sortDirection=${SortDirection.Acending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${VehiclesSortBy.Name}&sortDirection=${SortDirection.Ascending}`,
       'sorted by name vehicles request'
     );
 
@@ -117,7 +117,7 @@ describe('VehicleService', () => {
 
     vehiclesRequest = httpTestingController.expectOne(
       `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${VehiclesSortBy.Fuel}&sortDirection=${SortDirection.Descending}`,
-      'descendingly sorted by fuel vehicles request'
+      'sorted in descending order by fuel vehicles request'
     );
 
     vehiclesRequest.flush(testVehicles);
@@ -303,7 +303,7 @@ export const testVehicleTypeEnum: KeyValue<VehicleType, string>[] = [
     value: 'Для перевозок'
   },
   {
-    key: VehicleType.Argo,
+    key: VehicleType.Agro,
     value: 'Для работы на полях'
   }
 ];
@@ -335,7 +335,7 @@ export const testVehicleSubtypeEnum: KeyValue<VehicleSubtype, string>[] = [
   },
   {
     key: VehicleSubtype.Telehandler,
-    value: 'Tелескопический погрузчик'
+    value: 'Телескопический погрузчик'
   },
   {
     key: VehicleSubtype.Tractor,
@@ -371,7 +371,7 @@ const testVehicle: Vehicle = {
     value: testVehicleGroups[2].name
   },
   type: testVehicleTypeEnum[0],
-  subType:  testVehicleSubtypeEnum[2],
+  subType: testVehicleSubtypeEnum[2],
   fuelType: {
     id: testNewVehicle.fuelTypeId,
     value: testFuels[0].name

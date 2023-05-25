@@ -90,7 +90,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
 
       switch (direction) {
         case 'asc':
-          vehiclesOptions.sortDirection = SortDirection.Acending;
+          vehiclesOptions.sortDirection = SortDirection.Ascending;
 
           break;
 

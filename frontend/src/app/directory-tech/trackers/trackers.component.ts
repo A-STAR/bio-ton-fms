@@ -94,7 +94,7 @@ export default class TrackersComponent implements OnInit, OnDestroy {
 
       switch (direction) {
         case 'asc':
-          trackersOptions.sortDirection = SortDirection.Acending;
+          trackersOptions.sortDirection = SortDirection.Ascending;
 
           break;
 
