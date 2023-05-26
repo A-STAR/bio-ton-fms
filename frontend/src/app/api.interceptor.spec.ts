@@ -22,7 +22,8 @@ describe('APIInterceptor', () => {
   it('should be created', () => {
     const interceptor = TestBed.inject(APIInterceptor);
 
-    expect(interceptor).toBeTruthy();
+    expect(interceptor)
+      .toBeTruthy();
   });
 
   it('should modify HTTP request URL to API URL', (done: DoneFn) => {

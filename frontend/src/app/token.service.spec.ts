@@ -17,7 +17,8 @@ describe('TokenService', () => {
     service.clear();
   });
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(service)
+      .toBeTruthy();
   });
 
   it('should save token', () => {
