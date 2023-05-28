@@ -207,6 +207,12 @@
           }
         ],
         "no-whitespace-before-property": "error",
+        "object-property-newline": [
+          "error",
+          {
+            "allowAllPropertiesOnSameLine": true
+          }
+        ],
         "padded-blocks": [
           "error",
           "never"
