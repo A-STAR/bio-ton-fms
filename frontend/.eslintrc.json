@@ -200,6 +200,12 @@
             "exceptAfterSingleLine": true
           }
         ],
+        "newline-per-chained-call": [
+          "error",
+          {
+            "ignoreChainWithDepth": 1
+          }
+        ],
         "no-whitespace-before-property": "error",
         "padded-blocks": [
           "error",

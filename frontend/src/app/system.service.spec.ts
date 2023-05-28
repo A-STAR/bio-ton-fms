@@ -15,7 +15,8 @@ describe('SystemService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(service)
+      .toBeTruthy();
   });
 
   it('should return system version', (done: DoneFn) => {

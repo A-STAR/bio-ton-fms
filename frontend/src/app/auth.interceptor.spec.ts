@@ -51,7 +51,8 @@ describe('AuthInterceptor', () => {
   it('should be created', () => {
     const interceptor = TestBed.inject(AuthInterceptor);
 
-    expect(interceptor).toBeTruthy();
+    expect(interceptor)
+      .toBeTruthy();
   });
 
   it(`should leave HTTP request 'Authorization' header unmodified without token`, (done: DoneFn) => {
