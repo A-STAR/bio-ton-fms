@@ -83,8 +83,8 @@ describe('TrackerComponent', () => {
 
     component = fixture.componentInstance;
 
-    const trackerService = TestBed.inject(TrackerService);
     sensorService = TestBed.inject(SensorService);
+    const trackerService = TestBed.inject(TrackerService);
 
     const standardParameters$ = of(testStandardParameters);
     const parameters$ = of(testParameters);
@@ -247,6 +247,7 @@ describe('TrackerComponent', () => {
           value = formatDate(date!, dateFormat, localeID);
 
           break;
+
         case TrackerParameterName.Latitude:
         case TrackerParameterName.Longitude: {
           const formattedDecimal = formatNumber(decimal!, 'en-US', '1.6-6');

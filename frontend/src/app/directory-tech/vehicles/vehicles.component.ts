@@ -382,4 +382,5 @@ export const vehicleColumns: KeyValue<VehicleColumn, string | undefined>[] = [
 ];
 
 const REGISTRATION_NUMBER_PATTERN = /[a-zA-Zа-яА-ЯёЁ]+|[0-9]+/g;
+
 export const VEHICLE_DELETED = 'Машина удалена';
