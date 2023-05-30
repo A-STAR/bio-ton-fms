@@ -131,6 +131,41 @@
             ]
           }
         ],
+        "@typescript-eslint/padding-line-between-statements": [
+          "error",
+          {
+            "blankLine": "always",
+            "prev": "*",
+            "next": [
+              "break",
+              "continue",
+              "interface",
+              "return",
+              "type"
+            ]
+          },
+          {
+            "blankLine": "always",
+            "prev": [
+              "block",
+              "block-like",
+              "const",
+              "let"
+            ],
+            "next": "*"
+          },
+          {
+            "blankLine": "any",
+            "prev": [
+              "const",
+              "let"
+            ],
+            "next": [
+              "const",
+              "let"
+            ]
+          }
+        ],
         "@typescript-eslint/semi": [
           "error"
         ],
