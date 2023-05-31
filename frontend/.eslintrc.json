@@ -166,13 +166,8 @@
             ]
           }
         ],
-        "@typescript-eslint/semi": [
-          "error"
-        ],
-        "func-call-spacing": [
-          "error",
-          "never"
-        ],
+        "@typescript-eslint/semi": "error",
+        "func-call-spacing": "error",
         "jsdoc/check-line-alignment": "error",
         "jsdoc/check-param-names": [
           "error",
@@ -225,9 +220,7 @@
             "SwitchCase": 1
           }
         ],
-        "keyword-spacing": [
-          "error"
-        ],
+        "keyword-spacing": "error",
         "lines-between-class-members": [
           "error",
           "always",
@@ -274,9 +267,7 @@
             "named": "never"
           }
         ],
-        "spaced-comment": [
-          "error"
-        ]
+        "spaced-comment": "error"
       }
     },
     {
