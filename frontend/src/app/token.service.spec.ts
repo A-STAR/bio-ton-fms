@@ -16,6 +16,7 @@ describe('TokenService', () => {
   afterEach(() => {
     service.clear();
   });
+
   it('should be created', () => {
     expect(service)
       .toBeTruthy();
