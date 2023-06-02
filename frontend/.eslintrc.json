@@ -150,7 +150,8 @@
               "block",
               "block-like",
               "const",
-              "let"
+              "let",
+              "multiline-expression"
             ],
             "next": "*"
           },
