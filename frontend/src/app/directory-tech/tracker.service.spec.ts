@@ -490,7 +490,7 @@ export const testParameters: TrackerParameter[] = [
   },
   {
     paramName: 'blast_air_tempN',
-    lastValueDecimal: 86.62323119282430
+    lastValueDecimal: 86.72323119282430
   },
   {
     paramName: 'ds1923_humidityX',
