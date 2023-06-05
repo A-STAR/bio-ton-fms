@@ -29,7 +29,7 @@ export class ErrorHandler implements ErrorHandlerClass {
     });
 
     console.error(error);
-  };
+  }
 
   /**
    * Combine error messages.
