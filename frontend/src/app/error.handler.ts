@@ -9,6 +9,7 @@ export class ErrorHandler implements ErrorHandlerClass {
    *
    * @param error An error or `HttpErrorResponse`.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleError(error: any) {
     const isErrorResponse = error instanceof HttpErrorResponse;
 
@@ -29,7 +30,7 @@ export class ErrorHandler implements ErrorHandlerClass {
     });
 
     console.error(error);
-  };
+  }
 
   /**
    * Combine error messages.

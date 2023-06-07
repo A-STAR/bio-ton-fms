@@ -13,7 +13,6 @@ describe('ConfirmationDialogComponent', () => {
   let component: ConfirmationDialogComponent;
   let fixture: ComponentFixture<ConfirmationDialogComponent>;
   let loader: HarnessLoader;
-  let data: InnerHTML['innerHTML'];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -29,7 +28,6 @@ describe('ConfirmationDialogComponent', () => {
 
     fixture = TestBed.createComponent(ConfirmationDialogComponent);
     loader = TestbedHarnessEnvironment.loader(fixture);
-    data = TestBed.inject(MAT_DIALOG_DATA);
 
     component = fixture.componentInstance;
 
