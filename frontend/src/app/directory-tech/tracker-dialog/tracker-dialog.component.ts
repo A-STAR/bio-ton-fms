@@ -69,7 +69,7 @@ export class TrackerDialogComponent implements OnInit, OnDestroy {
 
     if (start) {
       const [day, month, year, hours, minutes] = start
-        .split(/[\.\s:]/)
+        .split(/[.\s:]/)
         .map(Number);
 
       const monthIndex = month - 1;
