@@ -344,7 +344,7 @@ describe('TrackerDialogComponent', () => {
     await imeiInput.setValue(imei);
 
     const [day, month, year, hours, minutes] = testStart
-      .split(/[\.\s:]/)
+      .split(/[.\s:]/)
       .map(Number);
 
     const monthIndex = month - 1;
@@ -460,7 +460,7 @@ describe('TrackerDialogComponent', () => {
     await saveButton.click();
 
     const [day, month, year, hours, minutes] = updatedStart
-      .split(/[\.\s:]/)
+      .split(/[.\s:]/)
       .map(Number);
 
     const monthIndex = month - 1;

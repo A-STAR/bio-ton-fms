@@ -41,7 +41,7 @@ describe('TableActionsTriggerDirective', () => {
     tick(HOVER_DELAY_MS);
 
     expect(
-      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
+      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('have deferred hover class after delay')
       .toBeFalse();
@@ -53,7 +53,7 @@ describe('TableActionsTriggerDirective', () => {
     });
 
     expect(
-      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
+      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('initially defer adding deferred hover class')
       .toBeFalse();
@@ -63,7 +63,7 @@ describe('TableActionsTriggerDirective', () => {
     tick(beforeDelayMS);
 
     expect(
-      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
+      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('defer adding deferred hover class right before delay expires')
       .toBeFalse();
@@ -71,7 +71,7 @@ describe('TableActionsTriggerDirective', () => {
     tick(HOVER_DELAY_MS);
 
     expect(
-      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
+      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('add deferred hover class after delay')
       .toBeTrue();
@@ -85,7 +85,7 @@ describe('TableActionsTriggerDirective', () => {
     tick(HOVER_DELAY_MS);
 
     expect(
-      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
+      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('have deferred hover class after delay')
       .toBeTrue();
@@ -95,7 +95,7 @@ describe('TableActionsTriggerDirective', () => {
     });
 
     expect(
-      directiveDe.classes.hasOwnProperty(DEFERRED_HOVER_CLASS_NAME)
+      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
     )
       .withContext('remove deferred hover class after leaving button')
       .toBeFalse();
