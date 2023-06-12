@@ -12,7 +12,7 @@
       "rules": {
         "eol-last": "error",
         "max-len": [
-          "error",
+          "warn",
           {
             "code": 140
           }

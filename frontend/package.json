@@ -12,7 +12,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --no-watch --code-coverage --browsers ChromeHeadless",
-    "lint": "ng lint",
+    "lint": "ng lint --max-warnings 0",
     "deploy": "npm run lint && npm run build && npm run test:coverage"
   },
   "private": true,
