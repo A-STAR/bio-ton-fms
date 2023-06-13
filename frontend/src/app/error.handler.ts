@@ -29,6 +29,7 @@ export class ErrorHandler implements ErrorHandlerClass {
       this.snackBar.open(message, ERROR_ACTION, snackBarConfig);
     });
 
+    // eslint-disable-next-line no-console
     console.error(error);
   }
 
