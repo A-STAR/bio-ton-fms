@@ -246,6 +246,7 @@
             "ignoreChainWithDepth": 1
           }
         ],
+        "no-console": "error",
         "no-irregular-whitespace": [
           "error",
           {

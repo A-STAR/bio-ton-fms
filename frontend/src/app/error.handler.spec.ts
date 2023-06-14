@@ -41,6 +41,7 @@ describe('ErrorHandler', () => {
     expect(snackBarSpy.open)
       .toHaveBeenCalledWith(DEFAULT_ERROR_MESSAGE, ERROR_ACTION, snackBarConfig);
 
+    // eslint-disable-next-line no-console
     expect(console.error)
       .toHaveBeenCalledWith(testError);
   });
@@ -57,6 +58,7 @@ describe('ErrorHandler', () => {
     expect(snackBarSpy.open)
       .toHaveBeenCalledWith(`${DEFAULT_ERROR_MESSAGE}: ${testRejectionError.rejection.message}`, ERROR_ACTION, snackBarConfig);
 
+    // eslint-disable-next-line no-console
     expect(console.error)
       .toHaveBeenCalledWith(testRejectionError.rejection);
   });
@@ -76,6 +78,7 @@ describe('ErrorHandler', () => {
     expect(snackBarSpy.open)
       .toHaveBeenCalledWith(testErrorResponse.error.message, ERROR_ACTION, snackBarConfig);
 
+    // eslint-disable-next-line no-console
     expect(console.error)
       .toHaveBeenCalledWith(testErrorResponse);
 
@@ -92,6 +95,7 @@ describe('ErrorHandler', () => {
         snackBarConfig
       );
 
+    // eslint-disable-next-line no-console
     expect(console.error)
       .toHaveBeenCalledWith(testErrorResponse);
   });
@@ -126,6 +130,7 @@ describe('ErrorHandler', () => {
         snackBarConfig
       );
 
+    // eslint-disable-next-line no-console
     expect(console.error)
       .toHaveBeenCalledWith(testErrorResponse);
   });
