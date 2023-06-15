@@ -247,6 +247,7 @@
           }
         ],
         "no-console": "error",
+        "no-debugger": "error",
         "no-irregular-whitespace": [
           "error",
           {
