@@ -296,7 +296,10 @@
       ],
       "extends": [
         "plugin:@angular-eslint/template/recommended"
-      ]
+      ],
+      "rules": {
+        "@angular-eslint/template/accessibility-alt-text": "error"
+      }
     }
   ]
 }
