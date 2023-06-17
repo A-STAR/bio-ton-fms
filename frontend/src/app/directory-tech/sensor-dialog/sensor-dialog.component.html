@@ -21,10 +21,10 @@
 
           <ng-container *ngIf="sensorData$ | async as sensorData$">
             <div>
-              <label>Тип датчика</label>
+              <label for="type">Тип датчика</label>
 
               <mat-form-field>
-                <mat-select placeholder="Тип датчика" formControlName="type"
+                <mat-select id="type" placeholder="Тип датчика" formControlName="type"
                   (selectionChange)="onControlSelectionChange($event, 'basic.fuelUse')">
                   <mat-option>Тип датчика</mat-option>
 
@@ -38,10 +38,10 @@
             </div>
 
             <div>
-              <label>Тип данных</label>
+              <label for="data-type">Тип данных</label>
 
               <mat-form-field>
-                <mat-select placeholder="Тип данных" formControlName="dataType">
+                <mat-select id="data-type" placeholder="Тип данных" formControlName="dataType">
                   <mat-option>Тип данных</mat-option>
 
                   <mat-option [value]="type.key" *ngFor="let type of sensorData$.dataType">{{ type.value }}</mat-option>
@@ -62,10 +62,10 @@
             </div>
 
             <div>
-              <label>Единица измерения</label>
+              <label for="unit">Единица измерения</label>
 
               <mat-form-field>
-                <mat-select placeholder="Единица измерения" formControlName="unit">
+                <mat-select id="unit" placeholder="Единица измерения" formControlName="unit">
                   <mat-option>Единица измерения</mat-option>
 
                   <mat-option [value]="unit.id" *ngFor="let unit of sensorData$.units">{{ unit.name }}</mat-option>
@@ -77,10 +77,10 @@
           </ng-container>
 
           <div>
-            <label>Валидатор</label>
+            <label for="validator">Валидатор</label>
 
             <mat-form-field>
-              <mat-select placeholder="Валидатор" formControlName="validator"
+              <mat-select id="validator" placeholder="Валидатор" formControlName="validator"
                 (selectionChange)="onControlSelectionChange($event, 'basic.validationType')">
                 <mat-option>Валидатор</mat-option>
 
@@ -93,10 +93,10 @@
 
           <ng-container *ngIf="sensorData$ | async as sensorData$">
             <div>
-              <label>Тип валидации</label>
+              <label for="validation-type">Тип валидации</label>
 
               <mat-form-field>
-                <mat-select placeholder="Тип валидации" formControlName="validationType">
+                <mat-select id="validation-type" placeholder="Тип валидации" formControlName="validationType">
                   <mat-option>Тип валидации</mat-option>
 
                   <mat-option [value]="validation.key" *ngFor="let validation of sensorData$.validation">{{ validation.value }}</mat-option>
