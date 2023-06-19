@@ -21,10 +21,10 @@
 
       <ng-container *ngIf="trackerType$ | async as trackerType">
         <div>
-          <label>Тип устройства</label>
+          <label for="type">Тип устройства</label>
 
           <mat-form-field>
-            <mat-select placeholder="Тип устройства" formControlName="type">
+            <mat-select id="type" placeholder="Тип устройства" formControlName="type">
               <mat-option>Тип устройства</mat-option>
 
               <mat-option [value]="type.key" *ngFor="let type of trackerType">{{ type.value }}</mat-option>

@@ -64,10 +64,10 @@
 
       <ng-container *ngIf="vehicleData$ | async as vehicleData">
         <div>
-          <label>Группа машин</label>
+          <label for="group">Группа машин</label>
 
           <mat-form-field>
-            <mat-select placeholder="Группа машин" formControlName="group">
+            <mat-select id="group" placeholder="Группа машин" formControlName="group">
               <mat-option>Группа машин</mat-option>
 
               <mat-option [value]="group.id" *ngFor="let group of vehicleData.groups">{{ group.name }}</mat-option>
@@ -76,10 +76,10 @@
         </div>
 
         <div>
-          <label>Тип машины</label>
+          <label for="type">Тип машины</label>
 
           <mat-form-field>
-            <mat-select placeholder="Тип машины" formControlName="type">
+            <mat-select id="type" placeholder="Тип машины" formControlName="type">
               <mat-option>Тип машины</mat-option>
 
               <mat-option [value]="type.key" *ngFor="let type of vehicleData.type">{{ type.value }}</mat-option>
@@ -90,10 +90,10 @@
         </div>
 
         <div>
-          <label>Подтип машины</label>
+          <label for="subtype">Подтип машины</label>
 
           <mat-form-field>
-            <mat-select placeholder="Подтип машины" formControlName="subtype">
+            <mat-select id="subtype" placeholder="Подтип машины" formControlName="subtype">
               <mat-option>Подтип машины</mat-option>
 
               <mat-option [value]="subtype.key" *ngFor="let subtype of vehicleData.subtype">{{ subtype.value }}</mat-option>
@@ -104,10 +104,10 @@
         </div>
 
         <div>
-          <label>Тип топлива</label>
+          <label for="fuel">Тип топлива</label>
 
           <mat-form-field>
-            <mat-select placeholder="Тип топлива" formControlName="fuel">
+            <mat-select id="fuel" placeholder="Тип топлива" formControlName="fuel">
               <mat-option>Тип топлива</mat-option>
 
               <mat-option [value]="fuel.id" *ngFor="let fuel of vehicleData.fuels">{{ fuel.name }}</mat-option>

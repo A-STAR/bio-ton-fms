@@ -298,7 +298,8 @@
         "plugin:@angular-eslint/template/recommended"
       ],
       "rules": {
-        "@angular-eslint/template/accessibility-alt-text": "error"
+        "@angular-eslint/template/accessibility-alt-text": "error",
+        "@angular-eslint/template/accessibility-label-has-associated-control": "error"
       }
     }
   ]
