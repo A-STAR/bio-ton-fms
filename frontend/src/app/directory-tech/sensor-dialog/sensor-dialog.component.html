@@ -28,8 +28,8 @@
                   (selectionChange)="onControlSelectionChange($event, 'basic.fuelUse')">
                   <mat-option>Тип датчика</mat-option>
 
-                  <mat-optgroup *ngFor="let group of sensorData$.groups" [label]="group.name">
-                    <mat-option *ngFor="let type of group.sensorTypes" [value]="type.id">{{ type.name }}</mat-option>
+                  <mat-optgroup [label]="group.name" *ngFor="let group of sensorData$.groups">
+                    <mat-option [value]="type.id" *ngFor="let type of group.sensorTypes">{{ type.name }}</mat-option>
                   </mat-optgroup>
                 </mat-select>
 

@@ -76,7 +76,7 @@
         <label for="sim">Номер SIM-карты</label>
 
         <mat-form-field>
-          <input matInput #sim id="sim" type="tel" placeholder="Номер SIM-карты" maxlength="12" formControlName="sim">
+          <input #sim matInput id="sim" type="tel" placeholder="Номер SIM-карты" maxlength="12" formControlName="sim">
           <span matTextSuffix>{{ sim.value.length }} / 12</span>
 
           <mat-hint><em>+78462777727</em></mat-hint>
@@ -91,7 +91,7 @@
         <label for="imei">IMEI номер</label>
 
         <mat-form-field>
-          <input matInput #imei id="imei" placeholder="IMEI номер" maxlength="15" formControlName="imei">
+          <input #imei matInput id="imei" placeholder="IMEI номер" maxlength="15" formControlName="imei">
           <span matTextSuffix>{{ imei.value.length }} / 15</span>
 
           <mat-hint><em>527111404753054</em></mat-hint>

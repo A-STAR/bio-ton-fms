@@ -1,11 +1,11 @@
 <div class="logo">
-  <a title="Bio-Ton Field Management System" routerLinkActive routerLink="/" #link="routerLinkActive" [routerLinkActiveOptions]="{
+  <a #link="routerLinkActive" title="Bio-Ton Field Management System" routerLinkActive routerLink="/" [routerLinkActiveOptions]="{
     exact: true
   }" [hidden]="link.isActive">
     <ng-container *ngTemplateOutlet="logo"></ng-container>
   </a>
 
-  <ng-container *ngIf="link.isActive" [ngTemplateOutlet]="logo"></ng-container>
+  <ng-container [ngTemplateOutlet]="logo" *ngIf="link.isActive"></ng-container>
 
   <ng-template #logo>
     <img src="assets/images/bio-ton-field-management-system-logo-sunflower.svg" alt="Bio-Ton Field Management System" width="42"
@@ -18,7 +18,7 @@
 <mat-nav-list *ngFor="let list of NAVIGATION">
   <ng-container *ngFor="let group of list; last as last">
     <ng-container *ngFor="let item of group">
-      <a mat-list-item routerLinkActive="active" #link="routerLinkActive" [title]="item.title" [routerLink]="item.link"
+      <a #link="routerLinkActive" mat-list-item routerLinkActive="active" [title]="item.title" [routerLink]="item.link"
         *ngIf="item.link; else button">
         <img matListItemIcon width="24" height="24" [src]="'assets/images/' + item.icon + (link?.isActive ? '-white.svg' : '-green.svg')"
           [alt]="item.alt">
