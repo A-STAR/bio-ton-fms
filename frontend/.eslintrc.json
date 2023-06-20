@@ -299,7 +299,20 @@
       ],
       "rules": {
         "@angular-eslint/template/accessibility-alt-text": "error",
-        "@angular-eslint/template/accessibility-label-has-associated-control": "error"
+        "@angular-eslint/template/accessibility-label-has-associated-control": "error",
+        "@angular-eslint/template/attributes-order": [
+          "error",
+          {
+            "order": [
+              "TEMPLATE_REFERENCE",
+              "ATTRIBUTE_BINDING",
+              "INPUT_BINDING",
+              "TWO_WAY_BINDING",
+              "STRUCTURAL_DIRECTIVE",
+              "OUTPUT_BINDING"
+            ]
+          }
+        ]
       }
     }
   ]
