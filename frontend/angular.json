@@ -43,6 +43,7 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/maplibre-gl/dist/maplibre-gl.css",
               "src/styles/reset.sass",
               "src/styles/fonts/fonts.sass",
               "src/styles/material-theme.sass",
@@ -152,6 +153,7 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/maplibre-gl/dist/maplibre-gl.css",
               "src/styles/reset.sass",
               "src/styles/fonts/fonts.sass",
               "src/styles/material-theme.sass",
