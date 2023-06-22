@@ -54,7 +54,10 @@
                 "src/styles/partials"
               ]
             },
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "@nextgis/mapboxgl-map-adapter"
+            ]
           },
           "configurations": {
             "production": {
