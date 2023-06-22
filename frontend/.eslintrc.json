@@ -179,6 +179,10 @@
           }
         ],
         "@typescript-eslint/semi": "error",
+        "eqeqeq": [
+          "error",
+          "smart"
+        ],
         "func-call-spacing": "error",
         "jsdoc/check-line-alignment": "error",
         "jsdoc/check-param-names": [
