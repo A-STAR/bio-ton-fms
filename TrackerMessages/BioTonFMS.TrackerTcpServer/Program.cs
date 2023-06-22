@@ -17,28 +17,29 @@ builder.Configuration.AddJsonFile("config/appsettings.json", true);
 
 var serverSettings = builder.Configuration.GetSection("ServerSettings").Get<ServerSettingsOptions>();
 
-builder.Services.Configure<MessageBrokerSettingsOptions>("Primary",
-    builder.Configuration.GetSection("PrimaryMessageBrokerSettings"));
-builder.Services.Configure<MessageBrokerSettingsOptions>("Secondary",
-    builder.Configuration.GetSection("SecondaryMessageBrokerSettings"));
-builder.Services.Configure<RetryOptions>(
-    builder.Configuration.GetSection("RetryOptions"));
+builder.Services.Configure<RabbitMQOptions>(builder.Configuration.GetSection("RabbitMQ"));
+builder.Services.Configure<RetryOptions>(builder.Configuration.GetSection("RetryOptions"));
+
 builder.Services.AddSingleton<IMessageBus>(serviceProvider =>
 {
     var timeouts = serviceProvider.GetRequiredService<IOptions<RetryOptions>>()
         .Value.TimeoutsInMs.Select(x => TimeSpan.FromSeconds(x));
-    var monitor = serviceProvider.GetRequiredService<IOptionsMonitor<MessageBrokerSettingsOptions>>();
+    var rabbitMQOptions = serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>();
     var primary = new RabbitMQMessageBus(
         serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-        serviceProvider, Options.Create(monitor.Get("Primary")));
+        serviceProvider,
+        rabbitMQOptions,
+        "RawTrackerMessages-primary");
 
-    var secondaryOptions = Options.Create(monitor.Get("Secondary"));
+    var secondaryOptions = builder.Configuration.GetSection("SecondaryMessageBrokerSettings").Get<MessageBrokerSettingsOptions>();
     RabbitMQMessageBus? secondary = null;
-    if (secondaryOptions.Value.Enabled)
+    if (secondaryOptions != null && secondaryOptions.Enabled)
     {
         secondary = new RabbitMQMessageBus(
             serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-            serviceProvider, secondaryOptions);
+            serviceProvider,
+            rabbitMQOptions,
+            "RawTrackerMessages-secondary");
     }
     return new MessageBusMux(primary, secondary, Policy.Handle<Exception>().WaitAndRetry(timeouts));
 });

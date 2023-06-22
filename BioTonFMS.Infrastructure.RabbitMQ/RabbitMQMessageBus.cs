@@ -11,44 +11,48 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
     {
         private readonly ILogger<RabbitMQMessageBus> _logger;
         private readonly IModel? _channel;
-        private readonly MessageBrokerSettingsOptions _settings;
 
         private readonly List<Type> _handlers = new();
         private readonly IServiceProvider _serviceProvider;
+        private readonly RabbitMQOptions _rabbitMqSettings;
+        private readonly string _queueName;
 
         public RabbitMQMessageBus(
             ILogger<RabbitMQMessageBus> logger,
             IServiceProvider serviceProvider,
-            IOptions<MessageBrokerSettingsOptions> opts
+            IOptions<RabbitMQOptions> rabbitMqOptions,
+            string queueName
             )
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _settings = opts.Value;
+            _rabbitMqSettings = rabbitMqOptions.Value;
+            _queueName = queueName;
             var factory = new ConnectionFactory
             {
-                HostName = _settings.HostName,
-                Port = _settings.Port,
-                Password = _settings.Password,
-                UserName = _settings.UserName,
+                HostName = _rabbitMqSettings.Host,
+                Port = _rabbitMqSettings.Port,
+                VirtualHost = _rabbitMqSettings.VHost,
+                Password = _rabbitMqSettings.Password,
+                UserName = _rabbitMqSettings.User,
                 AutomaticRecoveryEnabled = true,
                 DispatchConsumersAsync = true
             };
 
             var connection = factory.CreateConnection();
             _channel = connection.CreateModel();
-            _channel.QueueDeclare(queue: _settings.Queue,
-                                                durable: false,
-                                                exclusive: false,
-                                                autoDelete: false,
-                                                arguments: null);
+            _channel.QueueDeclare(queue: _queueName,
+                                        durable: false,
+                                        exclusive: false,
+                                        autoDelete: false,
+                                        arguments: null);
         }
 
         public void Publish(byte[] message)
         {
 
             _channel.BasicPublish(exchange: "",
-                                    routingKey: _settings.Queue,
+                                    routingKey: _queueName,
                                     basicProperties: null,
                                     body: message);
         }
@@ -63,7 +67,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
 
             _channel.BasicConsume
             (
-                queue: _settings.Queue,
+                queue: _queueName,
                 autoAck: true,
                 consumer: consumer
             );
