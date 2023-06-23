@@ -10,8 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(hostConfig =>
@@ -20,10 +22,19 @@ IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.Configure<MessageBrokerSettingsOptions>(hostContext.Configuration.GetSection("MessageBrokerSettings"));
+        services.Configure<RabbitMQOptions>(hostContext.Configuration.GetSection("RabbitMQ"));
         services.Configure<DbMigrationOptions>(hostContext.Configuration.GetSection("DbMigrationOptions"));
         services.AddTransient<TrackerMessageHandler>();
-        services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
+
+        services.AddSingleton<IMessageBus>(serviceProvider =>
+            {
+                return new RabbitMQMessageBus(
+                serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+                serviceProvider,
+                serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
+                "RawTrackerMessages-primary");
+            }
+        );
         services.AddHostedService<MessageHandlerWorker>();
 
         services.AddTransient<GalileoskyMessageParser>();
