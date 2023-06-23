@@ -40,11 +40,13 @@ describe('TableActionsTriggerDirective', () => {
 
     tick(HOVER_DELAY_MS);
 
-    expect(
-      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
-    )
+    expect(directiveDe.classes)
       .withContext('have deferred hover class after delay')
-      .toBeFalse();
+      .not.toEqual(
+        jasmine.objectContaining({
+          [DEFERRED_HOVER_CLASS_NAME]: true
+        })
+      );
   }));
 
   it('should defer adding deferred hover class after delay on mouse enter', fakeAsync(() => {
@@ -52,29 +54,35 @@ describe('TableActionsTriggerDirective', () => {
       target: directiveDe.nativeElement
     });
 
-    expect(
-      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
-    )
+    expect(directiveDe.classes)
       .withContext('initially defer adding deferred hover class')
-      .toBeFalse();
+      .not.toEqual(
+        jasmine.objectContaining({
+          [DEFERRED_HOVER_CLASS_NAME]: true
+        })
+      );
 
     const beforeDelayMS = HOVER_DELAY_MS - 1;
 
     tick(beforeDelayMS);
 
-    expect(
-      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
-    )
+    expect(directiveDe.classes)
       .withContext('defer adding deferred hover class right before delay expires')
-      .toBeFalse();
+      .not.toEqual(
+        jasmine.objectContaining({
+          [DEFERRED_HOVER_CLASS_NAME]: true
+        })
+      );
 
     tick(HOVER_DELAY_MS);
 
-    expect(
-      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
-    )
+    expect(directiveDe.classes)
       .withContext('add deferred hover class after delay')
-      .toBeTrue();
+      .toEqual(
+        jasmine.objectContaining({
+          [DEFERRED_HOVER_CLASS_NAME]: true
+        })
+      );
   }));
 
   it('should remove deferred hover class on mouse leave', fakeAsync(() => {
@@ -84,21 +92,25 @@ describe('TableActionsTriggerDirective', () => {
 
     tick(HOVER_DELAY_MS);
 
-    expect(
-      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
-    )
+    expect(directiveDe.classes)
       .withContext('have deferred hover class after delay')
-      .toBeTrue();
+      .toEqual(
+        jasmine.objectContaining({
+          [DEFERRED_HOVER_CLASS_NAME]: true
+        })
+      );
 
     directiveDe.triggerEventHandler('mouseleave', {
       target: directiveDe.nativeElement
     });
 
-    expect(
-      Object.prototype.hasOwnProperty.call(directiveDe.classes, DEFERRED_HOVER_CLASS_NAME)
-    )
+    expect(directiveDe.classes)
       .withContext('remove deferred hover class after leaving button')
-      .toBeFalse();
+      .not.toEqual(
+        jasmine.objectContaining({
+          [DEFERRED_HOVER_CLASS_NAME]: true
+        })
+      );
   }));
 });
 
