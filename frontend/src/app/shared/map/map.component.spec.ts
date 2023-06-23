@@ -24,4 +24,26 @@ describe('MapComponent', () => {
     expect(component)
       .toBeTruthy();
   });
+
+  it('should render map', async () => {
+    expect(fixture.debugElement.classes)
+      .withContext('render component map class')
+      .toEqual(
+        jasmine.objectContaining({
+          'maplibregl-map': true
+        })
+      );
+
+    const mapCanvasEl = fixture.debugElement.nativeElement.querySelector('.maplibregl-canvas-container');
+
+    expect(mapCanvasEl)
+      .withContext('render map canvas element')
+      .not.toBeNull();
+
+    const mapControlsEl = fixture.debugElement.nativeElement.querySelector('.maplibregl-control-container');
+
+    expect(mapControlsEl)
+      .withContext('render map controls element')
+      .not.toBeNull();
+  });
 });
