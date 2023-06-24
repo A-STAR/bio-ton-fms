@@ -38,5 +38,5 @@ export class MapComponent implements OnInit {
   }
 }
 
-const DEFAULT_POSITION: LngLatArray = [50.07, 53.11];
+const DEFAULT_POSITION: LngLatArray = [50.13, 53.17];
 const DEFAULT_ZOOM = 10;
