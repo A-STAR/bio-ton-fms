@@ -10,12 +10,16 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'directory',
+        redirectTo: 'tech',
         pathMatch: 'full'
       },
       {
         path: 'sign-in',
         loadComponent: () => import('./sign-in/sign-in.component')
+      },
+      {
+        path: 'tech',
+        loadComponent: () => import('./tech/tech.component')
       },
       {
         path: 'directory',
