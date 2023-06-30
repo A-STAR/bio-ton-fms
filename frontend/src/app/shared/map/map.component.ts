@@ -24,7 +24,13 @@ export class MapComponent implements OnInit {
       mapAdapter: new MapAdapter(),
       target: this.elementRef.nativeElement,
       center: DEFAULT_POSITION,
-      zoom: DEFAULT_ZOOM
+      zoom: DEFAULT_ZOOM,
+      controls: ['ZOOM'],
+      controlsOptions: {
+        ZOOM: {
+          position: 'top-right'
+        }
+      }
     });
 
     await this.#map.addBaseLayer('OSM');
