@@ -57,7 +57,8 @@
             },
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "@nextgis/mapboxgl-map-adapter"
+              "@nextgis/mapboxgl-map-adapter",
+              "maplibre-gl"
             ]
           },
           "configurations": {
