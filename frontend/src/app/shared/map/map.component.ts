@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { createWebMap, MainLayerAdapter, WebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
+import maplibregl from 'maplibre-gl';
 import { LngLatArray } from '@nextgis/utils';
 
 @Component({
@@ -17,7 +18,16 @@ export class MapComponent implements OnInit {
   #map!: WebMap<MapAdapter, MainLayerAdapter>;
 
   /**
-   * Initialize map, add base layer.
+   * Add map fullscreen control.
+   */
+  #addFullscreenControl() {
+    const fullscreenControl = new maplibregl.FullscreenControl();
+
+    this.#map.addControl(fullscreenControl, CONTROL_POSITION);
+  }
+
+  /**
+   * Initialize map, add base layer, fullscreen control.
    */
   async #initMap() {
     this.#map = await createWebMap({
@@ -28,12 +38,14 @@ export class MapComponent implements OnInit {
       controls: ['ZOOM'],
       controlsOptions: {
         ZOOM: {
-          position: 'top-right'
+          position: CONTROL_POSITION
         }
       }
     });
 
     await this.#map.addBaseLayer('OSM');
+
+    this.#addFullscreenControl();
   }
 
   constructor(private elementRef: ElementRef) {}
@@ -46,3 +58,5 @@ export class MapComponent implements OnInit {
 
 const DEFAULT_POSITION: LngLatArray = [50.13, 53.17];
 const DEFAULT_ZOOM = 10;
+
+const CONTROL_POSITION = 'top-right';
