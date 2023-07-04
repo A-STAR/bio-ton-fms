@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "npm run port:kill && ng serve",
     "build": "ng build",
     "build:stage": "ng build --configuration 'production, stage'",
     "build:test": "ng build --configuration 'production, test'",
@@ -13,7 +13,8 @@
     "test": "ng test",
     "test:coverage": "ng test --no-watch --code-coverage --browsers ChromeHeadless",
     "lint": "ng lint --max-warnings 0",
-    "deploy": "npm run lint && npm run build && npm run test:coverage"
+    "deploy": "npm run lint && npm run build && npm run test:coverage",
+    "port:kill": "npx kill-port --port 4200"
   },
   "private": true,
   "dependencies": {
