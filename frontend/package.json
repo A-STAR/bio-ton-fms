@@ -14,6 +14,7 @@
     "test:coverage": "ng test --no-watch --code-coverage --browsers ChromeHeadless",
     "lint": "ng lint --max-warnings 0",
     "deploy": "npm run lint && npm run build && npm run test:coverage",
+    "cache:clean": "ng cache clean",
     "port:kill": "npx kill-port --port 4200"
   },
   "private": true,
