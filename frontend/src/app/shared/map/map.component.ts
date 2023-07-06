@@ -5,6 +5,7 @@ import { createWebMap, MainLayerAdapter, WebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
 import maplibregl from 'maplibre-gl';
 import { LngLatArray } from '@nextgis/utils';
+import { createQmsAdapter } from '@nextgis/qms-kit';
 
 @Component({
   selector: 'bio-map',
@@ -43,12 +44,17 @@ export class MapComponent implements OnInit {
       }
     });
 
-    await this.#map.addBaseLayer('OSM');
+    const qmsAdapter = createQmsAdapter({
+      qmsId: 448,
+      webMap: this.#map
+    });
+
+    await this.#map.addBaseLayer(qmsAdapter);
 
     this.#addFullscreenControl();
   }
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   async ngOnInit() {
