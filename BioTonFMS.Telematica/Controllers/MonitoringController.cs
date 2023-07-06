@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BioTonFMS.Domain.Monitoring;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
@@ -7,6 +9,7 @@ using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.Monitoring;
 using BioTonFMS.Telematica.Dtos.Vehicle;
 using BioTonFMS.Telematica.Validation;
+using Bogus;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,18 +23,22 @@ namespace BioTonFMS.Telematica.Controllers;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("/api/telematica")]
+[Route("/api/telematica/monitoring")]
 [Consumes("application/json")]
 [Produces("application/json")]
 public class MonitoringController : ValidationControllerBase
 {
+    private readonly IVehicleRepository _vehicleRepository;
+    private readonly IMapper _mapper;
+
     public MonitoringController(
         IMapper mapper,
         ILogger<MonitoringController> logger,
         IVehicleRepository vehicleRepository,
         ITrackerRepository trackerRepo)
     {
-        _vehicleRepo = vehicleRepository;
+        _vehicleRepository = vehicleRepository;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -42,13 +49,20 @@ public class MonitoringController : ValidationControllerBase
     /// <response code="400">Невозможно вернуть список машин</response>
     [HttpGet("vehicles")]
     [ProducesResponseType(typeof(MonitoringVehicleDto[]), StatusCodes.Status200OK)]
-    public IActionResult GetVehicles([FromQuery] string findCriterion)
+    public IActionResult FindVehicles([FromQuery] string? findCriterion)
     {
-        //var filter = _mapper.Map<VehiclesFilter>(vehiclesRequest);
-        var vehiclesPaging = _vehicleRepo.GetVehicles(filter);
-        var result = vehiclesPaging.Results.Select(res => _mapper.Map<MonitoringVehicleDto>(res)).ToArray();
+        var vehicles = _vehicleRepository.FindVehicles(findCriterion);
 
-        return Ok(result);
+        var monitoringDtos = vehicles.Select(v => _mapper.Map<MonitoringVehicleDto>(v)).ToArray();
+        var randomizer = new Randomizer();
+        foreach (var monitoringDto in monitoringDtos) 
+        {
+            monitoringDto.MovementStatus = randomizer.Enum<MovementStatusEnum>();
+            monitoringDto.ConnectionStatus = randomizer.Enum<ConnectionStatusEnum>();
+            monitoringDto.NumberOfSatellites = randomizer.Int(0, 20);
+        }
+
+        return Ok(monitoringDtos);
     }
 
 }

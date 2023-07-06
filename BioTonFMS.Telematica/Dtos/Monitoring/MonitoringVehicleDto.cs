@@ -1,4 +1,5 @@
-﻿using BioTonFMS.Infrastructure.Extensions;
+﻿using BioTonFMS.Domain.Monitoring;
+using BioTonFMS.Infrastructure.Extensions;
 using System.ComponentModel.DataAnnotations;
 using KeyValuePair = BioTonFMS.Infrastructure.Extensions.KeyValuePair;
 
@@ -74,10 +75,14 @@ public class MonitoringVehicleDto
     /// </summary>
     public string Description { get; set; } = "";
 
-    /// <summary>
-    /// Трекер (ключ-значение)
-    /// </summary>
-    public ForeignKeyValue<int, string>? Tracker { get; set; }
+    public string VehicleNumber { get; set;}
+
+    public MovementStatusEnum MovementStatus { get; set; }
+
+    public ConnectionStatusEnum ConnectionStatus { get; set; }
+
+    public int NumberOfSatellites { get; set; }
+
 }
 
 /// <summary>
