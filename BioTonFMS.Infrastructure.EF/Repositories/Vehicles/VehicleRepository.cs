@@ -126,6 +126,20 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 .GetPagedQueryable(filter.PageNum, filter.PageSize);
         }
 
+        public Vehicle[] FindVehicles(string? findCriterion)
+        {
+            // заглушка - всегда возвращаем все машины
+            VehiclesFilter filter = new VehiclesFilter
+            {
+                PageNum = 1,
+                PageSize = 1000,
+                SortBy = VehicleSortBy.Name,
+                SortDirection = SortDirection.Ascending,
+            };
+            var result = GetVehicles(filter);
+            return result.Results.ToArray();
+        }
+
         public override void Add(Vehicle vehicle)
         {
             var vehicleWithTheSameName = QueryableProvider.Linq().Where(v => v.Name == vehicle.Name);
