@@ -17,3 +17,7 @@ StyleCop.Cache
 /TrackerMessages/BioTonFMS.TrackerTcpServer/logs/*.*
 /GlobalAssemblyInfo.cs
 /**/logs/
+/**/ClientApp/node_modules
+/**/ClientApp/.cache
+/BioTonFMSApp/ClientApp/package-lock.json
+/BioTonFMSApp/ClientApp/dist
