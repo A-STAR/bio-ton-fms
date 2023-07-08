@@ -75,7 +75,24 @@ export class MapComponent implements OnInit {
       id: 'fields'
     }, this.#map, connector);
 
-    await this.#map.addLayer<NgwLayerAdapterType, NgwLayerOptions>(fieldLayerAdapter);
+    await this.#map.addLayer<NgwLayerAdapterType, NgwLayerOptions>(fieldLayerAdapter, {
+      visibility: false,
+      paint: {
+        color: '#2E653C',
+        strokeColor: '#FFFFFF',
+        opacity: 1
+      }
+    });
+
+    // put away visible vector edges
+    this.#map.unSelectLayer('fields', () => true);
+
+    await this.#map.showLayer('fields');
+
+    await this.#map.fitLayer('fields', {
+      duration: FIT_DURATION,
+      padding: FIT_PADDING
+    });
   }
 
   constructor(private elementRef: ElementRef) { }
@@ -96,3 +113,6 @@ const AUTH_LOGIN = 'a.zubkova@bioton-agro.ru';
 const AUTH_PASSWORD = 'asdfghjkl13';
 
 const FIELD_RESOURCE = 109;
+
+const FIT_DURATION = 670;
+const FIT_PADDING = 60;
