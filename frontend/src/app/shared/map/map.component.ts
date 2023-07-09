@@ -25,10 +25,10 @@ export class MapComponent implements OnInit {
   /**
    * Add map fullscreen control.
    */
-  #addFullscreenControl() {
+  async #addFullscreenControl() {
     const fullscreenControl = new maplibregl.FullscreenControl();
 
-    this.#map.addControl(fullscreenControl, CONTROL_POSITION);
+    await this.#map.addControl(fullscreenControl, CONTROL_POSITION);
   }
 
   /**
@@ -55,7 +55,7 @@ export class MapComponent implements OnInit {
 
     await this.#map.addBaseLayer(qmsAdapter);
 
-    this.#addFullscreenControl();
+    await this.#addFullscreenControl();
   }
 
   /**
