@@ -21,66 +21,29 @@ public class MonitoringVehicleDto
     public string Name { get; set; } = "";
 
     /// <summary>
-    /// Тип машины (ключ-значение)
+    /// Идентификатор трекера во внешней системе
     /// </summary>
-    public KeyValuePair Type { get; set; }
+    public int? TrackerExternalId { get; set; }
 
     /// <summary>
-    /// Группа машины (ключ-значение)
+    /// IMEI трекера
     /// </summary>
-    public ForeignKeyValue<int, string>? VehicleGroup { get; set; }
+    public string? TrackerImei { get; set; } = "";
+
 
     /// <summary>
-    /// Бренд производителя машины
+    /// Состояние движения
     /// </summary>
-    public string Make { get; set; } = "";
-
-    /// <summary>
-    /// Модель машины
-    /// </summary>
-    public string Model { get; set; } = "";
-
-    /// <summary>
-    /// Подтип машины (ключ-значение)
-    /// </summary>
-    public KeyValuePair SubType { get; set; }
-
-    /// <summary>
-    /// Типа топлива (ключ-значение)
-    /// </summary>
-    public ForeignKeyValue<int, string> FuelType { get; set; }
-
-    /// <summary>
-    /// Год выпуска
-    /// </summary>
-    public int? ManufacturingYear { get; set; }
-
-    /// <summary>
-    /// Регистрационный номер
-    /// </summary>
-    public string RegistrationNumber { get; set; } = "";
-
-    /// <summary>
-    /// Инвентарный номер
-    /// </summary>
-    public string InventoryNumber { get; set; } = "";
-
-    /// <summary>
-    /// Серийный номер
-    /// </summary>
-    public string SerialNumber { get; set; } = "";
-
-    /// <summary>
-    /// Описание
-    /// </summary>
-    public string Description { get; set; } = "";
-
-    public string VehicleNumber { get; set;}
-
     public MovementStatusEnum MovementStatus { get; set; }
 
+    /// <summary>
+    /// Состояние соединения
+    /// </summary>
     public ConnectionStatusEnum ConnectionStatus { get; set; }
-
+        
+    /// <summary>
+    /// Количество спутников
+    /// </summary>
     public int NumberOfSatellites { get; set; }
 
 }
