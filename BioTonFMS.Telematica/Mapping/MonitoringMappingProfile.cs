@@ -12,25 +12,20 @@ namespace BioTonFMS.Telematica.Mapping
         public MonitoringMappingProfile()
         {
             CreateMap<Vehicle, MonitoringVehicleDto>()
-                .ForMember(dest => dest.SubType, opt => opt.MapFrom(src =>
-                    EnumExtension.GetKeyValuePair(src.VehicleSubType)))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src =>
-                    EnumExtension.GetKeyValuePair(src.Type)))
-                .ForMember(dest => dest.FuelType, opt => opt.MapFrom(src =>
-                    new ForeignKeyValue<int, string>(src.FuelType.Id, src.FuelType.Name)))
-                .ForMember(dest => dest.VehicleGroup, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {
-                    if (src.VehicleGroupId.HasValue)
+                    if (src.TrackerId.HasValue)
                     {
-                        dest.VehicleGroup = 
-                            new ForeignKeyValue<int, string>(src.VehicleGroupId.Value, src.VehicleGroup!.Name.ToString());
+                        dest.TrackerExternalId = src.Tracker!.ExternalId;
+                        dest.TrackerImei = src.Tracker!.Imei;
                     }
                     else
                     {
-                        dest.VehicleGroup = null;
+                        dest.TrackerExternalId = null;
+                        dest.TrackerImei = null;
                     }
                 });
+
         }
     }
 }
