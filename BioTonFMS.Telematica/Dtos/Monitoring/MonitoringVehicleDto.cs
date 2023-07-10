@@ -30,7 +30,6 @@ public class MonitoringVehicleDto
     /// </summary>
     public string? TrackerImei { get; set; } = "";
 
-
     /// <summary>
     /// Состояние движения
     /// </summary>
@@ -40,7 +39,12 @@ public class MonitoringVehicleDto
     /// Состояние соединения
     /// </summary>
     public ConnectionStatusEnum ConnectionStatus { get; set; }
-        
+
+    /// <summary>
+    /// Время последнего сообщения трекера
+    /// </summary>
+    public DateTime? LastMessageTime { get; set; }
+
     /// <summary>
     /// Количество спутников
     /// </summary>

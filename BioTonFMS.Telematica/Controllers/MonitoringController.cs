@@ -59,6 +59,7 @@ public class MonitoringController : ValidationControllerBase
         {
             monitoringDto.MovementStatus = randomizer.Enum<MovementStatusEnum>();
             monitoringDto.ConnectionStatus = randomizer.Enum<ConnectionStatusEnum>();
+            monitoringDto.LastMessageTime = DateTime.Now.AddMinutes(-randomizer.Int(0, 30)).ToUniversalTime() ;
             monitoringDto.NumberOfSatellites = randomizer.Int(0, 20);
         }
 
