@@ -1,32 +1,32 @@
 @use 'variables' as *
 
-mat-nav-list
-
-  &.mdc-list
-    padding-top: unset
-    padding-bottom: unset
-
-  .mat-ripple-element
-    background-color: rgba($green, 10%)
+.mat-mdc-list-base.mdc-list
+  padding-top: unset
+  padding-bottom: unset
 
 .mdc-list-item
-
-  @at-root [mat-list-item]#{&}
-    padding-right: unset
-
-  &__content
-
-    @at-root :hover &
-      $mat-list-item-content-padding-horizontal: 10px
-
-      padding-left: $mat-list-item-content-padding-horizontal
-      padding-right: $mat-list-item-content-padding-horizontal
-
-    @at-root button &
-      display: flex
 
   &__primary-text
     color: $dark
 
+  button &__content
+    display: flex
+
+  mat-nav-list &
+
+    @at-root [mat-list-item]#{&}
+      padding-right: unset
+
+    &__content
+
+      @at-root :hover &
+        $mat-list-item-content-padding-horizontal: 10px
+
+        padding-left: $mat-list-item-content-padding-horizontal
+        padding-right: $mat-list-item-content-padding-horizontal
+
 .mat-mdc-list-item-interactive::before
   background-color: $light-green
+
+.mat-ripple-element
+  background-color: rgba($green, 10%)
