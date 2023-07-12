@@ -1,3 +1,7 @@
-<ng-container *ngIf="vehicles$ | async"></ng-container>
+<aside>
+  <mat-selection-list *ngIf="vehicles$ | async as vehicles">
+    <mat-list-option checkboxPosition="before" *ngFor="let vehicle of vehicles">{{ vehicle.name }}</mat-list-option>
+  </mat-selection-list>
+</aside>
 
 <bio-map></bio-map>

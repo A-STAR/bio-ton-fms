@@ -1,7 +1,18 @@
+@use 'variables' as *
+
 \:host
   display: flex
+
+aside
+  display: flex
+  flex-direction: column
+  flex-basis: 400px
+  height: 100vh
+  background-color: $white
+
+mat-selection-list
+  overflow-y: auto
 
 bio-map
   flex: 1
   height: unset
-  margin-left: 400px

@@ -1,6 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HarnessLoader, parallel } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatSelectionListHarness } from '@angular/material/list/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -14,6 +17,7 @@ import { testMonitoringVehicles } from './tech.service.spec';
 describe('TechComponent', () => {
   let component: TechComponent;
   let fixture: ComponentFixture<TechComponent>;
+  let loader: HarnessLoader;
 
   let vehiclesSpy: jasmine.Spy<() => Observable<MonitoringVehicle[]>>;
 
@@ -28,6 +32,7 @@ describe('TechComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(TechComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     const techService = TestBed.inject(TechService);
 
@@ -50,6 +55,26 @@ describe('TechComponent', () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
   });
+
+  it('should render vehicle list', fakeAsync(async () => {
+    const list = await loader.getHarness(
+      MatSelectionListHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    const options = await list.getItems();
+
+    const titles = await parallel(() => options.map(
+      item => item.getTitle()
+    ));
+
+    expect(titles)
+      .withContext('render vehicle options title')
+      .toEqual(
+        testMonitoringVehicles.map(({ name }) => name)
+      );
+  }));
 
   it('should render map', () => {
     const mapDe = fixture.debugElement.query(
