@@ -1,4 +1,6 @@
-﻿using BioTonFMS.Domain;
+﻿using System.Text;
+using System.Text.Json;
+using BioTonFMS.Domain;
 using BioTonFMS.Domain.Messaging;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
@@ -7,11 +9,11 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.MessageBus;
 using BioTonFMS.MessageProcessing;
 using BioTonFMS.TrackerMessageHandler.MessageParsing;
+using BioTonFMS.TrackerMessageHandler.Retranslation;
 using Microsoft.Extensions.Logging;
-using System.Text;
-using System.Text.Json;
+using Microsoft.Extensions.Options;
 
-namespace BioTonFMS.TrackerMessageHandler;
+namespace BioTonFMS.TrackerMessageHandler.Handlers;
 
 public class TrackerMessageHandler : IBusMessageHandler
 {
@@ -20,16 +22,21 @@ public class TrackerMessageHandler : IBusMessageHandler
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly ITrackerTagRepository _trackerTagRepository;
     private readonly ITrackerRepository _trackerRepository;
+    private readonly IMessageBus _retranslatorBus;
+    private readonly RetranslatorOptions _retranslatorOptions;
 
     public TrackerMessageHandler(ILogger<TrackerMessageHandler> logger,
         Func<TrackerTypeEnum, IMessageParser> parserProvider, ITrackerMessageRepository messageRepository,
-        ITrackerTagRepository trackerTagRepository, ITrackerRepository trackerRepository)
+        ITrackerTagRepository trackerTagRepository, ITrackerRepository trackerRepository,
+        Func<BusType, IMessageBus> busResolver, IOptions<RetranslatorOptions> retranslatorOptions)
     {
         _logger = logger;
         _parserProvider = parserProvider;
         _messageRepository = messageRepository;
         _trackerTagRepository = trackerTagRepository;
         _trackerRepository = trackerRepository;
+        _retranslatorOptions = retranslatorOptions.Value;
+        _retranslatorBus = busResolver(BusType.Retranslation);
     }
 
     public Task HandleAsync(byte[] binaryMessage)
@@ -37,20 +44,27 @@ public class TrackerMessageHandler : IBusMessageHandler
         var messageText = Encoding.UTF8.GetString(binaryMessage);
         _logger.LogDebug("Получен пакет {MessageText}", messageText);
 
-        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
-            ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", nameof(binaryMessage));
+        if (_retranslatorOptions.Enabled)
+        {
+            _retranslatorBus.Publish(binaryMessage);
+        }
 
-        if (_messageRepository.ExistsByUid(rawMessage.PackageUID)) return Task.CompletedTask;
+        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
+            ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", messageText);
+
+        if (_messageRepository.ExistsByUid(rawMessage.PackageUID))
+        {
+            return Task.CompletedTask;
+        }
 
         TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
             .ToArray();
 
-        
         Tracker? tracker = null;
         if (messages.Length > 0)
         {
-            var firstMessge = messages[0];
-            tracker = _trackerRepository.FindTracker(firstMessge.Imei, firstMessge.ExternalTrackerId);
+            var firstMessage = messages[0];
+            tracker = _trackerRepository.FindTracker(firstMessage.Imei, firstMessage.ExternalTrackerId);
         }
         
         if (tracker is not null)
