@@ -59,15 +59,6 @@
 .mat-mdc-icon-button
   transition: color $button-transition
 
-  &:hover,
-  &:active
-
-    &.mat-accent
-      color: $light-green
-
-    &.mat-warn
-      color: $red
-
   @at-root a#{&}
     display: flex
     justify-content: center
@@ -86,12 +77,29 @@
   &.mat-mdc-button-base
     padding: map.get($mat-icon-button, padding)
 
+  mat-icon
+    line-height: map.get($mat-icon-button, icon, line-height)
+
+  &.mat-unthemed,
+  &.mat-primary
+    color: $gray
+
   &.mat-accent,
   &.mat-warn
     color: $green
 
-  &.mat-accent[aria-pressed="false"]
+  &.mat-unthemed[aria-pressed="true"]
     color: $light-green
+
+  &:hover,
+  &:active
+
+    &.mat-unthemed,
+    &.mat-accent
+      color: $light-green
+
+    &.mat-warn
+      color: $red
 
   span.mat-mdc-button-touch-target
     width: 100%
