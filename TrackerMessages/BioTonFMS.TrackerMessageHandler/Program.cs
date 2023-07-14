@@ -1,11 +1,17 @@
 ﻿using BioTonFMS.Common.Settings;
 using BioTonFMS.Domain;
+using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.MessageBus;
+using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.RabbitMQ;
+using BioTonFMS.Infrastructure.Utils.Network;
 using BioTonFMS.Migrations;
 using BioTonFMS.TrackerMessageHandler;
+using BioTonFMS.TrackerMessageHandler.Handlers;
 using BioTonFMS.TrackerMessageHandler.MessageParsing;
+using BioTonFMS.TrackerMessageHandler.Retranslation;
+using BioTonFMS.TrackerMessageHandler.Workers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +19,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
-using System;
+using System.ComponentModel;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(hostConfig =>
@@ -23,19 +29,35 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
         services.Configure<RabbitMQOptions>(hostContext.Configuration.GetSection("RabbitMQ"));
+        services.Configure<RetranslatorOptions>(hostContext.Configuration.GetSection("RetranslatorDestination"));
         services.Configure<DbMigrationOptions>(hostContext.Configuration.GetSection("DbMigrationOptions"));
         services.AddTransient<TrackerMessageHandler>();
+        services.AddTransient<RetranslatorHandler>();
 
-        services.AddSingleton<IMessageBus>(serviceProvider =>
+        services.AddTransient<ITcpClient, FmsTcpClient>();
+        services.AddSingleton<Factory<ITcpClient>>(serviceProvider => serviceProvider.GetRequiredService<ITcpClient>);
+        services.AddSingleton<IRetranslator, Retranslator>();
+        
+
+        services.AddSingleton<Func<BusType, IMessageBus>>(serviceProvider => bus =>
+            bus switch
             {
-                return new RabbitMQMessageBus(
-                serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-                serviceProvider,
-                serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
-                "RawTrackerMessages-primary");
+                BusType.Retranslation => new RabbitMQMessageBus(
+                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+                    serviceProvider,
+                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
+                    "Retranslation"),
+                BusType.Consuming => new RabbitMQMessageBus(
+                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+                    serviceProvider,
+                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
+                    "RawTrackerMessages-primary"),
+                _ => throw new ArgumentOutOfRangeException(nameof(bus), bus, null)
             }
         );
+        
         services.AddHostedService<MessageHandlerWorker>();
+        services.AddHostedService<RetranslatorHandlerWorker>();
 
         services.AddTransient<GalileoskyMessageParser>();
         services.AddTransient<Func<TrackerTypeEnum, IMessageParser>>(provider => key => key switch
