@@ -11,9 +11,7 @@
 .mat-mdc-unelevated-button,
 .mat-mdc-outlined-button,
 .mat-mdc-icon-button.mat-unthemed
-
-  div.mat-ripple-element
-    background-color: rgba($white, 10%)
+  --mat-mdc-button-ripple-color: rgba($white, 10%)
 
 .mat-mdc-unelevated-button,
 .mat-mdc-outlined-button
@@ -22,7 +20,7 @@
     height: 30px
 
   span.mat-mdc-button-persistent-ripple::before
-    background-color: $white
+    --mat-mdc-button-persistent-ripple-color: #{$white}
 
   span.mat-mdc-button-touch-target
     height: 100%
@@ -64,6 +62,10 @@
     justify-content: center
     align-items: center
 
+  &.mat-primary
+    --mat-mdc-button-persistent-ripple-color: #{$green}
+    --mat-mdc-button-ripple-color: rgba($green, 10%)
+
   @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
     opacity: 0
 
@@ -91,10 +93,14 @@
   &.mat-unthemed[aria-pressed="true"]
     color: $light-green
 
+  &.mat-primary[aria-pressed="true"]
+    color: $green
+
   &:hover,
   &:active
 
     &.mat-unthemed,
+    &.mat-primary,
     &.mat-accent
       color: $light-green
 

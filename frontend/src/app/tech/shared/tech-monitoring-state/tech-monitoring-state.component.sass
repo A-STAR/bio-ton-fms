@@ -1,0 +1,12 @@
+@use 'sass:map'
+@use 'variables' as *
+
+\:host
+  display: flex
+  align-items: center
+  column-gap: map.get($mat-icon-button, gap)
+  transform: translateY(-50%)
+
+  > mat-icon
+    margin-left: map.get($mat-icon-button, icon, md-18-margin-horizontal)
+    margin-right: map.get($mat-icon-button, icon, md-18-margin-horizontal)
