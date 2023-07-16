@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
+import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
 import { Observable } from 'rxjs';
 
@@ -14,6 +15,7 @@ import { MapComponent } from '../shared/map/map.component';
   imports: [
     CommonModule,
     MatListModule,
+    TechMonitoringStateComponent,
     MapComponent
   ],
   templateUrl: './tech.component.html',

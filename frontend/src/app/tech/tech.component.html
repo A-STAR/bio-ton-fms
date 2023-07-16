@@ -1,6 +1,10 @@
 <aside>
   <mat-selection-list *ngIf="vehicles$ | async as vehicles">
-    <mat-list-option checkboxPosition="before" *ngFor="let vehicle of vehicles">{{ vehicle.name }}</mat-list-option>
+    <div *ngFor="let vehicle of vehicles">
+      <mat-list-option checkboxPosition="before">{{ vehicle.name }}</mat-list-option>
+
+      <bio-tech-monitoring-state></bio-tech-monitoring-state>
+    </div>
   </mat-selection-list>
 </aside>
 

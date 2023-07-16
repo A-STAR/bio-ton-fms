@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'variables' as *
 
 .mat-mdc-list-base.mdc-list
@@ -26,6 +27,9 @@
         padding-right: $mat-list-item-content-padding-horizontal
 
   mat-selection-list &
+    $tech-monitoring-state-count: 6
+
+    padding-right: 2 * $mat-list-item-padding-right + $tech-monitoring-state-count * map.get($mat-icon-button, size) + ($tech-monitoring-state-count - 1) * map.get($mat-icon-button, gap)
 
     &__content,
     &__primary-text

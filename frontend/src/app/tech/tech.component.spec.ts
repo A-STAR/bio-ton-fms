@@ -76,6 +76,16 @@ describe('TechComponent', () => {
       );
   }));
 
+  it('should render vehicle options monitoring state', async () => {
+    const optionStateDes = fixture.debugElement.queryAll(
+      By.css('mat-selection-list div bio-tech-monitoring-state')
+    );
+
+    expect(optionStateDes.length)
+      .withContext('render vehicle options monitoring state')
+      .toBe(testMonitoringVehicles.length);
+  });
+
   it('should render map', () => {
     const mapDe = fixture.debugElement.query(
       By.directive(MapComponent)
