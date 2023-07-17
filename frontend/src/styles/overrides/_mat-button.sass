@@ -66,18 +66,18 @@
     --mat-mdc-button-persistent-ripple-color: #{$green}
     --mat-mdc-button-ripple-color: rgba($green, 10%)
 
-  @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
-    opacity: 0
-
-  @at-root .actions #{&} span.mat-mdc-button-persistent-ripple::before
-    transition: opacity $button-transition
-
   &.mat-mdc-button-base
     width: map.get($mat-icon-button, size)
     height: map.get($mat-icon-button, size)
 
   &.mat-mdc-button-base
     padding: map.get($mat-icon-button, padding)
+
+  span.mat-mdc-button-persistent-ripple::before
+    transition: opacity $button-transition
+
+  @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
+    opacity: 0
 
   mat-icon
     line-height: map.get($mat-icon-button, icon, line-height)
