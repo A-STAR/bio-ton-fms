@@ -146,6 +146,22 @@ Deploy-frontend-stage.bioton-fms.ru:
     paths:
       - frontend/dist/  
 
+Deploy-frontend-production.bioton-fms.ru:
+  stage: deploy
+  needs: 
+    - Test-frontend
+  extends: .node-job
+  script:        
+    - npm run build:prod
+    - rsync -avu dist/bio-ton-field-management-system/ gitlab@production.bioton-fms.ru:/var/www/production.bioton-fms.ru/   
+  rules:    
+    - when: manual        
+  allow_failure: true
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - frontend/dist/  
+
 Build-backend:
   stage: build
   script:
