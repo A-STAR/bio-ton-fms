@@ -13,11 +13,13 @@ public class MonitoringVehicleDto
     /// <summary>
     /// Id машины
     /// </summary>
+    [Required]
     public int Id { get; set; }
 
     /// <summary>
     /// Наименование машины
     /// </summary>
+    [Required]
     public string Name { get; set; } = "";
 
     /// <summary>
@@ -48,23 +50,6 @@ public class MonitoringVehicleDto
     /// <summary>
     /// Количество спутников
     /// </summary>
-    public int NumberOfSatellites { get; set; }
+    public int? NumberOfSatellites { get; set; }
 
-}
-
-/// <summary>
-/// Трекер
-/// </summary>
-public class VehicleTrackerDto
-{
-    /// <summary>
-    /// Id трекера
-    /// </summary>
-    public int Id { get; set; }
-
-    /// <summary>
-    /// Наименование трекера
-    /// </summary>
-    [Required]
-    public string Name { get; set; } = "";
 }
