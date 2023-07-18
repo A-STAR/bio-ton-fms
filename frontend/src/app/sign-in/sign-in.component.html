@@ -39,7 +39,7 @@
       <mat-form-field>
         <input matInput id="password" placeholder="Пароль" formControlName="password" [type]="hidePassword ? 'password' : 'text'">
 
-        <button mat-icon-button matIconSuffix type="button" aria-label="Скрыть пароль" color="accent" [attr.aria-pressed]="hidePassword"
+        <button mat-icon-button matIconSuffix type="button" aria-label="Скрыть пароль" color="accent" [attr.aria-pressed]="!hidePassword"
           (click)="togglePasswordVisibility($event)">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>

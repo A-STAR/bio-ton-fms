@@ -152,17 +152,6 @@ describe('TrackersComponent', () => {
           testTrackers.trackers[index].id.toString()
         );
     });
-
-    /* Suppress 'Spec has no expectations.' warning. */
-
-    const rowEl = await rows[1].host();
-    const routerLink = await rowEl.getAttribute('ng-reflect-router-link');
-
-    expect(routerLink)
-      .withContext('render GPS-tracker row router link')
-      .toBe(
-        testTrackers.trackers[1].id.toString()
-      );
   });
 
   it('should render tracker table header cells', async () => {
@@ -256,24 +245,24 @@ describe('TrackersComponent', () => {
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            ancestor: '[bioStopClickPropagation].actions',
             selector: '[bioStopClickPropagation]',
-            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'edit'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            ancestor: '[bioStopClickPropagation].actions',
             selector: '[bioStopClickPropagation]',
-            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'sms'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            ancestor: '[bioStopClickPropagation].actions',
             selector: '[bioStopClickPropagation]',
-            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'delete'
           })
