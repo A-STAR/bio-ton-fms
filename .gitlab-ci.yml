@@ -146,6 +146,22 @@ Deploy-frontend-stage.bioton-fms.ru:
     paths:
       - frontend/dist/  
 
+Deploy-frontend-production.bioton-fms.ru:
+  stage: deploy
+  needs: 
+    - Test-frontend
+  extends: .node-job
+  script:        
+    - npm run build:prod
+    - rsync -avu dist/bio-ton-field-management-system/ gitlab@production.bioton-fms.ru:/var/www/production.bioton-fms.ru/   
+  rules:    
+    - when: manual        
+  allow_failure: true
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - frontend/dist/  
+
 Build-backend:
   stage: build
   script:
@@ -269,6 +285,32 @@ Deploy-backend-stage.bioton-fms.ru:
     - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-message
     - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-message || true
     - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-message --network bioton -v /var/log/fms/tracker-message:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
+  rules:    
+    - changes:
+        - frontend/**/*        
+      when: manual 
+    - when: manual   
+  allow_failure: true
+
+Deploy-backend-production.bioton-fms.ru:
+  stage: deploy
+  needs: 
+    - Test-backend
+    - Build-TrackerTcpServer
+    - Build-TrackerMessage   
+  script:
+    # Backend
+    - ssh gitlab@production.bioton-fms.ru docker rm -f fms-backend || true
+    - ssh gitlab@production.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
+    - ssh gitlab@production.bioton-fms.ru docker run --name fms-backend -p 8080:80 -v /etc/fms/prod:/app/config -v /var/log/fms/prod:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
+    # Fms-tracker-tcp-server
+    - ssh gitlab@production.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server
+    - ssh gitlab@production.bioton-fms.ru docker rm -f fms-tracker-tcp-server || true
+    - ssh gitlab@production.bioton-fms.ru docker run --name fms-tracker-tcp-server -p 6000:6000 -v /var/log/fms/tracker-tcp-server:/app/logs -v /etc/fms/tracker-tcp-server:/app/config --network bioton --restart always -d git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
+    # Fms-tracker-message
+    - ssh gitlab@production.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-message
+    - ssh gitlab@production.bioton-fms.ru docker rm -f fms-tracker-message || true
+    - ssh gitlab@production.bioton-fms.ru docker run --name fms-tracker-message --network bioton -v /var/log/fms/tracker-message:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:    
     - changes:
         - frontend/**/*        
