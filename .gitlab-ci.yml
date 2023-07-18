@@ -152,7 +152,7 @@ Deploy-frontend-production.bioton-fms.ru:
     - Test-frontend
   extends: .node-job
   script:        
-    - npm run build:prod
+    - npm run build
     - rsync -avu dist/bio-ton-field-management-system/ gitlab@production.bioton-fms.ru:/var/www/production.bioton-fms.ru/   
   rules:    
     - when: manual        
