@@ -1,4 +1,8 @@
 <aside>
+  <div>
+    <mat-checkbox title="Выбрать все"></mat-checkbox>
+  </div>
+
   <mat-selection-list *ngIf="vehicles$ | async as vehicles">
     <div *ngFor="let vehicle of vehicles">
       <mat-list-option checkboxPosition="before">{{ vehicle.name }}</mat-list-option>

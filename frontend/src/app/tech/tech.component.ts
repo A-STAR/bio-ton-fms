@@ -1,19 +1,21 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
-import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
 import { Observable } from 'rxjs';
 
 import { MonitoringVehicle, TechService } from './tech.service';
 
 import { MapComponent } from '../shared/map/map.component';
+import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
 @Component({
   selector: 'bio-tech',
   standalone: true,
   imports: [
     CommonModule,
+    MatCheckboxModule,
     MatListModule,
     TechMonitoringStateComponent,
     MapComponent

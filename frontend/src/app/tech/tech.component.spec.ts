@@ -3,6 +3,7 @@ import { By } from '@angular/platform-browser';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatSelectionListHarness } from '@angular/material/list/testing';
 
 import { Observable, of } from 'rxjs';
@@ -55,6 +56,18 @@ describe('TechComponent', () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
   });
+
+  it('should render all checkbox', fakeAsync(async () => {
+    const checkbox = await loader.getHarnessOrNull(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    expect(checkbox)
+      .withContext('render all checkbox')
+      .toBeDefined();
+  }));
 
   it('should render vehicle list', fakeAsync(async () => {
     const list = await loader.getHarness(
