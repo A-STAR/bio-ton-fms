@@ -1,15 +1,20 @@
 <aside>
-  <div>
-    <mat-checkbox title="Выбрать все"></mat-checkbox>
-  </div>
-
-  <mat-selection-list *ngIf="vehicles$ | async as vehicles">
-    <div *ngFor="let vehicle of vehicles">
-      <mat-list-option checkboxPosition="before">{{ vehicle.name }}</mat-list-option>
-
-      <bio-tech-monitoring-state [vehicle]="vehicle"></bio-tech-monitoring-state>
+  <ng-container *ngIf="vehicles$ | async as vehicles">
+    <div>
+      <mat-checkbox #all title="Выбрать все"
+        [checked]="list.selectedOptions.hasValue() && list.selectedOptions.selected.length === vehicles.length"
+        [indeterminate]="list.selectedOptions.hasValue() && list.selectedOptions.selected.length !== vehicles.length"
+        (change)="all.checked ? list.selectAll() : list.deselectAll()"></mat-checkbox>
     </div>
-  </mat-selection-list>
+
+    <mat-selection-list #list>
+      <div *ngFor="let vehicle of vehicles">
+        <mat-list-option checkboxPosition="before">{{ vehicle.name }}</mat-list-option>
+
+        <bio-tech-monitoring-state [vehicle]="vehicle"></bio-tech-monitoring-state>
+      </div>
+    </mat-selection-list>
+  </ng-container>
 </aside>
 
 <bio-map></bio-map>
