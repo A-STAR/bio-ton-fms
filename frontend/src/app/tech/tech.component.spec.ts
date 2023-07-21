@@ -4,7 +4,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
-import { MatSelectionListHarness } from '@angular/material/list/testing';
+import { MatListOptionHarness, MatSelectionListHarness } from '@angular/material/list/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -98,6 +98,92 @@ describe('TechComponent', () => {
       .withContext('render vehicle options monitoring state')
       .toBe(testMonitoringVehicles.length);
   });
+
+  it('should toggle all checkbox selecting options', fakeAsync(async () => {
+    const checkbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    const options = await loader.getAllHarnesses(
+      MatListOptionHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    expect(options.length)
+      .withContext('render all options unselected')
+      .toBe(testMonitoringVehicles.length);
+
+    await checkbox.check();
+
+    expect(options.length)
+      .withContext('render all options selected')
+      .toBe(testMonitoringVehicles.length);
+
+    await checkbox.uncheck();
+
+    expect(options.length)
+      .withContext('render all options unselected')
+      .toBe(testMonitoringVehicles.length);
+  }));
+
+  it('should select options toggling all checkbox', fakeAsync(async () => {
+    const checkbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    const list = await loader.getHarness(
+      MatSelectionListHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    await expectAsync(
+      checkbox.isChecked()
+    )
+      .withContext('render all checkbox unchecked')
+      .toBeResolvedTo(false);
+
+    await list.selectItems({
+      title: testMonitoringVehicles[0].name,
+    });
+
+    await expectAsync(
+      checkbox.isIndeterminate()
+    )
+      .withContext('render all checkbox indeterminate')
+      .toBeResolvedTo(true);
+
+    await list.selectItems();
+
+    await expectAsync(
+      checkbox.isChecked()
+    )
+      .withContext('render all checkbox checked')
+      .toBeResolvedTo(true);
+
+    await list.deselectItems({
+      title: testMonitoringVehicles[1].name,
+    });
+
+    await expectAsync(
+      checkbox.isIndeterminate()
+    )
+      .withContext('render all checkbox indeterminate')
+      .toBeResolvedTo(true);
+
+    await list.deselectItems();
+
+    await expectAsync(
+      checkbox.isChecked()
+    )
+      .withContext('render all checkbox unchecked')
+      .toBeResolvedTo(false);
+  }));
 
   it('should render map', () => {
     const mapDe = fixture.debugElement.query(
