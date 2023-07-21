@@ -55,15 +55,15 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
     trackerIMEI: testTrackers.trackers[0].imei
   },
   {
-    id: testVehicles.vehicles[0].id,
-    name: testVehicles.vehicles[0].name,
+    id: testVehicles.vehicles[1].id,
+    name: testVehicles.vehicles[1].name,
     movementStatus: MovementStatus.NoData,
     connectionStatus: ConnectionStatus.NotConnected,
     numberOfSatellites: 0
   },
   {
-    id: testVehicles.vehicles[0].id,
-    name: testVehicles.vehicles[0].name,
+    id: testVehicles.vehicles[2].id,
+    name: testVehicles.vehicles[2].name,
     lastMessageTime: '2023-07-13T00:58:49.312Z',
     movementStatus: MovementStatus.Stopped,
     connectionStatus: ConnectionStatus.Connected,
