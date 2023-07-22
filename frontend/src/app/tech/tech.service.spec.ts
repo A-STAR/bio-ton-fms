@@ -58,8 +58,7 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
     id: testVehicles.vehicles[1].id,
     name: testVehicles.vehicles[1].name,
     movementStatus: MovementStatus.NoData,
-    connectionStatus: ConnectionStatus.NotConnected,
-    numberOfSatellites: 0
+    connectionStatus: ConnectionStatus.NotConnected
   },
   {
     id: testVehicles.vehicles[2].id,

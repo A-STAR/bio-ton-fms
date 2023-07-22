@@ -12,10 +12,9 @@
 <mat-icon class="md-18" title="Соединение"
   [color]="vehicle.connectionStatus === ConnectionStatus.Connected ? 'accent' : 'primary'">podcasts</mat-icon>
 
-<mat-icon class="md-18" title="Спутники"
-  [color]="vehicle.numberOfSatellites > 7 ? 'accent' : vehicle.numberOfSatellites > 4 ? 'primary' : 'warn'">
-  signal_cellular_alt
-</mat-icon>
+<mat-icon class="md-18" title="Спутники" [color]="vehicle.numberOfSatellites
+  ? vehicle.numberOfSatellites > 7 ? 'accent' : vehicle.numberOfSatellites > 4 ? 'primary' : 'warn'
+  : 'warn'">signal_cellular_alt</mat-icon>
 
 <button mat-icon-button bioStopClickPropagation title="Отправить команду" color="accent">
   <mat-icon class="md-18">sms</mat-icon>

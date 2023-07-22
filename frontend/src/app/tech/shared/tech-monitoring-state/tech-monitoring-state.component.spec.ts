@@ -111,7 +111,9 @@ async function testStateRendering(
     ),
     loader.getHarness(
       MatIconHarness.with({
-        selector: testVehicle.numberOfSatellites > 7 ? '.mat-accent' : testVehicle.numberOfSatellites > 4 ? '.mat-primary' : '.mat-warn',
+        selector: testVehicle.numberOfSatellites
+          ? testVehicle.numberOfSatellites > 7 ? '.mat-accent' : testVehicle.numberOfSatellites > 4 ? '.mat-primary' : '.mat-warn'
+          : '.mat-warn',
         name: 'signal_cellular_alt'
       })
     ),

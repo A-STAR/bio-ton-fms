@@ -35,7 +35,7 @@ export type MonitoringVehicle = Pick<Vehicle, 'id' | 'name'> & {
   lastMessageTime?: string;
   movementStatus: MovementStatus;
   connectionStatus: ConnectionStatus;
-  numberOfSatellites: number;
+  numberOfSatellites?: number;
   trackerExternalId?: Tracker['externalId'];
   trackerIMEI?: Tracker['imei'];
 };
