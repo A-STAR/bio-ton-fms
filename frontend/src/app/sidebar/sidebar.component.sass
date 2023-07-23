@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'sass:math'
 @use 'variables' as *
 
@@ -26,8 +27,8 @@ $mat-mdc-list-item-icon-size: 24px
   .mat-mdc-list-item-icon,
   .mat-mdc-list-item-title,
   mat-divider
-    transition-duration: $panel-transition-duration
-    transition-timing-function: $panel-transition-timing-function
+    transition-duration: map.get($transition, panel, duration)
+    transition-timing-function: map.get($transition, panel, timing-function)
 
   .logo img,
   .mat-mdc-list-item-title

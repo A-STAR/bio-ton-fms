@@ -28,14 +28,11 @@ $mat-mdc-form-field: (font-size: 14px, padding: (horizontal: 12px), infix: (heig
 
 $mat-icon-button: (size: 30px, padding: math.div(30px - 24px, 2), icon: (font-size: 24px, line-height: 24px, md-18-margin-horizontal: math.div(30px - 18px, 2)), gap: 4px)
 
-$panel-transition-duration: 200ms
-$panel-transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1)
-$button-transition: 280ms cubic-bezier(0.4, 0, 0.2, 1)
+$transition: (panel: (duration: 200ms, timing-function: cubic-bezier(0.25, 0.8, 0.25, 1)), button: (duration: 280ms, timing-function: cubic-bezier(0.4, 0, 0.2, 1)))
 
 $box-shadow: 0px 2px 9px rgba($shady, 18%)
 
-$panel-animation: 280ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
-$text-animation: 300ms forwards cubic-bezier(0.55, 0, 0.55, 0.2)
+$animation: (fill-mode: forwards, timing-function: cubic-bezier(0.55, 0, 0.55, 0.2), panel: (duration: 280ms), text: (duration: 300ms))
 
 $bio-sidebar-width: 100px
 

@@ -1,7 +1,8 @@
+@use 'sass:map'
 @use 'variables' as *
 
 mat-table
-  animation: fadein $panel-animation
+  animation: fadein map.get($animation, panel, duration) map.get($animation, fill-mode) map.get($animation, timing-function)
 
   &.mdc-data-table__table
     min-width: unset
