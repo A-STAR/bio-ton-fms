@@ -5,16 +5,13 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { ConnectionStatus, MonitoringVehicle, MovementStatus } from '../../tech.service';
 
-import { StopClickPropagationDirective } from 'src/app/shared/stop-click-propagation/stop-click-propagation.directive';
-
 @Component({
   selector: 'bio-tech-monitoring-state',
   standalone: true,
   imports: [
     CommonModule,
     MatButtonModule,
-    MatIconModule,
-    StopClickPropagationDirective
+    MatIconModule
   ],
   templateUrl: './tech-monitoring-state.component.html',
   styleUrls: ['./tech-monitoring-state.component.sass'],
