@@ -55,7 +55,11 @@
       box-shadow: $box-shadow
 
 .mat-mdc-icon-button
-  transition: color $button-transition
+
+  &, // this selector needed for icon color transition
+  span.mat-mdc-button-persistent-ripple::before
+    transition-duration: map.get($transition, button, duration)
+    transition-timing-function: map.get($transition, button, timing-function)
 
   @at-root a#{&}
     display: flex
@@ -74,7 +78,7 @@
     padding: map.get($mat-icon-button, padding)
 
   span.mat-mdc-button-persistent-ripple::before
-    transition: opacity $button-transition
+    transition-property: background-color, opacity
 
   @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
     opacity: 0

@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'variables' as *
 
 .mat-button-toggle-group-appearance-standard,
@@ -6,8 +7,9 @@
 
 .mat-button-toggle-appearance-standard
   color: $green
-  transition: $button-transition
   transition-property: background-color, color
+  transition-duration: map.get($transition, button, duration)
+  transition-timing-function: map.get($transition, button, timing-function)
 
   &:not(.mat-button-toggle-disabled, .mat-button-toggle-checked):hover
     background-color: $lighter-green

@@ -80,19 +80,17 @@ async function testStateRendering(
 ) {
   mockTestVehicle(component, fixture, testVehicle);
 
-  const selector = '[bioStopClickPropagation]';
-
   const harnesses: PromiseLike<MatButtonHarness | MatIconHarness>[] = [
     loader.getHarness(
       MatButtonHarness.with({
-        selector: `${selector}.mat-primary`,
+        selector: '.mat-primary',
         variant: 'icon',
         text: 'route'
       })
     ),
     loader.getHarness(
       MatButtonHarness.with({
-        selector: `${selector}.mat-primary`,
+        selector: '.mat-primary',
         variant: 'icon',
         text: 'my_location'
       })
@@ -100,7 +98,9 @@ async function testStateRendering(
     loader.getHarness(
       MatIconHarness.with({
         selector: testVehicle.movementStatus === MovementStatus.Moving ? '.mat-accent' : '.mat-primary',
-        name: testVehicle.movementStatus === MovementStatus.Moving ? 'play_arrow' : 'stop'
+        name: testVehicle.movementStatus === MovementStatus.Moving
+          ? 'play_arrow'
+          : testVehicle.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'
       })
     ),
     loader.getHarness(
@@ -111,13 +111,15 @@ async function testStateRendering(
     ),
     loader.getHarness(
       MatIconHarness.with({
-        selector: testVehicle.numberOfSatellites > 7 ? '.mat-accent' : testVehicle.numberOfSatellites > 4 ? '.mat-primary' : '.mat-warn',
+        selector: testVehicle.numberOfSatellites
+          ? testVehicle.numberOfSatellites > 3 ? '.mat-accent' : '.mat-primary'
+          : '.mat-warn',
         name: 'signal_cellular_alt'
       })
     ),
     loader.getHarness(
       MatButtonHarness.with({
-        selector: `${selector}.mat-accent`,
+        selector: '.mat-accent',
         variant: 'icon',
         text: 'sms'
       })
@@ -130,7 +132,15 @@ async function testStateRendering(
     const stateEl = await state.host();
     const stateTitle = await stateEl?.getAttribute('title');
 
-    const titles = ['Показать путь', 'Показать местоположение', 'Движение', 'Соединение', 'Спутники', 'Отправить команду'];
+    const movementTitle = testVehicle.movementStatus === MovementStatus.Moving
+      ? 'В движении'
+      : testVehicle.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных';
+
+    const connectionTitle = testVehicle.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён';
+
+    const satellitesTitle = `Захвачено ${testVehicle.numberOfSatellites} спутников`;
+
+    const titles = ['Построить трек', 'Следить за объектом', movementTitle, connectionTitle, satellitesTitle, 'Отправить команду'];
 
     expect(stateTitle)
       .withContext('render state title')

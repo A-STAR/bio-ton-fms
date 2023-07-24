@@ -76,7 +76,7 @@
       padding-left: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       padding-right: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       font-size: map.get($mat-mdc-form-field, font-size)
-      animation: transitionmessages $text-animation
+      animation: transitionmessages map.get($animation, text, duration) map.get($animation, fill-mode) map.get($animation, timing-function)
 
       @keyframes transitionmessages
         from
@@ -106,7 +106,7 @@
 
   mat-row
     position: relative
-    transition: background-color $panel-transition-duration $panel-transition-timing-function
+    transition: background-color map.get($transition, panel, duration) map.get($transition, panel, timing-function)
 
     &:nth-child(odd)
       background-color: $light
