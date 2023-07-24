@@ -1,19 +1,24 @@
-<button mat-icon-button bioStopClickPropagation title="Показать путь" color="primary">
+<button mat-icon-button bioStopClickPropagation title="Построить трек" color="primary">
   <mat-icon class="md-18">route</mat-icon>
 </button>
 
-<button mat-icon-button bioStopClickPropagation title="Показать местоположение" color="primary">
+<button mat-icon-button bioStopClickPropagation title="Следить за объектом" color="primary">
   <mat-icon class="md-18">my_location</mat-icon>
 </button>
 
-<mat-icon class="md-18" title="Движение" [color]="vehicle.movementStatus === MovementStatus.Moving ? 'accent' : 'primary'"
-  [fontIcon]="vehicle.movementStatus === MovementStatus.Moving ? 'play_arrow' : 'stop'"></mat-icon>
+<mat-icon class="md-18" [title]="vehicle.movementStatus === MovementStatus.Moving
+  ? 'В движении'
+  : vehicle.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных'"
+  [color]="vehicle.movementStatus === MovementStatus.Moving ? 'accent' : 'primary'"
+  [fontIcon]="vehicle.movementStatus === MovementStatus.Moving
+    ? 'play_arrow'
+    : vehicle.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'"></mat-icon>
 
-<mat-icon class="md-18" title="Соединение"
+<mat-icon class="md-18" [title]="vehicle.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён'"
   [color]="vehicle.connectionStatus === ConnectionStatus.Connected ? 'accent' : 'primary'">podcasts</mat-icon>
 
-<mat-icon class="md-18" title="Спутники" [color]="vehicle.numberOfSatellites
-  ? vehicle.numberOfSatellites > 7 ? 'accent' : vehicle.numberOfSatellites > 4 ? 'primary' : 'warn'
+<mat-icon class="md-18" [title]="'Захвачено ' + vehicle.numberOfSatellites + ' спутников'" [color]="vehicle.numberOfSatellites
+  ? vehicle.numberOfSatellites > 3 ? 'accent' : 'primary'
   : 'warn'">signal_cellular_alt</mat-icon>
 
 <button mat-icon-button bioStopClickPropagation title="Отправить команду" color="accent">
