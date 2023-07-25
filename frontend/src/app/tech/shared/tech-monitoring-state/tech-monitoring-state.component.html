@@ -21,6 +21,8 @@
   ? vehicle.numberOfSatellites > 3 ? 'accent' : 'primary'
   : 'warn'">signal_cellular_alt</mat-icon>
 
-<button mat-icon-button title="Отправить команду" color="accent">
-  <mat-icon class="md-18">sms</mat-icon>
-</button>
+<ng-container *ngIf="vehicle.tracker as tracker">
+  <button mat-icon-button title="Отправить команду" color="accent">
+    <mat-icon class="md-18">sms</mat-icon>
+  </button>
+</ng-container>
