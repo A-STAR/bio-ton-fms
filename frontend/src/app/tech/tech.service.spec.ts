@@ -51,8 +51,11 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
     movementStatus: MovementStatus.Moving,
     connectionStatus: ConnectionStatus.Connected,
     numberOfSatellites: 20,
-    trackerExternalId: testTrackers.trackers[0].externalId,
-    trackerIMEI: testTrackers.trackers[0].imei
+    tracker: {
+      id: testTrackers.trackers[0].id,
+      externalId: testTrackers.trackers[0].externalId,
+      imei: testTrackers.trackers[0].imei
+    }
   },
   {
     id: testVehicles.vehicles[1].id,
@@ -67,7 +70,10 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
     movementStatus: MovementStatus.Stopped,
     connectionStatus: ConnectionStatus.Connected,
     numberOfSatellites: 7,
-    trackerExternalId: testTrackers.trackers[2].externalId,
-    trackerIMEI: testTrackers.trackers[2].imei,
+    tracker: {
+      id: testTrackers.trackers[2].id,
+      externalId: testTrackers.trackers[2].externalId,
+      imei: testTrackers.trackers[2].imei
+    }
   }
 ];
