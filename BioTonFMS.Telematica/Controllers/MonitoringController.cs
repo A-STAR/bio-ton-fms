@@ -3,6 +3,7 @@ using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos;
@@ -30,14 +31,15 @@ public class MonitoringController : ValidationControllerBase
 {
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IMapper _mapper;
+    private readonly ITrackerMessageRepository _messageRepository;
 
     public MonitoringController(
         IMapper mapper,
         ILogger<MonitoringController> logger,
-        IVehicleRepository vehicleRepository,
-        ITrackerRepository trackerRepo)
+        IVehicleRepository vehicleRepository, ITrackerMessageRepository messageRepository)
     {
         _vehicleRepository = vehicleRepository;
+        _messageRepository = messageRepository;
         _mapper = mapper;
     }
 
@@ -54,16 +56,24 @@ public class MonitoringController : ValidationControllerBase
         var vehicles = _vehicleRepository.FindVehicles(findCriterion);
 
         var monitoringDtos = vehicles.Select(v => _mapper.Map<MonitoringVehicleDto>(v)).ToArray();
-        var randomizer = new Randomizer();
-        foreach (var monitoringDto in monitoringDtos) 
+
+        var ids = monitoringDtos.Where(x => x.Tracker?.ExternalId != null)
+            .Select(x => x.Tracker!.ExternalId!.Value).ToArray();
+        
+        var states = _messageRepository.GetVehicleStates(ids, 60);
+        
+        foreach (var monitoringDto in monitoringDtos)
         {
-            monitoringDto.MovementStatus = randomizer.Enum<MovementStatusEnum>();
-            monitoringDto.ConnectionStatus = randomizer.Enum<ConnectionStatusEnum>();
-            monitoringDto.LastMessageTime = DateTime.Now.AddMinutes(-randomizer.Int(0, 30)).ToUniversalTime() ;
-            monitoringDto.NumberOfSatellites = randomizer.Int(0, 20);
+            if (monitoringDto.Tracker?.ExternalId == null) continue;
+            
+            var status = states[monitoringDto.Tracker.ExternalId.Value];
+
+            monitoringDto.MovementStatus = status.MovementStatus;
+            monitoringDto.ConnectionStatus = status.ConnectionStatus;
+            monitoringDto.LastMessageTime = status.LastMessageTime;
+            monitoringDto.NumberOfSatellites = status.NumberOfSatellites;
         }
 
         return Ok(monitoringDtos);
     }
-
 }
