@@ -3,6 +3,7 @@ using System;
 using BioTonFMS.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMS.Migrations.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    partial class BioTonDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230706221807_TrackerCommandRespTime")]
+    partial class TrackerCommandRespTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1011,6 +1013,7 @@ namespace BioTonFMS.Migrations.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<byte[]>("BinaryResponse")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("bytea")
                         .HasColumnName("binary_response");
@@ -1198,7 +1201,7 @@ namespace BioTonFMS.Migrations.Migrations
                         {
                             Id = 10,
                             DataType = (byte)3,
-                            Description = "Одно из значений:\r\n1. HDOP, если источник координат ГЛОНАСС/GPS модуль\r\n2. Погрешность в метрах, если источник базовые станции GSM-сети",
+                            Description = "Одно из значений:\n1. HDOP, если источник координат ГЛОНАСС/GPS модуль\n2. Погрешность в метрах, если источник базовые станции GSM-сети",
                             Name = "hdop"
                         },
                         new
@@ -1247,28 +1250,28 @@ namespace BioTonFMS.Migrations.Migrations
                         {
                             Id = 17,
                             DataType = (byte)1,
-                            Description = "Значение на входе 0.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
+                            Description = "Значение на входе 0.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc1"
                         },
                         new
                         {
                             Id = 18,
                             DataType = (byte)1,
-                            Description = "Значение на входе 1.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
+                            Description = "Значение на входе 1.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc2"
                         },
                         new
                         {
                             Id = 19,
                             DataType = (byte)1,
-                            Description = "Значение на входе 2.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
+                            Description = "Значение на входе 2.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc3"
                         },
                         new
                         {
                             Id = 20,
                             DataType = (byte)1,
-                            Description = "Значение на входе 3.\r\nВ зависимости от настроек один из вариантов:\r\n1. Напряжение, Мв\r\n2. число импульсов\r\n3. частота, Гц",
+                            Description = "Значение на входе 3.\nВ зависимости от настроек один из вариантов:\n1. Напряжение, Мв\n2. число импульсов\n3. частота, Гц",
                             Name = "adc4"
                         },
                         new
@@ -1303,77 +1306,77 @@ namespace BioTonFMS.Migrations.Migrations
                         {
                             Id = 25,
                             DataType = (byte)1,
-                            Description = "Данные CAN-шины (CAN_A0) или CAN-LOG.\r\nТопливо, израсходованное машиной с момента её создания, л",
+                            Description = "Данные CAN-шины (CAN_A0) или CAN-LOG.\nТопливо, израсходованное машиной с момента её создания, л",
                             Name = "can_a0"
                         },
                         new
                         {
                             Id = 27,
                             DataType = (byte)1,
-                            Description = "Данные CAN-шины (CAN_B0) или CAN-LOG.\r\nПробег автомобиля, м.",
+                            Description = "Данные CAN-шины (CAN_B0) или CAN-LOG.\nПробег автомобиля, м.",
                             Name = "can_b0"
                         },
                         new
                         {
                             Id = 28,
                             DataType = (byte)3,
-                            Description = "CAN8BITR0\r\nили скорость транспортного средства, передаваемая с CAN-LOG’а, км/ч",
+                            Description = "CAN8BITR0\nили скорость транспортного средства, передаваемая с CAN-LOG’а, км/ч",
                             Name = "can8_bitr0"
                         },
                         new
                         {
                             Id = 29,
                             DataType = (byte)3,
-                            Description = "CAN8BITR1\r\nили второй байт префикса S от CAN-LOG",
+                            Description = "CAN8BITR1\nили второй байт префикса S от CAN-LOG",
                             Name = "can8_bitr1"
                         },
                         new
                         {
                             Id = 30,
                             DataType = (byte)3,
-                            Description = "CAN8BITR2\r\nили первый байт префикса S от CAN-LOG",
+                            Description = "CAN8BITR2\nили первый байт префикса S от CAN-LOG",
                             Name = "can8_bitr2"
                         },
                         new
                         {
                             Id = 31,
                             DataType = (byte)3,
-                            Description = "CAN8BITR3\r\nили младший байт префикса S от CAN-LOG",
+                            Description = "CAN8BITR3\nили младший байт префикса S от CAN-LOG",
                             Name = "can8_bitr3"
                         },
                         new
                         {
                             Id = 32,
                             DataType = (byte)3,
-                            Description = "CAN8BITR4\r\nили третий байт префикса P от CAN-LOG",
+                            Description = "CAN8BITR4\nили третий байт префикса P от CAN-LOG",
                             Name = "can8_bitr4"
                         },
                         new
                         {
                             Id = 33,
                             DataType = (byte)3,
-                            Description = "CAN8BITR5\r\nили второй байт префикса P от CAN-LOG",
+                            Description = "CAN8BITR5\nили второй байт префикса P от CAN-LOG",
                             Name = "can8_bitr5"
                         },
                         new
                         {
                             Id = 34,
                             DataType = (byte)1,
-                            Description = "В зависимости от настроек один из вариантов:\r\nCAN32BITR0\r\nполное время работы двигателя, ч",
+                            Description = "В зависимости от настроек один из вариантов:\nCAN32BITR0\nполное время работы двигателя, ч",
                             Name = "can32_bitr0"
                         },
                         new
                         {
                             Id = 35,
                             DataType = (byte)1,
-                            Description = "Значение на входе 4.\r\nВ зависимости от настроек один из вариантов:\r\n1. напряжение, мВ\r\n2. число импульсов\r\n3. частота, Гц",
+                            Description = "Значение на входе 4.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
                             Name = "port_4"
                         },
                         new
                         {
                             Id = 36,
                             DataType = (byte)1,
-                            Description = "Значение на входе 5.\r\nВ зависимости от настроек один из вариантов:\r\n1. напряжение, мВ\r\n2. число импульсов\r\n3. частота, Гц",
+                            Description = "Значение на входе 5.\nВ зависимости от настроек один из вариантов:\n1. напряжение, мВ\n2. число импульсов\n3. частота, Гц",
                             Name = "port_5"
                         },
                         new
@@ -1394,14 +1397,14 @@ namespace BioTonFMS.Migrations.Migrations
                         {
                             Id = 39,
                             DataType = (byte)3,
-                            Description = "Состояние ключей iButton, идентификаторы которых заданы командой iButtons.\r\nКаждый бит соответствует одному ключу.\r\nНапример, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи.",
+                            Description = "Состояние ключей iButton, идентификаторы которых заданы командой iButtons.\nКаждый бит соответствует одному ключу.\nНапример, получено: 05 или 00000101 в двоичном виде. Это значит, что подсоединены первый и третий ключи.",
                             Name = "i_button_keys"
                         },
                         new
                         {
                             Id = 40,
                             DataType = (byte)2,
-                            Description = "0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.\r\n1 – статус GPRS сессии. 1- установлена, 0 – нет.\r\n2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.\r\n3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.\r\n4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.\r\n5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.\r\n6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует.",
+                            Description = "0 – состояние подключения к основному серверу. 1- подключен, 0 – нет.\n1 – статус GPRS сессии. 1- установлена, 0 – нет.\n2 – признак глушения GSM. 1- обнаружено глушение, 0 – нет.\n3 – состояние подключения к дополнительному серверу. 1 – подключен, 0 – нет.\n4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.\n5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.\n6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует.",
                             Name = "expanded_terminal_status"
                         });
                 });

@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\BioTonFMS.Common\BioTonFMS.Common.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.Domain\BioTonFMS.Domain.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.Infrastructure.RabbitMQ\BioTonFMS.Infrastructure.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\BioTonFMS.Infrastructure.TrackerCommands\BioTonFMS.TrackerProtocolSpecific.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
     <ProjectReference Include="..\..\BioTonFMS.MessageProcessing\BioTonFMS.MessageProcessing.csproj" />
     <ProjectReference Include="..\..\Migrations\BioTonFMS.MessagesMigrations\BioTonFMS.MessagesMigrations.csproj" />

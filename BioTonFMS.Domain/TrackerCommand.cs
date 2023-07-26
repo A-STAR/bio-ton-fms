@@ -40,5 +40,10 @@ public class TrackerCommand : EntityBase, IAggregateRoot
     /// Бинарная информация, которая может прилагаться к ответу
     ///</summary>
     [MaxLength(200)]
-    public byte[] BinaryResponse { get; set; } = Array.Empty<byte>();
+    public byte[]? BinaryResponse { get; set; } = Array.Empty<byte>();
+
+    /// <summary>
+    /// Время получения ответа на команду
+    /// </summary>
+    public DateTime? ResponseDateTime { get; set; }
 }

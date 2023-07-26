@@ -100,13 +100,13 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
         {
             _logger.LogTrace("Обработка сообщения RabbitMQ");
 
-            var subscriptions = _handlers;
+            List<Type> subscriptions = _handlers;
             foreach (var subscription in subscriptions)
             {
                 var handler = _serviceProvider.GetService(subscription);
                 if (handler == null)
                 {
-                    _logger.LogWarning("Нет зарегистрированных обработчиков");
+                    _logger.LogWarning($"Нет зарегистрированных обработчиков для подписки на сообщение типа {subscription.Name}");
                     continue;
                 }
 
