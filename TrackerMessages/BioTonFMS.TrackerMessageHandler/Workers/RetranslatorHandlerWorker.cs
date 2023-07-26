@@ -11,11 +11,11 @@ public class RetranslatorHandlerWorker : BackgroundService
 
     public RetranslatorHandlerWorker(
         ILogger<RetranslatorHandlerWorker> logger,
-        Func<BusType, IMessageBus> busResolver
+        Func<MessgingBusType, IMessageBus> busResolver
     )
     {
         _logger = logger;
-        _messageBus = busResolver(BusType.Retranslation);
+        _messageBus = busResolver(MessgingBusType.Retranslation);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

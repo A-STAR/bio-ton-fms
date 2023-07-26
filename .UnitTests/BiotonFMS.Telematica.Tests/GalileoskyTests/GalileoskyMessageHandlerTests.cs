@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Net;
 using BiotonFMS.Telematica.Tests.Mocks;
-using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -54,7 +53,7 @@ public class GalileoskyMessageHandlerTests
         _testOutputHelper.WriteLine(title);
 
         var busMock = new MessageBusMock();
-        var handler = new GalileoskyProtocolMessageHandler(busMock, logStub.Object);
+        var handler = new GalileoskyProtocolMessageHandler(bus => busMock, logStub.Object);
 
         var bytes = File.ReadAllLines(messagePath)
             .SelectMany(x => x.Split())

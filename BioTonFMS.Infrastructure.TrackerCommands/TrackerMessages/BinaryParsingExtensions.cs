@@ -1,7 +1,7 @@
+﻿using BioTonFMS.Domain.TrackerMessages;
 using System.Text;
-using BioTonFMS.Domain.TrackerMessages;
 
-namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
+namespace BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 
 internal static class BinaryParsingExtensions
 {

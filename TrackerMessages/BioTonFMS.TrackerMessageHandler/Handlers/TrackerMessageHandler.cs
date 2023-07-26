@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Messaging;
 using BioTonFMS.Domain.TrackerMessages;
@@ -8,35 +9,45 @@ using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.MessageBus;
 using BioTonFMS.MessageProcessing;
-using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using BioTonFMS.TrackerMessageHandler.Retranslation;
+using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
+using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog.Core;
 
 namespace BioTonFMS.TrackerMessageHandler.Handlers;
 
 public class TrackerMessageHandler : IBusMessageHandler
 {
     private readonly ILogger<TrackerMessageHandler> _logger;
-    private readonly Func<TrackerTypeEnum, IMessageParser> _parserProvider;
+    private readonly Func<TrackerTypeEnum, ITrackerMessageParser> _parserProvider;
+    private readonly Func<TrackerTypeEnum, ICommandCodec> _codecProvider;
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly ITrackerTagRepository _trackerTagRepository;
     private readonly ITrackerRepository _trackerRepository;
     private readonly IMessageBus _retranslatorBus;
+    private readonly IMessageBus _commandReceiveBus;
     private readonly RetranslatorOptions _retranslatorOptions;
 
     public TrackerMessageHandler(ILogger<TrackerMessageHandler> logger,
-        Func<TrackerTypeEnum, IMessageParser> parserProvider, ITrackerMessageRepository messageRepository,
-        ITrackerTagRepository trackerTagRepository, ITrackerRepository trackerRepository,
-        Func<BusType, IMessageBus> busResolver, IOptions<RetranslatorOptions> retranslatorOptions)
+        Func<TrackerTypeEnum, ITrackerMessageParser> parserProvider,
+        Func<TrackerTypeEnum, ICommandCodec> codecProvider,
+        ITrackerMessageRepository messageRepository,
+        ITrackerTagRepository trackerTagRepository, 
+        ITrackerRepository trackerRepository,
+        Func<MessgingBusType, IMessageBus> busResolver, 
+        IOptions<RetranslatorOptions> retranslatorOptions)
     {
         _logger = logger;
         _parserProvider = parserProvider;
+        _codecProvider = codecProvider;
         _messageRepository = messageRepository;
         _trackerTagRepository = trackerTagRepository;
         _trackerRepository = trackerRepository;
         _retranslatorOptions = retranslatorOptions.Value;
-        _retranslatorBus = busResolver(BusType.Retranslation);
+        _retranslatorBus = busResolver(MessgingBusType.Retranslation);
+        _commandReceiveBus = busResolver(MessgingBusType.TrackerCommandsReceive);
     }
 
     public Task HandleAsync(byte[] binaryMessage)
@@ -44,21 +55,43 @@ public class TrackerMessageHandler : IBusMessageHandler
         var messageText = Encoding.UTF8.GetString(binaryMessage);
         _logger.LogDebug("Получен пакет {MessageText}", messageText);
 
+        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
+            ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", messageText);
+
         if (_retranslatorOptions.Enabled)
         {
             _retranslatorBus.Publish(binaryMessage);
         }
 
-        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
-            ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", messageText);
+        if (_parserProvider(rawMessage.TrackerType).IsCommandReply(rawMessage.RawMessage))
+        {
+            _logger.LogDebug("Получен ответ на команду RawMessage = {RawMessage}", string.Join(' ', rawMessage.RawMessage.Select(x => x.ToString("X"))));
+            CommandResponseInfo responseInfo = _codecProvider(rawMessage.TrackerType).DecodeCommand(rawMessage.RawMessage);
+            _logger.LogDebug("Команда декодирована ExternalId={ExternalId}, CommandId={CommandId}, ResponseText={ResponseText}",
+                responseInfo.ExternalId, responseInfo.CommandId, responseInfo.ResponseText);
+            TrackerCommandResponseMessage commendResponseMessage = new()
+            {
+                Imei = responseInfo.Imei,
+                ExternalId = responseInfo.ExternalId,
+                CommandId = responseInfo.CommandId,
+                ResponseText = responseInfo.ResponseText,
+                ResponseBinary = responseInfo.ResponseBinary,
+                ResponseDateTime = SystemTime.UtcNow
+            };
+            _commandReceiveBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(commendResponseMessage)));
+            return Task.CompletedTask;
+        }
 
         if (_messageRepository.ExistsByUid(rawMessage.PackageUID))
         {
             return Task.CompletedTask;
         }
 
+        var parseStart = DateTime.UtcNow;
         TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
             .ToArray();
+
+        _logger.LogTrace("TrackerMessageHandler after parcing {PackageUID} parsing took {Time} ms", rawMessage.PackageUID, (DateTime.UtcNow - parseStart).TotalMilliseconds);
 
         Tracker? tracker = null;
         if (messages.Length > 0)
@@ -76,7 +109,7 @@ public class TrackerMessageHandler : IBusMessageHandler
 
                 trackerMessage.ExternalTrackerId = tracker.ExternalId;
             }
-
+            _logger.LogTrace("TrackerMessageHandler before calculating tags {PackageUID}", rawMessage.PackageUID);
             try
             {
                 CalculateSensorTags(tracker, messages);
@@ -85,6 +118,7 @@ public class TrackerMessageHandler : IBusMessageHandler
             {
                 _logger.LogError(ex, "Ошибка при вычислении тегов датчиков");
             }
+            _logger.LogTrace("TrackerMessageHandler after calculating tags {PackageUID}", rawMessage.PackageUID);
         }
         else
         {
@@ -93,8 +127,10 @@ public class TrackerMessageHandler : IBusMessageHandler
 
         foreach (var trackerMessage in messages)
         {
+            _logger.LogTrace("TrackerMessageHandler перед добавлением нового сообщения из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId}, Imei={Imei}",
+                rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
             _messageRepository.Add(trackerMessage);
-            _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId} Imei={Imei}",
+            _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId}, Imei={Imei}",
                 rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
         }
 

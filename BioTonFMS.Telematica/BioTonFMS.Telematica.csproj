@@ -14,7 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BioTonFMS.Domain\BioTonFMS.Domain.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure.EF\BioTonFMS.Infrastructure.EF.csproj" />
-    <ProjectReference Include="..\BioTonFMS.Infrastructure.TrackerCommands\BioTonFMS.TrackerCommands.csproj" />
+    <ProjectReference Include="..\BioTonFMS.Infrastructure.TrackerCommands\BioTonFMS.TrackerProtocolSpecific.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
     <ProjectReference Include="..\BioTonFMS.MessageProcessing\BioTonFMS.MessageProcessing.csproj" />
   </ItemGroup>

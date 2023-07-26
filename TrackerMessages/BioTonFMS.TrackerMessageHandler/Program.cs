@@ -3,15 +3,15 @@ using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.MessageBus;
-using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.RabbitMQ;
 using BioTonFMS.Infrastructure.Utils.Network;
 using BioTonFMS.Migrations;
 using BioTonFMS.TrackerMessageHandler;
 using BioTonFMS.TrackerMessageHandler.Handlers;
-using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using BioTonFMS.TrackerMessageHandler.Retranslation;
 using BioTonFMS.TrackerMessageHandler.Workers;
+using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
+using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
-using System.ComponentModel;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(hostConfig =>
@@ -37,36 +36,31 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddTransient<ITcpClient, FmsTcpClient>();
         services.AddSingleton<Factory<ITcpClient>>(serviceProvider => serviceProvider.GetRequiredService<ITcpClient>);
         services.AddSingleton<IRetranslator, Retranslator>();
-        
 
-        services.AddSingleton<Func<BusType, IMessageBus>>(serviceProvider => bus =>
-            bus switch
-            {
-                BusType.Retranslation => new RabbitMQMessageBus(
-                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
-                    "Retranslation"),
-                BusType.Consuming => new RabbitMQMessageBus(
-                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
-                    "RawTrackerMessages-primary"),
-                _ => throw new ArgumentOutOfRangeException(nameof(bus), bus, null)
-            }
+        services.AddSingleton<Func<MessgingBusType, IMessageBus>>(serviceProvider => busType =>
+            MessageBusFactory.CreateOrGetBus(busType, serviceProvider)
         );
         
         services.AddHostedService<MessageHandlerWorker>();
         services.AddHostedService<RetranslatorHandlerWorker>();
 
         services.AddTransient<GalileoskyMessageParser>();
-        services.AddTransient<Func<TrackerTypeEnum, IMessageParser>>(provider => key => key switch
+        services.AddTransient<Func<TrackerTypeEnum, ITrackerMessageParser>>(provider => key => 
+        key switch
         {
             TrackerTypeEnum.GalileoSkyV50 => provider.GetRequiredService<GalileoskyMessageParser>(),
             TrackerTypeEnum.Retranslator => throw new NotImplementedException(),
             TrackerTypeEnum.WialonIPS => throw new NotImplementedException(),
             _ => throw new NotImplementedException()
         });
+
+        services.AddSingleton<Func<TrackerTypeEnum, ICommandCodec>>(type => 
+        type switch
+        {
+            TrackerTypeEnum.GalileoSkyV50 => new GalileoskyCommandCodec(),
+            _ => throw new NotImplementedException()
+        }
+        );
 
         Console.WriteLine("MessageConnection =" + hostContext.Configuration.GetConnectionString("MessagesConnection"));
         Console.WriteLine("DefaultConnection =" + hostContext.Configuration.GetConnectionString("DefaultConnection"));

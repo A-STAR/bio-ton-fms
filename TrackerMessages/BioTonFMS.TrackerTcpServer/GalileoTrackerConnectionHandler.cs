@@ -1,4 +1,5 @@
 ﻿using BioTonFMS.Domain;
+using BioTonFMS.Domain.Messaging;
 using BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 using Microsoft.AspNetCore.Connections;
 using System.Net;
@@ -9,13 +10,16 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
 {
     private readonly ILogger<GalileoTrackerConnectionHandler> _logger;
     private readonly IProtocolMessageHandler _handler;
+    private readonly TcpSendCommandMessages _commandMessages;
 
     public GalileoTrackerConnectionHandler(
         ILogger<GalileoTrackerConnectionHandler> logger,
-        Func<TrackerTypeEnum, IProtocolMessageHandler> handlerProvider)
+        Func<TrackerTypeEnum, IProtocolMessageHandler> handlerProvider,
+        TcpSendCommandMessages commandMessages)
     {
         _logger = logger;
         _handler = handlerProvider(TrackerTypeEnum.GalileoSkyV50);
+        _commandMessages = commandMessages;
     }
 
     public override async Task OnConnectedAsync(ConnectionContext connection)
@@ -49,17 +53,28 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
                     _logger.LogDebug("message.count = {MessageCount} length = {Length} for {Id}", message.Count, length,
                         connection.ConnectionId);
 
-                    byte[] resp;
+                    byte[] response;
+                    IPAddress ip = IPAddress.None;
+                    int port = 0;
                     if (connection.RemoteEndPoint is IPEndPoint endpoint)
                     {
-                        resp = _handler.HandleMessage(message.ToArray(), endpoint.Address, endpoint.Port);
+                        ip = endpoint.Address;
+                        port = endpoint.Port;
                     }
-                    else
+                    response = _handler.HandleMessage(message.ToArray(), ip, port);
+
+                    await connection.Transport.Output.WriteAsync(response);
+
+                    // после обработки пакета нужно проверить есть ли команда для этого трекера
+                    // если есть отправляем эту команду и удаляем команду из очереди
+                    TrackerCommandMessage? command = _commandMessages.GetCommandForTracker(ip, port);
+                    if (command != null)
                     {
-                        resp = _handler.HandleMessage(message.ToArray(), ip: IPAddress.None, port: 0);
+                        await connection.Transport.Output.WriteAsync(command.EncodedCommand);
+                        _logger.LogInformation("Команда CommandId = {CommandId} была отправлена трекеру по адресу {Ip}:{Port} данные: {Message}", 
+                            command.CommandId, ip, port, string.Join(' ', command.EncodedCommand.Select(x => x.ToString("X"))));
                     }
 
-                    await connection.Transport.Output.WriteAsync(resp);
                     message = new();
                 }
             }

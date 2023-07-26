@@ -3,8 +3,9 @@ using System.Globalization;
 using System.Text;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
+using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 using BiotonFMS.Telematica.Tests.Mocks;
-using BioTonFMS.TrackerMessageHandler.MessageParsing;
+
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;

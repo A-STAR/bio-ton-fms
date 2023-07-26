@@ -1,4 +1,4 @@
-namespace BioTonFMS.TrackerCommands.Exceptions;
+namespace BioTonFMS.TrackerProtocolSpecific.Exceptions;
 
 public class NotValidTrackerAddressException : Exception
 {

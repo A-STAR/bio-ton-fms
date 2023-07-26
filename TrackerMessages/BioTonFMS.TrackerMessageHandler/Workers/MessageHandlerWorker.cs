@@ -11,11 +11,11 @@ public class MessageHandlerWorker : BackgroundService
 
     public MessageHandlerWorker(
         ILogger<MessageHandlerWorker> logger,
-        Func<BusType, IMessageBus> busResolver
+        Func<MessgingBusType, IMessageBus> busResolver
         )
     {
         _logger = logger;
-        _messageBus = busResolver(BusType.Consuming);
+        _messageBus = busResolver(MessgingBusType.Consuming);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

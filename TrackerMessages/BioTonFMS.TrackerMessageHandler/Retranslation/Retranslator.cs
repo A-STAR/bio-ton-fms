@@ -55,13 +55,13 @@ public class Retranslator : IRetranslator
             try
             {
                 await _client.ConnectAsync(_options.Host, _options.Port);
-                _logger.LogInformation("Установлено соединение по адресу {Host}:{Port}",
-                    _options.Host, _options.Port);
+                _logger.LogInformation("Установлено соединение по адресу {Host}:{Port} для {MessageFrom}",
+                    _options.Host, _options.Port, messageFrom);
             }
             catch (Exception e)
             {
-                _logger.LogError("Ошибка при открытии соединения по адресу {Host}:{Port} - {Message}",
-                    _options.Host, _options.Port, e.Message);
+                _logger.LogError("Ошибка при открытии соединения по адресу {Host}:{Port} для {MessageFrom} - {Message}",
+                    _options.Host, _options.Port, messageFrom, e.Message);
                 return;
             }
         }
@@ -71,13 +71,13 @@ public class Retranslator : IRetranslator
         try
         {
             await stream.WriteAsync(data);
-            _logger.LogDebug("Отправлено: '{Message}'",
-                string.Join(' ', data.Select(x => x.ToString("X"))));
+            _logger.LogDebug("Отправлено для {MessageFrom}: '{Message}'",
+                messageFrom, string.Join(' ', data.Select(x => x.ToString("X"))));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Ошибка при отправке сообщения {Message}: {Exception}",
-                string.Join(' ', data.Select(x => x.ToString("X"))), e.Message);
+            _logger.LogError(e, "Ошибка при отправке сообщения для {MessageFrom} {Message}: {Exception}",
+                messageFrom, string.Join(' ', data.Select(x => x.ToString("X"))), e.Message);
             return;
         }
 
@@ -95,8 +95,8 @@ public class Retranslator : IRetranslator
             
             if (!success)
             {
-                _logger.LogError("Время ожидания истекло при отправке сообщения {Message}",
-                    string.Join(' ', data.Select(x => x.ToString("X"))));
+                _logger.LogError("Время ожидания истекло при отправке сообщения {Message} для {MessageFrom}",
+                    messageFrom, string.Join(' ', data.Select(x => x.ToString("X"))));
                 return;
             }
 
