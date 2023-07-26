@@ -103,7 +103,7 @@ public class Retranslator : IRetranslator
             var responseData = string.Join(' ', respBuf.Take(readCount)
                 .Select(x => x.ToString("X")));
 
-            _logger.LogDebug("Получено: {Response}", responseData);
+            _logger.LogDebug("Получено: '{Response}'", responseData);
         }
         catch (Exception e)
         {

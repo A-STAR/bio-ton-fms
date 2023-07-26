@@ -23,10 +23,7 @@ public class TcpClientMock : ITcpClient
         return MockStream;
     }
 
-    public bool IsConnected()
-    {
-        throw new NotImplementedException();
-    }
+    public bool IsConnected() => true;
 
     public DateTime LastUsed()
     {
