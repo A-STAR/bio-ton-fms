@@ -22,7 +22,7 @@
   : 'warn'">signal_cellular_alt</mat-icon>
 
 <ng-container *ngIf="vehicle.tracker as tracker">
-  <button mat-icon-button title="Отправить команду" color="accent">
+  <button mat-icon-button title="Отправить команду" color="accent" (click)="sendTrackerCommand.emit(tracker.id)">
     <mat-icon class="md-18">sms</mat-icon>
   </button>
 </ng-container>
