@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Globalization;
-using BioTonFMS.Domain;
+using System.Text;
 using BioTonFMS.Domain.TrackerMessages;
-using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
+using BiotonFMS.Telematica.Tests.Mocks;
 using BioTonFMS.TrackerMessageHandler.MessageParsing;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -490,34 +490,12 @@ public class GalileoskyMessageParserTests
     #region SetupTools
     private static GalileoskyMessageParser SetupGalileoskyMessageParser()
     {
-        var tagRepo = SetupTagRepository();
+        var tagRepo = ProtocolTagRepositoryMock.GetStub();
         var logStub = new Mock<ILogger<GalileoskyMessageParser>>();
 
         return new GalileoskyMessageParser(tagRepo, logStub.Object);
     }
-
-    private static IProtocolTagRepository SetupTagRepository()
-    {
-        var tagStub = new Mock<IProtocolTagRepository>();
-
-        var trackerTags = TagsSeed.TrackerTags
-            .ToDictionary(x => x.Id);
-
-        var protocolTags = TagsSeed.ProtocolTags
-            .Where(x => x.TrackerType == TrackerTypeEnum.GalileoSkyV50)
-            .Select(x =>
-            {
-                if (x.TagId.HasValue && trackerTags.TryGetValue(x.TagId.Value, out var tag))
-                    x.Tag = tag;
-                return x;
-            })
-            .ToArray();
-
-        tagStub.Setup(x => x.GetTagsForTrackerType(TrackerTypeEnum.GalileoSkyV50))
-            .Returns(protocolTags);
-
-        return tagStub.Object;
-    }
+    
     #endregion
 }
 public class BitArrayConverter : JsonConverter<BitArray>
@@ -532,7 +510,7 @@ public class BitArrayConverter : JsonConverter<BitArray>
 
         var byteArray = new byte[value.Length / 8 + 1];
         value.CopyTo(byteArray, 0);
-        writer.WriteValue(System.Text.Encoding.UTF8.GetString(byteArray));
+        writer.WriteValue(Encoding.UTF8.GetString(byteArray));
     }
 
     public override BitArray? ReadJson(JsonReader reader, Type objectType, BitArray? existingValue,
@@ -545,7 +523,7 @@ public class BitArrayConverter : JsonConverter<BitArray>
         }
 
         var str = (string)reader.Value;
-        var byteArray = System.Text.Encoding.UTF8.GetBytes(str);
+        var byteArray = Encoding.UTF8.GetBytes(str);
         return new BitArray(byteArray);
     }
 }
