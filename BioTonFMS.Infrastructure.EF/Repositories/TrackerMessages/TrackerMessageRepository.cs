@@ -1,5 +1,6 @@
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
@@ -8,6 +9,7 @@ using BioTonFMS.Infrastructure.Paging.Extensions;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
@@ -146,7 +148,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .OrderByDescending(m => m.Id)
             .FirstOrDefault();
     }
-    
+
     public PagedResult<ParametersHistoryRecord> GetParametersHistory(ParametersHistoryFilter filter)
     {
         Dictionary<int, string> tagNames = _tagsRepository.GetTags()
@@ -177,5 +179,41 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                     res + tagNames[tag.TrackerTagId!.Value] + '=' + tag.ValueString + ',')
             }).ToList()
         };
+    }
+
+    public IDictionary<int, VehicleStatus> GetVehicleStates(int[] externalIds,
+        int trackerAddressValidMinutes)
+    {
+        var now = SystemTime.UtcNow;
+        var foundResults = new Dictionary<int, VehicleStatus>();
+
+        foreach (var id in externalIds)
+        {
+            //todo: упаковать в 1 запрос
+            var msg = QueryableProvider.Linq()
+                .Where(x => x.ExternalTrackerId == id)
+                .OrderByDescending(x => x.ServerDateTime)
+                .FirstOrDefault();
+
+            foundResults[id] = msg != null
+                ? new VehicleStatus
+                {
+                    TrackerExternalId = msg.ExternalTrackerId,
+                    ConnectionStatus = (now - msg.ServerDateTime).Minutes < trackerAddressValidMinutes
+                        ? ConnectionStatusEnum.Connected
+                        : ConnectionStatusEnum.NotConnected,
+                    MovementStatus = msg.Speed > 0 ? MovementStatusEnum.Moving : MovementStatusEnum.Stopped,
+                    LastMessageTime = msg.TrackerDateTime,
+                    NumberOfSatellites = msg.SatNumber
+                }
+                : new VehicleStatus
+                {
+                    TrackerExternalId = id,
+                    MovementStatus = MovementStatusEnum.NoData,
+                    ConnectionStatus = ConnectionStatusEnum.NotConnected
+                };
+        }
+
+        return foundResults;
     }
 }

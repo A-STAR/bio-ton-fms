@@ -9,6 +9,7 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Xml.Xsl;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 {
@@ -18,9 +19,9 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             IKeyValueProvider<Vehicle, int> keyValueProvider,
             IQueryableProvider<Vehicle> queryableProvider,
             UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactory) : base(
-                keyValueProvider,
-                queryableProvider,
-                unitOfWorkFactory)
+            keyValueProvider,
+            queryableProvider,
+            unitOfWorkFactory)
         {
         }
 
@@ -33,11 +34,11 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 return vehicle;
             }
         }
+
         private IQueryable<Vehicle> HydratedQuery
         {
             get
             {
-
                 return QueryableProvider
                     .Fetch(v => v.VehicleGroup)
                     .Fetch(v => v.FuelType)
@@ -128,16 +129,15 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
         public Vehicle[] FindVehicles(string? findCriterion)
         {
-            // заглушка - всегда возвращаем все машины
-            VehiclesFilter filter = new VehiclesFilter
-            {
-                PageNum = 1,
-                PageSize = 1000,
-                SortBy = VehicleSortBy.Name,
-                SortDirection = SortDirection.Ascending,
-            };
-            var result = GetVehicles(filter);
-            return result.Results.ToArray();
+            // На странице мониторинга показываем только машины с привязанными трекерами
+            var vehicleQuery = QueryableProvider.Fetch(x => x.Tracker).Linq().Where(x => x.Tracker != null).OrderBy(x => x.Name);
+            return (string.IsNullOrEmpty(findCriterion)
+                ? vehicleQuery
+                : vehicleQuery.Where(x => x.Name.Contains(findCriterion) ||
+                                (x.Tracker != null &&
+                                    (x.Tracker.ExternalId.ToString() == findCriterion ||
+                                     x.Tracker.Imei == findCriterion)))
+            ).ToArray();
         }
 
         public override void Add(Vehicle vehicle)

@@ -1,29 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
 using BioTonFMS.Domain.Monitoring;
 
-namespace BioTonFMS.Telematica.Dtos.Monitoring;
+namespace BioTonFMS.Domain.TrackerMessages;
 
-/// <summary>
-/// Модель машины
-/// </summary>
-public class MonitoringVehicleDto
+public class VehicleStatus
 {
     /// <summary>
-    /// Id машины
+    /// Идентификатор трекера во внешней системе
     /// </summary>
-    [Required]
-    public int Id { get; set; }
-
-    /// <summary>
-    /// Наименование машины
-    /// </summary>
-    [Required]
-    public string Name { get; set; } = "";
-
-    /// <summary>
-    /// Трекер машины
-    /// </summary>
-    public MonitoringTrackerDto? Tracker { get; set; }
+    public int TrackerExternalId { get; set; }
 
     /// <summary>
     /// Состояние движения
@@ -44,5 +28,4 @@ public class MonitoringVehicleDto
     /// Количество спутников
     /// </summary>
     public int? NumberOfSatellites { get; set; }
-
 }

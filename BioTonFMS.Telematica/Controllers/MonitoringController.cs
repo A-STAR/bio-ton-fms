@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
-using BioTonFMS.Domain.Monitoring;
-using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Controllers;
-using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
-using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
-using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.Monitoring;
-using BioTonFMS.Telematica.Dtos.Vehicle;
-using BioTonFMS.Telematica.Validation;
-using Bogus;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,14 +24,15 @@ public class MonitoringController : ValidationControllerBase
 {
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IMapper _mapper;
+    private readonly ITrackerMessageRepository _messageRepository;
 
     public MonitoringController(
         IMapper mapper,
         ILogger<MonitoringController> logger,
-        IVehicleRepository vehicleRepository,
-        ITrackerRepository trackerRepo)
+        IVehicleRepository vehicleRepository, ITrackerMessageRepository messageRepository)
     {
         _vehicleRepository = vehicleRepository;
+        _messageRepository = messageRepository;
         _mapper = mapper;
     }
 
@@ -51,19 +46,27 @@ public class MonitoringController : ValidationControllerBase
     [ProducesResponseType(typeof(MonitoringVehicleDto[]), StatusCodes.Status200OK)]
     public IActionResult FindVehicles([FromQuery] string? findCriterion)
     {
-        var vehicles = _vehicleRepository.FindVehicles(findCriterion);
+        Vehicle[] vehicles = _vehicleRepository.FindVehicles(findCriterion);
 
-        var monitoringDtos = vehicles.Select(v => _mapper.Map<MonitoringVehicleDto>(v)).ToArray();
-        var randomizer = new Randomizer();
-        foreach (var monitoringDto in monitoringDtos) 
+        MonitoringVehicleDto[] monitoringDtos = vehicles.Select(v => _mapper.Map<MonitoringVehicleDto>(v)).ToArray();
+
+        int[] trackerExternalIds = monitoringDtos.Where(x => x.Tracker?.ExternalId != null)
+            .Select(x => x.Tracker!.ExternalId!.Value).ToArray();
+        
+        var states = _messageRepository.GetVehicleStates(trackerExternalIds, 60);
+        
+        foreach (MonitoringVehicleDto monitoringDto in monitoringDtos)
         {
-            monitoringDto.MovementStatus = randomizer.Enum<MovementStatusEnum>();
-            monitoringDto.ConnectionStatus = randomizer.Enum<ConnectionStatusEnum>();
-            monitoringDto.LastMessageTime = DateTime.Now.AddMinutes(-randomizer.Int(0, 30)).ToUniversalTime() ;
-            monitoringDto.NumberOfSatellites = randomizer.Int(0, 20);
+            if (monitoringDto.Tracker?.ExternalId == null) continue;
+            
+            var status = states[monitoringDto.Tracker.ExternalId.Value];
+
+            monitoringDto.MovementStatus = status.MovementStatus;
+            monitoringDto.ConnectionStatus = status.ConnectionStatus;
+            monitoringDto.LastMessageTime = status.LastMessageTime;
+            monitoringDto.NumberOfSatellites = status.NumberOfSatellites;
         }
 
         return Ok(monitoringDtos);
     }
-
 }
