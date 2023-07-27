@@ -116,15 +116,20 @@ async function testStateRendering(
           : '.mat-warn',
         name: 'signal_cellular_alt'
       })
-    ),
-    loader.getHarness(
+    )
+  ];
+
+  if (testVehicle.tracker) {
+    const sendTrackerCommandButtonHarness = loader.getHarness(
       MatButtonHarness.with({
         selector: '.mat-accent',
         variant: 'icon',
         text: 'sms'
       })
-    )
-  ];
+    );
+
+    harnesses.push(sendTrackerCommandButtonHarness);
+  }
 
   const states = await parallel(() => harnesses);
 

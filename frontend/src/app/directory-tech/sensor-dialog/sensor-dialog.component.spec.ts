@@ -70,9 +70,9 @@ describe('SensorDialogComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(SensorDialogComponent);
+    sensorService = TestBed.inject(SensorService);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
-    sensorService = TestBed.inject(SensorService);
 
     component = fixture.componentInstance;
 

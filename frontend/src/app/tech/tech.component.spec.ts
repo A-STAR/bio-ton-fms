@@ -1,10 +1,14 @@
 import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatListOptionHarness, MatSelectionListHarness } from '@angular/material/list/testing';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -12,12 +16,15 @@ import { MonitoringVehicle, TechService } from './tech.service';
 
 import TechComponent from './tech.component';
 import { MapComponent } from '../shared/map/map.component';
+import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
 import { testMonitoringVehicles } from './tech.service.spec';
 
 describe('TechComponent', () => {
   let component: TechComponent;
   let fixture: ComponentFixture<TechComponent>;
+  let overlayContainer: OverlayContainer;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
 
   let vehiclesSpy: jasmine.Spy<() => Observable<MonitoringVehicle[]>>;
@@ -26,13 +33,16 @@ describe('TechComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           HttpClientTestingModule,
+          MatDialogModule,
           TechComponent
         ]
       })
       .compileComponents();
 
     fixture = TestBed.createComponent(TechComponent);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
 
     const techService = TestBed.inject(TechService);
@@ -194,4 +204,24 @@ describe('TechComponent', () => {
       .withContext('render map component')
       .not.toBeNull();
   });
+
+  it('should render GPS tracker command dialog', fakeAsync(async () => {
+    const techMonitoringStateDe = fixture.debugElement.query(
+      By.directive(TechMonitoringStateComponent)
+    );
+
+    techMonitoringStateDe.triggerEventHandler('sendTrackerCommand', testMonitoringVehicles[0].tracker!.id);
+
+    const commandTrackerDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(commandTrackerDialog)
+      .withContext('render a GPS tracker command dialog')
+      .toBeDefined();
+
+    await commandTrackerDialog!.close();
+
+    overlayContainer = TestBed.inject(OverlayContainer);
+
+    overlayContainer.ngOnDestroy();
+  }));
 });

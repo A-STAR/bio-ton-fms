@@ -6,9 +6,9 @@ import localeRu from '@angular/common/locales/ru';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -65,10 +65,10 @@ describe('TrackersComponent', () => {
     registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackersComponent);
-    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
-    loader = TestbedHarnessEnvironment.loader(fixture);
     overlayContainer = TestBed.inject(OverlayContainer);
     trackerService = TestBed.inject(TrackerService);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
 

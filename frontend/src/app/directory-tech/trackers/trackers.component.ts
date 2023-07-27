@@ -15,10 +15,12 @@ import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, New
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { StopClickPropagationDirective } from 'src/app/shared/stop-click-propagation/stop-click-propagation.directive';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
+
 import {
   TrackerCommandDialogComponent,
   trackerCommandDialogConfig
-} from '../shared/tracker-command-dialog/tracker-command-dialog.component';
+} from '../../shared/tracker-command-dialog/tracker-command-dialog.component';
+
 import {
   ConfirmationDialogComponent,
   confirmationDialogConfig,
@@ -154,7 +156,7 @@ export default class TrackersComponent implements OnInit, OnDestroy {
   /**
    * Send a command to GPS-tracker.
    *
-   * @param trackerDataSource Tracker data source.
+   * @param trackerDataSource `TrackerDataSource` data source.
    */
   protected onSendTrackerCommand({ id }: TrackerDataSource) {
     const data: Tracker['id'] = id;
