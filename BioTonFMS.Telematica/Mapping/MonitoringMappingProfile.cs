@@ -11,21 +11,8 @@ namespace BioTonFMS.Telematica.Mapping
     {
         public MonitoringMappingProfile()
         {
-            CreateMap<Vehicle, MonitoringVehicleDto>()
-                .AfterMap((src, dest) =>
-                {
-                    if (src.TrackerId.HasValue)
-                    {
-                        dest.TrackerExternalId = src.Tracker!.ExternalId;
-                        dest.TrackerImei = src.Tracker!.Imei;
-                    }
-                    else
-                    {
-                        dest.TrackerExternalId = null;
-                        dest.TrackerImei = null;
-                    }
-                });
-
+            CreateMap<Vehicle, MonitoringVehicleDto>();
+            CreateMap<Tracker, MonitoringTrackerDto>();
         }
     }
 }
