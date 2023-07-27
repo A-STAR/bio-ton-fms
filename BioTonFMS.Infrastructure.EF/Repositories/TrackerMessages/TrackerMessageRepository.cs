@@ -184,7 +184,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     public IDictionary<int, VehicleStatus> GetVehicleStates(int[] externalIds,
         int trackerAddressValidMinutes)
     {
-        var now = DateTime.UtcNow;
+        var now = SystemTime.UtcNow;
         var foundResults = new Dictionary<int, VehicleStatus>();
 
         foreach (var id in externalIds)

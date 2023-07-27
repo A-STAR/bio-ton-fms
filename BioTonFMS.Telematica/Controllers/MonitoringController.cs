@@ -1,16 +1,9 @@
 ﻿using AutoMapper;
-using BioTonFMS.Domain.Monitoring;
-using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.Controllers;
-using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
-using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
-using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.Monitoring;
-using BioTonFMS.Telematica.Dtos.Vehicle;
-using BioTonFMS.Telematica.Validation;
-using Bogus;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -53,16 +46,16 @@ public class MonitoringController : ValidationControllerBase
     [ProducesResponseType(typeof(MonitoringVehicleDto[]), StatusCodes.Status200OK)]
     public IActionResult FindVehicles([FromQuery] string? findCriterion)
     {
-        var vehicles = _vehicleRepository.FindVehicles(findCriterion);
+        Vehicle[] vehicles = _vehicleRepository.FindVehicles(findCriterion);
 
-        var monitoringDtos = vehicles.Select(v => _mapper.Map<MonitoringVehicleDto>(v)).ToArray();
+        MonitoringVehicleDto[] monitoringDtos = vehicles.Select(v => _mapper.Map<MonitoringVehicleDto>(v)).ToArray();
 
-        var ids = monitoringDtos.Where(x => x.Tracker?.ExternalId != null)
+        int[] trackerExternalIds = monitoringDtos.Where(x => x.Tracker?.ExternalId != null)
             .Select(x => x.Tracker!.ExternalId!.Value).ToArray();
         
-        var states = _messageRepository.GetVehicleStates(ids, 60);
+        var states = _messageRepository.GetVehicleStates(trackerExternalIds, 60);
         
-        foreach (var monitoringDto in monitoringDtos)
+        foreach (MonitoringVehicleDto monitoringDto in monitoringDtos)
         {
             if (monitoringDto.Tracker?.ExternalId == null) continue;
             

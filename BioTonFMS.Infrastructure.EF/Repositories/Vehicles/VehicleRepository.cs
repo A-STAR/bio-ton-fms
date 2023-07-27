@@ -9,6 +9,7 @@ using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Xml.Xsl;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 {
@@ -126,16 +127,18 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 .GetPagedQueryable(filter.PageNum, filter.PageSize);
         }
 
-        public Vehicle[] FindVehicles(string? findCriterion) =>
-            (string.IsNullOrEmpty(findCriterion)
-                ? QueryableProvider.Fetch(x => x.Tracker).Linq()
-                : QueryableProvider.Fetch(x => x.Tracker)
-                    .Linq()
-                    .Where(x => x.Name.Contains(findCriterion) ||
+        public Vehicle[] FindVehicles(string? findCriterion)
+        {
+            // На странице мониторинга показываем только машины с привязанными трекерами
+            var vehicleQuery = QueryableProvider.Fetch(x => x.Tracker).Linq().Where(x => x.Tracker != null).OrderBy(x => x.Name);
+            return (string.IsNullOrEmpty(findCriterion)
+                ? vehicleQuery
+                : vehicleQuery.Where(x => x.Name.Contains(findCriterion) ||
                                 (x.Tracker != null &&
-                                 (x.Tracker.ExternalId.ToString() == findCriterion ||
-                                  x.Tracker.Imei == findCriterion)))
+                                    (x.Tracker.ExternalId.ToString() == findCriterion ||
+                                     x.Tracker.Imei == findCriterion)))
             ).ToArray();
+        }
 
         public override void Add(Vehicle vehicle)
         {
