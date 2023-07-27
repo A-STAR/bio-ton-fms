@@ -63,9 +63,9 @@ describe('TrackerDialogComponent', () => {
     registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackerDialogComponent);
+    trackerService = TestBed.inject(TrackerService);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
-    trackerService = TestBed.inject(TrackerService);
 
     component = fixture.componentInstance;
 

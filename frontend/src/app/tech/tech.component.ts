@@ -2,13 +2,20 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
+import { MatDialog } from '@angular/material/dialog';
 
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 import { MonitoringVehicle, TechService } from './tech.service';
+import { Tracker } from '../directory-tech/tracker.service';
 
 import { MapComponent } from '../shared/map/map.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
+
+import {
+  TrackerCommandDialogComponent,
+  trackerCommandDialogConfig
+} from '../shared/tracker-command-dialog/tracker-command-dialog.component';
 
 @Component({
   selector: 'bio-tech',
@@ -33,13 +40,15 @@ export default class TechComponent implements OnInit {
     this.#options$.next({ ...this.#options, ...options });
   }
 
+  protected vehicles$!: Observable<MonitoringVehicle[]>;
+
   /**
    * Select all `MatCheckbox` component change event handler.
    *
    * @param event `MatCheckboxChange` change event.
    * @param list `MatSelectionList` list component.
    */
-  onSelectAllChange({ checked }: MatCheckboxChange, list: MatSelectionList) {
+  protected onSelectAllChange({ checked }: MatCheckboxChange, list: MatSelectionList) {
     let selected: Set<MonitoringVehicle['id']>;
 
     if (checked) {
@@ -62,7 +71,7 @@ export default class TechComponent implements OnInit {
    *
    * @param event `MatSelectionListChange` selection change event.
    */
-  onSelectionChange({ source }: MatSelectionListChange) {
+  protected onSelectionChange({ source }: MatSelectionListChange) {
     const vehicleIDs = source.selectedOptions.selected.map<MonitoringVehicle['id']>(({ value }) => value.id);
 
     const selected = new Set(vehicleIDs);
@@ -70,7 +79,19 @@ export default class TechComponent implements OnInit {
     this.#options = { selected };
   }
 
-  protected vehicles$!: Observable<MonitoringVehicle[]>;
+  /**
+   * Send a command to vehicle GPS-tracker.
+   *
+   * @param id `Tracker` ID.
+   */
+  protected onSendTrackerCommand(id: Tracker['id']) {
+    const data: Tracker['id'] = id;
+
+    this.dialog.open<TrackerCommandDialogComponent, Tracker['id'], '' | undefined>(
+      TrackerCommandDialogComponent,
+      { ...trackerCommandDialogConfig, data }
+    );
+  }
 
   #vehicles: MonitoringVehicle[] | undefined;
   #options$ = new BehaviorSubject<TechOptions>({});
@@ -88,7 +109,7 @@ export default class TechComponent implements OnInit {
       );
   }
 
-  constructor(private techService: TechService) { }
+  constructor(private dialog: MatDialog, private techService: TechService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {

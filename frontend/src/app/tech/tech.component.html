@@ -11,7 +11,7 @@
       <div *ngFor="let vehicle of vehicles">
         <mat-list-option checkboxPosition="before" [value]="vehicle">{{ vehicle.name }}</mat-list-option>
 
-        <bio-tech-monitoring-state [vehicle]="vehicle"></bio-tech-monitoring-state>
+        <bio-tech-monitoring-state [vehicle]="vehicle" (sendTrackerCommand)="onSendTrackerCommand($event)"></bio-tech-monitoring-state>
       </div>
     </mat-selection-list>
   </ng-container>

@@ -77,9 +77,9 @@ describe('TrackerComponent', () => {
     registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackerComponent);
+    overlayContainer = TestBed.inject(OverlayContainer);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
-    overlayContainer = TestBed.inject(OverlayContainer);
 
     component = fixture.componentInstance;
 
