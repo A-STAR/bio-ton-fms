@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { ConnectionStatus, MonitoringVehicle, MovementStatus, TechService } from './tech.service';
+import { ConnectionStatus, MonitoringVehicle, MonitoringVehiclesOptions, MovementStatus, TechService } from './tech.service';
 
 import { testVehicles } from '../directory-tech/vehicle.service.spec';
 import { testTrackers } from '../directory-tech/tracker.service.spec';
@@ -19,27 +19,76 @@ describe('TechService', () => {
     service = TestBed.inject(TechService);
   });
 
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
   it('should be created', () => {
     expect(service)
       .toBeTruthy();
   });
 
   it('should get vehicles', (done: DoneFn) => {
-    service
-      .getVehicles()
+    let vehiclesOptions: MonitoringVehiclesOptions | undefined;
+
+    const subscription = service
+      .getVehicles(vehiclesOptions)
       .subscribe(vehicles => {
         expect(vehicles)
-          .withContext('get vehicles')
+          .withContext('get vehicles without options')
+          .toEqual(testMonitoringVehicles);
+      });
+
+    let vehiclesRequest = httpTestingController.expectOne('/api/telematica/monitoring/vehicles', 'vehicles request');
+
+    vehiclesRequest.flush(testMonitoringVehicles);
+
+    subscription.unsubscribe();
+
+    vehiclesOptions = {};
+
+    service
+      .getVehicles(vehiclesOptions)
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get vehicles with blank options')
           .toEqual(testMonitoringVehicles);
 
         done();
       });
 
-    const vehiclesRequest = httpTestingController.expectOne(`/api/telematica/monitoring/vehicles`, 'vehicles request');
+    vehiclesRequest = httpTestingController.expectOne('/api/telematica/monitoring/vehicles', 'vehicles request');
 
     vehiclesRequest.flush(testMonitoringVehicles);
+  });
 
-    httpTestingController.verify();
+  it('should get found vehicles', (done: DoneFn) => {
+    const vehiclesOptions: MonitoringVehiclesOptions = {
+      findCriterion: testMonitoringVehicles[0].name.substring(0, 3)
+    };
+
+    const testFoundVehicles = testMonitoringVehicles.filter(
+      ({ name, tracker }) => name.includes(vehiclesOptions.findCriterion!)
+        || [tracker?.externalId, tracker?.imei].includes(vehiclesOptions.findCriterion)
+    );
+
+    service
+      .getVehicles(vehiclesOptions)
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get found vehicles')
+          .toEqual(testFoundVehicles);
+
+        done();
+      });
+
+    const vehiclesRequest = httpTestingController.expectOne(
+      `/api/telematica/monitoring/vehicles?findCriterion=${encodeURIComponent(vehiclesOptions.findCriterion!)
+      }`,
+      'find vehicles request'
+    );
+
+    vehiclesRequest.flush(testFoundVehicles);
   });
 });
 

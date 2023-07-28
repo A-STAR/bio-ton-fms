@@ -12,7 +12,7 @@ import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { MonitoringVehicle, TechService } from './tech.service';
+import { MonitoringVehicle, MonitoringVehiclesOptions, TechService } from './tech.service';
 
 import TechComponent from './tech.component';
 import { MapComponent } from '../shared/map/map.component';
@@ -27,7 +27,7 @@ describe('TechComponent', () => {
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
 
-  let vehiclesSpy: jasmine.Spy<() => Observable<MonitoringVehicle[]>>;
+  let vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>;
 
   beforeEach(async () => {
     await TestBed

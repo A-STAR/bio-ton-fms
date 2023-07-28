@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 
 import { Vehicle } from '../directory-tech/vehicle.service';
 import { Tracker } from '../directory-tech/tracker.service';
@@ -11,10 +11,16 @@ export class TechService {
   /**
    * Get monitoring vehicles.
    *
+   * @param fromObject Vehicles params options.
+   *
    * @returns An `Observable` of the `MonitoringVehicle[]` stream.
    */
-  getVehicles() {
-    return this.httpClient.get<MonitoringVehicle[]>('/api/telematica/monitoring/vehicles');
+  getVehicles(fromObject?: MonitoringVehiclesOptions) {
+    const paramsOptions: HttpParamsOptions = { fromObject };
+
+    const params = new HttpParams(paramsOptions);
+
+    return this.httpClient.get<MonitoringVehicle[]>('/api/telematica/monitoring/vehicles', { params });
   }
 
   constructor(private httpClient: HttpClient) { }
@@ -30,6 +36,10 @@ export enum ConnectionStatus {
   NotConnected = 'notConnected',
   Connected = 'connected'
 }
+
+export type MonitoringVehiclesOptions = Partial<{
+  findCriterion: string;
+}>;
 
 export type MonitoringVehicle = Pick<Vehicle, 'id' | 'name'> & {
   lastMessageTime?: string;
