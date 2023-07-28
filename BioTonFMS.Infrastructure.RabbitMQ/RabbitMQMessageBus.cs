@@ -28,6 +28,8 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
             _serviceProvider = serviceProvider;
             _rabbitMqSettings = rabbitMqOptions.Value;
             _queueName = queueName;
+            _logger.LogDebug("RabbitMQMessageBus параметры соединения - HostName = {HostName} Port = {Port} VirtualHost = {VirtualHost}, UserName = {UserName}",
+                _rabbitMqSettings.Host, _rabbitMqSettings.Port, _rabbitMqSettings.VHost, _rabbitMqSettings.User);
             var factory = new ConnectionFactory
             {
                 HostName = _rabbitMqSettings.Host,
