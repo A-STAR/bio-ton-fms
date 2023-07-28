@@ -302,7 +302,7 @@ Deploy-backend-production.bioton-fms.ru:
     # Backend
     - ssh gitlab@production.bioton-fms.ru docker rm -f fms-backend || true
     - ssh gitlab@production.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
-    - ssh gitlab@production.bioton-fms.ru docker run --name fms-backend -p 8080:80 -v /etc/fms/prod:/app/config -v /var/log/fms/prod:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
+    - ssh gitlab@production.bioton-fms.ru docker run --name fms-backend --network bioton -p 8080:80 -v /etc/fms/prod:/app/config -v /var/log/fms/prod:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     # Fms-tracker-tcp-server
     - ssh gitlab@production.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server
     - ssh gitlab@production.bioton-fms.ru docker rm -f fms-tracker-tcp-server || true
