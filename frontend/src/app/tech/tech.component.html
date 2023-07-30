@@ -5,6 +5,15 @@
         [checked]="list.selectedOptions.hasValue() && list.selectedOptions.selected.length === vehicles.length"
         [indeterminate]="list.selectedOptions.hasValue() && list.selectedOptions.selected.length !== vehicles.length"
         (change)="onSelectAllChange($event, list)"></mat-checkbox>
+
+      <form id="search-form" [formGroup]="searchForm">
+        <mat-form-field>
+          <input matInput id="search" placeholder="Поиск" formControlName="search">
+          <span matPrefix>
+            <mat-icon color="primary">search</mat-icon>
+          </span>
+        </mat-form-field>
+      </form>
     </div>
 
     <mat-selection-list #list (selectionChange)="onSelectionChange($event)">

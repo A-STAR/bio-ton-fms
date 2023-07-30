@@ -6,6 +6,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
+import { MatInputHarness } from '@angular/material/input/testing';
 import { MatListOptionHarness, MatSelectionListHarness } from '@angular/material/list/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
@@ -77,6 +78,23 @@ describe('TechComponent', () => {
     expect(checkbox)
       .withContext('render all checkbox')
       .toBeDefined();
+  }));
+
+  it('should render search form', fakeAsync(async () => {
+    const searchFormDe = fixture.debugElement.query(
+      By.css('form#search-form')
+    );
+
+    expect(searchFormDe)
+      .withContext('render search form element')
+      .not.toBeNull();
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
   }));
 
   it('should render vehicle list', fakeAsync(async () => {

@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -22,7 +26,11 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatCheckboxModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
     MatListModule,
     TechMonitoringStateComponent,
     MapComponent
@@ -41,6 +49,7 @@ export default class TechComponent implements OnInit {
   }
 
   protected vehicles$!: Observable<MonitoringVehicle[]>;
+  protected searchForm!: TechSearchForm;
 
   /**
    * Select all `MatCheckbox` component change event handler.
@@ -97,6 +106,15 @@ export default class TechComponent implements OnInit {
   #options$ = new BehaviorSubject<TechOptions>({});
 
   /**
+   * Initialize Search form.
+   */
+  #initSearchForm() {
+    this.searchForm = this.fb.group({
+      search: this.fb.nonNullable.control<string | undefined>(undefined)
+    });
+  }
+
+  /**
    * Get and set vehicles.
    */
   #setVehicles() {
@@ -109,14 +127,20 @@ export default class TechComponent implements OnInit {
       );
   }
 
-  constructor(private dialog: MatDialog, private techService: TechService) { }
+  constructor(private fb: FormBuilder, private dialog: MatDialog, private techService: TechService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
+    this.#initSearchForm();
     this.#setVehicles();
   }
 }
 
+type TechSearchForm = FormGroup<{
+  search: FormControl<string | undefined>;
+}>;
+
 type TechOptions = Partial<{
   selected: Set<MonitoringVehicle['id']>;
 }>;
+
