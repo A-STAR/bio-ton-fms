@@ -5,6 +5,7 @@ import { ConnectionStatus, MonitoringVehicle, MonitoringVehiclesOptions, Movemen
 
 import { testVehicles } from '../directory-tech/vehicle.service.spec';
 import { testTrackers } from '../directory-tech/tracker.service.spec';
+import { SEARCH_MIN_LENGTH } from './tech.component';
 
 describe('TechService', () => {
   let httpTestingController: HttpTestingController;
@@ -64,20 +65,15 @@ describe('TechService', () => {
 
   it('should get found vehicles', (done: DoneFn) => {
     const vehiclesOptions: MonitoringVehiclesOptions = {
-      findCriterion: testMonitoringVehicles[0].name.substring(0, 3)
+      findCriterion: testFindCriterion
     };
-
-    const testFoundVehicles = testMonitoringVehicles.filter(
-      ({ name, tracker }) => name.includes(vehiclesOptions.findCriterion!)
-        || [tracker?.externalId, tracker?.imei].includes(vehiclesOptions.findCriterion)
-    );
 
     service
       .getVehicles(vehiclesOptions)
       .subscribe(vehicles => {
         expect(vehicles)
           .withContext('get found vehicles')
-          .toEqual(testFoundVehicles);
+          .toEqual(testFoundMonitoringVehicles);
 
         done();
       });
@@ -88,7 +84,7 @@ describe('TechService', () => {
       'find vehicles request'
     );
 
-    vehiclesRequest.flush(testFoundVehicles);
+    vehiclesRequest.flush(testFoundMonitoringVehicles);
   });
 });
 
@@ -126,3 +122,10 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
     }
   }
 ];
+
+export const testFindCriterion = testMonitoringVehicles[0].name.substring(0, SEARCH_MIN_LENGTH);
+
+export const testFoundMonitoringVehicles = testMonitoringVehicles.filter(
+  ({ name, tracker }) => name.includes(testFindCriterion)
+    || [tracker?.externalId, tracker?.imei].includes(testFindCriterion)
+);

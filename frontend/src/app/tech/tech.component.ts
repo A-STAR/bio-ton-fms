@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
 import { MatDialog } from '@angular/material/dialog';
 
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, map, skipWhile, startWith, switchMap, tap } from 'rxjs';
 
 import { MonitoringVehicle, TechService } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
@@ -40,10 +40,35 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class TechComponent implements OnInit {
+  /**
+   * Get search stream.
+   *
+   * @returns An `Observable` of search stream.
+   */
+  get #search$() {
+    return this.searchForm
+      .get('search')!
+      .valueChanges.pipe(
+        debounceTime(SEARCH_DEBOUNCE_TIME),
+        distinctUntilChanged(),
+        skipWhile(searchValue => searchValue ? searchValue.length < SEARCH_MIN_LENGTH : true),
+        map(searchValue => searchValue !== undefined && searchValue.length < SEARCH_MIN_LENGTH ? undefined : searchValue),
+        distinctUntilChanged()
+      );
+  }
+
+  /**
+   * Get tech options.
+   *
+   * @returns `TechOptions` value.
+   */
   get #options() {
     return Object.freeze(this.#options$.value);
   }
 
+  /**
+   * Set tech options.
+   */
   set #options(options: TechOptions) {
     this.#options$.next({ ...this.#options, ...options });
   }
@@ -118,13 +143,20 @@ export default class TechComponent implements OnInit {
    * Get and set vehicles.
    */
   #setVehicles() {
-    this.vehicles$ = this.techService
-      .getVehicles()
-      .pipe(
-        tap(vehicles => {
-          this.#vehicles = vehicles;
-        })
-      );
+    this.vehicles$ = this.#search$.pipe(
+      startWith(undefined),
+      switchMap(findCriterion => findCriterion
+        ? this.techService.getVehicles({ findCriterion })
+        : this.techService
+          .getVehicles()
+          .pipe(
+            tap(vehicles => {
+              if (!findCriterion) {
+                this.#vehicles = vehicles;
+              }
+            })
+          ))
+    );
   }
 
   constructor(private fb: FormBuilder, private dialog: MatDialog, private techService: TechService) { }
@@ -144,3 +176,5 @@ type TechOptions = Partial<{
   selected: Set<MonitoringVehicle['id']>;
 }>;
 
+export const SEARCH_MIN_LENGTH = 3;
+export const SEARCH_DEBOUNCE_TIME = 500;

@@ -16,13 +16,15 @@
       </form>
     </div>
 
-    <mat-selection-list #list (selectionChange)="onSelectionChange($event)">
+    <mat-selection-list #list [hidden]="!vehicles.length" (selectionChange)="onSelectionChange($event)">
       <div *ngFor="let vehicle of vehicles">
         <mat-list-option checkboxPosition="before" [value]="vehicle">{{ vehicle.name }}</mat-list-option>
 
         <bio-tech-monitoring-state [vehicle]="vehicle" (sendTrackerCommand)="onSendTrackerCommand($event)"></bio-tech-monitoring-state>
       </div>
     </mat-selection-list>
+
+    <p [hidden]="vehicles.length">Техника не найдена</p>
   </ng-container>
 </aside>
 

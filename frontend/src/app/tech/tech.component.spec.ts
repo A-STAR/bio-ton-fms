@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -15,11 +15,11 @@ import { Observable, of } from 'rxjs';
 
 import { MonitoringVehicle, MonitoringVehiclesOptions, TechService } from './tech.service';
 
-import TechComponent from './tech.component';
+import TechComponent, { SEARCH_DEBOUNCE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
 import { MapComponent } from '../shared/map/map.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
-import { testMonitoringVehicles } from './tech.service.spec';
+import { testFindCriterion, testFoundMonitoringVehicles, testMonitoringVehicles } from './tech.service.spec';
 
 describe('TechComponent', () => {
   let component: TechComponent;
@@ -115,6 +115,22 @@ describe('TechComponent', () => {
       .toEqual(
         testMonitoringVehicles.map(({ name }) => name)
       );
+
+    const paragraphDe = fixture.debugElement.query(
+      By.css('p')
+    );
+
+    expect(paragraphDe.attributes)
+      .withContext('render empty tech list fallback paragraph `hidden` attribute')
+      .toEqual(
+        jasmine.objectContaining({
+          hidden: ''
+        })
+      );
+
+    expect(paragraphDe.nativeElement.textContent)
+      .withContext('render empty tech list fallback paragraph text')
+      .toBe('Техника не найдена');
   }));
 
   it('should render vehicle options monitoring state', async () => {
@@ -241,5 +257,71 @@ describe('TechComponent', () => {
     overlayContainer = TestBed.inject(OverlayContainer);
 
     overlayContainer.ngOnDestroy();
+  }));
+
+  it('should search vehicles', fakeAsync(async () => {
+    // skip initial call
+    vehiclesSpy.calls.reset();
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // enter empty value
+    await searchInput.setValue('');
+
+    tick(SEARCH_DEBOUNCE_TIME);
+
+    expect(vehiclesSpy)
+      .not.toHaveBeenCalled();
+
+    // enter insufficient search query
+    const testInsufficientSearchQuery = testFindCriterion.substring(0, SEARCH_MIN_LENGTH - 1);
+
+    await searchInput.setValue(testInsufficientSearchQuery);
+
+    tick(SEARCH_DEBOUNCE_TIME);
+
+    expect(vehiclesSpy)
+      .not.toHaveBeenCalled();
+
+    // enter satisfying search query
+    await searchInput.setValue(testFindCriterion);
+
+    tick(SEARCH_DEBOUNCE_TIME);
+
+    let vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith({
+        findCriterion: testFindCriterion
+      });
+
+    // clean search field
+    await searchInput.setValue('');
+
+    tick(SEARCH_DEBOUNCE_TIME);
+
+    vehicles$ = of(testMonitoringVehicles);
+
+    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith();
+
+    // enter insufficient search query
+    vehiclesSpy.calls.reset();
+
+    await searchInput.setValue(testInsufficientSearchQuery);
+
+    tick(SEARCH_DEBOUNCE_TIME);
+
+    expect(vehiclesSpy)
+      .not.toHaveBeenCalled();
   }));
 });
