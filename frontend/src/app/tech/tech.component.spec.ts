@@ -150,9 +150,10 @@ describe('TechComponent', () => {
       })
     );
 
-    const options = await loader.getAllHarnesses(
+    let options = await loader.getAllHarnesses(
       MatListOptionHarness.with({
-        ancestor: 'aside'
+        ancestor: 'aside',
+        selected: false
       })
     );
 
@@ -162,11 +163,25 @@ describe('TechComponent', () => {
 
     await checkbox.check();
 
+    options = await loader.getAllHarnesses(
+      MatListOptionHarness.with({
+        ancestor: 'aside',
+        selected: true
+      })
+    );
+
     expect(options.length)
       .withContext('render all options selected')
       .toBe(testMonitoringVehicles.length);
 
     await checkbox.uncheck();
+
+    options = await loader.getAllHarnesses(
+      MatListOptionHarness.with({
+        ancestor: 'aside',
+        selected: false
+      })
+    );
 
     expect(options.length)
       .withContext('render all options unselected')
