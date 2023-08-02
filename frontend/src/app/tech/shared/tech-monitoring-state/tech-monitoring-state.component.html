@@ -6,22 +6,20 @@
   <mat-icon class="md-18">my_location</mat-icon>
 </button>
 
-<mat-icon class="md-18" [title]="vehicle.movementStatus === MovementStatus.Moving
+<mat-icon class="md-18" [title]="tech.movementStatus === MovementStatus.Moving
   ? 'В движении'
-  : vehicle.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных'"
-  [color]="vehicle.movementStatus === MovementStatus.Moving ? 'accent' : 'primary'"
-  [fontIcon]="vehicle.movementStatus === MovementStatus.Moving
+  : tech.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных'"
+  [color]="tech.movementStatus === MovementStatus.Moving ? 'accent' : 'primary'" [fontIcon]="tech.movementStatus === MovementStatus.Moving
     ? 'play_arrow'
-    : vehicle.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'"></mat-icon>
+    : tech.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'"></mat-icon>
 
-<mat-icon class="md-18" [title]="vehicle.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён'"
-  [color]="vehicle.connectionStatus === ConnectionStatus.Connected ? 'accent' : 'primary'">podcasts</mat-icon>
+<mat-icon class="md-18" [title]="tech.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён'"
+  [color]="tech.connectionStatus === ConnectionStatus.Connected ? 'accent' : 'primary'">podcasts</mat-icon>
 
-<mat-icon class="md-18" [title]="'Захвачено ' + vehicle.numberOfSatellites + ' спутников'" [color]="vehicle.numberOfSatellites
-  ? vehicle.numberOfSatellites > 3 ? 'accent' : 'primary'
-  : 'warn'">signal_cellular_alt</mat-icon>
+<mat-icon class="md-18" [title]="'Захвачено ' + tech.numberOfSatellites + ' спутников'"
+  [color]="tech.numberOfSatellites ? tech.numberOfSatellites > 3 ? 'accent' : 'primary' : 'warn'">signal_cellular_alt</mat-icon>
 
-<ng-container *ngIf="vehicle.tracker as tracker">
+<ng-container *ngIf="tech.tracker as tracker">
   <button mat-icon-button title="Отправить команду" color="accent" (click)="sendTrackerCommand.emit(tracker.id)">
     <mat-icon class="md-18">sms</mat-icon>
   </button>

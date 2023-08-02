@@ -63,7 +63,7 @@ describe('TechComponent', () => {
       .toBeTruthy();
   });
 
-  it('should get vehicles', () => {
+  it('should get tech', () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
   });
@@ -97,7 +97,7 @@ describe('TechComponent', () => {
     );
   }));
 
-  it('should render vehicle list', fakeAsync(async () => {
+  it('should render tech list', fakeAsync(async () => {
     const list = await loader.getHarness(
       MatSelectionListHarness.with({
         ancestor: 'aside'
@@ -111,7 +111,7 @@ describe('TechComponent', () => {
     ));
 
     expect(titles)
-      .withContext('render vehicle options title')
+      .withContext('render tech options title')
       .toEqual(
         testMonitoringVehicles.map(({ name }) => name)
       );
@@ -133,13 +133,13 @@ describe('TechComponent', () => {
       .toBe('Техника не найдена');
   }));
 
-  it('should render vehicle options monitoring state', async () => {
+  it('should render tech options monitoring state', async () => {
     const optionStateDes = fixture.debugElement.queryAll(
       By.css('mat-selection-list div bio-tech-monitoring-state')
     );
 
     expect(optionStateDes.length)
-      .withContext('render vehicle options monitoring state')
+      .withContext('render tech options monitoring state')
       .toBe(testMonitoringVehicles.length);
   });
 
@@ -274,7 +274,7 @@ describe('TechComponent', () => {
     overlayContainer.ngOnDestroy();
   }));
 
-  it('should search vehicles', fakeAsync(async () => {
+  it('should search tech', fakeAsync(async () => {
     // skip initial call
     vehiclesSpy.calls.reset();
 

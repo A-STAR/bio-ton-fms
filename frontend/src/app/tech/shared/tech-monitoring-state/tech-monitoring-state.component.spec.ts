@@ -6,7 +6,8 @@ import { MatIconHarness } from '@angular/material/icon/testing';
 
 import { TechMonitoringStateComponent } from './tech-monitoring-state.component';
 
-import { ConnectionStatus, MonitoringVehicle, MovementStatus } from '../../tech.service';
+import { ConnectionStatus, MovementStatus } from '../../tech.service';
+import { MonitoringTech } from '../../tech.component';
 
 import { testMonitoringVehicles } from '../../tech.service.spec';
 
@@ -29,7 +30,7 @@ describe('TechMonitoringStateComponent', () => {
   });
 
   it('should create', () => {
-    mockTestVehicle(component, fixture, testMonitoringVehicles[0]);
+    mockTestTech(component, fixture, testMonitoringVehicles[0]);
 
     expect(component)
       .toBeTruthy();
@@ -39,25 +40,25 @@ describe('TechMonitoringStateComponent', () => {
     await testStateRendering(component, fixture, loader, testMonitoringVehicles[0]);
   }));
 
-  it('should render not connected vehicle without data and satellites state', fakeAsync(async () => {
+  it('should render not connected tech without data and satellites state', fakeAsync(async () => {
     await testStateRendering(component, fixture, loader, testMonitoringVehicles[1]);
   }));
 
-  it('should render stopped vehicle with satellites state', fakeAsync(async () => {
+  it('should render stopped tech with satellites state', fakeAsync(async () => {
     await testStateRendering(component, fixture, loader, testMonitoringVehicles[2]);
   }));
 });
 
 /**
- * Mock test vehicle.
+ * Mock test tech.
  *
  * @param component `TechMonitoringStateComponent` test component.
  * @param fixture `ComponentFixture` of `TechMonitoringStateComponent` test component.
- * @param testVehicle Test vehicle.
+ * @param testTech Test tech.
  */
-function mockTestVehicle(component: TechMonitoringStateComponent,
-  fixture: ComponentFixture<TechMonitoringStateComponent>, testVehicle: MonitoringVehicle) {
-  component.vehicle = testVehicle;
+function mockTestTech(component: TechMonitoringStateComponent,
+  fixture: ComponentFixture<TechMonitoringStateComponent>, testTech: MonitoringTech) {
+  component.tech = testTech;
 
   fixture.detectChanges();
 }
@@ -68,7 +69,7 @@ function mockTestVehicle(component: TechMonitoringStateComponent,
  * @param component `TechMonitoringStateComponent` test component.
  * @param fixture `ComponentFixture` of `TechMonitoringStateComponent` test component.
  * @param loader `HarnessLoader`.
- * @param testVehicle Test vehicle.
+ * @param testTech Test tech.
  *
  * @returns `Promise` of `void` state rendering test.
  */
@@ -76,9 +77,9 @@ async function testStateRendering(
   component: TechMonitoringStateComponent,
   fixture: ComponentFixture<TechMonitoringStateComponent>,
   loader: HarnessLoader,
-  testVehicle: MonitoringVehicle
+  testTech: MonitoringTech
 ) {
-  mockTestVehicle(component, fixture, testVehicle);
+  mockTestTech(component, fixture, testTech);
 
   const harnesses: PromiseLike<MatButtonHarness | MatIconHarness>[] = [
     loader.getHarness(
@@ -97,29 +98,29 @@ async function testStateRendering(
     ),
     loader.getHarness(
       MatIconHarness.with({
-        selector: testVehicle.movementStatus === MovementStatus.Moving ? '.mat-accent' : '.mat-primary',
-        name: testVehicle.movementStatus === MovementStatus.Moving
+        selector: testTech.movementStatus === MovementStatus.Moving ? '.mat-accent' : '.mat-primary',
+        name: testTech.movementStatus === MovementStatus.Moving
           ? 'play_arrow'
-          : testVehicle.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'
+          : testTech.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'
       })
     ),
     loader.getHarness(
       MatIconHarness.with({
-        selector: testVehicle.connectionStatus === ConnectionStatus.Connected ? '.mat-accent' : '.mat-primary',
+        selector: testTech.connectionStatus === ConnectionStatus.Connected ? '.mat-accent' : '.mat-primary',
         name: 'podcasts'
       })
     ),
     loader.getHarness(
       MatIconHarness.with({
-        selector: testVehicle.numberOfSatellites
-          ? testVehicle.numberOfSatellites > 3 ? '.mat-accent' : '.mat-primary'
+        selector: testTech.numberOfSatellites
+          ? testTech.numberOfSatellites > 3 ? '.mat-accent' : '.mat-primary'
           : '.mat-warn',
         name: 'signal_cellular_alt'
       })
     )
   ];
 
-  if (testVehicle.tracker) {
+  if (testTech.tracker) {
     const sendTrackerCommandButtonHarness = loader.getHarness(
       MatButtonHarness.with({
         selector: '.mat-accent',
@@ -137,13 +138,13 @@ async function testStateRendering(
     const stateEl = await state.host();
     const stateTitle = await stateEl?.getAttribute('title');
 
-    const movementTitle = testVehicle.movementStatus === MovementStatus.Moving
+    const movementTitle = testTech.movementStatus === MovementStatus.Moving
       ? 'В движении'
-      : testVehicle.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных';
+      : testTech.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных';
 
-    const connectionTitle = testVehicle.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён';
+    const connectionTitle = testTech.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён';
 
-    const satellitesTitle = `Захвачено ${testVehicle.numberOfSatellites} спутников`;
+    const satellitesTitle = `Захвачено ${testTech.numberOfSatellites} спутников`;
 
     const titles = ['Построить трек', 'Следить за объектом', movementTitle, connectionTitle, satellitesTitle, 'Отправить команду'];
 

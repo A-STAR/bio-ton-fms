@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { ConnectionStatus, MonitoringVehicle, MovementStatus } from '../../tech.service';
-import { Tracker } from 'src/app/directory-tech/tracker.service';
+import { ConnectionStatus, MovementStatus } from '../../tech.service';
+import { Tracker } from '../../../directory-tech/tracker.service';
+import { MonitoringTech } from '../../tech.component';
 
 @Component({
   selector: 'bio-tech-monitoring-state',
@@ -19,7 +20,7 @@ import { Tracker } from 'src/app/directory-tech/tracker.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TechMonitoringStateComponent {
-  @Input() vehicle!: MonitoringVehicle;
+  @Input() tech!: MonitoringTech;
 
   @Output() protected sendTrackerCommand = new EventEmitter<Tracker['id']>();
 
