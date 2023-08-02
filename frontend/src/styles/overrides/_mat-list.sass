@@ -21,15 +21,15 @@
     &__content
 
       @at-root :hover &
-        $mat-list-item-content-padding-horizontal: 10px
+        $mat-list-option-content-padding-horizontal: 10px
 
-        padding-left: $mat-list-item-content-padding-horizontal
-        padding-right: $mat-list-item-content-padding-horizontal
+        padding-left: $mat-list-option-content-padding-horizontal
+        padding-right: $mat-list-option-content-padding-horizontal
 
   mat-selection-list &
     $tech-monitoring-state-count: 6
 
-    padding-right: 2 * $mat-list-item-padding-right + $tech-monitoring-state-count * map.get($mat-icon-button, size) + ($tech-monitoring-state-count - 1) * map.get($mat-icon-button, gap)
+    padding-right: 2 * map.get($mat-list-option, padding-right) + $tech-monitoring-state-count * map.get($mat-icon-button, size) + ($tech-monitoring-state-count - 1) * map.get($mat-icon-button, gap)
 
     &__content,
     &__primary-text
@@ -42,7 +42,7 @@
   --mdc-checkbox-disabled-selected-icon-color: #{$light-gray}
 
 .mdc-list-item--with-leading-checkbox span.mdc-list-item__start
-  margin-left: 2px
+  margin-left: map.get($mat-list-option, checkbox, before, margin-left)
   margin-right: unset
 
 .mat-mdc-list-item-interactive::before

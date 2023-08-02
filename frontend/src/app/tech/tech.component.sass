@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'sass:math'
 @use 'variables' as *
 
@@ -13,13 +14,16 @@ aside
 
   > div
     display: flex
-    align-items: center
-    flex-basis: 44px
-    flex-shrink: 0
+    column-gap: 8px
+    padding: 10px 10px 10px map.get($mat-list-option, checkbox, before, margin-left)
 
-mat-checkbox
-  margin-left: 2px
-  margin-right: 8px
+  > p
+    margin-top: 20px
+    font-size: 14px
+    text-align: center
+
+form
+  flex: 1
 
 mat-selection-list,
 mat-list-option
@@ -38,7 +42,7 @@ mat-selection-list
 bio-tech-monitoring-state
   position: absolute
   top: 50%
-  right: $mat-list-item-padding-right
+  right: map.get($mat-list-option, padding-right)
 
 bio-map
   flex: 1

@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
-import { MatListModule, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule, MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatDialog } from '@angular/material/dialog';
 
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, map, skipWhile, startWith, switchMap } from 'rxjs';
 
 import { MonitoringVehicle, TechService } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
@@ -22,7 +26,11 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatCheckboxModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
     MatListModule,
     TechMonitoringStateComponent,
     MapComponent
@@ -32,15 +40,73 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class TechComponent implements OnInit {
+  /**
+   * Get search stream.
+   *
+   * @returns An `Observable` of search stream.
+   */
+  get #search$() {
+    return this.searchForm
+      .get('search')!
+      .valueChanges.pipe(
+        debounceTime(SEARCH_DEBOUNCE_TIME),
+        distinctUntilChanged(),
+        skipWhile(searchValue => searchValue ? searchValue.length < SEARCH_MIN_LENGTH : true),
+        map(searchValue => searchValue !== undefined && searchValue.length < SEARCH_MIN_LENGTH ? undefined : searchValue),
+        distinctUntilChanged()
+      );
+  }
+
+  /**
+   * Get tech options.
+   *
+   * @returns `TechOptions` value.
+   */
   get #options() {
     return Object.freeze(this.#options$.value);
   }
 
+  /**
+   * Set tech options.
+   */
   set #options(options: TechOptions) {
     this.#options$.next({ ...this.#options, ...options });
   }
 
   protected vehicles$!: Observable<MonitoringVehicle[]>;
+  protected searchForm!: TechSearchForm;
+
+  /**
+   * Vehicle option selected state.
+   *
+   * @param id `MonitoringVehicle` vehicle ID.
+   *
+   * @returns Option selected state.
+   */
+  protected isSelected(id: MonitoringVehicle['id']) {
+    return this.#options.selected?.has(id);
+  }
+
+  /**
+   * Selection change handler.
+   *
+   * @param options `QueryList<MatListOption> | MatListOption[]` of options that have been changed.
+   */
+  protected handleSelectionChange(options: QueryList<MatListOption> | MatListOption[]) {
+    const {
+      selected = new Set()
+    } = this.#options;
+
+    options.forEach(option => {
+      if (option.selected) {
+        selected.add(option.value);
+      } else {
+        selected.delete(option.value);
+      }
+    });
+
+    this.#options = { selected };
+  }
 
   /**
    * Select all `MatCheckbox` component change event handler.
@@ -49,34 +115,13 @@ export default class TechComponent implements OnInit {
    * @param list `MatSelectionList` list component.
    */
   protected onSelectAllChange({ checked }: MatCheckboxChange, list: MatSelectionList) {
-    let selected: Set<MonitoringVehicle['id']>;
-
     if (checked) {
       list.selectAll();
-
-      const vehicleIDs = this.#vehicles?.map(({ id }) => id);
-
-      selected = new Set(vehicleIDs);
     } else {
       list.deselectAll();
-
-      selected = new Set();
     }
 
-    this.#options = { selected };
-  }
-
-  /**
-   * `MatSelectionList` component selection change event handler.
-   *
-   * @param event `MatSelectionListChange` selection change event.
-   */
-  protected onSelectionChange({ source }: MatSelectionListChange) {
-    const vehicleIDs = source.selectedOptions.selected.map<MonitoringVehicle['id']>(({ value }) => value.id);
-
-    const selected = new Set(vehicleIDs);
-
-    this.#options = { selected };
+    this.handleSelectionChange(list.options);
   }
 
   /**
@@ -93,30 +138,43 @@ export default class TechComponent implements OnInit {
     );
   }
 
-  #vehicles: MonitoringVehicle[] | undefined;
   #options$ = new BehaviorSubject<TechOptions>({});
+
+  /**
+   * Initialize Search form.
+   */
+  #initSearchForm() {
+    this.searchForm = this.fb.group({
+      search: this.fb.nonNullable.control<string | undefined>(undefined)
+    });
+  }
 
   /**
    * Get and set vehicles.
    */
   #setVehicles() {
-    this.vehicles$ = this.techService
-      .getVehicles()
-      .pipe(
-        tap(vehicles => {
-          this.#vehicles = vehicles;
-        })
-      );
+    this.vehicles$ = this.#search$.pipe(
+      startWith(undefined),
+      switchMap(findCriterion => findCriterion ? this.techService.getVehicles({ findCriterion }) : this.techService.getVehicles())
+    );
   }
 
-  constructor(private dialog: MatDialog, private techService: TechService) { }
+  constructor(private fb: FormBuilder, private dialog: MatDialog, private techService: TechService) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
+    this.#initSearchForm();
     this.#setVehicles();
   }
 }
 
+type TechSearchForm = FormGroup<{
+  search: FormControl<string | undefined>;
+}>;
+
 type TechOptions = Partial<{
   selected: Set<MonitoringVehicle['id']>;
 }>;
+
+export const SEARCH_MIN_LENGTH = 3;
+export const SEARCH_DEBOUNCE_TIME = 500;
