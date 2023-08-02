@@ -73,17 +73,17 @@ export default class TechComponent implements OnInit {
     this.#options$.next({ ...this.#options, ...options });
   }
 
-  protected vehicles$!: Observable<MonitoringVehicle[]>;
+  protected tech$!: Observable<MonitoringTech[]>;
   protected searchForm!: TechSearchForm;
 
   /**
-   * Vehicle option selected state.
+   * Tech option selected state.
    *
-   * @param id `MonitoringVehicle` vehicle ID.
+   * @param id `MonitoringTech` ID.
    *
    * @returns Option selected state.
    */
-  protected isSelected(id: MonitoringVehicle['id']) {
+  protected isSelected(id: MonitoringTech['id']) {
     return this.#options.selected?.has(id);
   }
 
@@ -125,7 +125,7 @@ export default class TechComponent implements OnInit {
   }
 
   /**
-   * Send a command to vehicle GPS-tracker.
+   * Send a command to tech GPS-tracker.
    *
    * @param id `Tracker` ID.
    */
@@ -150,10 +150,10 @@ export default class TechComponent implements OnInit {
   }
 
   /**
-   * Get and set vehicles.
+   * Get and set tech.
    */
-  #setVehicles() {
-    this.vehicles$ = this.#search$.pipe(
+  #setTech() {
+    this.tech$ = this.#search$.pipe(
       startWith(undefined),
       switchMap(findCriterion => findCriterion ? this.techService.getVehicles({ findCriterion }) : this.techService.getVehicles())
     );
@@ -164,7 +164,7 @@ export default class TechComponent implements OnInit {
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#initSearchForm();
-    this.#setVehicles();
+    this.#setTech();
   }
 }
 
@@ -172,8 +172,10 @@ type TechSearchForm = FormGroup<{
   search: FormControl<string | undefined>;
 }>;
 
+export type MonitoringTech = MonitoringVehicle;
+
 type TechOptions = Partial<{
-  selected: Set<MonitoringVehicle['id']>;
+  selected: Set<MonitoringTech['id']>;
 }>;
 
 export const SEARCH_MIN_LENGTH = 3;
