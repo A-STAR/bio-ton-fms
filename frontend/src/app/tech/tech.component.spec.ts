@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -15,7 +15,7 @@ import { Observable, of } from 'rxjs';
 
 import { MonitoringVehicle, MonitoringVehiclesOptions, TechService } from './tech.service';
 
-import TechComponent, { SEARCH_DEBOUNCE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
+import TechComponent, { POLL_INTERVAL_PERIOD, SEARCH_DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
 import { MapComponent } from '../shared/map/map.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
@@ -63,10 +63,51 @@ describe('TechComponent', () => {
       .toBeTruthy();
   });
 
-  it('should get tech', () => {
+  it('should poll tech', fakeAsync(async () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
-  });
+
+    /* Workaround to retrigger async pipe. */
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // enter search query
+    let vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue(testFindCriterion);
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    // clean search field to get back to normal tech requests
+    vehicles$ = of(testMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue('');
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(3);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(4);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(5);
+
+    discardPeriodicTasks();
+  }));
 
   it('should render all checkbox', fakeAsync(async () => {
     const checkbox = await loader.getHarnessOrNull(
@@ -288,7 +329,7 @@ describe('TechComponent', () => {
     // enter empty value
     await searchInput.setValue('');
 
-    tick(SEARCH_DEBOUNCE_TIME);
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .not.toHaveBeenCalled();
@@ -298,15 +339,15 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(testInsufficientSearchQuery);
 
-    tick(SEARCH_DEBOUNCE_TIME);
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
-      .not.toHaveBeenCalled();
+      .not.toHaveBeenCalledTimes(2);
 
     // enter satisfying search query
     await searchInput.setValue(testFindCriterion);
 
-    tick(SEARCH_DEBOUNCE_TIME);
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
 
     let vehicles$ = of(testFoundMonitoringVehicles);
 
@@ -320,11 +361,14 @@ describe('TechComponent', () => {
     // clean search field
     await searchInput.setValue('');
 
-    tick(SEARCH_DEBOUNCE_TIME);
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
 
     vehicles$ = of(testMonitoringVehicles);
 
     vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(2);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledWith();
@@ -334,9 +378,83 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(testInsufficientSearchQuery);
 
-    tick(SEARCH_DEBOUNCE_TIME);
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .not.toHaveBeenCalled();
+
+    discardPeriodicTasks();
+  }));
+
+  it('should poll tech search', fakeAsync(async () => {
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // enter search query
+    let vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue(testFindCriterion);
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(2);
+
+    const options = {
+      findCriterion: testFindCriterion
+    };
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith(options);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(3);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith(options);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(4);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith(options);
+
+    // clean search field
+    vehicles$ = of(testMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue('');
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(5);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith();
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(6);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith();
+
+    discardPeriodicTasks();
   }));
 });

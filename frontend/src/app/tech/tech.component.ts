@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatDialog } from '@angular/material/dialog';
 
-import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, map, skipWhile, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, interval, map, skipWhile, startWith, switchMap } from 'rxjs';
 
 import { MonitoringVehicle, TechService } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
@@ -49,7 +49,7 @@ export default class TechComponent implements OnInit {
     return this.searchForm
       .get('search')!
       .valueChanges.pipe(
-        debounceTime(SEARCH_DEBOUNCE_TIME),
+        debounceTime(SEARCH_DEBOUNCE_DUE_TIME),
         distinctUntilChanged(),
         skipWhile(searchValue => searchValue ? searchValue.length < SEARCH_MIN_LENGTH : true),
         map(searchValue => searchValue !== undefined && searchValue.length < SEARCH_MIN_LENGTH ? undefined : searchValue),
@@ -153,9 +153,16 @@ export default class TechComponent implements OnInit {
    * Get and set tech.
    */
   #setTech() {
+    const timer$ = interval(POLL_INTERVAL_PERIOD)
+      .pipe(
+        startWith(undefined)
+      );
+
     this.tech$ = this.#search$.pipe(
       startWith(undefined),
-      switchMap(findCriterion => findCriterion ? this.techService.getVehicles({ findCriterion }) : this.techService.getVehicles())
+      switchMap(findCriterion => timer$.pipe(
+        switchMap(() => findCriterion ? this.techService.getVehicles({ findCriterion }) : this.techService.getVehicles())
+      ))
     );
   }
 
@@ -178,5 +185,7 @@ type TechOptions = Partial<{
   selected: Set<MonitoringTech['id']>;
 }>;
 
+export const POLL_INTERVAL_PERIOD = 5000;
+
 export const SEARCH_MIN_LENGTH = 3;
-export const SEARCH_DEBOUNCE_TIME = 500;
+export const SEARCH_DEBOUNCE_DUE_TIME = 500;
