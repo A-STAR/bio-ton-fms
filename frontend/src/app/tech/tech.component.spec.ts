@@ -285,6 +285,67 @@ describe('TechComponent', () => {
       .toBeResolvedTo(false);
   }));
 
+  it('should converge tech selection', fakeAsync(async () => {
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+
+    const checkbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    await checkbox.check();
+
+    /* Workaround to retrigger async pipe. */
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // enter search query
+    let vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue(testFindCriterion);
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    /* Coverage for selected tech become diverged. */
+    const testUpdatedMonitoringVehicles = testMonitoringVehicles.slice(0, 2);
+
+    vehicles$ = of(testUpdatedMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    // clean search field to get back to normal tech requests
+    await searchInput.setValue('');
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(3);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith();
+
+    const options = await loader.getAllHarnesses(
+      MatListOptionHarness.with({
+        ancestor: 'aside',
+        selected: true
+      })
+    );
+
+    expect(options.length)
+      .withContext('render all converged options selected')
+      .toBe(testUpdatedMonitoringVehicles.length);
+
+    discardPeriodicTasks();
+  }));
+
   it('should render map', () => {
     const mapDe = fixture.debugElement.query(
       By.directive(MapComponent)
