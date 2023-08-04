@@ -8,7 +8,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatDialog } from '@angular/material/dialog';
 
-import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged, map, skipWhile, startWith, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  debounceTime,
+  defer,
+  distinctUntilChanged,
+  interval,
+  map,
+  skipWhile,
+  startWith,
+  switchMap,
+  tap
+} from 'rxjs';
 
 import { MonitoringVehicle, TechService } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
@@ -49,7 +61,7 @@ export default class TechComponent implements OnInit {
     return this.searchForm
       .get('search')!
       .valueChanges.pipe(
-        debounceTime(SEARCH_DEBOUNCE_TIME),
+        debounceTime(SEARCH_DEBOUNCE_DUE_TIME),
         distinctUntilChanged(),
         skipWhile(searchValue => searchValue ? searchValue.length < SEARCH_MIN_LENGTH : true),
         map(searchValue => searchValue !== undefined && searchValue.length < SEARCH_MIN_LENGTH ? undefined : searchValue),
@@ -150,12 +162,54 @@ export default class TechComponent implements OnInit {
   }
 
   /**
+   * Remove diverged tech from selection.
+   *
+   * @param tech `MonitoringTech[]` tech.
+   */
+  #convergeSelection(tech: MonitoringTech[]) {
+    const { selected } = this.#options;
+
+    if (selected?.size) {
+      const techIDs = tech.map(({ id }) => id);
+      const ids = new Set(techIDs);
+
+      selected.forEach(id => {
+        const hasTechID = ids.has(id);
+
+        if (!hasTechID) {
+          selected.delete(id);
+        }
+      });
+
+      this.#options = { selected };
+    }
+  }
+
+  /**
    * Get and set tech.
    */
   #setTech() {
+    const timer$ = interval(POLL_INTERVAL_PERIOD)
+      .pipe(
+        startWith(undefined)
+      );
+
+    const tech$ = defer(
+      () => this.techService.getVehicles()
+    )
+      .pipe(
+        tap(
+          this.#convergeSelection.bind(this)
+        )
+      );
+
+    const searchTech = (findCriterion: string) => this.techService.getVehicles({ findCriterion });
+
     this.tech$ = this.#search$.pipe(
       startWith(undefined),
-      switchMap(findCriterion => findCriterion ? this.techService.getVehicles({ findCriterion }) : this.techService.getVehicles())
+      switchMap(searchQuery => timer$.pipe(
+        switchMap(() => searchQuery ? searchTech(searchQuery) : tech$)
+      ))
     );
   }
 
@@ -178,5 +232,7 @@ type TechOptions = Partial<{
   selected: Set<MonitoringTech['id']>;
 }>;
 
+export const POLL_INTERVAL_PERIOD = 5000;
+
 export const SEARCH_MIN_LENGTH = 3;
-export const SEARCH_DEBOUNCE_TIME = 500;
+export const SEARCH_DEBOUNCE_DUE_TIME = 500;
