@@ -1,7 +1,49 @@
+@use 'sass:map'
+@use 'sass:math'
+@use 'variables' as *
+
 \:host
   display: flex
+
+aside
+  display: flex
+  flex-direction: column
+  flex-basis: 400px
+  height: 100vh
+  background-color: $white
+
+  > div
+    display: flex
+    column-gap: 8px
+    padding: 10px 10px 10px map.get($mat-list-option, checkbox, before, margin-left)
+
+  > p
+    margin-top: 20px
+    font-size: 14px
+    text-align: center
+
+form
+  flex: 1
+
+mat-selection-list,
+mat-list-option
+  $border-width: 1px
+
+  border-top: math.div($border-width, 2) solid $light-gray
+  border-bottom: math.div($border-width, 2) solid $light-gray
+
+mat-selection-list
+  overflow-y: auto
+  font-size: 12px
+
+  > div
+    position: relative
+
+bio-tech-monitoring-state
+  position: absolute
+  top: 50%
+  right: map.get($mat-list-option, padding-right)
 
 bio-map
   flex: 1
   height: unset
-  margin-left: 400px

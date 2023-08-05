@@ -1,8 +1,8 @@
+using BioTonFMS.Infrastructure.MessageBus;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using BioTonFMS.Infrastructure.MessageBus;
 
-namespace BioTonFMS.TrackerMessageHandler;
+namespace BioTonFMS.TrackerMessageHandler.Workers;
 
 public class MessageHandlerWorker : BackgroundService
 {
@@ -11,18 +11,18 @@ public class MessageHandlerWorker : BackgroundService
 
     public MessageHandlerWorker(
         ILogger<MessageHandlerWorker> logger,
-        IMessageBus messageBus
+        Func<MessgingBusType, IMessageBus> busResolver
         )
     {
         _logger = logger;
-        _messageBus = messageBus;
+        _messageBus = busResolver(MessgingBusType.Consuming);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("MessageHandlerWorker обработка начата в : {time}", DateTimeOffset.Now);
 
-        _messageBus.Subscribe<TrackerMessageHandler>();
+        _messageBus.Subscribe<Handlers.TrackerMessageHandler>();
         await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
 
         _logger.LogInformation("MessageHandlerWorker обработка закончена в : {time}", DateTimeOffset.Now);

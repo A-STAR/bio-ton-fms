@@ -1,16 +1,20 @@
+using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BioTonFMS.Common.Settings;
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.Extensions;
+using BioTonFMS.Infrastructure.MessageBus;
+using BioTonFMS.Infrastructure.RabbitMQ;
 using BioTonFMS.Security.Controllers;
 using BioTonFMS.Telematica.Controllers;
+using BioTonFMS.Telematica.Hosting;
+using BioTonFMS.TrackerProtocolSpecific;
 using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using BioTonFMS.TrackerCommands;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("config/appsettings.json", true);
@@ -23,6 +27,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 })
 .AddApplicationPart(typeof(AuthController).Assembly)
 .AddApplicationPart(typeof(TrackerController).Assembly);
+
+builder.Services.Configure<RabbitMQOptions>(builder.Configuration.GetSection("RabbitMQ"));
+
+builder.Services.AddSingleton<Func<MessgingBusType, IMessageBus>>(serviceProvider => busType =>
+    MessageBusFactory.CreateOrGetBus(busType, serviceProvider)
+);
 
 builder.Services.AddOptions();
 builder.Services.Configure<VersionInfoOptions>(builder.Configuration.GetSection("ShowVersionOptions"));
@@ -41,7 +51,9 @@ builder.Services.AddDbContext<MessagesDBContext>(
         .UseSnakeCaseNamingConvention()
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
+builder.Services.AddTransient<CommandResponseHandler>();
 builder.Services.AddCommands(builder.Configuration);
+builder.Services.AddHostedService<CommandResponseWorker>();
 
 builder.Services
     .AddMappingProfiles()

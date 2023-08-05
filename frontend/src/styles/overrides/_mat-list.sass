@@ -1,32 +1,52 @@
+@use 'sass:map'
 @use 'variables' as *
 
-mat-nav-list
-
-  &.mdc-list
-    padding-top: unset
-    padding-bottom: unset
-
-  .mat-ripple-element
-    background-color: rgba($green, 10%)
+.mat-mdc-list-base.mdc-list
+  padding-top: unset
+  padding-bottom: unset
 
 .mdc-list-item
-
-  @at-root [mat-list-item]#{&}
-    padding-right: unset
-
-  &__content
-
-    @at-root :hover &
-      $mat-list-item-content-padding-horizontal: 10px
-
-      padding-left: $mat-list-item-content-padding-horizontal
-      padding-right: $mat-list-item-content-padding-horizontal
-
-    @at-root button &
-      display: flex
 
   &__primary-text
     color: $dark
 
+  button &__content
+    display: flex
+
+  mat-nav-list &
+
+    @at-root [mat-list-item]#{&}
+      padding-right: unset
+
+    &__content
+
+      @at-root :hover &
+        $mat-list-option-content-padding-horizontal: 10px
+
+        padding-left: $mat-list-option-content-padding-horizontal
+        padding-right: $mat-list-option-content-padding-horizontal
+
+  mat-selection-list &
+    $tech-monitoring-state-count: 6
+
+    padding-right: 2 * map.get($mat-list-option, padding-right) + $tech-monitoring-state-count * map.get($mat-icon-button, size) + ($tech-monitoring-state-count - 1) * map.get($mat-icon-button, gap)
+
+    &__content,
+    &__primary-text
+      line-height: 20px
+      white-space: normal
+
+.mat-mdc-list-option.mat-accent .mdc-list-item__start
+  --mdc-checkbox-unselected-icon-color: #{$gray}
+  --mdc-checkbox-disabled-unselected-icon-color: #{$light-gray}
+  --mdc-checkbox-disabled-selected-icon-color: #{$light-gray}
+
+.mdc-list-item--with-leading-checkbox span.mdc-list-item__start
+  margin-left: map.get($mat-list-option, checkbox, before, margin-left)
+  margin-right: unset
+
 .mat-mdc-list-item-interactive::before
   background-color: $light-green
+
+.mat-ripple-element
+  background-color: rgba($green, 10%)

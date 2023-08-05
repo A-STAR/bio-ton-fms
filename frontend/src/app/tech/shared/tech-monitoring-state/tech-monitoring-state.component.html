@@ -1,0 +1,26 @@
+<button mat-icon-button title="Построить трек" color="primary">
+  <mat-icon class="md-18">route</mat-icon>
+</button>
+
+<button mat-icon-button title="Следить за объектом" color="primary">
+  <mat-icon class="md-18">my_location</mat-icon>
+</button>
+
+<mat-icon class="md-18" [title]="tech.movementStatus === MovementStatus.Moving
+  ? 'В движении'
+  : tech.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных'"
+  [color]="tech.movementStatus === MovementStatus.Moving ? 'accent' : 'primary'" [fontIcon]="tech.movementStatus === MovementStatus.Moving
+    ? 'play_arrow'
+    : tech.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'"></mat-icon>
+
+<mat-icon class="md-18" [title]="tech.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён'"
+  [color]="tech.connectionStatus === ConnectionStatus.Connected ? 'accent' : 'primary'">podcasts</mat-icon>
+
+<mat-icon class="md-18" [title]="'Захвачено ' + tech.numberOfSatellites + ' спутников'"
+  [color]="tech.numberOfSatellites ? tech.numberOfSatellites > 3 ? 'accent' : 'primary' : 'warn'">signal_cellular_alt</mat-icon>
+
+<ng-container *ngIf="tech.tracker as tracker">
+  <button mat-icon-button title="Отправить команду" color="accent" (click)="sendTrackerCommand.emit(tracker.id)">
+    <mat-icon class="md-18">sms</mat-icon>
+  </button>
+</ng-container>

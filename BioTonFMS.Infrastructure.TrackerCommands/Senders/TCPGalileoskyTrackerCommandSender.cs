@@ -1,31 +1,65 @@
 using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
 using BioTonFMS.Common.Constants;
 using BioTonFMS.Common.Settings;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
-using BioTonFMS.TrackerCommands.Codecs;
-using BioTonFMS.TrackerCommands.Exceptions;
+using BioTonFMS.Domain.Messaging;
+using BioTonFMS.Infrastructure.MessageBus;
+using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
+using BioTonFMS.TrackerProtocolSpecific.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace BioTonFMS.TrackerCommands.Senders;
+namespace BioTonFMS.TrackerProtocolSpecific.Senders;
 
 public class TcpGalileoskyTrackerCommandSender : ITrackerCommandSender
 {
     private readonly TimeSpan _validnessThreshold;
     private readonly ICommandCodec _codec;
     private readonly ILogger<TcpGalileoskyTrackerCommandSender> _logger;
+    private readonly IMessageBus _trackerCommandSendBus;
 
     public TcpGalileoskyTrackerCommandSender(IOptions<TrackerOptions> options,
         Func<TrackerTypeEnum, ICommandCodec> codec,
-        ILogger<TcpGalileoskyTrackerCommandSender> logger)
+        ILogger<TcpGalileoskyTrackerCommandSender> logger,
+        Func<MessgingBusType, IMessageBus> busResolver)
     {
         _validnessThreshold = TimeSpan.FromMinutes(options.Value.TrackerAddressValidMinutes);
         _codec = codec(TrackerTypeEnum.GalileoSkyV50);
         _logger = logger;
+        _trackerCommandSendBus = busResolver.Invoke(MessgingBusType.TrackerCommandsSend);
     }
 
-    public (string ResponseText, byte[] ResponseBinaryInfo) Send(Tracker tracker, string commandText)
+    public void Send(TrackerCommand command)
+    {
+        if (command.Tracker == null)
+        {
+            throw new ArgumentException("Не указан трекер для отправки команды");
+        }
+
+        if (!command.Tracker.Port.HasValue || command.Tracker.IpAddress is null || !command.Tracker.LastMessageReceived.HasValue ||
+            SystemTime.UtcNow.Subtract(command.Tracker.LastMessageReceived.Value) > _validnessThreshold)
+        {
+            throw new NotValidTrackerAddressException();
+        }
+
+        var msg = new TrackerCommandMessage
+        {
+            //Imei = command.Tracker.Imei,
+            //ExternalId = command.Tracker.ExternalId,
+            IpAddress = command.Tracker.IpAddress,
+            Port = command.Tracker.Port.Value,
+            SentDateTime = command.SentDateTime,
+            CommandId = command.Id,
+            EncodedCommand = _codec.EncodeCommand(command.Tracker, command.Id, command.CommandText)
+        };
+        _trackerCommandSendBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg)));
+        _logger.LogDebug("Опубликовано сообщение TrackerCommandMessage = {msg}", msg);
+    }
+    /*
+    public (string ResponseText, byte[] ResponseBinaryInfo) SendOld(Tracker tracker, string commandText)
     {
         if (!tracker.Port.HasValue || tracker.IpAddress is null || !tracker.LastMessageReceived.HasValue ||
             SystemTime.UtcNow.Subtract(tracker.LastMessageReceived.Value) > _validnessThreshold)
@@ -50,7 +84,7 @@ public class TcpGalileoskyTrackerCommandSender : ITrackerCommandSender
         using NetworkStream stream = client.GetStream();
         try
         {
-            byte[] data = _codec.Encode(tracker, commandText);
+            byte[] data = _codec.EncodeCommand(tracker, commandText);
 
             stream.Write(data, 0, data.Length);
             _logger.LogInformation("Отправлено: '{Message}'", commandText);
@@ -99,6 +133,7 @@ public class TcpGalileoskyTrackerCommandSender : ITrackerCommandSender
             throw new ParseCommandResponseException("Неверная контрольная сумма");
         }
 
-        return _codec.Decode(resp);
-    }
+        return _codec.DecodeCommand(resp);
+    }*/
+
 }

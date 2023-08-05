@@ -76,7 +76,7 @@
       padding-left: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       padding-right: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       font-size: map.get($mat-mdc-form-field, font-size)
-      animation: transitionmessages $text-animation
+      animation: transitionmessages map.get($animation, text, duration) map.get($animation, fill-mode) map.get($animation, timing-function)
 
       @keyframes transitionmessages
         from
@@ -106,7 +106,7 @@
 
   mat-row
     position: relative
-    transition: background-color $panel-transition-duration $panel-transition-timing-function
+    transition: background-color map.get($transition, panel, duration) map.get($transition, panel, timing-function)
 
     &:nth-child(odd)
       background-color: $light
@@ -164,17 +164,9 @@
 
   .mat-column-action
     $column-spacing-horizontal: 10px
-    $button-size: 34px
 
     flex: unset
-    flex-basis: 2 * $column-spacing-horizontal + $button-size
-
-    .mat-mdc-icon-button
-      width: $button-size
-      height: $button-size
-
-      &.mat-unthemed
-        color: $gray
+    flex-basis: 2 * $column-spacing-horizontal + map.get($mat-icon-button, size)
 
     button.deferred-hover + .actions,
     .actions:hover
@@ -189,18 +181,11 @@
       left: 0
       display: none
       align-items: center
-      gap: 4px
+      gap: map.get($mat-icon-button, gap)
       height: 100%
       padding: 0 $actions-padding-right 0 $column-spacing-horizontal
       background: linear-gradient(to left, transparent, $white $actions-padding-right)
       border-right: unset
-
-    .mat-icon.md-18
-      $icon-size: 18px
-
-      width: $icon-size
-      height: $icon-size
-      line-height: unset
 
 %heading-with-border
   padding-bottom: 10px

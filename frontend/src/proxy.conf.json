@@ -7,5 +7,14 @@
     },
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/nextgis": {
+    "target": "https://bioton.nextgis.com",
+    "secure": false,
+    "pathRewrite": {
+      "^/nextgis": ""
+    },
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

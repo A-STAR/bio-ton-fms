@@ -9,6 +9,7 @@ using BioTonFMS.Infrastructure.Paging.Extensions;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 

@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  api: 'http://test.lan.bioton-fms-ru'
+  api: 'https://production.bioton-fms.ru',
+  nextgis: 'https://bioton.nextgis.com'
 };

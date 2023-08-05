@@ -10,7 +10,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { BehaviorSubject, Subscription } from 'rxjs';
 
-import { Tracker, TrackerCommand, TrackerCommandResponse, TrackerCommandTransport, TrackerService } from '../../tracker.service';
+import {
+  Tracker,
+  TrackerCommand,
+  TrackerCommandResponse,
+  TrackerCommandTransport,
+  TrackerService
+} from '../../directory-tech/tracker.service';
 
 @Component({
   selector: 'bio-tracker-command-dialog',

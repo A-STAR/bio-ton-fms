@@ -1,8 +1,11 @@
 using System.Text;
+using Azure;
 using BioTonFMS.Common.Constants;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 
-namespace BioTonFMS.TrackerCommands.Codecs;
+namespace BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
 
 public class GalileoskyCommandCodec : ICommandCodec
 {
@@ -12,7 +15,7 @@ public class GalileoskyCommandCodec : ICommandCodec
     private const byte ImeiTag = 0x03;
     private const byte ExternalIdTag = 0x04;
 
-    public byte[] Encode(Tracker tracker, string commandText)
+    public byte[] EncodeCommand(Tracker tracker, int commandId, string commandText)
     {
         // описание протокола
         // http://base.galileosky.com/articles/#!docs-publication/galileosky-protocol/a/h2__1673588740
@@ -28,7 +31,7 @@ public class GalileoskyCommandCodec : ICommandCodec
         result.AddRange(externalId);
 
         result.Add(CommandNumberTag);
-        byte[] cmdNum = BitConverter.GetBytes(0);
+        byte[] cmdNum = BitConverter.GetBytes(commandId);
         if (!BitConverter.IsLittleEndian)
             Array.Reverse(cmdNum);
         result.AddRange(cmdNum);
@@ -53,40 +56,45 @@ public class GalileoskyCommandCodec : ICommandCodec
         return result.ToArray();
     }
 
-    public (string ResponseText, byte[] ResponseBynaryInfo) Decode(byte[] commandResponse)
+    public CommandResponseInfo DecodeCommand(byte[] commandResponse)
     {
-        var i = 0;
-        var respText = "";
-        byte[] respBinary = Array.Empty<byte>();
+        CommandResponseInfo responseInfo = new ();
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+        var i = 0;
+        i += Galileosky.HeaderLength;
         while (i < commandResponse.Length - Galileosky.CheckSumLength)
         {
             switch (commandResponse[i])
             {
                 case ImeiTag:
+                    responseInfo.Imei = commandResponse[(i+1)..((i+1) + 15)].ParseToString();
                     i += 15;
                     break;
                 case ExternalIdTag:
+                    responseInfo.ExternalId = commandResponse[(i+1)..((i+1) + 2)].ParseToInt();
                     i += 2;
                     break;
                 case CommandNumberTag:
+                    responseInfo.CommandId = commandResponse[(i+1)..((i+1) + 4)].ParseToInt();
                     i += 4;
                     break;
                 case CommandTextTag:
                     // В следующем за тегом байте (i + 1) содержится длина текста
                     // Сам текст начинается ещё на байт дальше, поэтому i + 2
-                    respText = Encoding.UTF8.GetString(
+                    responseInfo.ResponseText = Encoding.GetEncoding("windows-1251").GetString(
                         commandResponse[(i + 2)..(i + 2 + commandResponse[i + 1])]);
+                    i += commandResponse[i + 1] + 1;
                     break;
                 case BinaryDataTag:
                     // Тут то же самое, просто в строку не переводим
-                    respBinary = commandResponse[(i + 2)..(i + 2 + commandResponse[i + 1])];
+                    responseInfo.ResponseBinary = commandResponse[(i + 2)..(i + 2 + commandResponse[i + 1])];
                     break;
             }
 
             i++;
         }
 
-        return (respText, respBinary);
+        return responseInfo;
     }
 }

@@ -17,6 +17,7 @@ import { Sensor, SensorService } from '../sensor.service';
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { TrackerParametersHistoryDialogComponent } from '../tracker-parameters-history-dialog/tracker-parameters-history-dialog.component';
 import { SensorDialogComponent, SensorDialogData } from '../sensor-dialog/sensor-dialog.component';
+
 import {
   ConfirmationDialogComponent,
   confirmationDialogConfig,

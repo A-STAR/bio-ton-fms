@@ -51,7 +51,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".SolutionItems", ".Solution
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.MessageProcessing", "..\BioTonFMS.MessageProcessing\BioTonFMS.MessageProcessing.csproj", "{A02A9D21-B39D-4924-BDF8-7923DB044AC9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.TrackerCommands", "..\BioTonFMS.Infrastructure.TrackerCommands\BioTonFMS.TrackerCommands.csproj", "{7686E246-9909-44FF-91FF-A0A443FD9ABD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BioTonFMS.TrackerProtocolSpecific", "..\BioTonFMS.Infrastructure.TrackerCommands\BioTonFMS.TrackerProtocolSpecific.csproj", "{7686E246-9909-44FF-91FF-A0A443FD9ABD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

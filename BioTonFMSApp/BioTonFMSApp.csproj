@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BioTonFMS.Common\BioTonFMS.Common.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure.EF\BioTonFMS.Infrastructure.EF.csproj" />
+    <ProjectReference Include="..\BioTonFMS.Infrastructure.RabbitMQ\BioTonFMS.Infrastructure.RabbitMQ.csproj" />
     <ProjectReference Include="..\BioTonFMS.Infrastructure\BioTonFMS.Infrastructure.csproj" />
     <ProjectReference Include="..\BioTonFMS.Security\BioTonFMS.Security.csproj" />
     <ProjectReference Include="..\BioTonFMS.Telematica\BioTonFMS.Telematica.csproj" />

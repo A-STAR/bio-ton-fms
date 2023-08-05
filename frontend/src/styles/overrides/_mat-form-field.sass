@@ -8,10 +8,14 @@ mat-form-field
   &.mat-mdc-form-field
     display: block
 
-.mat-mdc-form-field-has-icon-suffix div.mat-mdc-text-field-wrapper
-  $mat-mdc-form-field-icon-suffix-padding: map.get($mat-mdc-form-field, padding, horizontal) - map.get($mat-icon-button, padding)
+div.mat-mdc-text-field-wrapper
+  $mat-mdc-form-field-icon-prefix-suffix-padding-horizontal: map.get($mat-mdc-form-field, padding, horizontal) - map.get($mat-icon-button, padding)
 
-  padding-right: $mat-mdc-form-field-icon-suffix-padding
+  .mat-mdc-form-field-has-icon-prefix &
+    padding-left: $mat-mdc-form-field-icon-prefix-suffix-padding-horizontal
+
+  .mat-mdc-form-field-has-icon-suffix &
+    padding-right: $mat-mdc-form-field-icon-prefix-suffix-padding-horizontal
 
 .mdc-text-field
 
@@ -100,6 +104,9 @@ div.mat-mdc-form-field-hint-wrapper,
 div.mat-mdc-form-field-error-wrapper
   padding-top: map.get($mat-mdc-form-field, subscript-wrapper, padding, vertical)
   padding-bottom: map.get($mat-mdc-form-field, subscript-wrapper, padding, vertical)
+
+.mat-mdc-form-field-subscript-wrapper:not(label + mat-form-field *)
+  display: none
 
 div.mat-mdc-form-field-bottom-align::before
   display: block

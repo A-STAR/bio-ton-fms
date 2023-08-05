@@ -1,1 +1,30 @@
+<aside>
+  <ng-container *ngIf="tech$ | async as tech">
+    <div>
+      <mat-checkbox title="Выбрать все" [checked]="list.selectedOptions.hasValue() && list.selectedOptions.selected.length === tech.length"
+        [indeterminate]="list.selectedOptions.hasValue() && list.selectedOptions.selected.length < tech.length"
+        (change)="onSelectAllChange($event, list)"></mat-checkbox>
+
+      <form id="search-form" [formGroup]="searchForm">
+        <mat-form-field>
+          <input matInput id="search" placeholder="Поиск" formControlName="search">
+          <span matPrefix>
+            <mat-icon color="primary">search</mat-icon>
+          </span>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <mat-selection-list #list [hidden]="!tech.length" (selectionChange)="handleSelectionChange($event.options)">
+      <div *ngFor="let tech of tech">
+        <mat-list-option checkboxPosition="before" [value]="tech.id" [selected]="isSelected(tech.id)">{{ tech.name }}</mat-list-option>
+
+        <bio-tech-monitoring-state [tech]="tech" (sendTrackerCommand)="onSendTrackerCommand($event)"></bio-tech-monitoring-state>
+      </div>
+    </mat-selection-list>
+
+    <p [hidden]="tech.length">Техника не найдена</p>
+  </ng-container>
+</aside>
+
 <bio-map></bio-map>

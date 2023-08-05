@@ -14,13 +14,16 @@ import { NewVehicle, VehiclesSortBy, Vehicle, Vehicles, VehicleService, Vehicles
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
+
 import {
   TrackerCommandDialogComponent,
   trackerCommandDialogConfig
-} from '../shared/tracker-command-dialog/tracker-command-dialog.component';
+} from '../../shared/tracker-command-dialog/tracker-command-dialog.component';
 
 import {
-  ConfirmationDialogComponent, confirmationDialogConfig, getConfirmationDialogContent
+  ConfirmationDialogComponent,
+  confirmationDialogConfig,
+  getConfirmationDialogContent
 } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { SortDirection } from '../shared/sort';
@@ -171,7 +174,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
   /**
    * Send a command to vehicle GPS-tracker.
    *
-   * @param trackerDataSource Tracker data source.
+   * @param trackerDataSource `VehicleDataSource` data source.
    */
   protected onSendTrackerCommand({ tracker }: VehicleDataSource) {
     const data: Tracker['id'] = tracker!.id;

@@ -6,9 +6,9 @@ import localeRu from '@angular/common/locales/ru';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -65,10 +65,10 @@ describe('TrackersComponent', () => {
     registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TrackersComponent);
-    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
-    loader = TestbedHarnessEnvironment.loader(fixture);
     overlayContainer = TestBed.inject(OverlayContainer);
     trackerService = TestBed.inject(TrackerService);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
 
@@ -152,17 +152,6 @@ describe('TrackersComponent', () => {
           testTrackers.trackers[index].id.toString()
         );
     });
-
-    /* Suppress 'Spec has no expectations.' warning. */
-
-    const rowEl = await rows[1].host();
-    const routerLink = await rowEl.getAttribute('ng-reflect-router-link');
-
-    expect(routerLink)
-      .withContext('render GPS-tracker row router link')
-      .toBe(
-        testTrackers.trackers[1].id.toString()
-      );
   });
 
   it('should render tracker table header cells', async () => {
@@ -256,24 +245,24 @@ describe('TrackersComponent', () => {
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            ancestor: '[bioStopClickPropagation].actions',
             selector: '[bioStopClickPropagation]',
-            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'edit'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            ancestor: '[bioStopClickPropagation].actions',
             selector: '[bioStopClickPropagation]',
-            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'sms'
           })
         ),
         actionCell.getHarnessOrNull(
           MatButtonHarness.with({
+            ancestor: '[bioStopClickPropagation].actions',
             selector: '[bioStopClickPropagation]',
-            ancestor: '.actions[bioStopClickPropagation]',
             variant: 'icon',
             text: 'delete'
           })
