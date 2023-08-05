@@ -7,6 +7,7 @@ using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Mapping;
 using BiotonFMS.Telematica.Tests.Mocks;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using BioTonFMS.Telematica.Validation;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;

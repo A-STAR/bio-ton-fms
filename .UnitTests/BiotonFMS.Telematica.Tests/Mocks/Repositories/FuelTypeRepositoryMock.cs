@@ -2,9 +2,9 @@
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
 using Moq;
 
-namespace BiotonFMS.Telematica.Tests.Mocks;
+namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
-public static class FuelTypeMock
+public static class FuelTypeRepositoryMock
 {
     public static IEnumerable<FuelType> GetFuelTypes() =>
         new List<FuelType>{

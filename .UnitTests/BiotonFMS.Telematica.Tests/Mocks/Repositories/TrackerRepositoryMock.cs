@@ -4,7 +4,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.Paging;
 using Moq;
 
-namespace BiotonFMS.Telematica.Tests.Mocks;
+namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 public static class TrackerRepositoryMock
 {
