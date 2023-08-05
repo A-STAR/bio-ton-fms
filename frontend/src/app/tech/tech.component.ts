@@ -62,6 +62,10 @@ export default class TechComponent implements OnInit {
       .get('search')!
       .valueChanges.pipe(
         debounceTime(SEARCH_DEBOUNCE_DUE_TIME),
+        map(searchValue => searchValue
+          ?.trim()
+          ?.toLocaleLowerCase()
+        ),
         distinctUntilChanged(),
         skipWhile(searchValue => searchValue ? searchValue.length < SEARCH_MIN_LENGTH : true),
         map(searchValue => searchValue !== undefined && searchValue.length < SEARCH_MIN_LENGTH ? undefined : searchValue),

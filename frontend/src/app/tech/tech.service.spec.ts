@@ -65,7 +65,7 @@ describe('TechService', () => {
 
   it('should get found vehicles', (done: DoneFn) => {
     const vehiclesOptions: MonitoringVehiclesOptions = {
-      findCriterion: testFindCriterion
+      findCriterion: testFindCriterion.toLocaleLowerCase()
     };
 
     service
@@ -126,6 +126,7 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
 export const testFindCriterion = testMonitoringVehicles[0].name.substring(0, SEARCH_MIN_LENGTH);
 
 export const testFoundMonitoringVehicles = testMonitoringVehicles.filter(
-  ({ name, tracker }) => name.includes(testFindCriterion)
-    || [tracker?.externalId, tracker?.imei].includes(testFindCriterion)
+  ({ name, tracker }) => name
+    .toLocaleLowerCase()
+    .includes(testFindCriterion) || [tracker?.externalId, tracker?.imei].includes(testFindCriterion)
 );

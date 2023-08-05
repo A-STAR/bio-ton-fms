@@ -395,8 +395,10 @@ describe('TechComponent', () => {
     expect(vehiclesSpy)
       .not.toHaveBeenCalled();
 
+    const spaceChar = ' ';
+
     // enter insufficient search query
-    const testInsufficientSearchQuery = testFindCriterion.substring(0, SEARCH_MIN_LENGTH - 1);
+    const testInsufficientSearchQuery = `${spaceChar}${testFindCriterion.substring(0, SEARCH_MIN_LENGTH - 1)}${spaceChar.repeat(20)}`;
 
     await searchInput.setValue(testInsufficientSearchQuery);
 
@@ -406,7 +408,7 @@ describe('TechComponent', () => {
       .not.toHaveBeenCalledTimes(2);
 
     // enter satisfying search query
-    await searchInput.setValue(testFindCriterion);
+    await searchInput.setValue(`${testFindCriterion}${spaceChar.repeat(2)}`);
 
     tick(SEARCH_DEBOUNCE_DUE_TIME);
 
@@ -416,7 +418,7 @@ describe('TechComponent', () => {
 
     expect(vehiclesSpy)
       .toHaveBeenCalledWith({
-        findCriterion: testFindCriterion
+        findCriterion: testFindCriterion.toLocaleLowerCase()
       });
 
     // clean search field
@@ -471,7 +473,7 @@ describe('TechComponent', () => {
       .toHaveBeenCalledTimes(2);
 
     const options = {
-      findCriterion: testFindCriterion
+      findCriterion: testFindCriterion.toLocaleLowerCase()
     };
 
     expect(vehiclesSpy)
