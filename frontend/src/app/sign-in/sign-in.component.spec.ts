@@ -46,8 +46,8 @@ describe('SignInComponent', () => {
     fixture = TestBed.createComponent(SignInComponent);
     httpTestingController = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
-    loader = TestbedHarnessEnvironment.loader(fixture);
     authService = TestBed.inject(AuthService);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
 

@@ -14,12 +14,12 @@ import { MatProgressSpinnerHarness } from '@angular/material/progress-spinner/te
 
 import { of, throwError } from 'rxjs';
 
-import { TrackerService } from '../../tracker.service';
+import { TrackerService } from '../../directory-tech/tracker.service';
 
 import { TrackerCommandDialogComponent } from './tracker-command-dialog.component';
 
-import { environment } from '../../../../environments/environment';
-import { TEST_TRACKER_ID, testTrackerCommand, testTrackerCommandResponse } from '../../tracker.service.spec';
+import { environment } from '../../../environments/environment';
+import { TEST_TRACKER_ID, testTrackerCommand, testTrackerCommandResponse } from '../../directory-tech/tracker.service.spec';
 
 describe('TrackerCommandDialogComponent', () => {
   let component: TrackerCommandDialogComponent;
@@ -45,8 +45,8 @@ describe('TrackerCommandDialogComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(TrackerCommandDialogComponent);
-    loader = TestbedHarnessEnvironment.loader(fixture);
     trackerService = TestBed.inject(TrackerService);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
 

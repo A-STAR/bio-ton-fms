@@ -58,9 +58,9 @@ describe('VehicleDialogComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(VehicleDialogComponent);
+    vehicleService = TestBed.inject(VehicleService);
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
-    vehicleService = TestBed.inject(VehicleService);
 
     component = fixture.componentInstance;
 

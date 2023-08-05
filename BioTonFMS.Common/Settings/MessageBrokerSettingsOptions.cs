@@ -2,6 +2,6 @@
 {
     public class MessageBrokerSettingsOptions
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
     }
 }

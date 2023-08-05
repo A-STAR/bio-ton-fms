@@ -1,16 +1,15 @@
+﻿using BioTonFMS.Common.Constants;
+using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Domain;
+using Microsoft.Extensions.Logging;
 using System.Collections;
 using System.Diagnostics;
-using BioTonFMS.Common.Constants;
-using BioTonFMS.Domain;
-using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.ProtocolTags;
-using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
-using Microsoft.Extensions.Logging;
 
-namespace BioTonFMS.TrackerMessageHandler.MessageParsing;
+namespace BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 
-public class GalileoskyMessageParser : IMessageParser
+public class GalileoskyMessageParser : ITrackerMessageParser
 {
     private const int ImeiCode = 0x03;
     private const int TrackerIdCode = 0x04;
@@ -24,7 +23,7 @@ public class GalileoskyMessageParser : IMessageParser
     private readonly ILogger<GalileoskyMessageParser> _logger;
 
     public GalileoskyMessageParser(
-        IProtocolTagRepository protocolTagRepository, 
+        IProtocolTagRepository protocolTagRepository,
         ILogger<GalileoskyMessageParser> logger)
     {
         _protocolTagRepository = protocolTagRepository;
@@ -48,7 +47,7 @@ public class GalileoskyMessageParser : IMessageParser
         {
             if (!tags.TryGetValue(binaryPackage[i], out ProtocolTag? tag))
             {
-                _logger.LogError("Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}, пакет {PackageUID}",
+                _logger.LogError("GalileoskyMessageParser Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}, пакет {PackageUID}",
                     binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))), packageUid);
                 yield break;
             }
@@ -124,6 +123,12 @@ public class GalileoskyMessageParser : IMessageParser
         yield return message;
     }
 
+    public bool IsCommandReply(byte[] binaryPackage)
+    {
+        // в 23 байте ответа на команду приходит тег 0xE0 (номер команды) а в 28-м тег 0xE1 (длина команды)
+        return binaryPackage.Length > 28 && binaryPackage[23-1] == 0xE0 && binaryPackage[28-1] == 0xE1;
+    }
+
     private static void AddMessageTag<TValue>(TValue value, int trackerTagId, TrackerMessage message)
     {
         var messageTag = MessageTag.Create(value);
@@ -135,42 +140,49 @@ public class GalileoskyMessageParser : IMessageParser
         where TTagType : MessageTag
     {
         Debug.Assert(tag.Tag is not null);
-        
+
         var messageTag = CreateMessageTag(tag.Tag!, binaryPackage[i..(i + tag.Size)]);
         message.Tags.Add(messageTag);
         return ((TTagType)messageTag);
-    }    
+    }
 
     private static MessageTag CreateMessageTag(TrackerTag trackerTag, byte[] value) =>
         trackerTag.DataType switch
         {
             TagDataTypeEnum.Integer => new MessageTagInteger
             {
-                TrackerTagId = trackerTag.Id, Value = value.ParseToInt()
+                TrackerTagId = trackerTag.Id,
+                Value = value.ParseToInt()
             },
             TagDataTypeEnum.Double => new MessageTagDouble
             {
-                TrackerTagId = trackerTag.Id, Value = value.ParseToDouble()
+                TrackerTagId = trackerTag.Id,
+                Value = value.ParseToDouble()
             },
             TagDataTypeEnum.Boolean => new MessageTagBoolean
             {
-                TrackerTagId = trackerTag.Id, Value = value.Any(x => x != 0)
+                TrackerTagId = trackerTag.Id,
+                Value = value.Any(x => x != 0)
             },
             TagDataTypeEnum.String => new MessageTagString
             {
-                TrackerTagId = trackerTag.Id, Value = value.ParseToString()
+                TrackerTagId = trackerTag.Id,
+                Value = value.ParseToString()
             },
             TagDataTypeEnum.DateTime => new MessageTagDateTime
             {
-                TrackerTagId = trackerTag.Id, Value = value.ParseToDateTime()
+                TrackerTagId = trackerTag.Id,
+                Value = value.ParseToDateTime()
             },
             TagDataTypeEnum.Bits => new MessageTagBits
             {
-                TrackerTagId = trackerTag.Id, Value = new BitArray(value)
+                TrackerTagId = trackerTag.Id,
+                Value = new BitArray(value)
             },
             TagDataTypeEnum.Byte => new MessageTagByte
             {
-                TrackerTagId = trackerTag.Id, Value = value[0]
+                TrackerTagId = trackerTag.Id,
+                Value = value[0]
             },
             TagDataTypeEnum.Struct or _ =>
                 throw new ArgumentOutOfRangeException(nameof(trackerTag))

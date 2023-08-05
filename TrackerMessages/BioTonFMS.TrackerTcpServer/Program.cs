@@ -19,30 +19,16 @@ var serverSettings = builder.Configuration.GetSection("ServerSettings").Get<Serv
 
 builder.Services.Configure<RabbitMQOptions>(builder.Configuration.GetSection("RabbitMQ"));
 builder.Services.Configure<RetryOptions>(builder.Configuration.GetSection("RetryOptions"));
+builder.Services.AddTransient<TcpSendCommandMessageHandler>();
 
-builder.Services.AddSingleton<IMessageBus>(serviceProvider =>
-{
-    var timeouts = serviceProvider.GetRequiredService<IOptions<RetryOptions>>()
-        .Value.TimeoutsInMs.Select(x => TimeSpan.FromSeconds(x));
-    var rabbitMQOptions = serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>();
-    var primary = new RabbitMQMessageBus(
-        serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-        serviceProvider,
-        rabbitMQOptions,
-        "RawTrackerMessages-primary");
+builder.Services.AddSingleton<Func<MessgingBusType, IMessageBus>>(serviceProvider => busType =>
+    MessageBusFactory.CreateOrGetBus(busType, serviceProvider, GetRowTrackerMessageBus)
+);
 
-    var secondaryOptions = builder.Configuration.GetSection("SecondaryMessageBrokerSettings").Get<MessageBrokerSettingsOptions>();
-    RabbitMQMessageBus? secondary = null;
-    if (secondaryOptions != null && secondaryOptions.Enabled)
-    {
-        secondary = new RabbitMQMessageBus(
-            serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-            serviceProvider,
-            rabbitMQOptions,
-            "RawTrackerMessages-secondary");
-    }
-    return new MessageBusMux(primary, secondary, Policy.Handle<Exception>().WaitAndRetry(timeouts));
-});
+builder.Services.AddSingleton<TcpSendCommandMessages>();
+
+builder.Services.AddHostedService<TcpSendCommandMessageHandlerWorker>();
+
 builder.Services.AddTransient<GalileoskyProtocolMessageHandler>();
 builder.Services.AddTransient<Func<TrackerTypeEnum, IProtocolMessageHandler>>(provider => key => key switch
 {
@@ -72,6 +58,28 @@ app.Lifetime.ApplicationStarted.Register(() =>
         Console.WriteLine(String.Join(Environment.NewLine, addresses));
     }
 });
-
 app.Run();
 
+IMessageBus GetRowTrackerMessageBus(IServiceProvider serviceProvider)
+{
+    var timeouts = serviceProvider.GetRequiredService<IOptions<RetryOptions>>()
+        .Value.TimeoutsInMs.Select(x => TimeSpan.FromSeconds(x));
+    var rabbitMQOptions = serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>();
+    var primaryBus = new RabbitMQMessageBus(
+        serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+        serviceProvider,
+        rabbitMQOptions,
+        "RawTrackerMessages-primary");
+    var secondaryOptions = builder.Configuration.GetSection("SecondaryMessageBrokerSettings").Get<MessageBrokerSettingsOptions>();
+    RabbitMQMessageBus? secondary = null;
+    if (secondaryOptions != null && secondaryOptions.Enabled)
+    {
+        secondary = new RabbitMQMessageBus(
+            serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
+            serviceProvider,
+            rabbitMQOptions,
+            "RawTrackerMessages-secondary");
+    }
+
+    return new MessageBusMux(primaryBus, secondary, Policy.Handle<Exception>().WaitAndRetry(timeouts));
+}

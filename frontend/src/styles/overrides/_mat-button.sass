@@ -11,9 +11,7 @@
 .mat-mdc-unelevated-button,
 .mat-mdc-outlined-button,
 .mat-mdc-icon-button.mat-unthemed
-
-  div.mat-ripple-element
-    background-color: rgba($white, 10%)
+  --mat-mdc-button-ripple-color: rgba($white, 10%)
 
 .mat-mdc-unelevated-button,
 .mat-mdc-outlined-button
@@ -22,7 +20,7 @@
     height: 30px
 
   span.mat-mdc-button-persistent-ripple::before
-    background-color: $white
+    --mat-mdc-button-persistent-ripple-color: #{$white}
 
   span.mat-mdc-button-touch-target
     height: 100%
@@ -57,27 +55,20 @@
       box-shadow: $box-shadow
 
 .mat-mdc-icon-button
-  transition: color $button-transition
 
-  &:hover,
-  &:active
-
-    &.mat-accent
-      color: $light-green
-
-    &.mat-warn
-      color: $red
+  &, // this selector needed for icon color transition
+  span.mat-mdc-button-persistent-ripple::before
+    transition-duration: map.get($transition, button, duration)
+    transition-timing-function: map.get($transition, button, timing-function)
 
   @at-root a#{&}
     display: flex
     justify-content: center
     align-items: center
 
-  @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
-    opacity: 0
-
-  @at-root .actions #{&} span.mat-mdc-button-persistent-ripple::before
-    transition: opacity $button-transition
+  &.mat-primary
+    --mat-mdc-button-persistent-ripple-color: #{$green}
+    --mat-mdc-button-ripple-color: rgba($green, 10%)
 
   &.mat-mdc-button-base
     width: map.get($mat-icon-button, size)
@@ -86,12 +77,39 @@
   &.mat-mdc-button-base
     padding: map.get($mat-icon-button, padding)
 
+  span.mat-mdc-button-persistent-ripple::before
+    transition-property: background-color, opacity
+
+  @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
+    opacity: 0
+
+  mat-icon
+    line-height: map.get($mat-icon-button, icon, line-height)
+
+  &.mat-unthemed,
+  &.mat-primary
+    color: $gray
+
   &.mat-accent,
   &.mat-warn
     color: $green
 
-  &.mat-accent[aria-pressed="false"]
+  &.mat-unthemed[aria-pressed="true"]
     color: $light-green
+
+  &.mat-primary[aria-pressed="true"]
+    color: $green
+
+  &:hover,
+  &:active
+
+    &.mat-unthemed,
+    &.mat-primary,
+    &.mat-accent
+      color: $light-green
+
+    &.mat-warn
+      color: $red
 
   span.mat-mdc-button-touch-target
     width: 100%

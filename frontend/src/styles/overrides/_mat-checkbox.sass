@@ -1,0 +1,16 @@
+@use 'variables' as *
+
+.mat-mdc-checkbox
+
+  &.mat-accent
+    --mdc-checkbox-unselected-icon-color: #{$gray}
+    --mdc-checkbox-unselected-focus-icon-color: #{$light-green}
+    --mdc-checkbox-unselected-hover-icon-color: #{$light-green}
+    --mdc-checkbox-disabled-unselected-icon-color: #{$light-gray}
+    --mdc-checkbox-disabled-selected-icon-color: #{$light-gray}
+
+  & .mdc-checkbox__ripple
+    background-color: $light-green
+
+  & .mat-ripple-element
+    background-color: rgba($green, 10%)

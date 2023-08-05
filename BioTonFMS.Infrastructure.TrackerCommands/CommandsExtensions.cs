@@ -1,11 +1,12 @@
 using BioTonFMS.Common.Settings;
 using BioTonFMS.Domain;
-using BioTonFMS.TrackerCommands.Codecs;
-using BioTonFMS.TrackerCommands.Senders;
+using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
+using BioTonFMS.TrackerProtocolSpecific.Senders;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BioTonFMS.TrackerCommands;
+namespace BioTonFMS.TrackerProtocolSpecific;
 
 public static class CommandsExtensions
 {

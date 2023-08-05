@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'sass:math'
 @use 'variables' as *
 
@@ -12,7 +13,7 @@ $mat-mdc-list-item-icon-size: 24px
   overflow-x: hidden
   display: flex
   flex-direction: column
-  width: $sidebar-width
+  width: $bio-sidebar-width
   height: 100vh
   padding-top: 20px
   padding-bottom: 15px
@@ -26,8 +27,8 @@ $mat-mdc-list-item-icon-size: 24px
   .mat-mdc-list-item-icon,
   .mat-mdc-list-item-title,
   mat-divider
-    transition-duration: $panel-transition-duration
-    transition-timing-function: $panel-transition-timing-function
+    transition-duration: map.get($transition, panel, duration)
+    transition-timing-function: map.get($transition, panel, timing-function)
 
   .logo img,
   .mat-mdc-list-item-title
@@ -36,7 +37,7 @@ $mat-mdc-list-item-icon-size: 24px
   .logo
     $sunflower-logo-width: 42px
 
-    margin-left: math.div($sidebar-width - $sunflower-logo-width, 2)
+    margin-left: math.div($bio-sidebar-width - $sunflower-logo-width, 2)
     transition-property: margin-left
 
     img
@@ -54,7 +55,7 @@ $mat-mdc-list-item-icon-size: 24px
     transition-property: margin-left, margin-right
 
   .mat-mdc-list-item-icon
-    $mat-mdc-list-item-icon-margin-horizontal: math.div($sidebar-width - $mat-mdc-list-item-icon-size, 2)
+    $mat-mdc-list-item-icon-margin-horizontal: math.div($bio-sidebar-width - $mat-mdc-list-item-icon-size, 2)
 
     margin-left: $mat-mdc-list-item-icon-margin-horizontal
     margin-right: $mat-mdc-list-item-icon-margin-horizontal
