@@ -30,6 +30,7 @@ public class MonitoringControllerTests
     public static IEnumerable<object[]> CriterionData =>
         new List<object[]>
         {
+            // поиск по вхождению в начале названия машины, должна быть найдена одна машина
             new object[]
             {
                 "красн",
@@ -52,6 +53,7 @@ public class MonitoringControllerTests
                     }
                 }
             },
+            // поиск по вхождению в конец названия, должно быть найдено две машины
             new object[]
             {
                 "ая",
@@ -278,10 +280,10 @@ public class MonitoringControllerTests
     {
         var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MonitoringMappingProfile())));
         var logger = new Mock<ILogger<MonitoringController>>().Object;
-        var vehicleRepo = VehicleRepositoryMock.GetStub();
-        var trackerRepo = TrackerMessageRepositoryMock.GetStub();
+        var vehicleRepository = VehicleRepositoryMock.GetStub();
+        var trackerMessageRepository = TrackerMessageRepositoryMock.GetStub();
         var options = Options.Create(new TrackerOptions { TrackerAddressValidMinutes = 60 });
 
-        return new MonitoringController(mapper, logger, vehicleRepo, trackerRepo, options);
+        return new MonitoringController(mapper, logger, vehicleRepository, trackerMessageRepository, options);
     }
 }
