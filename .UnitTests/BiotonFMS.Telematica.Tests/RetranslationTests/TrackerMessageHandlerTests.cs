@@ -1,20 +1,19 @@
 using System.Text;
 using System.Text.Json;
+using BioTonFMS.Domain;
 using BioTonFMS.Domain.Messaging;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
+using BioTonFMS.Infrastructure.MessageBus;
 using BiotonFMS.Telematica.Tests.Mocks;
-using BioTonFMS.TrackerMessageHandler;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using BioTonFMS.TrackerMessageHandler.Handlers;
 using BioTonFMS.TrackerMessageHandler.Retranslation;
+using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
+using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using BioTonFMS.Infrastructure.MessageBus;
-using BioTonFMS.Domain;
-using System;
-using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
-using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
 
 namespace BiotonFMS.Telematica.Tests.RetranslationTests;
 

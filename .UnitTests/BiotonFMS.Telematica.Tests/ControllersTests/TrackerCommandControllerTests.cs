@@ -5,7 +5,7 @@ using BioTonFMS.Infrastructure.Persistence.Specifications;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Dtos.TrackerCommand;
-using BiotonFMS.Telematica.Tests.Mocks;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using BioTonFMS.TrackerProtocolSpecific.Senders;
 using FluentAssertions;
 using LinqSpecs;
@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using BioTonFMS.Infrastructure.EF.Providers;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
