@@ -19,7 +19,7 @@ import TechComponent, { POLL_INTERVAL_PERIOD, SEARCH_DEBOUNCE_DUE_TIME, SEARCH_M
 import { MapComponent } from '../shared/map/map.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
-import { testFindCriterion, testFoundMonitoringVehicles, testMonitoringVehicles } from './tech.service.spec';
+import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from './tech.service.spec';
 
 describe('TechComponent', () => {
   let component: TechComponent;
@@ -76,6 +76,7 @@ describe('TechComponent', () => {
     );
 
     // enter search query
+    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
     vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
@@ -162,16 +163,12 @@ describe('TechComponent', () => {
     );
 
     expect(paragraphDe.attributes)
-      .withContext('render empty tech list fallback paragraph `hidden` attribute')
+      .withContext('render empty tech list paragraph `hidden` attribute')
       .toEqual(
         jasmine.objectContaining({
           hidden: ''
         })
       );
-
-    expect(paragraphDe.nativeElement.textContent)
-      .withContext('render empty tech list fallback paragraph text')
-      .toBe('Техника не найдена');
   }));
 
   it('should render tech options monitoring state', async () => {
@@ -306,6 +303,7 @@ describe('TechComponent', () => {
     );
 
     // enter search query
+    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
     vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
@@ -395,8 +393,10 @@ describe('TechComponent', () => {
     expect(vehiclesSpy)
       .not.toHaveBeenCalled();
 
+    const spaceChar = ' ';
+
     // enter insufficient search query
-    const testInsufficientSearchQuery = testFindCriterion.substring(0, SEARCH_MIN_LENGTH - 1);
+    const testInsufficientSearchQuery = `${spaceChar}${testFindCriterion.substring(0, SEARCH_MIN_LENGTH - 1)}${spaceChar.repeat(20)}`;
 
     await searchInput.setValue(testInsufficientSearchQuery);
 
@@ -406,27 +406,28 @@ describe('TechComponent', () => {
       .not.toHaveBeenCalledTimes(2);
 
     // enter satisfying search query
-    await searchInput.setValue(testFindCriterion);
-
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
-
+    let testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
     vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
 
-    expect(vehiclesSpy)
-      .toHaveBeenCalledWith({
-        findCriterion: testFindCriterion
-      });
-
-    // clean search field
-    await searchInput.setValue('');
+    await searchInput.setValue(`${testFindCriterion}${spaceChar.repeat(2)}`);
 
     tick(SEARCH_DEBOUNCE_DUE_TIME);
 
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith({
+        findCriterion: testFindCriterion.toLocaleLowerCase()
+      });
+
+    // clean search field
     vehicles$ = of(testMonitoringVehicles);
 
     vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue('');
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledTimes(2);
@@ -444,6 +445,37 @@ describe('TechComponent', () => {
     expect(vehiclesSpy)
       .not.toHaveBeenCalled();
 
+    // enter invalid search query
+    const testInvalidIDSearchQuery = '123';
+
+    testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles(testInvalidIDSearchQuery);
+    vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue(testInvalidIDSearchQuery);
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith({
+        findCriterion: testInvalidIDSearchQuery.toLocaleLowerCase()
+      });
+
+    const paragraphDe = fixture.debugElement.query(
+      By.css('p')
+    );
+
+    expect(paragraphDe.attributes)
+      .withContext('render empty tech list paragraph without `hidden` attribute')
+      .toEqual(
+        jasmine.objectContaining({})
+      );
+
+    expect(paragraphDe.nativeElement.textContent)
+      .withContext('render empty tech list paragraph text')
+      .toBe('Техника не найдена');
+
     discardPeriodicTasks();
   }));
 
@@ -459,6 +491,7 @@ describe('TechComponent', () => {
     );
 
     // enter search query
+    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
     vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
@@ -471,7 +504,7 @@ describe('TechComponent', () => {
       .toHaveBeenCalledTimes(2);
 
     const options = {
-      findCriterion: testFindCriterion
+      findCriterion: testFindCriterion.toLocaleLowerCase()
     };
 
     expect(vehiclesSpy)
