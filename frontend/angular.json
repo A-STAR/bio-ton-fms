@@ -21,6 +21,9 @@
           "displayBlock": true,
           "standalone": true,
           "style": "sass"
+        },
+        "@schematics/angular:pipe": {
+          "standalone": true
         }
       },
       "root": "",
