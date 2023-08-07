@@ -144,7 +144,7 @@ async function testStateRendering(
 
     const connectionTitle = testTech.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён';
 
-    const satellitesTitle = `Захвачено ${testTech.numberOfSatellites} спутников`;
+    const satellitesTitle = `Захвачено ${testTech.numberOfSatellites ?? 0} спутников`;
 
     const titles = ['Построить трек', 'Следить за объектом', movementTitle, connectionTitle, satellitesTitle, 'Отправить команду'];
 
