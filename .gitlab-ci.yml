@@ -276,11 +276,11 @@ Deploy-backend-stage.bioton-fms.ru:
     # Backend
     - ssh user@stage.bioton-fms.ru docker rm -f fms-backend || true
     - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
-    - ssh user@stage.bioton-fms.ru docker run --name fms-backend -p 8080:80 -v /etc/fms/stage:/app/config -v /var/log/fms/stage:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
+    - ssh user@stage.bioton-fms.ru docker run --name fms-backend --network bioton -p 8080:80 -v /etc/fms/stage:/app/config -v /var/log/fms/stage:/app/logs --restart always -d git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     # Fms-tracker-tcp-server
     - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server
     - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-tcp-server || true
-    - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-tcp-server -p 6000:6000 -v /var/log/fms/tracker-tcp-server:/app/logs -v /etc/fms/tracker-tcp-server:/app/config --network bioton --restart always -d git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
+    - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-tcp-server --network bioton -p 6000:6000 -v /var/log/fms/tracker-tcp-server:/app/logs -v /etc/fms/tracker-tcp-server:/app/config --restart always -d git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
     # Fms-tracker-message
     - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-message
     - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-message || true
