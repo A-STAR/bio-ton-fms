@@ -23,9 +23,10 @@ import { Observable, of, throwError } from 'rxjs';
 import { Trackers, TrackerService } from '../tracker.service';
 
 import TrackersComponent, { TrackerColumn, trackerColumns, TRACKER_DELETED } from './trackers.component';
-import { localeID, TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
+import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import { environment } from '../../../environments/environment';
+import { localeID } from '../../tech/shared/relative-time.pipe';
 import { testTrackers } from '../tracker.service.spec';
 
 describe('TrackersComponent', () => {

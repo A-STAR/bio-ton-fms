@@ -21,7 +21,7 @@ import {
   TrackerParametersHistoryDialogComponent
 } from './tracker-parameters-history-dialog.component';
 
-import { localeID } from '../tracker-dialog/tracker-dialog.component';
+import { localeID } from '../../tech/shared/relative-time.pipe';
 import { dateFormat } from '../trackers/trackers.component.spec';
 import { testParametersHistory, TEST_TRACKER_ID } from '../tracker.service.spec';
 
