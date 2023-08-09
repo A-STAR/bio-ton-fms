@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
+import { RelativeTimePipe } from '../relative-time.pipe';
+
 import { ConnectionStatus, MovementStatus } from '../../tech.service';
 import { Tracker } from '../../../directory-tech/tracker.service';
 import { MonitoringTech } from '../../tech.component';
@@ -12,6 +14,7 @@ import { MonitoringTech } from '../../tech.component';
   standalone: true,
   imports: [
     CommonModule,
+    RelativeTimePipe,
     MatButtonModule,
     MatIconModule
   ],
