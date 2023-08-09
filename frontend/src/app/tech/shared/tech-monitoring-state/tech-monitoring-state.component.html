@@ -13,7 +13,8 @@
     ? 'play_arrow'
     : tech.movementStatus === MovementStatus.Stopped ? 'stop' : 'sensors_off'"></mat-icon>
 
-<mat-icon class="md-18" [title]="tech.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён'"
+<mat-icon class="md-18" [title]="(tech.connectionStatus === ConnectionStatus.Connected ? 'Подключен' : 'Не подключен')
+  + (tech.lastMessageTime ? ', ' + (tech.lastMessageTime | relativeTime) + ' (' + (tech.lastMessageTime | date) + ')' : '')"
   [color]="tech.connectionStatus === ConnectionStatus.Connected ? 'accent' : 'primary'">podcasts</mat-icon>
 
 <mat-icon class="md-18" [title]="'Захвачено ' + (tech.numberOfSatellites ?? 0) + ' спутников'"

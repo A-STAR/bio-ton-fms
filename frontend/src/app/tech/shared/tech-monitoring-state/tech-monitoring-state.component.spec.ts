@@ -1,8 +1,13 @@
+import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, registerLocaleData } from '@angular/common';
+import localeRu from '@angular/common/locales/ru';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatIconHarness } from '@angular/material/icon/testing';
+
+import { RelativeTimePipe, localeID } from '../relative-time.pipe';
 
 import { TechMonitoringStateComponent } from './tech-monitoring-state.component';
 
@@ -10,20 +15,36 @@ import { ConnectionStatus, MovementStatus } from '../../tech.service';
 import { MonitoringTech } from '../../tech.component';
 
 import { testMonitoringVehicles } from '../../tech.service.spec';
+import { dateFormat } from '../../../directory-tech/trackers/trackers.component.spec';
 
 describe('TechMonitoringStateComponent', () => {
   let component: TechMonitoringStateComponent;
   let fixture: ComponentFixture<TechMonitoringStateComponent>;
   let loader: HarnessLoader;
+  let relativeTimePipe: RelativeTimePipe;
 
   beforeEach(async () => {
     await TestBed
       .configureTestingModule({
-        imports: [TechMonitoringStateComponent]
+        imports: [TechMonitoringStateComponent],
+        providers: [
+          {
+            provide: LOCALE_ID,
+            useValue: localeID
+          },
+          {
+            provide: DATE_PIPE_DEFAULT_OPTIONS,
+            useValue: { dateFormat }
+          },
+          RelativeTimePipe
+        ]
       })
       .compileComponents();
 
+    registerLocaleData(localeRu, localeID);
+
     fixture = TestBed.createComponent(TechMonitoringStateComponent);
+    relativeTimePipe = TestBed.inject(RelativeTimePipe);
     loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
@@ -37,15 +58,15 @@ describe('TechMonitoringStateComponent', () => {
   });
 
   it('should render state', fakeAsync(async () => {
-    await testStateRendering(component, fixture, loader, testMonitoringVehicles[0]);
+    await testStateRendering(component, fixture, loader, relativeTimePipe, testMonitoringVehicles[0]);
   }));
 
   it('should render not connected tech without data and satellites state', fakeAsync(async () => {
-    await testStateRendering(component, fixture, loader, testMonitoringVehicles[1]);
+    await testStateRendering(component, fixture, loader, relativeTimePipe, testMonitoringVehicles[1]);
   }));
 
   it('should render stopped tech with satellites state', fakeAsync(async () => {
-    await testStateRendering(component, fixture, loader, testMonitoringVehicles[2]);
+    await testStateRendering(component, fixture, loader, relativeTimePipe, testMonitoringVehicles[2]);
   }));
 });
 
@@ -68,7 +89,8 @@ function mockTestTech(component: TechMonitoringStateComponent,
  *
  * @param component `TechMonitoringStateComponent` test component.
  * @param fixture `ComponentFixture` of `TechMonitoringStateComponent` test component.
- * @param loader `HarnessLoader`.
+ * @param loader `HarnessLoader` instance.
+ * @param relativeTimePipe `RelativeTimePipe` instance.
  * @param testTech Test tech.
  *
  * @returns `Promise` of `void` state rendering test.
@@ -77,6 +99,7 @@ async function testStateRendering(
   component: TechMonitoringStateComponent,
   fixture: ComponentFixture<TechMonitoringStateComponent>,
   loader: HarnessLoader,
+  relativeTimePipe: RelativeTimePipe,
   testTech: MonitoringTech
 ) {
   mockTestTech(component, fixture, testTech);
@@ -142,7 +165,11 @@ async function testStateRendering(
       ? 'В движении'
       : testTech.movementStatus === MovementStatus.Stopped ? 'Остановка' : 'Нет данных';
 
-    const connectionTitle = testTech.connectionStatus === ConnectionStatus.Connected ? 'Подключён' : 'Не подключён';
+    const connectionTime = testTech.lastMessageTime
+      ? `, ${relativeTimePipe.transform(testTech.lastMessageTime)} (${formatDate(testTech.lastMessageTime, dateFormat, localeID)})`
+      : '';
+
+    const connectionTitle = `${testTech.connectionStatus === ConnectionStatus.Connected ? 'Подключен' : 'Не подключен'}${connectionTime}`;
 
     const satellitesTitle = `Захвачено ${testTech.numberOfSatellites ?? 0} спутников`;
 
