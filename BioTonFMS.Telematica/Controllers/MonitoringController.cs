@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
@@ -68,5 +69,65 @@ public class MonitoringController : ValidationControllerBase
         }
 
         return Ok(monitoringDtos);
+    }
+
+    [HttpGet("vehicle/{id:int}")]
+    [ProducesResponseType(typeof(MonitoringVehicleInfoDto), StatusCodes.Status200OK)]
+    public IActionResult GetVehicleInformation(int id)
+    {
+        return Ok(new MonitoringVehicleInfoDto
+        {
+            GeneralInfo = new MonitoringGeneralInfoDto
+            {
+                Latitude = 36.884816,
+                Longitude = 30.701173,
+                LastMessageTime = DateTime.UtcNow.AddMinutes(-25),
+                Mileage = 73000,
+                EngineHours = 246,
+                Speed = 73,
+                SatellitesNumber = 21,
+                TimeSinceLastMessage = 1080
+            },
+            TrackerInfo = new MonitoringTrackerInfoDto
+            {
+                ExternalId = -1,
+                Imei = "6C6F6C6B656B636",
+                SimNumber = "88005553535",
+                TrackerType = "GalileoSkyV50",
+                Parameters = new []
+                {
+                    new TrackerParameter
+                    {
+                        ParamName = "param decimal",
+                        LastValueDecimal = 123.12
+                    },
+                    new TrackerParameter
+                    {
+                        ParamName = "param str",
+                        LastValueString = "somthing"
+                    },
+                    new TrackerParameter
+                    {
+                        ParamName = "param date",
+                        LastValueDateTime = DateTime.UnixEpoch.AddDays(3304)
+                    },
+                },
+                Sensors = new []
+                {
+                    new TrackerSensorDto
+                    {
+                        Name = "sensor 1",
+                        Value = "val",
+                        Unit = "unit"
+                    },
+                    new TrackerSensorDto
+                    {
+                        Name = "sensor 2",
+                        Value = "123",
+                        Unit = "miles"
+                    },
+                }
+            }
+        });
     }
 }
