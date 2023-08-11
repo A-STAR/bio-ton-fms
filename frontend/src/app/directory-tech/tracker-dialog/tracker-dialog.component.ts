@@ -14,6 +14,8 @@ import { NewTracker, Tracker, TrackerService, TrackerTypeEnum } from '../tracker
 
 import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
 
+import { localeID } from '../../tech/shared/relative-time.pipe';
+
 @Component({
   selector: 'bio-tracker-dialog',
   standalone: true,
@@ -186,7 +188,6 @@ export const DATE_PATTERN = /^(?:(?:31(\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\.
 const SIM_PATTERN = /^\+7\d{10}$/;
 const IMEI_PATTERN = /^\d{15}$/;
 
-export const localeID = 'ru-RU';
 export const inputDateFormat = 'dd.MM.YYYY HH:mm';
 
 export const TRACKER_CREATED = 'GPS-трекер создан';

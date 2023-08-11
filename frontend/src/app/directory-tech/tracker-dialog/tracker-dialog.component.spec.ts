@@ -19,8 +19,9 @@ import { Observable, of } from 'rxjs';
 import { NewTracker, Tracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
-import { inputDateFormat, localeID, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
+import { inputDateFormat, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
 
+import { localeID } from '../../tech/shared/relative-time.pipe';
 import { testNewTracker, testTrackerTypeEnum } from '../tracker.service.spec';
 
 describe('TrackerDialogComponent', () => {
