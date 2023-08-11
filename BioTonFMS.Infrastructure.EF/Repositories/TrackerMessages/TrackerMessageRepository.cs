@@ -185,35 +185,48 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         int trackerAddressValidMinutes)
     {
         var now = SystemTime.UtcNow;
-        var foundResults = new Dictionary<int, VehicleStatus>();
-
-        foreach (var id in externalIds)
-        {
-            //todo: упаковать в 1 запрос
-            var msg = QueryableProvider.Linq()
-                .Where(x => x.ExternalTrackerId == id)
-                .OrderByDescending(x => x.ServerDateTime)
-                .FirstOrDefault();
-
-            foundResults[id] = msg != null
-                ? new VehicleStatus
-                {
-                    TrackerExternalId = msg.ExternalTrackerId,
-                    ConnectionStatus = (now - msg.ServerDateTime).Minutes < trackerAddressValidMinutes
-                        ? ConnectionStatusEnum.Connected
-                        : ConnectionStatusEnum.NotConnected,
-                    MovementStatus = msg.Speed > 0 ? MovementStatusEnum.Moving : MovementStatusEnum.Stopped,
-                    LastMessageTime = msg.TrackerDateTime,
-                    NumberOfSatellites = msg.SatNumber
-                }
-                : new VehicleStatus
-                {
-                    TrackerExternalId = id,
-                    MovementStatus = MovementStatusEnum.NoData,
-                    ConnectionStatus = ConnectionStatusEnum.NotConnected
-                };
-        }
+        
+        var foundResults = QueryableProvider.Linq()
+            .Where(x => externalIds.Contains(x.ExternalTrackerId))
+            .GroupBy(x => x.ExternalTrackerId,
+                (key, g) => g
+                    .OrderByDescending(x => x.ServerDateTime)
+                    .Select(x => new VehicleStatus
+                    {
+                        TrackerExternalId = x.ExternalTrackerId,
+                        ConnectionStatus = (now - x.ServerDateTime).Minutes < trackerAddressValidMinutes
+                            ? ConnectionStatusEnum.Connected
+                            : ConnectionStatusEnum.NotConnected,
+                        MovementStatus = x.Speed > 0 ? MovementStatusEnum.Moving : MovementStatusEnum.Stopped,
+                        LastMessageTime = x.TrackerDateTime,
+                        NumberOfSatellites = x.SatNumber
+                    })
+                    .First())
+            .ToDictionary(x => x.TrackerExternalId);
 
         return foundResults;
+    }
+
+    public void GetFastTrack(int[] externalIds)
+    {
+        var yesterday = DateTime.UtcNow.AddDays(-1);
+        
+        var list = QueryableProvider.Linq()
+            .Where(x => externalIds.Contains(x.ExternalTrackerId))
+            .GroupBy(x => x.ExternalTrackerId,
+                (key, g) => g
+                    .OrderByDescending(x => x.ServerDateTime)
+                    .Where(x => x.Longitude != null && x.Latitude != null)
+                    .Select(x => new
+                    {
+                        lat = x.Latitude,
+                        lon = x.Longitude,
+                        alt = x.Altitude,
+                        time = x.ServerDateTime,
+                        speed = x.Speed
+                    }))
+            .ToList();
+        
+        
     }
 }

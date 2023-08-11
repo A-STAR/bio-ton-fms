@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.Monitoring;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
@@ -52,14 +54,22 @@ public class MonitoringController : ValidationControllerBase
 
         int[] trackerExternalIds = monitoringDtos.Where(x => x.Tracker?.ExternalId != null)
             .Select(x => x.Tracker!.ExternalId!.Value).ToArray();
-        
+
         var states = _messageRepository.GetVehicleStates(trackerExternalIds, 60);
-        
+
         foreach (MonitoringVehicleDto monitoringDto in monitoringDtos)
         {
             if (monitoringDto.Tracker?.ExternalId == null) continue;
-            
-            var status = states[monitoringDto.Tracker.ExternalId.Value];
+
+            if (!states.TryGetValue(monitoringDto.Tracker.ExternalId.Value, out var status))
+            {
+                status = new VehicleStatus
+                    {
+                        TrackerExternalId = monitoringDto.Tracker.ExternalId.Value,
+                        MovementStatus = MovementStatusEnum.NoData,
+                        ConnectionStatus = ConnectionStatusEnum.NotConnected
+                    };
+            }
 
             monitoringDto.MovementStatus = status.MovementStatus;
             monitoringDto.ConnectionStatus = status.ConnectionStatus;
@@ -68,5 +78,21 @@ public class MonitoringController : ValidationControllerBase
         }
 
         return Ok(monitoringDtos);
+    }
+
+    /// <summary>
+    /// Возвращает текущие координаты и данные для построения быстрого трека для заданных машин
+    /// </summary>
+    /// <response code="200">Данные успешно возвращены</response>
+    /// <response code="400">Невозможно вернуть данные</response>
+    [HttpPost("locations-and-tracks")]
+    [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
+    public IActionResult LocationsAndTracks(LocationAndTrackRequest[] requests)
+    {
+        var externalIds = new[] { 484088 };
+
+        _messageRepository.GetFastTrack(externalIds);
+
+        return Ok();
     }
 }
