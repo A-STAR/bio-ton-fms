@@ -19,7 +19,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of, throwError } from 'rxjs';
 
-import { Vehicles, VehicleService } from '../vehicle.service';
+import { Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import VehiclesComponent, { vehicleColumns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
@@ -36,7 +36,7 @@ describe('VehiclesComponent', () => {
   let loader: HarnessLoader;
   let vehicleService: VehicleService;
 
-  let vehiclesSpy: jasmine.Spy<() => Observable<Vehicles>>;
+  let vehiclesSpy: jasmine.Spy<(options: VehiclesOptions) => Observable<Vehicles>>;
 
   beforeEach(async () => {
     await TestBed
