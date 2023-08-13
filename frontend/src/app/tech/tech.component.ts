@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatListOption, MatSelectionList } from '@angular/material/list';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
 
 import {
@@ -25,6 +26,7 @@ import {
 import { MonitoringVehicle, TechService } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
 
+import { StopClickPropagationDirective } from '../shared/stop-click-propagation/stop-click-propagation.directive';
 import { MapComponent } from '../shared/map/map.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 
@@ -44,6 +46,8 @@ import {
     MatInputModule,
     MatIconModule,
     MatListModule,
+    MatExpansionModule,
+    StopClickPropagationDirective,
     TechMonitoringStateComponent,
     MapComponent
   ],
