@@ -68,35 +68,7 @@ describe('TechComponent', () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
 
-    /* Workaround to retrigger async pipe. */
-    const searchInput = await loader.getHarness(
-      MatInputHarness.with({
-        ancestor: 'form#search-form',
-        placeholder: 'Поиск'
-      })
-    );
-
-    // enter search query
-    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
-    let vehicles$ = of(testFoundMonitoringVehicles);
-
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
-
-    await searchInput.setValue(testFindCriterion);
-
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
-
-    // clean search field to get back to normal tech requests
-    vehicles$ = of(testMonitoringVehicles);
-
-    vehiclesSpy.and.returnValue(vehicles$);
-
-    await searchInput.setValue('');
-
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
-
-    expect(vehiclesSpy)
-      .toHaveBeenCalledTimes(3);
+    retriggerAsyncPipe(loader, vehiclesSpy);
 
     tick(POLL_INTERVAL_PERIOD);
 
@@ -164,7 +136,7 @@ describe('TechComponent', () => {
     const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue(testFindCriterion);
 
@@ -479,6 +451,83 @@ describe('TechComponent', () => {
     await testTogglePanel(0);
   }));
 
+  it('should persist tech panel state', fakeAsync(async () => {
+    let panelButtonDes = fixture.debugElement.queryAll(
+      By.css('aside mat-selection-list mat-list-option button')
+    );
+
+    let index = 0;
+
+    const event = new MouseEvent('click');
+
+    // open tech panel
+    panelButtonDes[index].triggerEventHandler('click', event);
+
+    const accordion = await loader.getHarness(
+      MatAccordionHarness.with({
+        ancestor: 'aside mat-selection-list',
+        selector: '[displayMode="flat"]'
+      })
+    );
+
+    retriggerAsyncPipe(loader, vehiclesSpy);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(4);
+
+    let {
+      [index]: panel
+    } = await accordion.getExpansionPanels();
+
+    let isExpanded = await panel.isExpanded();
+
+    expect(isExpanded)
+      .withContext(`render persistent expanded ${testMonitoringVehicles[index].name} panel`)
+      .toBe(true);
+
+    // close tech panel
+    panelButtonDes[index].triggerEventHandler('click', event);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(5);
+
+    isExpanded = await panel.isExpanded();
+
+    expect(isExpanded)
+      .withContext(`render persistent collapsed ${testMonitoringVehicles[index].name} panel`)
+      .toBe(false);
+
+    // open another tech panel
+    panelButtonDes = fixture.debugElement.queryAll(
+      By.css('aside mat-selection-list mat-list-option button')
+    );
+
+    index = 2;
+
+    panelButtonDes[index].triggerEventHandler('click', event);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(6);
+
+    ({
+      [index]: panel
+    } = await accordion.getExpansionPanels());
+
+    isExpanded = await panel.isExpanded();
+
+    expect(isExpanded)
+      .withContext(`render persistent another expanded ${testMonitoringVehicles[index].name} panel`)
+      .toBe(true);
+
+    discardPeriodicTasks();
+  }));
+
   it('should search tech', fakeAsync(async () => {
     // skip initial call
     vehiclesSpy.calls.reset();
@@ -514,7 +563,7 @@ describe('TechComponent', () => {
     let testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue(`${testFindCriterion}${spaceChar.repeat(2)}`);
 
@@ -528,7 +577,7 @@ describe('TechComponent', () => {
     // clean search field
     vehicles$ = of(testMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue('');
 
@@ -556,7 +605,7 @@ describe('TechComponent', () => {
     testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles(testInvalidIDSearchQuery);
     vehicles$ = of(testFoundMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue(testInvalidIDSearchQuery);
 
@@ -599,7 +648,7 @@ describe('TechComponent', () => {
     const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue(testFindCriterion);
 
@@ -657,3 +706,43 @@ describe('TechComponent', () => {
     discardPeriodicTasks();
   }));
 });
+
+/**
+ * Workaround to retrigger async pipe.
+ *
+ * @param loader `HarnessLoader` instance.
+ * @param vehiclesSpy Vehicles spy.
+ */
+async function retriggerAsyncPipe(
+  loader: HarnessLoader,
+  vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>
+) {
+  const searchInput = await loader.getHarness(
+    MatInputHarness.with({
+      ancestor: 'form#search-form',
+      placeholder: 'Поиск'
+    })
+  );
+
+  // enter search query
+  const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
+  let vehicles$ = of(testFoundMonitoringVehicles);
+
+  vehiclesSpy.and.returnValue(vehicles$);
+
+  await searchInput.setValue(testFindCriterion);
+
+  tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+  // clean search field to get back to normal tech requests
+  vehicles$ = of(testMonitoringVehicles);
+
+  vehiclesSpy.and.returnValue(vehicles$);
+
+  await searchInput.setValue('');
+
+  tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+  expect(vehiclesSpy)
+    .toHaveBeenCalledTimes(3);
+}

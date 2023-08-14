@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatListOption, MatSelectionList } from '@angular/material/list';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
 
 import {
@@ -95,6 +95,7 @@ export default class TechComponent implements OnInit {
 
   protected tech$!: Observable<MonitoringTech[]>;
   protected searchForm!: TechSearchForm;
+  protected expandedPanelTechID?: MonitoringTech['id'];
 
   /**
    * Tech option selected state.
@@ -156,6 +157,18 @@ export default class TechComponent implements OnInit {
       TrackerCommandDialogComponent,
       { ...trackerCommandDialogConfig, data }
     );
+  }
+
+  /**
+   * Toggle tech panel, save expanded panel tech ID.
+   *
+   * @param panel `MatExpansionPanel` instance.
+   * @param id `MonitoringTech` ID.
+   */
+  protected onPanelToggle(panel: MatExpansionPanel, id: MonitoringTech['id']) {
+    panel.toggle();
+
+    this.expandedPanelTechID = panel.expanded ? id : undefined;
   }
 
   #options$ = new BehaviorSubject<TechOptions>({});

@@ -20,13 +20,13 @@
         <ng-container *ngFor="let tech of tech">
           <div>
             <mat-list-option checkboxPosition="before" [value]="tech.id" [selected]="isSelected(tech.id)">
-              <button bioStopClickPropagation (click)="panel.toggle()">{{ tech.name }}</button>
+              <button bioStopClickPropagation (click)="onPanelToggle(panel, tech.id)">{{ tech.name }}</button>
             </mat-list-option>
 
             <bio-tech-monitoring-state [tech]="tech" (sendTrackerCommand)="onSendTrackerCommand($event)"></bio-tech-monitoring-state>
           </div>
 
-          <mat-expansion-panel #panel></mat-expansion-panel>
+          <mat-expansion-panel #panel [expanded]="tech.id === expandedPanelTechID"></mat-expansion-panel>
         </ng-container>
       </mat-accordion>
     </mat-selection-list>
