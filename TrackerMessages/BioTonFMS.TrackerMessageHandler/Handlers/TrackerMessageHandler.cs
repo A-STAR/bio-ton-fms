@@ -22,7 +22,7 @@ public class TrackerMessageHandler : IBusMessageHandler
 {
     private readonly ILogger<TrackerMessageHandler> _logger;
     private readonly Func<TrackerTypeEnum, ITrackerMessageParser> _parserProvider;
-    private readonly Func<TrackerTypeEnum, ICommandCodec> _codecProvider;
+    private readonly Func<TrackerTypeEnum, ICommandCodec> _commandCodecProvider;
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly ITrackerTagRepository _trackerTagRepository;
     private readonly ITrackerRepository _trackerRepository;
@@ -41,7 +41,7 @@ public class TrackerMessageHandler : IBusMessageHandler
     {
         _logger = logger;
         _parserProvider = parserProvider;
-        _codecProvider = codecProvider;
+        _commandCodecProvider = codecProvider;
         _messageRepository = messageRepository;
         _trackerTagRepository = trackerTagRepository;
         _trackerRepository = trackerRepository;
@@ -58,15 +58,15 @@ public class TrackerMessageHandler : IBusMessageHandler
         var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
             ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", messageText);
 
-        if (_retranslatorOptions.Enabled)
+        /*if (_retranslatorOptions.Enabled)
         {
             _retranslatorBus.Publish(binaryMessage);
-        }
+        }*/
 
         if (_parserProvider(rawMessage.TrackerType).IsCommandReply(rawMessage.RawMessage))
         {
             _logger.LogDebug("Получен ответ на команду RawMessage = {RawMessage}", string.Join(' ', rawMessage.RawMessage.Select(x => x.ToString("X"))));
-            CommandResponseInfo responseInfo = _codecProvider(rawMessage.TrackerType).DecodeCommand(rawMessage.RawMessage);
+            CommandResponseInfo responseInfo = _commandCodecProvider(rawMessage.TrackerType).DecodeCommand(rawMessage.RawMessage);
             _logger.LogDebug("Команда декодирована ExternalId={ExternalId}, CommandId={CommandId}, ResponseText={ResponseText}",
                 responseInfo.ExternalId, responseInfo.CommandId, responseInfo.ResponseText);
             TrackerCommandResponseMessage commendResponseMessage = new()
@@ -132,6 +132,17 @@ public class TrackerMessageHandler : IBusMessageHandler
             _messageRepository.Add(trackerMessage);
             _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId}, Imei={Imei}",
                 rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
+        }
+
+        if (_retranslatorOptions.Enabled && 
+            (_retranslatorOptions.AllowedExtIds is null || 
+             (messages.Length > 0 && _retranslatorOptions.AllowedExtIds.Contains(messages[0].ExternalTrackerId.ToString()))))
+        {
+            _retranslatorBus.Publish(binaryMessage);
+        }
+        else
+        {
+            _logger.LogTrace("Retranslation skipped as {AllowedExtIdsIsNull} and {AllowedExtIds}", _retranslatorOptions.AllowedExtIds is null, _retranslatorOptions.AllowedExtIds);
         }
 
         return Task.CompletedTask;
