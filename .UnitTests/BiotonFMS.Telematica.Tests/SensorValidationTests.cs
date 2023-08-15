@@ -4,13 +4,14 @@ using BioTonFMS.Expressions;
 using BioTonFMS.Telematica.Expressions;
 using BiotonFMS.Telematica.Tests.Mocks;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using BioTonFMS.Telematica.Validation;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.IdentityModel.Tokens;
 using Xunit.Abstractions;
 
-namespace BiotonFMS.Telematica.Tests.Expressions;
+namespace BiotonFMS.Telematica.Tests;
 
 public class ValidationTests
 {

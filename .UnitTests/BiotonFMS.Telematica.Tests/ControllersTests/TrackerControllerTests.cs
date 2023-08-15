@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using BioTonFMS.Telematica.Dtos.Vehicle;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 

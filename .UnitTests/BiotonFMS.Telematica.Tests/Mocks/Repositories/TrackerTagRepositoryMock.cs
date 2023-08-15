@@ -1,8 +1,7 @@
-﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
+﻿using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using Moq;
 
-namespace BiotonFMS.Telematica.Tests.Mocks;
+namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 public static class TrackerTagRepositoryMock
 {

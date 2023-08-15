@@ -96,7 +96,7 @@ public static class Seeds
             .RuleFor(v => v.VehicleSubType, (f, _) => f.Random.Enum<VehicleSubTypeEnum>())
             .RuleFor(v => v.FuelTypeId, (f, _) => fuelTypeIds[f.Random.Int(0, fuelTypeIds.Length - 1)])
             .RuleFor(v => v.ManufacturingYear, (f, _) => f.Random.Int(2000, 2023).OrNull(f, .1f))
-            .RuleFor(v => v.RegistrationNumber, (f, _) => f.Random.Replace("?###?? ###"))
+            .RuleFor(v => v.RegistrationNumber, (f, _) => f.Random.Replace("?###??###"))
             .RuleFor(v => v.TrackerId, (f, vv) =>
             {
                 if (trackers.Length == 0)

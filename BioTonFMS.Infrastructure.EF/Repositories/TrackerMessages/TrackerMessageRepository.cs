@@ -202,7 +202,9 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                     ConnectionStatus = (now - msg.ServerDateTime).Minutes < trackerAddressValidMinutes
                         ? ConnectionStatusEnum.Connected
                         : ConnectionStatusEnum.NotConnected,
-                    MovementStatus = msg.Speed > 0 ? MovementStatusEnum.Moving : MovementStatusEnum.Stopped,
+                    MovementStatus = msg.Speed == null
+                        ? MovementStatusEnum.NoData
+                        : msg.Speed.Value > 0 ? MovementStatusEnum.Moving : MovementStatusEnum.Stopped,
                     LastMessageTime = msg.TrackerDateTime,
                     NumberOfSatellites = msg.SatNumber
                 }
