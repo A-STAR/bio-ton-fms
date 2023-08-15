@@ -85,8 +85,7 @@ public class MonitoringController : ValidationControllerBase
                 Mileage = 73000,
                 EngineHours = 246,
                 Speed = 73,
-                SatellitesNumber = 21,
-                TimeSinceLastMessage = 1080
+                SatellitesNumber = 21
             },
             TrackerInfo = new MonitoringTrackerInfoDto
             {
