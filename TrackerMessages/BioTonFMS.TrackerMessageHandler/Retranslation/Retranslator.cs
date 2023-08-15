@@ -4,7 +4,6 @@ using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.Utils.Network;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json;
 
@@ -78,6 +77,31 @@ public class Retranslator : IRetranslator
         {
             _logger.LogError(e, "Ошибка при отправке сообщения для {MessageFrom} {Message}: {Exception}",
                 messageFrom, string.Join(' ', data.Select(x => x.ToString("X"))), e.Message);
+            // Попытка переоткрыть соединение
+            try
+            {
+                await _client.ConnectAsync(_options.Host, _options.Port);
+                _logger.LogInformation("Установлено повторное соединение по адресу {Host}:{Port} для {MessageFrom}",
+                    _options.Host, _options.Port, messageFrom);
+                try
+                {
+                    await stream.WriteAsync(data);
+                    _logger.LogDebug("Отправлено для {MessageFrom}: '{Message}'",
+                        messageFrom, string.Join(' ', data.Select(x => x.ToString("X"))));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Ошибка при повторной отправке сообщения для {MessageFrom} {Message}: {Exception}",
+                        messageFrom, string.Join(' ', data.Select(x => x.ToString("X"))), e.Message);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Ошибка при открытии повторного соединения по адресу {Host}:{Port} для {MessageFrom} - {Message}",
+                    _options.Host, _options.Port, messageFrom, ex.Message);
+                return;
+            }
             return;
         }
 
@@ -92,7 +116,7 @@ public class Retranslator : IRetranslator
             });
             var timeoutTask = Task.Delay(_options.TimeoutSeconds * 1000);
             var success = await Task.WhenAny(readTask, timeoutTask) == readTask;
-            
+
             if (!success)
             {
                 _logger.LogError("Время ожидания истекло при отправке сообщения {Message} для {MessageFrom}",
@@ -114,8 +138,8 @@ public class Retranslator : IRetranslator
 
     private void RemoveOutdatedTcpClients()
     {
-        foreach(string? key in _clientDictionary.Keys.ToArray()) 
-        { 
+        foreach (string? key in _clientDictionary.Keys.ToArray())
+        {
             var client = _clientDictionary[key];
             var clientLastUsed = client.LastUsed();
             if (clientLastUsed.AddSeconds(_options.TcpClientMaxIdleTimeSeconds) < SystemTime.Now)

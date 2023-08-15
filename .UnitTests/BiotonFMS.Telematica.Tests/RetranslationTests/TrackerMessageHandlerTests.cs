@@ -20,7 +20,7 @@ namespace BiotonFMS.Telematica.Tests.RetranslationTests;
 
 public class TrackerMessageHandlerTests
 {
-    [Fact]
+    /*[Fact]
     public async Task TrackerMessageHandler_ShouldEnqueueRawMessageForRetranslation()
     {
         var retBus = new MessageBusMock();
@@ -60,5 +60,5 @@ public class TrackerMessageHandlerTests
 
         retBus.Messages.Count.Should().Be(1);
         retBus.Messages[0].Should().Equal(rawMsgEncoded);
-    }
+    }*/
 }

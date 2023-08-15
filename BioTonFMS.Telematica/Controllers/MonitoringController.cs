@@ -2,6 +2,7 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
@@ -79,55 +80,115 @@ public class MonitoringController : ValidationControllerBase
         return Ok(monitoringDtos);
     }
 
-    /// <summary>
-    /// Возвращает текущие координаты и данные для построения быстрого трека для заданных машин
-    /// </summary>
-    /// <response code="200">Данные успешно возвращены</response>
-    /// <response code="400">Невозможно вернуть данные</response>
-    [HttpPost("locations-and-tracks")]
-    [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
-    public IActionResult LocationsAndTracks(LocationAndTrackRequest[] requests)
+    [HttpGet("vehicle/{id:int}")]
+    [ProducesResponseType(typeof(MonitoringVehicleInfoDto), StatusCodes.Status200OK)]
+    public IActionResult GetVehicleInformation(int id)
     {
-        var externalIds = _vehicleRepository.GetExternalIds(
-            requests.Select(x => x.VehicleId).ToArray());
-
-        var locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
-
-        var needTrack = requests.Where(x => x.NeedReturnTrack)
-            .Select(x => x.VehicleId);
-
-        var tracks = _messageRepository.GetTracks(
-            externalIds.Where(x => needTrack.Contains(x.Key))
-                .Select(x => x.Value)
-                .ToArray()
-        );
-
-        var locationsAndTracks = new List<LocationAndTrack>();
-        foreach (var r in requests)
+        return Ok(new MonitoringVehicleInfoDto
         {
-            if (!externalIds.TryGetValue(r.VehicleId, out var externalId)) continue;
-            
-            if (!locations.TryGetValue(externalId, out var location)) continue;
-
-            var locationAndTrack = new LocationAndTrack
+            GeneralInfo = new MonitoringGeneralInfoDto
             {
-                Longitude = location.Item1,
-                Latitude = location.Item2,
-                VehicleId = r.VehicleId
-            };
-
-            if (!r.NeedReturnTrack || !tracks.TryGetValue(externalId, out var track))
+                Latitude = 36.884816,
+                Longitude = 30.701173,
+                LastMessageTime = DateTime.UtcNow.AddMinutes(-25),
+                Mileage = 73000,
+                EngineHours = 246,
+                Speed = 73,
+                SatellitesNumber = 21,
+                TimeSinceLastMessage = 1080
+            },
+            TrackerInfo = new MonitoringTrackerInfoDto
             {
-                locationAndTrack.Track = Array.Empty<TrackPointInfo>();
+                ExternalId = -1,
+                Imei = "6C6F6C6B656B636",
+                SimNumber = "88005553535",
+                TrackerType = "GalileoSkyV50",
+                Parameters = new []
+                {
+                    new TrackerParameter
+                    {
+                        ParamName = "param decimal",
+                        LastValueDecimal = 123.12
+                    },
+                    new TrackerParameter
+                    {
+                        ParamName = "param str",
+                        LastValueString = "somthing"
+                    },
+                    new TrackerParameter
+                    {
+                        ParamName = "param date",
+                        LastValueDateTime = DateTime.UnixEpoch.AddDays(3304)
+                    },
+                },
+                Sensors = new []
+                {
+                    new TrackerSensorDto
+                    {
+                        Name = "sensor 1",
+                        Value = "val",
+                        Unit = "unit"
+                    },
+                    new TrackerSensorDto
+                    {
+                        Name = "sensor 2",
+                        Value = "123",
+                        Unit = "miles"
+                    },
+                }
             }
-            else
-            {
-                locationAndTrack.Track = track;
-            }
+        });
+    }
+}
+
+/// <summary>
+/// Возвращает текущие координаты и данные для построения быстрого трека для заданных машин
+/// </summary>
+/// <response code="200">Данные успешно возвращены</response>
+/// <response code="400">Невозможно вернуть данные</response>
+[HttpPost("locations-and-tracks")]
+[ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
+public IActionResult LocationsAndTracks(LocationAndTrackRequest[] requests)
+{
+    var externalIds = _vehicleRepository.GetExternalIds(
+        requests.Select(x => x.VehicleId).ToArray());
+
+    var locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
+
+    var needTrack = requests.Where(x => x.NeedReturnTrack)
+        .Select(x => x.VehicleId);
+
+    var tracks = _messageRepository.GetTracks(
+        externalIds.Where(x => needTrack.Contains(x.Key))
+            .Select(x => x.Value)
+            .ToArray()
+    );
+
+    var locationsAndTracks = new List<LocationAndTrack>();
+    foreach (var r in requests)
+    {
+        if (!externalIds.TryGetValue(r.VehicleId, out var externalId)) continue;
             
-            locationsAndTracks.Add(locationAndTrack);
+        if (!locations.TryGetValue(externalId, out var location)) continue;
+
+        var locationAndTrack = new LocationAndTrack
+        {
+            Longitude = location.Item1,
+            Latitude = location.Item2,
+            VehicleId = r.VehicleId
+        };
+
+        if (!r.NeedReturnTrack || !tracks.TryGetValue(externalId, out var track))
+        {
+            locationAndTrack.Track = Array.Empty<TrackPointInfo>();
         }
-
+        else
+        {
+            locationAndTrack.Track = track;
+        }
+            
+        locationsAndTracks.Add(locationAndTrack);
+    }
         var lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
         lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
         
