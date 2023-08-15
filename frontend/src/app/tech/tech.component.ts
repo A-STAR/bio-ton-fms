@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, QueryList } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import {
   BehaviorSubject,
   Observable,
+  Subscription,
   debounceTime,
   defer,
   distinctUntilChanged,
@@ -23,12 +24,13 @@ import {
   tap
 } from 'rxjs';
 
-import { MonitoringVehicle, TechService } from './tech.service';
+import { MonitoringVehicle, TechService, VehicleMonitoringInfo } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
 
 import { StopClickPropagationDirective } from '../shared/stop-click-propagation/stop-click-propagation.directive';
-import { MapComponent } from '../shared/map/map.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
+import { TechMonitoringInfoComponent } from './shared/tech-monitoring-info/tech-monitoring-info/tech-monitoring-info.component';
+import { MapComponent } from '../shared/map/map.component';
 
 import {
   TrackerCommandDialogComponent,
@@ -49,13 +51,14 @@ import {
     MatExpansionModule,
     StopClickPropagationDirective,
     TechMonitoringStateComponent,
+    TechMonitoringInfoComponent,
     MapComponent
   ],
   templateUrl: './tech.component.html',
   styleUrls: ['./tech.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class TechComponent implements OnInit {
+export default class TechComponent implements OnInit, OnDestroy {
   /**
    * Get search stream.
    *
@@ -96,6 +99,7 @@ export default class TechComponent implements OnInit {
   protected tech$!: Observable<MonitoringTech[]>;
   protected searchForm!: TechSearchForm;
   protected expandedPanelTechID?: MonitoringTech['id'];
+  protected techInfo?: TechMonitoringInfo;
 
   /**
    * Tech option selected state.
@@ -160,18 +164,38 @@ export default class TechComponent implements OnInit {
   }
 
   /**
+   * Get, set tech monitoring information.
+   *
    * Toggle tech panel, save expanded panel tech ID.
    *
    * @param panel `MatExpansionPanel` instance.
    * @param id `MonitoringTech` ID.
    */
   protected onPanelToggle(panel: MatExpansionPanel, id: MonitoringTech['id']) {
-    panel.toggle();
+    this.#techInfoSubscription?.unsubscribe();
 
-    this.expandedPanelTechID = panel.expanded ? id : undefined;
+    if (panel.expanded) {
+      this.#techInfoSubscription = panel.afterCollapse.subscribe(() => {
+        this.techInfo = undefined;
+      });
+
+      panel.toggle();
+
+      this.expandedPanelTechID = undefined;
+    } else {
+      this.#techInfoSubscription = this.techService
+        .getVehicleInfo(id)
+        .subscribe(info => {
+          this.expandedPanelTechID = id;
+          this.techInfo = info;
+
+          panel.toggle();
+        });
+    }
   }
 
   #options$ = new BehaviorSubject<TechOptions>({});
+  #techInfoSubscription: Subscription | undefined;
 
   /**
    * Initialize Search form.
@@ -241,6 +265,11 @@ export default class TechComponent implements OnInit {
     this.#initSearchForm();
     this.#setTech();
   }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnDestroy() {
+    this.#techInfoSubscription?.unsubscribe();
+  }
 }
 
 type TechSearchForm = FormGroup<{
@@ -252,6 +281,8 @@ export type MonitoringTech = MonitoringVehicle;
 type TechOptions = Partial<{
   selected: Set<MonitoringTech['id']>;
 }>;
+
+export type TechMonitoringInfo = VehicleMonitoringInfo;
 
 export const POLL_INTERVAL_PERIOD = 5000;
 

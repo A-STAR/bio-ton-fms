@@ -8,19 +8,19 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatListOptionHarness, MatSelectionListHarness } from '@angular/material/list/testing';
-import { MatAccordionHarness } from '@angular/material/expansion/testing';
+import { MatAccordionHarness, MatExpansionPanelHarness } from '@angular/material/expansion/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { MonitoringVehicle, MonitoringVehiclesOptions, TechService } from './tech.service';
+import { MonitoringVehicle, MonitoringVehiclesOptions, TechService, VehicleMonitoringInfo } from './tech.service';
 
 import TechComponent, { POLL_INTERVAL_PERIOD, SEARCH_DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 import { MapComponent } from '../shared/map/map.component';
 
-import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from './tech.service.spec';
+import { mockTestFoundMonitoringVehicles, testFindCriterion, testVehicleMonitoringInfo, testMonitoringVehicles } from './tech.service.spec';
 
 describe('TechComponent', () => {
   let component: TechComponent;
@@ -28,8 +28,10 @@ describe('TechComponent', () => {
   let overlayContainer: OverlayContainer;
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
+  let techService: TechService;
 
   let vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>;
+  let vehicleInfoSpy: jasmine.Spy<(id: MonitoringVehicle['id']) => Observable<VehicleMonitoringInfo>>;
 
   beforeEach(async () => {
     await TestBed
@@ -47,14 +49,18 @@ describe('TechComponent', () => {
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
 
-    const techService = TestBed.inject(TechService);
+    techService = TestBed.inject(TechService);
 
     component = fixture.componentInstance;
 
     const vehicles$ = of(testMonitoringVehicles);
+    const vehicleInfo$ = of(testVehicleMonitoringInfo);
 
     vehiclesSpy = spyOn(techService, 'getVehicles')
       .and.returnValue(vehicles$);
+
+    vehicleInfoSpy = spyOn(techService, 'getVehicleInfo')
+      .and.returnValue(vehicleInfo$);
 
     fixture.detectChanges();
   });
@@ -229,13 +235,19 @@ describe('TechComponent', () => {
   }));
 
   it('should render tech options monitoring state', async () => {
-    const optionStateDes = fixture.debugElement.queryAll(
+    const techMonitoringStateDes = fixture.debugElement.queryAll(
       By.css('mat-selection-list div bio-tech-monitoring-state')
     );
 
-    expect(optionStateDes.length)
-      .withContext('render tech options monitoring state')
+    expect(techMonitoringStateDes.length)
+      .withContext('render `bio-tech-monitoring-state` component elements')
       .toBe(testMonitoringVehicles.length);
+
+    techMonitoringStateDes.forEach((techMonitoringStateDe, index) => {
+      expect(techMonitoringStateDe.componentInstance.tech)
+        .withContext('render `bio-tech-monitoring-state` component `tech` input value')
+        .toBe(testMonitoringVehicles[index]);
+    });
   });
 
   it('should render tech panels', fakeAsync(async () => {
@@ -384,6 +396,42 @@ describe('TechComponent', () => {
     overlayContainer.ngOnDestroy();
   }));
 
+  it('should render tech monitoring info', fakeAsync(async () => {
+    const panelButtonDes = fixture.debugElement.queryAll(
+      By.css('mat-selection-list mat-list-option button')
+    );
+
+    const panels = await loader.getAllHarnesses(
+      MatExpansionPanelHarness.with({
+        ancestor: 'aside mat-selection-list',
+        expanded: false
+      })
+    );
+
+    panelButtonDes.forEach(async (panelButtonDe, index) => {
+      const event = new MouseEvent('click');
+
+      panelButtonDe.triggerEventHandler('click', event);
+
+      expect(vehicleInfoSpy)
+        .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
+
+      await panels[index].isExpanded();
+
+      const techMonitoringInfoDe = fixture.debugElement.query(
+        By.css(`mat-selection-list mat-expansion-panel:nth-of-type(${index + 1}) bio-tech-monitoring-info`)
+      );
+
+      expect(techMonitoringInfoDe)
+        .withContext('render `bio-tech-monitoring-info` component element')
+        .not.toBeNull();
+
+      expect(techMonitoringInfoDe.componentInstance.info)
+        .withContext('render `bio-tech-monitoring-info` component `info` input value')
+        .toBe(testVehicleMonitoringInfo);
+    });
+  }));
+
   it('should toggle tech panels', fakeAsync(async () => {
     const accordion = await loader.getHarness(
       MatAccordionHarness.with({
@@ -414,6 +462,16 @@ describe('TechComponent', () => {
       const event = new MouseEvent('click');
 
       panelButtonDes[index].triggerEventHandler('click', event);
+
+      if (isExpanded) {
+        vehicleInfoSpy.calls.reset();
+
+        expect(vehicleInfoSpy)
+          .not.toHaveBeenCalled();
+      } else {
+        expect(vehicleInfoSpy)
+          .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
+      }
 
       panels = await accordion.getExpansionPanels({
         expanded: false
@@ -463,6 +521,9 @@ describe('TechComponent', () => {
     // open tech panel
     panelButtonDes[index].triggerEventHandler('click', event);
 
+    expect(vehicleInfoSpy)
+      .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
+
     const accordion = await loader.getHarness(
       MatAccordionHarness.with({
         ancestor: 'aside mat-selection-list',
@@ -490,6 +551,11 @@ describe('TechComponent', () => {
     // close tech panel
     panelButtonDes[index].triggerEventHandler('click', event);
 
+    vehicleInfoSpy.calls.reset();
+
+    expect(vehicleInfoSpy)
+      .not.toHaveBeenCalled();
+
     tick(POLL_INTERVAL_PERIOD);
 
     expect(vehiclesSpy)
@@ -509,6 +575,9 @@ describe('TechComponent', () => {
     index = 2;
 
     panelButtonDes[index].triggerEventHandler('click', event);
+
+    expect(vehicleInfoSpy)
+      .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
 
     tick(POLL_INTERVAL_PERIOD);
 

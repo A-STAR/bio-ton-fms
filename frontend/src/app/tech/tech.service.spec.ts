@@ -117,7 +117,7 @@ describe('TechService', () => {
   });
 });
 
-const testVehicleMonitoringInfo: VehicleMonitoringInfo = {
+export const testVehicleMonitoringInfo: VehicleMonitoringInfo = {
   generalInfo: {
     lastMessageTime: '2023-07-13T00:56:27.766Z',
     speed: 16.100714299456435,

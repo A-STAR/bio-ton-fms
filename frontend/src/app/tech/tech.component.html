@@ -26,7 +26,9 @@
             <bio-tech-monitoring-state [tech]="tech" (sendTrackerCommand)="onSendTrackerCommand($event)"></bio-tech-monitoring-state>
           </div>
 
-          <mat-expansion-panel #panel [expanded]="tech.id === expandedPanelTechID"></mat-expansion-panel>
+          <mat-expansion-panel #panel [expanded]="tech.id === expandedPanelTechID">
+            <bio-tech-monitoring-info [info]="techInfo" *ngIf="techInfo"></bio-tech-monitoring-info>
+          </mat-expansion-panel>
         </ng-container>
       </mat-accordion>
     </mat-selection-list>

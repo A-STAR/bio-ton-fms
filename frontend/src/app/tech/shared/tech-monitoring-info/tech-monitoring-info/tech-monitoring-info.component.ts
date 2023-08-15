@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+import { TechMonitoringInfo } from '../../../../tech/tech.component';
 
 @Component({
   selector: 'bio-tech-monitoring-info',
@@ -9,4 +11,6 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./tech-monitoring-info.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TechMonitoringInfoComponent { }
+export class TechMonitoringInfoComponent {
+  @Input() info!: TechMonitoringInfo;
+}
