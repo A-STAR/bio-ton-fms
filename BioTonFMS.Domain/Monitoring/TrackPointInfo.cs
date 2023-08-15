@@ -5,7 +5,7 @@ public class TrackPointInfo
     /// <summary>
     /// Идентификатор сообщения
     /// </summary>
-    public long Id { get; set; }
+    public long MessageId { get; set; }
 
     /// <summary>
     /// Дата и время получения сообщения

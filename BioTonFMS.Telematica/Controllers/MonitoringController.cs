@@ -88,35 +88,50 @@ public class MonitoringController : ValidationControllerBase
     [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
     public IActionResult LocationsAndTracks(LocationAndTrackRequest[] requests)
     {
-        var externalIds = _vehicleRepository.GetExternalIds(
+        IDictionary<int, int> externalIds = _vehicleRepository.GetExternalIds(
             requests.Select(x => x.VehicleId).ToArray());
 
-        var locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
+        IDictionary<int, (double Lat, double Long)> locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
 
-        var needTrack = requests.Where(x => x.NeedReturnTrack)
+        IEnumerable<int> needTrack = requests.Where(x => x.NeedReturnTrack)
             .Select(x => x.VehicleId);
 
-        var tracks = _messageRepository.GetTracks(
+        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(
             externalIds.Where(x => needTrack.Contains(x.Key))
                 .Select(x => x.Value)
                 .ToArray()
         );
 
-        var locationsAndTracks = new List<LocationAndTrack>();
-        foreach (var r in requests)
+        List<LocationAndTrack> locationsAndTracks = GetClocationsAndTracks(requests, externalIds, locations, tracks);
+
+        ViewBounds viewBounds = CalculateViewBounds(locationsAndTracks);
+
+        return Ok(new LocationsAndTracksResponse
         {
-            if (!externalIds.TryGetValue(r.VehicleId, out var externalId)) continue;
+            ViewBounds = viewBounds,
+            Tracks = locationsAndTracks
+        });
+    }
+
+    private static List<LocationAndTrack> GetClocationsAndTracks(LocationAndTrackRequest[] requests, 
+        IDictionary<int, int> externalIds, IDictionary<int, (double Lat, double Long)> locations, 
+        IDictionary<int, TrackPointInfo[]> tracks)
+    {
+        var locationsAndTracks = new List<LocationAndTrack>();
+        foreach (var request in requests)
+        {
+            if (!externalIds.TryGetValue(request.VehicleId, out var externalId)) continue;
 
             if (!locations.TryGetValue(externalId, out var location)) continue;
 
             var locationAndTrack = new LocationAndTrack
             {
-                Longitude = location.Item1,
-                Latitude = location.Item2,
-                VehicleId = r.VehicleId
+                Longitude = location.Long,
+                Latitude = location.Lat,
+                VehicleId = request.VehicleId
             };
 
-            if (!r.NeedReturnTrack || !tracks.TryGetValue(externalId, out var track))
+            if (!request.NeedReturnTrack || !tracks.TryGetValue(externalId, out var track))
             {
                 locationAndTrack.Track = Array.Empty<TrackPointInfo>();
             }
@@ -128,6 +143,11 @@ public class MonitoringController : ValidationControllerBase
             locationsAndTracks.Add(locationAndTrack);
         }
 
+        return locationsAndTracks;
+    }
+
+    private static ViewBounds CalculateViewBounds(List<LocationAndTrack> locationsAndTracks)
+    {
         var lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
         lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
 
@@ -137,17 +157,14 @@ public class MonitoringController : ValidationControllerBase
         var difLat = (lats.Max() - lats.Min()) / 20;
         var difLon = (lons.Max() - lons.Min()) / 20;
 
-        return Ok(new LocationsAndTracksResponse
+        var viewBounds = new ViewBounds
         {
-            ViewBounds = new ViewBounds
-            {
-                UpperLeftLatitude = lats.Max() + difLat,
-                UpperLeftLongitude = lons.Min() - difLon,
-                BottomRightLatitude = lats.Min() - difLat,
-                BottomRightLongitude = lats.Max() + difLon
-            },
-            Tracks = locationsAndTracks
-        });
+            UpperLeftLatitude = lats.Max() + difLat,
+            UpperLeftLongitude = lons.Min() - difLon,
+            BottomRightLatitude = lats.Min() - difLat,
+            BottomRightLongitude = lats.Max() + difLon
+        };
+        return viewBounds;
     }
 
     [HttpGet("vehicle/{id:int}")]

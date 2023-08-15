@@ -224,7 +224,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .ToLookup(x => x.ExternalTrackerId,
                 x => new TrackPointInfo
                 {
-                    Id = x.Id,
+                    MessageId = x.Id,
                     Latitude = x.Latitude!.Value,
                     Longitude = x.Longitude!.Value,
                     Altitude = x.Altitude,
@@ -236,7 +236,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return result;
     }
     
-    public IDictionary<int, (double, double)> GetLocations(int[] externalIds)
+    public IDictionary<int, (double Lat, double Long)> GetLocations(int[] externalIds)
     {
         var result = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
@@ -245,7 +245,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 (key, g) => g.OrderByDescending(x => x.ServerDateTime)
                     .Select(x => new { x.ExternalTrackerId, x.Longitude, x.Latitude })
                     .First())
-            .ToDictionary(x => x.ExternalTrackerId, x => (x.Longitude!.Value, x.Latitude!.Value));
+            .ToDictionary(x => x.ExternalTrackerId, x => (x.Latitude!.Value, x.Longitude!.Value));
 
         return result;
     }

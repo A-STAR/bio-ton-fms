@@ -21,5 +21,5 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     /// </summary>
     /// <param name="externalIds">Внешние id трекеров</param>
     /// <returns>Локации трекеров в формате Longitude, Latitude</returns>
-    IDictionary<int, (double, double)> GetLocations(int[] externalIds);
+    IDictionary<int, (double Lat, double Long)> GetLocations(int[] externalIds);
 }
