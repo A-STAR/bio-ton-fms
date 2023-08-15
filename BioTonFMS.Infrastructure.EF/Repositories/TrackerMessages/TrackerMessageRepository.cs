@@ -1,3 +1,4 @@
+using System.Security.Cryptography.Xml;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Monitoring;
@@ -185,7 +186,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         int trackerAddressValidMinutes)
     {
         var now = SystemTime.UtcNow;
-        
+
         var foundResults = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId))
             .GroupBy(x => x.ExternalTrackerId,
@@ -207,26 +208,45 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return foundResults;
     }
 
-    public void GetFastTrack(int[] externalIds)
+    /// <summary>
+    /// Информация о перемещении трекеров за сутки
+    /// </summary>
+    /// <param name="externalIds">Внешние id трекеров</param>
+    /// <returns>Данные трека для машин за последние сутки</returns>
+    public IDictionary<int, TrackPointInfo[]> GetTracks(int[] externalIds)
     {
         var yesterday = DateTime.UtcNow.AddDays(-1);
-        
-        var list = QueryableProvider.Linq()
-            .Where(x => externalIds.Contains(x.ExternalTrackerId))
+
+        var result = QueryableProvider.Linq()
+            .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
+                        x.Latitude != null && x.Longitude != null &&
+                        x.ServerDateTime > yesterday)
+            .ToLookup(x => x.ExternalTrackerId,
+                x => new TrackPointInfo
+                {
+                    Id = x.Id,
+                    Latitude = x.Latitude!.Value,
+                    Longitude = x.Longitude!.Value,
+                    Altitude = x.Altitude,
+                    Speed = x.Speed,
+                    Time = x.ServerDateTime
+                })
+            .ToDictionary(x => x.Key, x => x.ToArray());
+
+        return result;
+    }
+    
+    public IDictionary<int, (double, double)> GetLocations(int[] externalIds)
+    {
+        var result = QueryableProvider.Linq()
+            .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
+                        x.Latitude != null && x.Longitude != null)
             .GroupBy(x => x.ExternalTrackerId,
-                (key, g) => g
-                    .OrderByDescending(x => x.ServerDateTime)
-                    .Where(x => x.Longitude != null && x.Latitude != null)
-                    .Select(x => new
-                    {
-                        lat = x.Latitude,
-                        lon = x.Longitude,
-                        alt = x.Altitude,
-                        time = x.ServerDateTime,
-                        speed = x.Speed
-                    }))
-            .ToList();
-        
-        
+                (key, g) => g.OrderByDescending(x => x.ServerDateTime)
+                    .Select(x => new { x.ExternalTrackerId, x.Longitude, x.Latitude })
+                    .First())
+            .ToDictionary(x => x.ExternalTrackerId, x => (x.Longitude!.Value, x.Latitude!.Value));
+
+        return result;
     }
 }

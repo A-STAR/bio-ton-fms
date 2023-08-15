@@ -1,3 +1,4 @@
+using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.Paging;
@@ -14,5 +15,11 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     TrackerMessage? GetLastMessageFor(int externalId);
     PagedResult<ParametersHistoryRecord> GetParametersHistory(ParametersHistoryFilter filter);
     IDictionary<int, VehicleStatus> GetVehicleStates(int[] externalIds, int trackerAddressValidMinutes);
-    void GetFastTrack(int[] externalIds);
+    IDictionary<int, TrackPointInfo[]> GetTracks(int[] externalIds);
+    /// <summary>
+    /// Информация о местонахождении трекеров
+    /// </summary>
+    /// <param name="externalIds">Внешние id трекеров</param>
+    /// <returns>Локации трекеров в формате Longitude, Latitude</returns>
+    IDictionary<int, (double, double)> GetLocations(int[] externalIds);
 }

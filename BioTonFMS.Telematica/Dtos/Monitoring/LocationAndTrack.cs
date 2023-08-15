@@ -1,3 +1,5 @@
+using BioTonFMS.Domain.Monitoring;
+
 namespace BioTonFMS.Telematica.Dtos.Monitoring;
 
 public class LocationAndTrack

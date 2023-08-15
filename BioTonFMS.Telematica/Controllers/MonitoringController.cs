@@ -6,7 +6,6 @@ using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos.Monitoring;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -64,11 +63,11 @@ public class MonitoringController : ValidationControllerBase
             if (!states.TryGetValue(monitoringDto.Tracker.ExternalId.Value, out var status))
             {
                 status = new VehicleStatus
-                    {
-                        TrackerExternalId = monitoringDto.Tracker.ExternalId.Value,
-                        MovementStatus = MovementStatusEnum.NoData,
-                        ConnectionStatus = ConnectionStatusEnum.NotConnected
-                    };
+                {
+                    TrackerExternalId = monitoringDto.Tracker.ExternalId.Value,
+                    MovementStatus = MovementStatusEnum.NoData,
+                    ConnectionStatus = ConnectionStatusEnum.NotConnected
+                };
             }
 
             monitoringDto.MovementStatus = status.MovementStatus;
@@ -89,10 +88,65 @@ public class MonitoringController : ValidationControllerBase
     [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
     public IActionResult LocationsAndTracks(LocationAndTrackRequest[] requests)
     {
-        var externalIds = new[] { 484088 };
+        var externalIds = _vehicleRepository.GetExternalIds(
+            requests.Select(x => x.VehicleId).ToArray());
 
-        _messageRepository.GetFastTrack(externalIds);
+        var locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
 
-        return Ok();
+        var needTrack = requests.Where(x => x.NeedReturnTrack)
+            .Select(x => x.VehicleId);
+
+        var tracks = _messageRepository.GetTracks(
+            externalIds.Where(x => needTrack.Contains(x.Key))
+                .Select(x => x.Value)
+                .ToArray()
+        );
+
+        var locationsAndTracks = new List<LocationAndTrack>();
+        foreach (var r in requests)
+        {
+            if (!externalIds.TryGetValue(r.VehicleId, out var externalId)) continue;
+            
+            if (!locations.TryGetValue(externalId, out var location)) continue;
+
+            var locationAndTrack = new LocationAndTrack
+            {
+                Longitude = location.Item1,
+                Latitude = location.Item2,
+                VehicleId = r.VehicleId
+            };
+
+            if (!r.NeedReturnTrack || !tracks.TryGetValue(externalId, out var track))
+            {
+                locationAndTrack.Track = Array.Empty<TrackPointInfo>();
+            }
+            else
+            {
+                locationAndTrack.Track = track;
+            }
+            
+            locationsAndTracks.Add(locationAndTrack);
+        }
+
+        var lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
+        lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
+        
+        var lats = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Latitude).ToList();
+        lats.AddRange(locationsAndTracks.Select(x => x.Latitude));
+
+        var difLat = (lats.Max() - lats.Min()) / 20;
+        var difLon = (lons.Max() - lons.Min()) / 20;
+
+        return Ok(new LocationsAndTracksResponse
+        {
+            ViewBounds = new ViewBounds
+            {
+                UpperLeftLatitude = lats.Max() + difLat,
+                UpperLeftLongitude = lons.Min() - difLon,
+                BottomRightLatitude = lats.Min() - difLat,
+                BottomRightLongitude = lats.Max() + difLon
+            },
+            Tracks = locationsAndTracks
+        });
     }
 }

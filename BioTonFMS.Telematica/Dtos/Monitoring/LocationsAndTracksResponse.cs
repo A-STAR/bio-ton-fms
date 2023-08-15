@@ -10,5 +10,5 @@ public class LocationsAndTracksResponse
     /// <summary>
     /// Данные для построения быстрого трека для заданных машин
     /// </summary>
-    public LocationAndTrack[] Tracks { get; set; }
+    public ICollection<LocationAndTrack> Tracks { get; set; }
 }
