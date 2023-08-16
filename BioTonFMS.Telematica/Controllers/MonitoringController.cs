@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BioTonFMS.Common.Settings;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
@@ -58,15 +59,23 @@ public class MonitoringController : ValidationControllerBase
 
         int[] trackerExternalIds = monitoringDtos.Where(x => x.Tracker?.ExternalId != null)
             .Select(x => x.Tracker!.ExternalId!.Value).ToArray();
-        
+
         var states = _messageRepository.GetVehicleStates(trackerExternalIds,
             _trackerOptions.TrackerAddressValidMinutes);
-        
+
         foreach (MonitoringVehicleDto monitoringDto in monitoringDtos)
         {
             if (monitoringDto.Tracker?.ExternalId == null) continue;
-            
-            var status = states[monitoringDto.Tracker.ExternalId.Value];
+
+            if (!states.TryGetValue(monitoringDto.Tracker.ExternalId.Value, out var status))
+            {
+                status = new VehicleStatus
+                {
+                    TrackerExternalId = monitoringDto.Tracker.ExternalId.Value,
+                    MovementStatus = MovementStatusEnum.NoData,
+                    ConnectionStatus = ConnectionStatusEnum.NotConnected
+                };
+            }
 
             monitoringDto.MovementStatus = status.MovementStatus;
             monitoringDto.ConnectionStatus = status.ConnectionStatus;
@@ -75,6 +84,98 @@ public class MonitoringController : ValidationControllerBase
         }
 
         return Ok(monitoringDtos);
+    }
+
+    /// <summary>
+    /// Возвращает текущие координаты и данные для построения быстрого трека для заданных машин
+    /// </summary>
+    /// <response code="200">Данные успешно возвращены</response>
+    /// <response code="400">Невозможно вернуть данные</response>
+    [HttpPost("locations-and-tracks")]
+    [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
+    public IActionResult LocationsAndTracks(LocationAndTrackRequest[] requests)
+    {
+        IDictionary<int, int> externalIds = _vehicleRepository.GetExternalIds(
+            requests.Select(x => x.VehicleId).ToArray());
+
+        IDictionary<int, (double Lat, double Long)> locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
+
+        IEnumerable<int> needTrack = requests.Where(x => x.NeedReturnTrack)
+            .Select(x => x.VehicleId);
+
+        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(
+            externalIds.Where(x => needTrack.Contains(x.Key))
+                .Select(x => x.Value)
+                .ToArray()
+        );
+
+        List<LocationAndTrack> locationsAndTracks = GetLocationsAndTracks(requests, externalIds, locations, tracks);
+
+        ViewBounds viewBounds = CalculateViewBounds(locationsAndTracks);
+
+        return Ok(new LocationsAndTracksResponse
+        {
+            ViewBounds = viewBounds,
+            Tracks = locationsAndTracks
+        });
+    }
+
+    private static List<LocationAndTrack> GetLocationsAndTracks(LocationAndTrackRequest[] requests, 
+        IDictionary<int, int> externalIds, IDictionary<int, (double Lat, double Long)> locations, 
+        IDictionary<int, TrackPointInfo[]> tracks)
+    {
+        var locationsAndTracks = new List<LocationAndTrack>();
+        foreach (var request in requests)
+        {
+            if (!externalIds.TryGetValue(request.VehicleId, out var externalId)) continue;
+
+            if (!locations.TryGetValue(externalId, out var location)) continue;
+
+            var locationAndTrack = new LocationAndTrack
+            {
+                Longitude = location.Long,
+                Latitude = location.Lat,
+                VehicleId = request.VehicleId
+            };
+
+            if (!request.NeedReturnTrack || !tracks.TryGetValue(externalId, out var track))
+            {
+                locationAndTrack.Track = Array.Empty<TrackPointInfo>();
+            }
+            else
+            {
+                locationAndTrack.Track = track;
+            }
+
+            locationsAndTracks.Add(locationAndTrack);
+        }
+
+        return locationsAndTracks;
+    }
+
+    private static ViewBounds? CalculateViewBounds(List<LocationAndTrack> locationsAndTracks)
+    {
+        if (locationsAndTracks.Count == 0)
+        {
+            return null;
+        }
+        var lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
+        lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
+
+        var lats = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Latitude).ToList();
+        lats.AddRange(locationsAndTracks.Select(x => x.Latitude));
+
+        var difLat = (lats.Max() - lats.Min()) / 20;
+        var difLon = (lons.Max() - lons.Min()) / 20;
+
+        var viewBounds = new ViewBounds
+        {
+            UpperLeftLatitude = lats.Max() + difLat,
+            UpperLeftLongitude = lons.Min() - difLon,
+            BottomRightLatitude = lats.Min() - difLat,
+            BottomRightLongitude = lats.Max() + difLon
+        };
+        return viewBounds;
     }
 
     [HttpGet("vehicle/{id:int}")]
@@ -99,7 +200,7 @@ public class MonitoringController : ValidationControllerBase
                 Imei = "6C6F6C6B656B636",
                 SimNumber = "88005553535",
                 TrackerType = "GalileoSkyV50",
-                Parameters = new []
+                Parameters = new[]
                 {
                     new TrackerParameter
                     {
@@ -117,7 +218,7 @@ public class MonitoringController : ValidationControllerBase
                         LastValueDateTime = DateTime.UnixEpoch.AddDays(3304)
                     },
                 },
-                Sensors = new []
+                Sensors = new[]
                 {
                     new TrackerSensorDto
                     {
