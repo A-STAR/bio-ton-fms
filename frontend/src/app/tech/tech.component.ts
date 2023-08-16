@@ -18,6 +18,7 @@ import {
   distinctUntilChanged,
   interval,
   map,
+  of,
   skipWhile,
   startWith,
   switchMap,
@@ -232,6 +233,8 @@ export default class TechComponent implements OnInit, OnDestroy {
 
   /**
    * Get and set tech.
+   *
+   * Update tech info.
    */
   #setTech() {
     const timer$ = interval(POLL_INTERVAL_PERIOD)
@@ -250,11 +253,36 @@ export default class TechComponent implements OnInit, OnDestroy {
 
     const searchTech = (findCriterion: string) => this.techService.getVehicles({ findCriterion });
 
+    const updateTechInfo = (tech: MonitoringTech[]) => {
+      this.#techInfoSubscription?.unsubscribe();
+
+      let techInfo$: Observable<TechMonitoringInfo | undefined> = of(undefined);
+
+      if (this.expandedPanelTechID) {
+        const hasTech = tech.some(({ id }) => id === this.expandedPanelTechID);
+
+        if (hasTech) {
+          techInfo$ = this.techService
+            .getVehicleInfo(this.expandedPanelTechID)
+            .pipe(
+              tap(info => {
+                this.techInfo = info;
+              })
+            );
+        }
+      }
+
+      return techInfo$.pipe(
+        switchMap(() => of(tech))
+      );
+    };
+
     this.tech$ = this.#search$.pipe(
       startWith(undefined),
       switchMap(searchQuery => timer$.pipe(
         switchMap(() => searchQuery ? searchTech(searchQuery) : tech$)
-      ))
+      )),
+      switchMap(tech => updateTechInfo(tech))
     );
   }
 
