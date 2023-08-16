@@ -3,11 +3,6 @@ namespace BioTonFMS.Telematica.Dtos.Monitoring;
 public class MonitoringGeneralInfoDto
 {
      /// <summary>
-     /// Время в секундах, прошедшее с момента получения последнего сообщения
-     /// </summary>
-     public int? TimeSinceLastMessage {get;set;}
-     
-     /// <summary>
      /// Дата и время последнего сообщения
      /// </summary>
      public DateTime? LastMessageTime {get;set;}

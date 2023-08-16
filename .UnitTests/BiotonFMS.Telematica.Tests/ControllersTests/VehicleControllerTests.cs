@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using BioTonFMS.Telematica.Dtos.Vehicle;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
@@ -331,10 +332,10 @@ public class VehicleControllerTests
         return new VehicleController(
             mapper,
             loggerDummy,
-            VehicleMock.GetStub(),
+            VehicleRepositoryMock.GetStub(),
             TrackerRepositoryMock.GetStub(),
-            FuelTypeMock.GetStub(),
-            VehicleGroupMock.GetStub(),
+            FuelTypeRepositoryMock.GetStub(),
+            VehicleGroupRepositoryMock.GetStub(),
             new CreateVehicleDtoValidator(),
             new UpdateVehicleDtoValidator(),
             new VehiclesRequestValidator()

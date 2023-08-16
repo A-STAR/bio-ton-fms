@@ -2,6 +2,7 @@
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Mapping;
 using BiotonFMS.Telematica.Tests.Mocks;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,7 @@ public class FuelTypeControllerTests
         var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile(new FuelTypeMappingProfile()));
         IMapper mapper = new Mapper(mapperConfig);
 
-        var fuelTypeController = new FuelTypeController(loggerDummy, FuelTypeMock.GetStub(), mapper);
+        var fuelTypeController = new FuelTypeController(loggerDummy, FuelTypeRepositoryMock.GetStub(), mapper);
 
         // Act
         var result = (OkObjectResult)fuelTypeController.GetFuelTypes();

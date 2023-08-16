@@ -133,7 +133,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             var vehicleQuery = QueryableProvider.Fetch(x => x.Tracker).Linq().Where(x => x.Tracker != null).OrderBy(x => x.Name);
             return (string.IsNullOrEmpty(findCriterion)
                 ? vehicleQuery
-                : vehicleQuery.Where(x => x.Name.Contains(findCriterion) ||
+                : vehicleQuery.Where(x => x.Name.ToLower().Contains(findCriterion.ToLower()) ||
                                 (x.Tracker != null &&
                                     (x.Tracker.ExternalId.ToString() == findCriterion ||
                                      x.Tracker.Imei == findCriterion)))

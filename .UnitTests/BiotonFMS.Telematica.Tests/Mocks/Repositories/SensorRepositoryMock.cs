@@ -1,11 +1,10 @@
-using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
 using BioTonFMS.Infrastructure.Paging;
 using Moq;
 
-namespace BiotonFMS.Telematica.Tests.Mocks;
+namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 public static class SensorRepositoryMock
 {

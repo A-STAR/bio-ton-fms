@@ -1,22 +1,35 @@
 using System.Collections;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.Paging;
-using BiotonFMS.Telematica.Tests.Mocks;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
+/// <summary>
+/// Тесты для <see cref="TrackerMessageRepository"/>
+/// </summary>
 public class TrackerMessageRepositoryTests
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public TrackerMessageRepositoryTests(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
+
     #region ExistsByUid
     [Fact]
     public void ExistsByUid_MessageExists_ShouldReturnTrue()
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         bool result = repo.ExistsByUid(Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"));
 
         result.Should().BeTrue();
@@ -25,7 +38,7 @@ public class TrackerMessageRepositoryTests
     [Fact]
     public void ExistsByUid_MessageNotExists_ShouldReturnFalse()
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         bool result = repo.ExistsByUid(Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B89"));
 
         result.Should().BeFalse();
@@ -37,7 +50,7 @@ public class TrackerMessageRepositoryTests
     [InlineData(2552)]
     public void GetParameters_ShouldReturnParameters(int externalId)
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         var parameters = repo.GetParameters(externalId);
         parameters.Count.Should().Be(3);
         parameters.First(x => x.ParamName == "hdop").LastValueDecimal.Should().Be(6);
@@ -50,7 +63,7 @@ public class TrackerMessageRepositoryTests
     [InlineData(32)]
     public void GetParameters_NoMessages_ShouldReturnEmptyCollection(int externalId)
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         var parameters = repo.GetParameters(externalId);
 
         parameters.Should().Equal(Enumerable.Empty<TrackerParameter>());
@@ -107,7 +120,7 @@ public class TrackerMessageRepositoryTests
                 }
             }
         };
-        var repo = GetRepo(messages);
+        var repo = TrackerMessageRepositoryMock.GetStub(messages);
         var parameters = repo.GetParameters(2552);
 
         parameters.Count.Should().Be(6);
@@ -125,7 +138,7 @@ public class TrackerMessageRepositoryTests
     [InlineData(2552)]
     public void GetStandardParameters_ShouldReturnStandardParameters(int externalId)
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         var parameters = repo.GetStandardParameters(externalId);
         parameters.Speed.Should().Be(12.1);
         parameters.Alt.Should().Be(97.0);
@@ -139,7 +152,7 @@ public class TrackerMessageRepositoryTests
     [InlineData(32)]
     public void GetStandardParameters_NoMessages_ShouldReturnModelWithNulls(int externalId)
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         var parameters = repo.GetStandardParameters(externalId);
         parameters.Speed.Should().BeNull();
         parameters.Alt.Should().BeNull();
@@ -169,7 +182,7 @@ public class TrackerMessageRepositoryTests
                 ServerDateTime = DateTime.UtcNow + TimeSpan.FromSeconds(2)
             }
         };
-        var repo = GetRepo(messages);
+        var repo = TrackerMessageRepositoryMock.GetStub(messages);
         var parameters = repo.GetStandardParameters(externalId);
         parameters.Speed.Should().BeNull();
         parameters.Alt.Should().BeNull();
@@ -184,7 +197,7 @@ public class TrackerMessageRepositoryTests
     [InlineData(2552)]
     public void GetParametersHistory_ShouldReturnParametersHistory(int externalId)
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         var filter = new ParametersHistoryFilter
         {
             ExternalId = externalId,
@@ -325,7 +338,7 @@ public class TrackerMessageRepositoryTests
                 Tags = tags
             }
         };
-        var repo = GetRepo(messages);
+        var repo = TrackerMessageRepositoryMock.GetStub(messages);
         var filter = new ParametersHistoryFilter
         {
             ExternalId = 2552,
@@ -344,7 +357,7 @@ public class TrackerMessageRepositoryTests
     [InlineData(32)]
     public void GetLastMessageFor_EmptyOrNonexistentParams_ShouldReturnNull(int externalId)
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         var last = repo.GetLastMessageFor(externalId);
 
         last.Should().BeNull();
@@ -354,7 +367,7 @@ public class TrackerMessageRepositoryTests
     [InlineData(2552)]
     public void GetLastMessageFor_ExistentParams_ShouldReturnLastMessage(int externalId)
     {
-        var repo = GetRepo(Messages);
+        var repo = TrackerMessageRepositoryMock.GetStub();
         var last = repo.GetLastMessageFor(externalId);
 
         last.Should().NotBeNull();
@@ -365,95 +378,99 @@ public class TrackerMessageRepositoryTests
     }
     #endregion
 
-    private static ITrackerMessageRepository GetRepo(ICollection<TrackerMessage> messages)
+    #region GetVehicleStates
+    
+    public static IEnumerable<object[]> StatesData =>
+        new List<object[]>
+        {
+            new object[]
+            {
+                new [] {2552},
+                new Dictionary<int, VehicleStatus>
+                {
+                    {2552, new VehicleStatus
+                    {
+                        TrackerExternalId = 2552,
+                        ConnectionStatus = ConnectionStatusEnum.Connected,
+                        MovementStatus = MovementStatusEnum.Moving,
+                        NumberOfSatellites = 12,
+                        LastMessageTime = DateTime.UtcNow
+                    }}
+                }
+            },
+            new object[]
+            {
+                new int[] {},
+                new Dictionary<int, VehicleStatus>()
+            },
+            new object[]
+            {
+                new [] {2552, 1024, 128, 190384},
+                new Dictionary<int, VehicleStatus>
+                {
+                    {2552, new VehicleStatus
+                    {
+                        TrackerExternalId = 2552,
+                        ConnectionStatus = ConnectionStatusEnum.Connected,
+                        MovementStatus = MovementStatusEnum.Moving,
+                        NumberOfSatellites = 12,
+                        LastMessageTime = DateTime.UtcNow
+                    }},
+                    {1024, new VehicleStatus
+                    {
+                        TrackerExternalId = 1024,
+                        ConnectionStatus = ConnectionStatusEnum.Connected,
+                        MovementStatus = MovementStatusEnum.NoData,
+                        NumberOfSatellites = 1,
+                        LastMessageTime = DateTime.UtcNow
+                    }},
+                    {128, new VehicleStatus
+                    {
+                        TrackerExternalId = 128,
+                        ConnectionStatus = ConnectionStatusEnum.Connected,
+                        MovementStatus = MovementStatusEnum.Stopped,
+                        NumberOfSatellites = 19
+                    }},
+                    {190384, new VehicleStatus
+                    {
+                        TrackerExternalId = 190384,
+                        ConnectionStatus = ConnectionStatusEnum.NotConnected,
+                        MovementStatus = MovementStatusEnum.NoData
+                    }},
+                }
+            },
+        };
+    
+    [Theory, MemberData(nameof(StatesData))]
+    public void GetVehicleStates_ShouldReturnRightSates(int[] externalIds,
+        IDictionary<int, VehicleStatus> expected)
     {
-        var kvp = new KeyValueProviderMock<TrackerMessage, int>(messages);
-        var qp = new QueryableProviderMock<TrackerMessage>(messages);
-        var uow = new MessagesDBContextUnitOfWorkFactoryMock();
-        var repo = new TrackerMessageRepository(kvp, qp, uow, TrackerTagRepositoryMock.GetStub());
-        return repo;
-    }
+        _testOutputHelper.WriteLine("External IDs: " + string.Join(" ", externalIds));
 
-    private TrackerMessage[] Messages => new TrackerMessage[]
-    {
-        new()
+        var results = TrackerMessageRepositoryMock.GetStub().GetVehicleStates(externalIds, 60);
+
+        Assert.Equal(expected.Count, results.Count);
+
+        results.Keys.Should().BeEquivalentTo(expected.Keys);
+
+        foreach (var r in results)
         {
-            Id = 0,
-            ExternalTrackerId = 2552,
-            Imei = "123",
-            ServerDateTime = DateTime.UtcNow,
-            TrackerDateTime = DateTime.UtcNow,
-            Latitude = 49.432023,
-            Longitude = 52.556861,
-            SatNumber = 12,
-            CoordCorrectness = 0,
-            Altitude = 97.0,
-            Direction = 2.8,
-            FuelLevel = 100,
-            CoolantTemperature = 45,
-            EngineSpeed = 901,
-            PackageUID = Guid.Parse("F28AC4A2-5DD0-49DC-B8B5-3B161C39546A"),
-            Tags = new List<MessageTag>
+            expected[r.Key].ConnectionStatus.Should().Be(r.Value.ConnectionStatus);
+            expected[r.Key].MovementStatus.Should().Be(r.Value.MovementStatus);
+            expected[r.Key].TrackerExternalId.Should().Be(r.Value.TrackerExternalId);
+            expected[r.Key].NumberOfSatellites.Should().Be(r.Value.NumberOfSatellites);
+
+            if (expected[r.Key].LastMessageTime == null)
             {
-                new MessageTagInteger
-                {
-                    Value = 1234,
-                    TrackerTagId = 5,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagByte
-                {
-                    Value = 6,
-                    TrackerTagId = 10,
-                    TagType = TagDataTypeEnum.Byte
-                },
-                new MessageTagBits
-                {
-                    Value = new BitArray(new byte[] { 215 }),
-                    TrackerTagId = 15,
-                    TagType = TagDataTypeEnum.Bits
-                }
+                r.Value.LastMessageTime.Should().BeNull();
             }
-        },
-        new()
-        {
-            Id = 1,
-            ExternalTrackerId = 2552,
-            Imei = "123",
-            ServerDateTime = DateTime.UtcNow + TimeSpan.FromSeconds(2),
-            TrackerDateTime = DateTime.UtcNow + TimeSpan.FromSeconds(2),
-            Latitude = 49.432023,
-            Longitude = 52.556861,
-            SatNumber = 12,
-            CoordCorrectness = 0,
-            Altitude = 97.0,
-            Speed = 12.1,
-            Direction = 2.8,
-            FuelLevel = 100,
-            CoolantTemperature = 45,
-            EngineSpeed = 901,
-            PackageUID = Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"),
-            Tags = new List<MessageTag>
+            else
             {
-                new MessageTagInteger
-                {
-                    Value = 12345,
-                    TrackerTagId = 5,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagByte
-                {
-                    Value = 6,
-                    TrackerTagId = 10,
-                    TagType = TagDataTypeEnum.Byte
-                },
-                new MessageTagInteger
-                {
-                    Value = 2134,
-                    TrackerTagId = 24,
-                    TagType = TagDataTypeEnum.Integer
-                }
+                r.Value.LastMessageTime.Should().NotBeNull();
             }
         }
-    };
+    }
+
+    #endregion
+    
 }

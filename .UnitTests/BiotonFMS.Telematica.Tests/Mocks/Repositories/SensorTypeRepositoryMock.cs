@@ -2,7 +2,7 @@
 using BioTonFMS.Infrastructure.EF.Repositories.SensorTypes;
 using Moq;
 
-namespace BiotonFMS.Telematica.Tests.Mocks;
+namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 public static class SensorTypeRepositoryMock
 {

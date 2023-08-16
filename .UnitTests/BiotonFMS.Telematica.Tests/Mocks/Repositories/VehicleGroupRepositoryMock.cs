@@ -2,9 +2,9 @@ using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using Moq;
 
-namespace BiotonFMS.Telematica.Tests.Mocks;
+namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
-public static class VehicleGroupMock
+public static class VehicleGroupRepositoryMock
 {
     public static IEnumerable<VehicleGroup> GetVehicleGroups() =>
         new List<VehicleGroup>

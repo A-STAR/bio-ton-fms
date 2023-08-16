@@ -9,6 +9,7 @@ using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using FluentAssertions;
 using Xunit.Abstractions;
 using BioTonFMS.Infrastructure.EF;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
@@ -30,94 +31,94 @@ public class VehicleRepositoryTests
             {
                 "Name filter",
                 new VehiclesFilter { Name = "Красная машина" },
-                SampleVehicles.Where(x => x.Name == "Красная машина").ToList()
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.Name == "Красная машина").ToList()
             },
             new object[]
             {
                 "Type filter",
                 new VehiclesFilter { Type = VehicleTypeEnum.Transport },
-                SampleVehicles.Where(x => x.Type == VehicleTypeEnum.Transport).ToList()
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.Type == VehicleTypeEnum.Transport).ToList()
             },
             new object[]
             {
                 "Group filter",
                 new VehiclesFilter { GroupId = 1 },
-                SampleVehicles.Where(x => (x.VehicleGroupId ?? 0) == 1).ToList()
+                VehicleRepositoryMock.SampleVehicles.Where(x => (x.VehicleGroupId ?? 0) == 1).ToList()
             },
             new object[]
             {
                 "Subtype filter",
                 new VehiclesFilter { SubType = VehicleSubTypeEnum.Car },
-                SampleVehicles.Where(x => x.VehicleSubType == VehicleSubTypeEnum.Car).ToList()
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.VehicleSubType == VehicleSubTypeEnum.Car).ToList()
             },
             new object[]
             {
                 "Name asc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.Name, SortDirection = SortDirection.Ascending },
-                SampleVehicles.OrderBy(x => x.Name).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderBy(x => x.Name).ToList(),
                 true
             },
             new object[]
             {
                 "Group asc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.Group, SortDirection = SortDirection.Ascending },
-                SampleVehicles.OrderBy(x => x.VehicleGroup?.Name).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderBy(x => x.VehicleGroup?.Name).ToList(),
                 true
             },
             new object[]
             {
                 "Type asc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.Type, SortDirection = SortDirection.Ascending },
-                SampleVehicles.OrderBy(x => x.Type).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderBy(x => x.Type).ToList(),
                 true
             },
             new object[]
             {
                 "Fuel type asc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.FuelType, SortDirection = SortDirection.Ascending },
-                SampleVehicles.OrderBy(x => x.FuelType.Name).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderBy(x => x.FuelType.Name).ToList(),
                 true
             },
             new object[]
             {
                 "Subtype asc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.SubType, SortDirection = SortDirection.Ascending },
-                SampleVehicles.OrderBy(x => x.VehicleSubType).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderBy(x => x.VehicleSubType).ToList(),
                 true
             },
             new object[]
             {
                 "Name desc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.Name, SortDirection = SortDirection.Descending },
-                SampleVehicles.OrderByDescending(x => x.Name).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderByDescending(x => x.Name).ToList(),
                 true
             },
             new object[]
             {
                 "Group desc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.Group, SortDirection = SortDirection.Descending },
-                SampleVehicles.OrderByDescending(x => x.VehicleGroup?.Name).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderByDescending(x => x.VehicleGroup?.Name).ToList(),
                 true
             },
             new object[]
             {
                 "Type desc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.Type, SortDirection = SortDirection.Descending },
-                SampleVehicles.OrderByDescending(x => x.Type).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderByDescending(x => x.Type).ToList(),
                 true
             },
             new object[]
             {
                 "Fuel type desc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.FuelType, SortDirection = SortDirection.Descending },
-                SampleVehicles.OrderByDescending(x => x.FuelType.Name).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderByDescending(x => x.FuelType.Name).ToList(),
                 true
             },
             new object[]
             {
                 "Subtype desc sort",
                 new VehiclesFilter { SortBy = VehicleSortBy.SubType, SortDirection = SortDirection.Descending },
-                SampleVehicles.OrderByDescending(x => x.VehicleSubType).ToList(),
+                VehicleRepositoryMock.SampleVehicles.OrderByDescending(x => x.VehicleSubType).ToList(),
                 true
             }
         };
@@ -127,15 +128,77 @@ public class VehicleRepositoryTests
         List<Vehicle> expected, bool considerOrder = false)
     {
         _testOutputHelper.WriteLine(testName);
-            
-        var results = CreateVehicleRepository(SampleVehicles).GetVehicles(filter).Results;
 
-        Assert.Equal(results.Count, expected.Count);
+        var results = VehicleRepositoryMock.GetStub().GetVehicles(filter).Results;
+
+        Assert.Equal(expected.Count, results.Count);
 
         if (considerOrder)
             results.Should().Equal(expected);
         else
             results.Should().BeEquivalentTo(expected);
+    }
+
+    #endregion
+
+    #region Find
+
+    public static IEnumerable<object[]> CriterionData =>
+        new List<object[]>
+        {
+            new object[]
+            {
+                "красн",
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.Name == "Красная машина").ToArray()
+            },
+            new object[]
+            {
+                "ая",
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.Name is "Красная машина" or "Желтая машина").ToArray()
+            },
+            new object[]
+            {
+                "512512",
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.Tracker?.Imei == "512512").ToArray()
+            },
+            new object[]
+            {
+                "512",
+                Array.Empty<Vehicle>()
+            },
+            new object[]
+            {
+                "15",
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.Tracker?.ExternalId == 15).ToArray()
+            },
+            new object[]
+            {
+                "",
+                VehicleRepositoryMock.SampleVehicles.ToArray()
+            },
+            new object[]
+            {
+                "такой строки нет",
+                Array.Empty<Vehicle>()
+            },
+            new object[]
+            {
+                null!,
+                VehicleRepositoryMock.SampleVehicles.ToArray()
+            }
+        };
+
+    [Theory, MemberData(nameof(CriterionData))]
+    public void FindVehicle_WithCriterion_ShouldFilter(
+        string? criterion, Vehicle[] expected)
+    {
+        _testOutputHelper.WriteLine("Criterion = \"" + criterion + "\"");
+
+        var results = VehicleRepositoryMock.GetStub().FindVehicles(criterion);
+
+        Assert.Equal(expected.Length, results.Length);
+
+        results.Should().BeEquivalentTo(expected);
     }
 
     #endregion
@@ -159,7 +222,7 @@ public class VehicleRepositoryTests
             InventoryNumber = "1234"
         };
 
-        var repo = CreateVehicleRepository(new List<Vehicle> { existingVehicle });
+        var repo = VehicleRepositoryMock.GetStub(new List<Vehicle> { existingVehicle });
 
         var newVehicle = new Vehicle
         {
@@ -179,7 +242,7 @@ public class VehicleRepositoryTests
         repo.Invoking(r => r.Add(newVehicle)).Should().Throw<ArgumentException>()
             .WithMessage($"Машина с именем {existingVehicle.Name} уже существует");
     }
-        
+
     [Fact]
     public void UpdateVehicle_VehicleWithSuchNameExists_ShouldThrowException()
     {
@@ -214,14 +277,14 @@ public class VehicleRepositoryTests
             InventoryNumber = "1235"
         };
 
-        var repo = CreateVehicleRepository(new List<Vehicle> { existingVehicle, updatingVehicle });
+        var repo = VehicleRepositoryMock.GetStub(new List<Vehicle> { existingVehicle, updatingVehicle });
 
         updatingVehicle.Name = "Сущесвующая";
 
         repo.Invoking(r => r.Update(updatingVehicle)).Should().Throw<ArgumentException>()
             .WithMessage($"Машина с именем {existingVehicle.Name} уже существует");
     }
-    
+
     [Fact]
     public void AddVehicle_VehicleWithSuchTrackerExists_ShouldThrowException()
     {
@@ -241,7 +304,7 @@ public class VehicleRepositoryTests
             InventoryNumber = "1234",
             TrackerId = 1
         };
-        
+
         var existingTracker = new Tracker
         {
             Id = 1,
@@ -256,7 +319,7 @@ public class VehicleRepositoryTests
 
         existingVehicle.Tracker = existingTracker;
 
-        var repo = CreateVehicleRepository(new List<Vehicle> { existingVehicle });
+        var repo = VehicleRepositoryMock.GetStub(new List<Vehicle> { existingVehicle });
 
         var newVehicle = new Vehicle
         {
@@ -278,7 +341,7 @@ public class VehicleRepositoryTests
         repo.Invoking(r => r.Add(newVehicle)).Should().Throw<ArgumentException>()
             .WithMessage($"Трекер {existingTracker.Name} уже используется для машины {existingVehicle.Name}");
     }
-        
+
     [Fact]
     public void UpdateVehicle_VehicleWithSuchTrackerExists_ShouldThrowException()
     {
@@ -313,7 +376,7 @@ public class VehicleRepositoryTests
             RegistrationNumber = "В167АР 189",
             InventoryNumber = "1235"
         };
-        
+
         var existingTracker = new Tracker
         {
             Id = 1,
@@ -328,7 +391,7 @@ public class VehicleRepositoryTests
 
         existingVehicle.Tracker = existingTracker;
 
-        var repo = CreateVehicleRepository(new List<Vehicle> { existingVehicle, updatingVehicle });
+        var repo = VehicleRepositoryMock.GetStub(new List<Vehicle> { existingVehicle, updatingVehicle });
 
         updatingVehicle.TrackerId = 1;
         updatingVehicle.Tracker = existingTracker;
@@ -337,66 +400,5 @@ public class VehicleRepositoryTests
             .WithMessage($"Трекер {existingTracker.Name} уже используется для машины {existingVehicle.Name}");
     }
 
-    private static VehicleRepository CreateVehicleRepository(ICollection<Vehicle> vehicleList)
-    {
-        IKeyValueProvider<Vehicle, int> keyValueProviderMock = new KeyValueProviderMock<Vehicle, int>(vehicleList);
-        IQueryableProvider<Vehicle> vehicleQueryProviderMock = new QueryableProviderMock<Vehicle>(vehicleList);
-        UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactoryMock = new BioTonDBContextUnitOfWorkFactoryMock();
-
-        var repo = new VehicleRepository(keyValueProviderMock, vehicleQueryProviderMock, unitOfWorkFactoryMock);
-        return repo;
-    }
-
-    private static IList<Vehicle> SampleVehicles => new List<Vehicle>
-    {
-        new()
-        {
-            Id = 1,
-            Name = "Красная машина",
-            Type = VehicleTypeEnum.Transport,
-            VehicleSubType = VehicleSubTypeEnum.Car,
-            FuelType = new FuelType { Id = 1, Name = "Бензин" },
-            FuelTypeId = 1,
-            Description = "Описание 1",
-            Make = "Ford",
-            Model = "Focus",
-            ManufacturingYear = 2020,
-            RegistrationNumber = "В167АР 199",
-            InventoryNumber = "1234"
-        },
-        new()
-        {
-            Id = 2,
-            Name = "Синяя машина",
-            Type = VehicleTypeEnum.Agro,
-            VehicleSubType = VehicleSubTypeEnum.Car,
-            FuelType = new FuelType { Id = 1, Name = "Бензин" },
-            FuelTypeId = 1,
-            VehicleGroup = new VehicleGroup { Id = 1, Name = "Группа 1" },
-            VehicleGroupId = 1,
-            Description = "Описание 2",
-            Make = "Ford",
-            Model = "Focus",
-            ManufacturingYear = 2015,
-            RegistrationNumber = "В167АР 172",
-            InventoryNumber = "1235"
-        },
-        new()
-        {
-            Id = 3,
-            Name = "Желтая машина",
-            Type = VehicleTypeEnum.Transport,
-            VehicleSubType = VehicleSubTypeEnum.Sprayer,
-            FuelType = new FuelType { Id = 2, Name = "Дизель" },
-            FuelTypeId = 2,
-            VehicleGroup = new VehicleGroup { Id = 2, Name = "Группа 2" },
-            VehicleGroupId = 2,
-            Description = "Описание 3",
-            Make = "Mazda",
-            Model = "CX5",
-            ManufacturingYear = 2010,
-            RegistrationNumber = "В167АР 174",
-            InventoryNumber = "1236"
-        }
-    };
+    
 }
