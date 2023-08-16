@@ -102,7 +102,7 @@ public class MonitoringController : ValidationControllerBase
                 .ToArray()
         );
 
-        List<LocationAndTrack> locationsAndTracks = GetClocationsAndTracks(requests, externalIds, locations, tracks);
+        List<LocationAndTrack> locationsAndTracks = GetLocationsAndTracks(requests, externalIds, locations, tracks);
 
         ViewBounds viewBounds = CalculateViewBounds(locationsAndTracks);
 
@@ -113,7 +113,7 @@ public class MonitoringController : ValidationControllerBase
         });
     }
 
-    private static List<LocationAndTrack> GetClocationsAndTracks(LocationAndTrackRequest[] requests, 
+    private static List<LocationAndTrack> GetLocationsAndTracks(LocationAndTrackRequest[] requests, 
         IDictionary<int, int> externalIds, IDictionary<int, (double Lat, double Long)> locations, 
         IDictionary<int, TrackPointInfo[]> tracks)
     {
@@ -146,8 +146,12 @@ public class MonitoringController : ValidationControllerBase
         return locationsAndTracks;
     }
 
-    private static ViewBounds CalculateViewBounds(List<LocationAndTrack> locationsAndTracks)
+    private static ViewBounds? CalculateViewBounds(List<LocationAndTrack> locationsAndTracks)
     {
+        if (locationsAndTracks.Count == 0)
+        {
+            return null;
+        }
         var lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
         lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
 

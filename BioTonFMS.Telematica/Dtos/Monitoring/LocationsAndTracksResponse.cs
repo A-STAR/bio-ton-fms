@@ -5,7 +5,7 @@ public class LocationsAndTracksResponse
     /// <summary>
     /// Cтруктура содержащая координаты области карты для отображения на экране
     /// </summary>
-    public ViewBounds ViewBounds { get; set; }
+    public ViewBounds? ViewBounds { get; set; }
 
     /// <summary>
     /// Данные для построения быстрого трека для заданных машин

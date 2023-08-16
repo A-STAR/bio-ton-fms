@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography.Xml;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
@@ -215,12 +216,19 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     /// <returns>Данные трека для машин за последние сутки</returns>
     public IDictionary<int, TrackPointInfo[]> GetTracks(int[] externalIds)
     {
-        var yesterday = DateTime.UtcNow.AddDays(-1);
+        if (externalIds.Length == 0)
+        {
+            return new Dictionary<int, TrackPointInfo[]>();
+        }
+
+        var now = SystemTime.UtcNow;
+        var todayStart = new DateTime(now.Year, now.Month, now.Day).ToUniversalTime();
 
         var result = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
                         x.Latitude != null && x.Longitude != null &&
-                        x.ServerDateTime > yesterday)
+                        x.ServerDateTime > todayStart)
+            .OrderBy(x => x.TrackerDateTime)
             .ToLookup(x => x.ExternalTrackerId,
                 x => new TrackPointInfo
                 {
