@@ -14,8 +14,8 @@ import { TechMonitoringStateComponent } from './tech-monitoring-state.component'
 import { ConnectionStatus, MovementStatus } from '../../tech.service';
 import { MonitoringTech } from '../../tech.component';
 
-import { testMonitoringVehicles } from '../../tech.service.spec';
 import { dateFormat } from '../../../directory-tech/trackers/trackers.component.spec';
+import { testMonitoringVehicles } from '../../tech.service.spec';
 
 describe('TechMonitoringStateComponent', () => {
   let component: TechMonitoringStateComponent;

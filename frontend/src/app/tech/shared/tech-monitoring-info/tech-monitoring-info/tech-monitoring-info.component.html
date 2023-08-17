@@ -1,0 +1,36 @@
+<dl *ngIf="info.generalInfo as info">
+  <div>
+    <dt>Последняя точка:</dt>
+    <dd><span>{{ info.lastMessageTime | relativeTime }}</span></dd>
+    <dd><span>{{ info.lastMessageTime | date }}</span></dd>
+  </div>
+
+  <div>
+    <dt>Скорость</dt>
+    <dd>{{ info.speed | number:'1.1-1':'en-US' }} км/ч</dd>
+  </div>
+
+  <div>
+    <dt>Пробег</dt>
+    <dd>{{ info.mileage | number:'1.0-0' }} км</dd>
+  </div>
+
+  <div>
+    <dt>Моточасы</dt>
+    <dd>{{ info.engineHours }} ч</dd>
+  </div>
+
+  <div>
+    <dt>Спутники</dt>
+    <dd>{{ info.satellitesNumber }}</dd>
+  </div>
+
+  <div>
+    <dt>Координаты</dt>
+
+    <dd>
+      <span>ш: {{ info.latitude | number: '1.6-6':'en-US' }}&deg;</span>
+      <span>д: {{ info.longitude | number: '1.6-6':'en-US' }}&deg;</span>
+    </dd>
+  </div>
+</dl>
