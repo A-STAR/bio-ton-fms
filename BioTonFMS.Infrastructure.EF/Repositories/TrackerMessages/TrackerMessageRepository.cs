@@ -214,20 +214,19 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     /// </summary>
     /// <param name="externalIds">Внешние id трекеров</param>
     /// <returns>Данные трека для машин за последние сутки</returns>
-    public IDictionary<int, TrackPointInfo[]> GetTracks(int[] externalIds)
+    public IDictionary<int, TrackPointInfo[]> GetTracks(DateTime trackStartTime, int[] externalIds)
     {
         if (externalIds.Length == 0)
         {
             return new Dictionary<int, TrackPointInfo[]>();
         }
 
-        var now = SystemTime.UtcNow;
-        var todayStart = new DateTime(now.Year, now.Month, now.Day).ToUniversalTime();
+        var trackStartTimeUtc = trackStartTime.ToUniversalTime();
 
         var result = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
                         x.Latitude != null && x.Longitude != null &&
-                        x.ServerDateTime > todayStart)
+                        x.ServerDateTime > trackStartTimeUtc)
             .OrderBy(x => x.TrackerDateTime)
             .ToLookup(x => x.ExternalTrackerId,
                 x => new TrackPointInfo
