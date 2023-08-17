@@ -93,18 +93,17 @@ public class MonitoringController : ValidationControllerBase
     /// <response code="400">Невозможно вернуть данные</response>
     [HttpPost("locations-and-tracks")]
     [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
-    public IActionResult LocationsAndTracks(LocationAndTrackRequest[] requests)
+    public IActionResult LocationsAndTracks(DateTime trackStartTime, LocationAndTrackRequest[] requests)
     {
         IDictionary<int, int> externalIds = _vehicleRepository.GetExternalIds(
             requests.Select(x => x.VehicleId).ToArray());
 
         IDictionary<int, (double Lat, double Long)> locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
 
-        IEnumerable<int> needTrack = requests.Where(x => x.NeedReturnTrack)
-            .Select(x => x.VehicleId);
+        IEnumerable<int> vehiclesNeedTrack = requests.Where(x => x.NeedReturnTrack).Select(x => x.VehicleId);
 
-        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(
-            externalIds.Where(x => needTrack.Contains(x.Key))
+        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(trackStartTime, 
+            externalIds.Where(x => vehiclesNeedTrack.Contains(x.Key))
                 .Select(x => x.Value)
                 .ToArray()
         );

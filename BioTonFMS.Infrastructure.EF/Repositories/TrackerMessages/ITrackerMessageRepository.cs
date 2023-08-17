@@ -15,7 +15,7 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     TrackerMessage? GetLastMessageFor(int externalId);
     PagedResult<ParametersHistoryRecord> GetParametersHistory(ParametersHistoryFilter filter);
     IDictionary<int, VehicleStatus> GetVehicleStates(int[] externalIds, int trackerAddressValidMinutes);
-    IDictionary<int, TrackPointInfo[]> GetTracks(int[] externalIds);
+    IDictionary<int, TrackPointInfo[]> GetTracks(DateTime trackStartTime, int[] externalIds);
     /// <summary>
     /// Информация о местонахождении трекеров
     /// </summary>
