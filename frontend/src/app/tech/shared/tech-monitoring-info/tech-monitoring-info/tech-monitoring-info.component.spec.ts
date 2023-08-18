@@ -113,4 +113,46 @@ describe('TechMonitoringInfoComponent', () => {
       });
     });
   });
+
+  it('should render sensors info', () => {
+    const headingDe = fixture.debugElement.query(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render heading element')
+      .not.toBeNull();
+
+    expect(headingDe.nativeElement.textContent)
+      .withContext('render heading text')
+      .toBe('Значения датчиков');
+
+    const descriptionListDe = fixture.debugElement.query(
+      By.css('dl:nth-of-type(2)')
+    );
+
+    const descriptionTermDes = descriptionListDe.queryAll(
+      By.css('dt')
+    );
+
+    const descriptionDetailsDes = descriptionListDe.queryAll(
+      By.css('dd')
+    );
+
+    const { sensors } = testVehicleMonitoringInfo.trackerInfo;
+
+    descriptionTermDes.forEach((descriptionTermDe, index) => {
+      const { name, value, unit } = sensors![index];
+
+      expect(descriptionTermDe.nativeElement.textContent)
+        .withContext('render description term text')
+        .toBe(`${name}:`);
+
+      const expectedDetailsText = value ? `${value} ${unit}` : '';
+
+      expect(descriptionDetailsDes[index].nativeElement.textContent)
+        .withContext('render description details text')
+        .toBe(expectedDetailsText);
+    });
+  });
 });

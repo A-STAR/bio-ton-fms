@@ -34,3 +34,16 @@
     </dd>
   </div>
 </dl>
+
+<ng-container *ngIf="info.trackerInfo.sensors as sensors">
+  <h1>Значения датчиков</h1>
+
+  <dl>
+    <ng-container *ngFor="let sensor of sensors">
+      <dt>{{ sensor.name }}:</dt>
+      <dd>
+        <ng-container *ngIf="sensor.value">{{ sensor.value }} {{ sensor.unit }}</ng-container>
+      </dd>
+    </ng-container>
+  </dl>
+</ng-container>

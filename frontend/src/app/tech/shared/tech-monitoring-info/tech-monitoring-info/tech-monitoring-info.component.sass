@@ -1,5 +1,6 @@
 @use 'sass:map'
 @use 'variables' as *
+@use 'extends' as *
 
 \:host
   $padding: 10px
@@ -7,7 +8,7 @@
   display: block
   padding: $padding $padding $padding map.get($mat-list-option, checkbox, before, margin-left) + map.get($mat-list-option, checkbox, padding)
 
-dl:first-child
+dl
   display: flex
   flex-wrap: wrap
   margin-bottom: 20px
@@ -17,6 +18,7 @@ dl:first-child
     display: flex
     flex-wrap: wrap
     align-items: center
+    color: $light-dark
 
 dl:first-child
   gap: 15px
@@ -70,3 +72,20 @@ dl:first-child
   dd
     color: $light-dark
     font-size: 13px
+
+h1
+  @extend %heading-with-border
+
+  font-size: 10px
+  margin-bottom: 5px
+
+dl:not(:first-child)
+  row-gap: 10px
+
+  dt
+    flex: 45%
+    font-size: 11px
+
+  dd
+    flex: 55%
+    font-weight: 500
