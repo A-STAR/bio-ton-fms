@@ -155,4 +155,61 @@ describe('TechMonitoringInfoComponent', () => {
         .toBe(expectedDetailsText);
     });
   });
+
+  it('should render tracker info', () => {
+    const headingDe = fixture.debugElement.query(
+      By.css('h1:nth-of-type(2)')
+    );
+
+    expect(headingDe)
+      .withContext('render heading element')
+      .not.toBeNull();
+
+    expect(headingDe.nativeElement.textContent)
+      .withContext('render heading text')
+      .toBe('Настройки подключения');
+
+    const descriptionListDe = fixture.debugElement.query(
+      By.css('dl:nth-of-type(3)')
+    );
+
+    const descriptionTermDes = descriptionListDe.queryAll(
+      By.css('dt')
+    );
+
+    const descriptionDetailsDes = descriptionListDe.queryAll(
+      By.css('dd')
+    );
+
+    const { trackerType, externalId, simNumber, imei } = testVehicleMonitoringInfo.trackerInfo;
+
+    const DESCRIPTION_TEXTS = [
+      {
+        term: 'Тип устройства',
+        details: trackerType
+      },
+      {
+        term: 'Уникальный ID',
+        details: externalId.toString()
+      },
+      {
+        term: 'Телефон',
+        details: simNumber ? `${simNumber.slice(0, 2)} (${simNumber.slice(2, 5)}) ${simNumber.slice(4)}` : ''
+      },
+      {
+        term: 'IMEI',
+        details: imei
+      }
+    ];
+
+    descriptionTermDes.forEach((descriptionTermDe, index) => {
+      expect(descriptionTermDe.nativeElement.textContent)
+        .withContext('render description term text')
+        .toBe(`${DESCRIPTION_TEXTS[index].term}:`);
+
+      expect(descriptionDetailsDes[index].nativeElement.textContent)
+        .withContext('render description details text')
+        .toBe(DESCRIPTION_TEXTS[index].details);
+    });
+  });
 });

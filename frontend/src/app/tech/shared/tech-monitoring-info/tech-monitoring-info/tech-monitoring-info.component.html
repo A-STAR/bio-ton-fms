@@ -47,3 +47,21 @@
     </ng-container>
   </dl>
 </ng-container>
+
+<ng-container *ngIf="info.trackerInfo as tracker">
+  <h1>Настройки подключения</h1>
+
+  <dl>
+      <dt>Тип устройства:</dt>
+      <dd>{{ tracker.trackerType }}</dd>
+
+      <dt>Уникальный ID:</dt>
+      <dd>{{ tracker.externalId }}</dd>
+
+      <dt>Телефон:</dt>
+      <dd>{{ tracker.simNumber.slice(0, 2) + '&nbsp;(' + tracker.simNumber.slice(2, 5) + ')&nbsp;' + tracker.simNumber.slice(4) }}</dd>
+
+      <dt>IMEI:</dt>
+      <dd>{{ tracker.imei }}</dd>
+  </dl>
+</ng-container>
