@@ -14,8 +14,8 @@ import { TechMonitoringStateComponent } from './tech-monitoring-state.component'
 import { ConnectionStatus, MovementStatus } from '../../tech.service';
 import { MonitoringTech } from '../../tech.component';
 
-import { testMonitoringVehicles } from '../../tech.service.spec';
 import { dateFormat } from '../../../directory-tech/trackers/trackers.component.spec';
+import { testMonitoringVehicles } from '../../tech.service.spec';
 
 describe('TechMonitoringStateComponent', () => {
   let component: TechMonitoringStateComponent;
@@ -157,9 +157,12 @@ async function testStateRendering(
 
   const states = await parallel(() => harnesses);
 
-  states.forEach(async (state, index) => {
-    const stateEl = await state.host();
-    const stateTitle = await stateEl?.getAttribute('title');
+  const stateEls = await parallel(() => states.map(
+    state => state.host()
+  ));
+
+  states.forEach(async (_, index) => {
+    const stateTitle = await stateEls[index].getAttribute('title');
 
     const movementTitle = testTech.movementStatus === MovementStatus.Moving
       ? 'В движении'

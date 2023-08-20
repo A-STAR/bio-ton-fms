@@ -19,7 +19,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of, throwError } from 'rxjs';
 
-import { Vehicles, VehicleService } from '../vehicle.service';
+import { Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
 
 import VehiclesComponent, { vehicleColumns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
@@ -36,7 +36,7 @@ describe('VehiclesComponent', () => {
   let loader: HarnessLoader;
   let vehicleService: VehicleService;
 
-  let vehiclesSpy: jasmine.Spy<() => Observable<Vehicles>>;
+  let vehiclesSpy: jasmine.Spy<(options: VehiclesOptions) => Observable<Vehicles>>;
 
   beforeEach(async () => {
     await TestBed
@@ -71,9 +71,9 @@ describe('VehiclesComponent', () => {
   afterEach(async () => {
     const dialogs = await documentRootLoader.getAllHarnesses(MatDialogHarness);
 
-    await Promise.all(
-      dialogs.map(dialog => dialog.close())
-    );
+    await parallel(() => dialogs.map(
+      dialog => dialog.close()
+    ));
 
     overlayContainer.ngOnDestroy();
   });
@@ -259,7 +259,7 @@ describe('VehiclesComponent', () => {
 
         const trackerAnchorEl = await trackerAnchor?.host();
 
-        const [trackerRouterLink, trackerAnchorTitle] = await Promise.all([
+        const [trackerRouterLink, trackerAnchorTitle] = await parallel(() => [
           trackerAnchorEl?.getAttribute('ng-reflect-router-link'),
           trackerAnchorEl?.getAttribute('title')
         ]);

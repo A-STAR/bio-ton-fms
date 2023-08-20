@@ -1,0 +1,100 @@
+@use 'sass:map'
+@use 'variables' as *
+@use 'extends' as *
+
+\:host
+  $padding: 10px
+
+  display: block
+  padding: $padding $padding $padding map.get($mat-list-option, checkbox, before, margin-left) + map.get($mat-list-option, checkbox, padding)
+
+dl
+  display: flex
+  flex-wrap: wrap
+  margin-bottom: 15px
+
+  dt,
+  dd
+    display: flex
+    flex-wrap: wrap
+    align-items: center
+    color: $light-dark
+
+dl:first-child
+  gap: 15px
+
+  div
+    flex: 1
+
+    &:first-child,
+    &:last-child
+
+      dd
+        font-size: 10px
+
+    &:last-child span,
+    &:not(:first-child, :last-child) dd
+      text-wrap: nowrap
+
+    &:first-child
+      display: flex
+      column-gap: 10px
+      flex-basis: 100%
+
+      dd:last-of-type
+        justify-content: flex-end
+        flex: 1
+        text-align: right
+
+    &:not(:first-child)
+      flex-direction: column
+      row-gap: 10px
+
+      &,
+      dd
+        display: flex
+
+      dd
+        flex: 1
+        font-weight: 500
+
+    &:last-child
+      padding-right: 10px
+
+      dd span
+        display: inline-block
+        line-height: normal
+
+  dt
+    color: $darker-gray
+    font-size: 9px
+
+  dd
+    color: $light-dark
+    font-size: 13px
+
+h1
+  @extend %heading-with-border
+
+  font-size: 10px
+  margin-bottom: 5px
+
+dl:not(:first-child)
+  row-gap: 10px
+
+  dt
+    flex: 45%
+    font-size: 11px
+
+  dd
+    flex: 55%
+    font-weight: 500
+
+mat-chip-set
+  $padding-horizontal: 1px
+
+  padding-top: $padding-horizontal
+  padding-bottom: $padding-horizontal
+
+mat-chip
+  font-size: 10px

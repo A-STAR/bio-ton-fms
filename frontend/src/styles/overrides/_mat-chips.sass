@@ -1,26 +1,39 @@
 @use 'variables' as *
 
-mat-chip.mat-mdc-standard-chip
-  height: 20px
+.mdc-evolution-chip-set
+  $column-gap: 10px
 
-  .mdc-evolution-chip-set &
-    margin-top: 2px
-    margin-bottom: 2px
-    margin-left: 4px
+  span.mdc-evolution-chip-set__chips
+    margin-left: -$column-gap
 
-  .mdc-evolution-chip__action--primary
+  mat-chip.mdc-evolution-chip
+    margin-left: $column-gap
+
+mat-chip
+  border: 1px solid $light-green
+  font-size: 12px
+  font-weight: 500
+
+.mat-mdc-chip
+  height: var(--mdc-chip-container-height)
+
+  span.mat-mdc-chip-focus-overlay
+    background-color: $green
+
+    :hover &
+      opacity: 0
+
+.mat-mdc-standard-chip
+  --mdc-chip-container-height: 20px
+  --mdc-chip-container-shape-radius: 6px
+  --mdc-chip-elevated-container-color: #{$lighter-gray}
+  --mdc-chip-elevated-disabled-container-color: #{$light-gray}
+  --mdc-chip-label-text-color: #{$green}
+  --mdc-chip-disabled-label-text-color: #{$light-green}
+
+  div.mdc-evolution-chip__action--primary
     padding-left: 6px
     padding-right: 6px
 
-.mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled)
-
-  @at-root mat-chip#{&}
-    background-color: $white
-    border: 1px solid $gray
-
-  span.mdc-evolution-chip__text-label
-    color: $light-dark
-    user-select: unset
-
-.mat-mdc-chip-focus-overlay
-  display: none
+span.mdc-evolution-chip__text-label
+  user-select: unset

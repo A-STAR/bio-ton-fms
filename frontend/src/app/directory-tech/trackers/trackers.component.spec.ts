@@ -84,9 +84,9 @@ describe('TrackersComponent', () => {
   afterEach(async () => {
     const dialogs = await documentRootLoader.getAllHarnesses(MatDialogHarness);
 
-    await Promise.all(
-      dialogs.map(dialog => dialog.close())
-    );
+    await parallel(() => dialogs.map(
+      dialog => dialog.close()
+    ));
 
     overlayContainer.ngOnDestroy();
   });

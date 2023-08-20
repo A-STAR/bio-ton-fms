@@ -31,9 +31,9 @@ import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component'
 
 import { environment } from '../../../environments/environment';
 import { localeID } from '../../tech/shared/relative-time.pipe';
+import { dateFormat } from '../trackers/trackers.component.spec';
 import { testParameters, testStandardParameters, TEST_TRACKER_ID } from '../tracker.service.spec';
 import { testSensor, testSensors } from '../sensor.service.spec';
-import { dateFormat } from '../trackers/trackers.component.spec';
 
 describe('TrackerComponent', () => {
   let component: TrackerComponent;

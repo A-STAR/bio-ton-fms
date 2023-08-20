@@ -314,7 +314,11 @@ describe('SensorDialogComponent', () => {
       })
     );
 
-    const accordion = await loader.getHarnessOrNull(MatAccordionHarness);
+    const accordion = await loader.getHarnessOrNull(
+      MatAccordionHarness.with({
+        selector: '[displayMode="flat"]'
+      })
+    );
 
     expect(accordion)
       .withContext('render settings accordion')

@@ -8,18 +8,19 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatListOptionHarness, MatSelectionListHarness } from '@angular/material/list/testing';
+import { MatAccordionHarness, MatExpansionPanelHarness } from '@angular/material/expansion/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { MonitoringVehicle, MonitoringVehiclesOptions, TechService } from './tech.service';
+import { MonitoringVehicle, MonitoringVehiclesOptions, TechService, VehicleMonitoringInfo } from './tech.service';
 
 import TechComponent, { POLL_INTERVAL_PERIOD, SEARCH_DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
-import { MapComponent } from '../shared/map/map.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
+import { MapComponent } from '../shared/map/map.component';
 
-import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from './tech.service.spec';
+import { mockTestFoundMonitoringVehicles, testFindCriterion, testVehicleMonitoringInfo, testMonitoringVehicles } from './tech.service.spec';
 
 describe('TechComponent', () => {
   let component: TechComponent;
@@ -27,8 +28,10 @@ describe('TechComponent', () => {
   let overlayContainer: OverlayContainer;
   let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
+  let techService: TechService;
 
   let vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>;
+  let vehicleInfoSpy: jasmine.Spy<(id: MonitoringVehicle['id']) => Observable<VehicleMonitoringInfo>>;
 
   beforeEach(async () => {
     await TestBed
@@ -46,14 +49,18 @@ describe('TechComponent', () => {
     documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
 
-    const techService = TestBed.inject(TechService);
+    techService = TestBed.inject(TechService);
 
     component = fixture.componentInstance;
 
     const vehicles$ = of(testMonitoringVehicles);
+    const vehicleInfo$ = of(testVehicleMonitoringInfo);
 
     vehiclesSpy = spyOn(techService, 'getVehicles')
       .and.returnValue(vehicles$);
+
+    vehicleInfoSpy = spyOn(techService, 'getVehicleInfo')
+      .and.returnValue(vehicleInfo$);
 
     fixture.detectChanges();
   });
@@ -67,35 +74,7 @@ describe('TechComponent', () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
 
-    /* Workaround to retrigger async pipe. */
-    const searchInput = await loader.getHarness(
-      MatInputHarness.with({
-        ancestor: 'form#search-form',
-        placeholder: 'Поиск'
-      })
-    );
-
-    // enter search query
-    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
-    let vehicles$ = of(testFoundMonitoringVehicles);
-
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
-
-    await searchInput.setValue(testFindCriterion);
-
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
-
-    // clean search field to get back to normal tech requests
-    vehicles$ = of(testMonitoringVehicles);
-
-    vehiclesSpy.and.returnValue(vehicles$);
-
-    await searchInput.setValue('');
-
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
-
-    expect(vehiclesSpy)
-      .toHaveBeenCalledTimes(3);
+    retriggerAsyncPipe(loader, vehiclesSpy);
 
     tick(POLL_INTERVAL_PERIOD);
 
@@ -139,6 +118,68 @@ describe('TechComponent', () => {
     );
   }));
 
+  it('should converge tech selection', fakeAsync(async () => {
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+
+    const checkbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    await checkbox.check();
+
+    /* Workaround to retrigger async pipe. */
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // enter search query
+    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
+    let vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue(testFindCriterion);
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    /* Coverage for selected tech become diverged. */
+    const testUpdatedMonitoringVehicles = testMonitoringVehicles.slice(0, 2);
+
+    vehicles$ = of(testUpdatedMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    // clean search field to get back to normal tech requests
+    await searchInput.setValue('');
+
+    tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(3);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith();
+
+    const options = await loader.getAllHarnesses(
+      MatListOptionHarness.with({
+        ancestor: 'aside',
+        selected: true
+      })
+    );
+
+    expect(options.length)
+      .withContext('render all converged options selected')
+      .toBe(testUpdatedMonitoringVehicles.length);
+
+    discardPeriodicTasks();
+  }));
+
   it('should render tech list', fakeAsync(async () => {
     const list = await loader.getHarness(
       MatSelectionListHarness.with({
@@ -148,8 +189,12 @@ describe('TechComponent', () => {
 
     const options = await list.getItems();
 
+    expect(options.length)
+      .withContext('render tech options')
+      .toBe(testMonitoringVehicles.length);
+
     const titles = await parallel(() => options.map(
-      item => item.getTitle()
+      option => option.getTitle()
     ));
 
     expect(titles)
@@ -157,6 +202,24 @@ describe('TechComponent', () => {
       .toEqual(
         testMonitoringVehicles.map(({ name }) => name)
       );
+
+    const checkboxPositions = await parallel(() => options.map(
+      item => item.getCheckboxPosition()
+    ));
+
+    checkboxPositions.forEach(position => {
+      expect(position)
+        .withContext('render tech options checkbox position')
+        .toBe('before');
+    });
+
+    const panelButtonDes = fixture.debugElement.queryAll(
+      By.css('aside mat-selection-list mat-list-option button[bioStopClickPropagation]')
+    );
+
+    expect(panelButtonDes.length)
+      .withContext('render panel buttons')
+      .toBe(testMonitoringVehicles.length);
 
     const paragraphDe = fixture.debugElement.query(
       By.css('p')
@@ -172,13 +235,44 @@ describe('TechComponent', () => {
   }));
 
   it('should render tech options monitoring state', async () => {
-    const optionStateDes = fixture.debugElement.queryAll(
+    const techMonitoringStateDes = fixture.debugElement.queryAll(
       By.css('mat-selection-list div bio-tech-monitoring-state')
     );
 
-    expect(optionStateDes.length)
-      .withContext('render tech options monitoring state')
+    expect(techMonitoringStateDes.length)
+      .withContext('render `bio-tech-monitoring-state` component elements')
       .toBe(testMonitoringVehicles.length);
+
+    techMonitoringStateDes.forEach((techMonitoringStateDe, index) => {
+      expect(techMonitoringStateDe.componentInstance.tech)
+        .withContext('render `bio-tech-monitoring-state` component `tech` input value')
+        .toBe(testMonitoringVehicles[index]);
+    });
+  });
+
+  it('should render tech panels', fakeAsync(async () => {
+    const accordion = await loader.getHarness(
+      MatAccordionHarness.with({
+        ancestor: 'aside mat-selection-list',
+        selector: '[displayMode="flat"]'
+      })
+    );
+
+    const panels = await accordion.getExpansionPanels();
+
+    expect(panels.length)
+      .withContext('render tech panels')
+      .toBe(testMonitoringVehicles.length);
+  }));
+
+  it('should render map', () => {
+    const mapDe = fixture.debugElement.query(
+      By.directive(MapComponent)
+    );
+
+    expect(mapDe)
+      .withContext('render map component')
+      .not.toBeNull();
   });
 
   it('should toggle all checkbox selecting options', fakeAsync(async () => {
@@ -282,78 +376,6 @@ describe('TechComponent', () => {
       .toBeResolvedTo(false);
   }));
 
-  it('should converge tech selection', fakeAsync(async () => {
-    expect(vehiclesSpy)
-      .toHaveBeenCalled();
-
-    const checkbox = await loader.getHarness(
-      MatCheckboxHarness.with({
-        ancestor: 'aside'
-      })
-    );
-
-    await checkbox.check();
-
-    /* Workaround to retrigger async pipe. */
-    const searchInput = await loader.getHarness(
-      MatInputHarness.with({
-        ancestor: 'form#search-form',
-        placeholder: 'Поиск'
-      })
-    );
-
-    // enter search query
-    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
-    let vehicles$ = of(testFoundMonitoringVehicles);
-
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
-
-    await searchInput.setValue(testFindCriterion);
-
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
-
-    /* Coverage for selected tech become diverged. */
-    const testUpdatedMonitoringVehicles = testMonitoringVehicles.slice(0, 2);
-
-    vehicles$ = of(testUpdatedMonitoringVehicles);
-
-    vehiclesSpy.and.returnValue(vehicles$);
-
-    // clean search field to get back to normal tech requests
-    await searchInput.setValue('');
-
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
-
-    expect(vehiclesSpy)
-      .toHaveBeenCalledTimes(3);
-
-    expect(vehiclesSpy)
-      .toHaveBeenCalledWith();
-
-    const options = await loader.getAllHarnesses(
-      MatListOptionHarness.with({
-        ancestor: 'aside',
-        selected: true
-      })
-    );
-
-    expect(options.length)
-      .withContext('render all converged options selected')
-      .toBe(testUpdatedMonitoringVehicles.length);
-
-    discardPeriodicTasks();
-  }));
-
-  it('should render map', () => {
-    const mapDe = fixture.debugElement.query(
-      By.directive(MapComponent)
-    );
-
-    expect(mapDe)
-      .withContext('render map component')
-      .not.toBeNull();
-  });
-
   it('should render GPS tracker command dialog', fakeAsync(async () => {
     const techMonitoringStateDe = fixture.debugElement.query(
       By.directive(TechMonitoringStateComponent)
@@ -372,6 +394,207 @@ describe('TechComponent', () => {
     overlayContainer = TestBed.inject(OverlayContainer);
 
     overlayContainer.ngOnDestroy();
+  }));
+
+  it('should render tech monitoring info', fakeAsync(async () => {
+    const panelButtonDes = fixture.debugElement.queryAll(
+      By.css('mat-selection-list mat-list-option button')
+    );
+
+    const panels = await loader.getAllHarnesses(
+      MatExpansionPanelHarness.with({
+        ancestor: 'aside mat-selection-list',
+        expanded: false
+      })
+    );
+
+    panelButtonDes.forEach(async (panelButtonDe, index) => {
+      const event = new MouseEvent('click');
+
+      panelButtonDe.triggerEventHandler('click', event);
+
+      expect(vehicleInfoSpy)
+        .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
+
+      await panels[index].isExpanded();
+
+      const techMonitoringInfoDe = fixture.debugElement.query(
+        By.css(`mat-selection-list mat-expansion-panel:nth-of-type(${index + 1}) bio-tech-monitoring-info`)
+      );
+
+      expect(techMonitoringInfoDe)
+        .withContext('render `bio-tech-monitoring-info` component element')
+        .not.toBeNull();
+
+      expect(techMonitoringInfoDe.componentInstance.info)
+        .withContext('render `bio-tech-monitoring-info` component `info` input value')
+        .toBe(testVehicleMonitoringInfo);
+    });
+  }));
+
+  it('should toggle tech panels', fakeAsync(async () => {
+    const accordion = await loader.getHarness(
+      MatAccordionHarness.with({
+        ancestor: 'aside mat-selection-list',
+        selector: '[displayMode="flat"]'
+      })
+    );
+
+    let panels = await accordion.getExpansionPanels({
+      expanded: false
+    });
+
+    expect(panels.length)
+      .withContext('render collapsed tech panels')
+      .toBe(testMonitoringVehicles.length);
+
+    const panelButtonDes = fixture.debugElement.queryAll(
+      By.css('aside mat-selection-list mat-list-option button')
+    );
+
+    const testTogglePanel = async (index: number) => {
+      const {
+        [index]: panel
+      } = await accordion.getExpansionPanels();
+
+      let isExpanded = await panel.isExpanded();
+
+      const event = new MouseEvent('click');
+
+      panelButtonDes[index].triggerEventHandler('click', event);
+
+      if (isExpanded) {
+        vehicleInfoSpy.calls.reset();
+
+        expect(vehicleInfoSpy)
+          .not.toHaveBeenCalled();
+      } else {
+        expect(vehicleInfoSpy)
+          .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
+      }
+
+      panels = await accordion.getExpansionPanels({
+        expanded: false
+      });
+
+      if (isExpanded) {
+        isExpanded = await panel.isExpanded();
+
+        expect(isExpanded)
+          .withContext(`render collapsed ${testMonitoringVehicles[index].name} panel`)
+          .toBe(false);
+
+        expect(panels.length)
+          .withContext('render collapsed tech panels')
+          .toBe(testMonitoringVehicles.length);
+      } else {
+        isExpanded = await panel.isExpanded();
+
+        expect(isExpanded)
+          .withContext(`render expanded ${testMonitoringVehicles[index].name} panel`)
+          .toBe(true);
+
+        expect(panels.length)
+          .withContext('render collapsed tech panels')
+          .toBe(testMonitoringVehicles.length - 1);
+      }
+    };
+
+    await testTogglePanel(0);
+    await testTogglePanel(0);
+    await testTogglePanel(0);
+    await testTogglePanel(1);
+    await testTogglePanel(2);
+    await testTogglePanel(2);
+    await testTogglePanel(0);
+  }));
+
+  it('should persist tech panel state', fakeAsync(async () => {
+    let panelButtonDes = fixture.debugElement.queryAll(
+      By.css('aside mat-selection-list mat-list-option button')
+    );
+
+    let index = 0;
+
+    const event = new MouseEvent('click');
+
+    // open tech panel
+    panelButtonDes[index].triggerEventHandler('click', event);
+
+    expect(vehicleInfoSpy)
+      .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
+
+    const accordion = await loader.getHarness(
+      MatAccordionHarness.with({
+        ancestor: 'aside mat-selection-list',
+        selector: '[displayMode="flat"]'
+      })
+    );
+
+    retriggerAsyncPipe(loader, vehiclesSpy);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(4);
+
+    let {
+      [index]: panel
+    } = await accordion.getExpansionPanels();
+
+    let isExpanded = await panel.isExpanded();
+
+    expect(isExpanded)
+      .withContext(`render persistent expanded ${testMonitoringVehicles[index].name} panel`)
+      .toBe(true);
+
+    // close tech panel
+    panelButtonDes[index].triggerEventHandler('click', event);
+
+    vehicleInfoSpy.calls.reset();
+
+    expect(vehicleInfoSpy)
+      .not.toHaveBeenCalled();
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(5);
+
+    isExpanded = await panel.isExpanded();
+
+    expect(isExpanded)
+      .withContext(`render persistent collapsed ${testMonitoringVehicles[index].name} panel`)
+      .toBe(false);
+
+    // open another tech panel
+    panelButtonDes = fixture.debugElement.queryAll(
+      By.css('aside mat-selection-list mat-list-option button')
+    );
+
+    index = 2;
+
+    panelButtonDes[index].triggerEventHandler('click', event);
+
+    expect(vehicleInfoSpy)
+      .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
+
+    tick(POLL_INTERVAL_PERIOD);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(6);
+
+    ({
+      [index]: panel
+    } = await accordion.getExpansionPanels());
+
+    isExpanded = await panel.isExpanded();
+
+    expect(isExpanded)
+      .withContext(`render persistent another expanded ${testMonitoringVehicles[index].name} panel`)
+      .toBe(true);
+
+    discardPeriodicTasks();
   }));
 
   it('should search tech', fakeAsync(async () => {
@@ -409,7 +632,7 @@ describe('TechComponent', () => {
     let testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue(`${testFindCriterion}${spaceChar.repeat(2)}`);
 
@@ -423,7 +646,7 @@ describe('TechComponent', () => {
     // clean search field
     vehicles$ = of(testMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue('');
 
@@ -451,7 +674,7 @@ describe('TechComponent', () => {
     testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles(testInvalidIDSearchQuery);
     vehicles$ = of(testFoundMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue(testInvalidIDSearchQuery);
 
@@ -494,7 +717,7 @@ describe('TechComponent', () => {
     const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
     let vehicles$ = of(testFoundMonitoringVehicles);
 
-    vehiclesSpy = vehiclesSpy.and.returnValue(vehicles$);
+    vehiclesSpy.and.returnValue(vehicles$);
 
     await searchInput.setValue(testFindCriterion);
 
@@ -552,3 +775,43 @@ describe('TechComponent', () => {
     discardPeriodicTasks();
   }));
 });
+
+/**
+ * Workaround to retrigger async pipe.
+ *
+ * @param loader `HarnessLoader` instance.
+ * @param vehiclesSpy Vehicles spy.
+ */
+async function retriggerAsyncPipe(
+  loader: HarnessLoader,
+  vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>
+) {
+  const searchInput = await loader.getHarness(
+    MatInputHarness.with({
+      ancestor: 'form#search-form',
+      placeholder: 'Поиск'
+    })
+  );
+
+  // enter search query
+  const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
+  let vehicles$ = of(testFoundMonitoringVehicles);
+
+  vehiclesSpy.and.returnValue(vehicles$);
+
+  await searchInput.setValue(testFindCriterion);
+
+  tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+  // clean search field to get back to normal tech requests
+  vehicles$ = of(testMonitoringVehicles);
+
+  vehiclesSpy.and.returnValue(vehicles$);
+
+  await searchInput.setValue('');
+
+  tick(SEARCH_DEBOUNCE_DUE_TIME);
+
+  expect(vehiclesSpy)
+    .toHaveBeenCalledTimes(3);
+}

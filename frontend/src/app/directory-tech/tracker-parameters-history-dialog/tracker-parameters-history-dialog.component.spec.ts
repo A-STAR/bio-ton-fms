@@ -221,6 +221,12 @@ describe('TrackerParametersHistoryDialogComponent', () => {
       ([parametersCell]) => parametersCell.getHarness(MatChipSetHarness))
     );
 
+    parametersChipSets.forEach(parametersChipSet => {
+      expect(parametersChipSet)
+        .withContext('render chip set')
+        .not.toBeNull();
+    });
+
     parametersChipSets.forEach(async (parametersChipSet, index) => {
       const chips = await parametersChipSet.getChips();
 
@@ -235,12 +241,20 @@ describe('TrackerParametersHistoryDialogComponent', () => {
       expect(chipTexts)
         .withContext('render chip texts')
         .toEqual(parameters);
-    });
 
-    parametersChipSets.forEach(parametersChipSet => {
-      expect(parametersChipSet)
-        .withContext('render chip set')
-        .not.toBeNull();
+      const chipHosts = await parallel(() => chips.map(
+        chip => chip.host()
+      ));
+
+      const chipDisableRippleAttributes = await parallel(() => chipHosts.map(
+        host => host.getAttribute('ng-reflect-disable-ripple')
+      ));
+
+      chipDisableRippleAttributes.forEach(async value => {
+        expect(value)
+          .withContext('render disable ripple attribute')
+          .not.toBeNull();
+      });
     });
   });
 

@@ -5,24 +5,15 @@
 
   @at-root .mat-accordion mat-expansion-panel#{&}
 
-    &:first-of-type
-      border-top-right-radius: unset
-      border-top-left-radius: unset
-
-    &:last-of-type
-      border-bottom-right-radius: unset
-      border-bottom-left-radius: unset
+    &:not(.mat-expanded),
+    &:not(.mat-expansion-panel-spacing)
+      border-radius: unset
 
   &:not([class*=mat-elevation-z])
     box-shadow: unset
 
 mat-expansion-panel-header
   margin-bottom: 20px
-
-mat-expansion-panel.mat-expansion-panel-spacing
-  margin: unset
-
-mat-expansion-panel-header
   border-bottom: 1px solid $lighter-gray
 
 .mat-expansion-panel-header

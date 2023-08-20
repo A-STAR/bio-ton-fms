@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, QueryList } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -6,27 +6,32 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatListOption, MatSelectionList } from '@angular/material/list';
+import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
 
 import {
   BehaviorSubject,
   Observable,
+  Subscription,
   debounceTime,
   defer,
   distinctUntilChanged,
   interval,
   map,
+  of,
   skipWhile,
   startWith,
   switchMap,
   tap
 } from 'rxjs';
 
-import { MonitoringVehicle, TechService } from './tech.service';
+import { MonitoringVehicle, TechService, VehicleMonitoringInfo } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
 
-import { MapComponent } from '../shared/map/map.component';
+import { StopClickPropagationDirective } from '../shared/stop-click-propagation/stop-click-propagation.directive';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
+import { TechMonitoringInfoComponent } from './shared/tech-monitoring-info/tech-monitoring-info/tech-monitoring-info.component';
+import { MapComponent } from '../shared/map/map.component';
 
 import {
   TrackerCommandDialogComponent,
@@ -44,14 +49,17 @@ import {
     MatInputModule,
     MatIconModule,
     MatListModule,
+    MatExpansionModule,
+    StopClickPropagationDirective,
     TechMonitoringStateComponent,
+    TechMonitoringInfoComponent,
     MapComponent
   ],
   templateUrl: './tech.component.html',
   styleUrls: ['./tech.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class TechComponent implements OnInit {
+export default class TechComponent implements OnInit, OnDestroy {
   /**
    * Get search stream.
    *
@@ -91,6 +99,8 @@ export default class TechComponent implements OnInit {
 
   protected tech$!: Observable<MonitoringTech[]>;
   protected searchForm!: TechSearchForm;
+  protected expandedPanelTechID?: MonitoringTech['id'];
+  protected techInfo?: TechMonitoringInfo;
 
   /**
    * Tech option selected state.
@@ -154,7 +164,39 @@ export default class TechComponent implements OnInit {
     );
   }
 
+  /**
+   * Get, set tech monitoring information.
+   *
+   * Toggle tech panel, save expanded panel tech ID.
+   *
+   * @param panel `MatExpansionPanel` instance.
+   * @param id `MonitoringTech` ID.
+   */
+  protected onPanelToggle(panel: MatExpansionPanel, id: MonitoringTech['id']) {
+    this.#techInfoSubscription?.unsubscribe();
+
+    if (panel.expanded) {
+      this.#techInfoSubscription = panel.afterCollapse.subscribe(() => {
+        this.techInfo = undefined;
+      });
+
+      panel.toggle();
+
+      this.expandedPanelTechID = undefined;
+    } else {
+      this.#techInfoSubscription = this.techService
+        .getVehicleInfo(id)
+        .subscribe(info => {
+          this.expandedPanelTechID = id;
+          this.techInfo = info;
+
+          panel.toggle();
+        });
+    }
+  }
+
   #options$ = new BehaviorSubject<TechOptions>({});
+  #techInfoSubscription: Subscription | undefined;
 
   /**
    * Initialize Search form.
@@ -191,6 +233,8 @@ export default class TechComponent implements OnInit {
 
   /**
    * Get and set tech.
+   *
+   * Update tech info.
    */
   #setTech() {
     const timer$ = interval(POLL_INTERVAL_PERIOD)
@@ -209,11 +253,36 @@ export default class TechComponent implements OnInit {
 
     const searchTech = (findCriterion: string) => this.techService.getVehicles({ findCriterion });
 
+    const updateTechInfo = (tech: MonitoringTech[]) => {
+      this.#techInfoSubscription?.unsubscribe();
+
+      let techInfo$: Observable<TechMonitoringInfo | undefined> = of(undefined);
+
+      if (this.expandedPanelTechID) {
+        const hasTech = tech.some(({ id }) => id === this.expandedPanelTechID);
+
+        if (hasTech) {
+          techInfo$ = this.techService
+            .getVehicleInfo(this.expandedPanelTechID)
+            .pipe(
+              tap(info => {
+                this.techInfo = info;
+              })
+            );
+        }
+      }
+
+      return techInfo$.pipe(
+        switchMap(() => of(tech))
+      );
+    };
+
     this.tech$ = this.#search$.pipe(
       startWith(undefined),
       switchMap(searchQuery => timer$.pipe(
         switchMap(() => searchQuery ? searchTech(searchQuery) : tech$)
-      ))
+      )),
+      switchMap(tech => updateTechInfo(tech))
     );
   }
 
@@ -223,6 +292,11 @@ export default class TechComponent implements OnInit {
   ngOnInit() {
     this.#initSearchForm();
     this.#setTech();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnDestroy() {
+    this.#techInfoSubscription?.unsubscribe();
   }
 }
 
@@ -235,6 +309,8 @@ export type MonitoringTech = MonitoringVehicle;
 type TechOptions = Partial<{
   selected: Set<MonitoringTech['id']>;
 }>;
+
+export type TechMonitoringInfo = VehicleMonitoringInfo;
 
 export const POLL_INTERVAL_PERIOD = 5000;
 

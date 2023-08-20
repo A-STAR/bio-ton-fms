@@ -25,19 +25,25 @@ aside
 form
   flex: 1
 
-mat-selection-list,
-mat-list-option
-  $border-width: 1px
-
-  border-top: math.div($border-width, 2) solid $light-gray
-  border-bottom: math.div($border-width, 2) solid $light-gray
-
 mat-selection-list
   overflow-y: auto
   font-size: 12px
 
-  > div
+  mat-accordion > div
     position: relative
+
+  button
+    padding: unset
+    background-color: unset
+    color: currentColor
+    border: unset
+    font-weight: 500
+    line-height: 20px
+    text-align: unset
+    cursor: pointer
+
+    &:hover
+      color: $green
 
 bio-tech-monitoring-state
   position: absolute
