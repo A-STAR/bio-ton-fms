@@ -3,6 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, formatNumber, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
+import { HarnessLoader, parallel } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatChipSetHarness } from '@angular/material/chips/testing';
 
 import { RelativeTimePipe, localeID } from '../../relative-time.pipe';
 
@@ -14,6 +17,7 @@ import { testVehicleMonitoringInfo } from '../../../../../app/tech/tech.service.
 describe('TechMonitoringInfoComponent', () => {
   let component: TechMonitoringInfoComponent;
   let fixture: ComponentFixture<TechMonitoringInfoComponent>;
+  let loader: HarnessLoader;
 
   beforeEach(async () => {
     await TestBed
@@ -36,6 +40,7 @@ describe('TechMonitoringInfoComponent', () => {
     registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(TechMonitoringInfoComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
     component.info = testVehicleMonitoringInfo;
@@ -210,6 +215,58 @@ describe('TechMonitoringInfoComponent', () => {
       expect(descriptionDetailsDes[index].nativeElement.textContent)
         .withContext('render description details text')
         .toBe(DESCRIPTION_TEXTS[index].details);
+    });
+  });
+
+  it('should render parameters info', async () => {
+    const headingDe = fixture.debugElement.query(
+      By.css('h1:nth-of-type(3)')
+    );
+
+    expect(headingDe)
+      .withContext('render heading element')
+      .not.toBeNull();
+
+    expect(headingDe.nativeElement.textContent)
+      .withContext('render heading text')
+      .toBe('Параметры');
+
+    const parametersChipSet = await loader.getHarness(MatChipSetHarness);
+    const chips = await parametersChipSet.getChips();
+
+    const chipTexts = await parallel(() => chips.map(
+      chip => chip.getText()
+    ));
+
+    const parameters = testVehicleMonitoringInfo.trackerInfo.parameters!;
+
+    chipTexts.forEach((chipText, index) => {
+      const {
+        paramName: name,
+        lastValueDateTime,
+        lastValueDecimal,
+        lastValueString
+      } = parameters[index];
+
+      const value = lastValueString ?? lastValueDecimal ?? lastValueDateTime;
+
+      expect(chipText)
+        .withContext('render parameter text')
+        .toBe(`${name}=${value}`);
+    });
+
+    const chipHosts = await parallel(() => chips.map(
+      chip => chip.host()
+    ));
+
+    const chipDisableRippleAttributes = await parallel(() => chipHosts.map(
+      host => host.getAttribute('ng-reflect-disable-ripple')
+    ));
+
+    chipDisableRippleAttributes.forEach(async value => {
+      expect(value)
+        .withContext('render disable ripple attribute')
+        .not.toBeNull();
     });
   });
 });

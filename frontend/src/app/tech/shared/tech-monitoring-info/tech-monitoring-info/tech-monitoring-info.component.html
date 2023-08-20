@@ -65,3 +65,13 @@
       <dd>{{ tracker.imei }}</dd>
   </dl>
 </ng-container>
+
+<ng-container *ngIf="info.trackerInfo.parameters as parameters">
+  <h1>Параметры</h1>
+
+  <mat-chip-set>
+    <mat-chip disableRipple *ngFor="let parameter of parameters">
+      {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
+    </mat-chip>
+  </mat-chip-set>
+</ng-container>

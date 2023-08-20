@@ -71,9 +71,9 @@ describe('VehiclesComponent', () => {
   afterEach(async () => {
     const dialogs = await documentRootLoader.getAllHarnesses(MatDialogHarness);
 
-    await Promise.all(
-      dialogs.map(dialog => dialog.close())
-    );
+    await parallel(() => dialogs.map(
+      dialog => dialog.close()
+    ));
 
     overlayContainer.ngOnDestroy();
   });
@@ -259,7 +259,7 @@ describe('VehiclesComponent', () => {
 
         const trackerAnchorEl = await trackerAnchor?.host();
 
-        const [trackerRouterLink, trackerAnchorTitle] = await Promise.all([
+        const [trackerRouterLink, trackerAnchorTitle] = await parallel(() => [
           trackerAnchorEl?.getAttribute('ng-reflect-router-link'),
           trackerAnchorEl?.getAttribute('title')
         ]);
