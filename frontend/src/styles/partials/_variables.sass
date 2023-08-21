@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'sass:math'
 
 $black: #000000
@@ -33,6 +34,8 @@ $transition: (panel: (duration: 200ms, timing-function: cubic-bezier(0.25, 0.8, 
 $box-shadow: 0px 2px 9px rgba($shady, 18%)
 
 $animation: (fill-mode: forwards, timing-function: cubic-bezier(0.55, 0, 0.55, 0.2), panel: (duration: 280ms), text: (duration: 300ms))
+
+$fadein-animation: (panel: (fadein map.get($animation, panel, duration) map.get($animation, fill-mode) map.get($animation, timing-function)), text: (fadein map.get($animation, text, duration) map.get($animation, fill-mode) map.get($animation, timing-function)))
 
 $bio-sidebar-width: 100px
 
