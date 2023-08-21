@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography.Xml;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Monitoring;
@@ -11,7 +9,6 @@ using BioTonFMS.Infrastructure.Paging.Extensions;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
@@ -199,7 +196,11 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                         ConnectionStatus = (now - x.ServerDateTime).Minutes < trackerAddressValidMinutes
                             ? ConnectionStatusEnum.Connected
                             : ConnectionStatusEnum.NotConnected,
-                        MovementStatus = x.Speed > 0 ? MovementStatusEnum.Moving : MovementStatusEnum.Stopped,
+                        MovementStatus = x.Speed == null
+                            ? MovementStatusEnum.NoData
+                            : x.Speed.Value > 0
+                                ? MovementStatusEnum.Moving
+                                : MovementStatusEnum.Stopped,
                         LastMessageTime = x.TrackerDateTime,
                         NumberOfSatellites = x.SatNumber
                     })

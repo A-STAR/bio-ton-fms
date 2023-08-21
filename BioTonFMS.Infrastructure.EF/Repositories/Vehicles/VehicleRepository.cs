@@ -1,4 +1,5 @@
-﻿using BioTonFMS.Domain;
+﻿using System.Linq.Expressions;
+using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure.EF.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
@@ -8,8 +9,6 @@ using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using BioTonFMS.Infrastructure.Utils.Builders;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Xml.Xsl;
 
 namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 {
@@ -167,6 +166,15 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
             base.Add(vehicle);
         }
+
+        public Tracker? GetTracker(int vehicleId) => QueryableProvider
+            .Linq()
+            .Include(x => x.Tracker)
+            .ThenInclude(x => x.Sensors)
+            .ThenInclude(x => x.Unit)
+            .Where(x => x.Id == vehicleId && x.Tracker != null)
+            .Select(x => x.Tracker)
+            .FirstOrDefault();
 
         public override void Update(Vehicle vehicle)
         {

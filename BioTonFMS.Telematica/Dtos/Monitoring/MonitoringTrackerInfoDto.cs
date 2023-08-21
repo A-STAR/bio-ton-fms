@@ -6,7 +6,7 @@ namespace BioTonFMS.Telematica.Dtos.Monitoring;
 public class MonitoringTrackerInfoDto
 {
     [Required]
-    public string TrackerType { get; set; }
+    public string TrackerType { get; set; } = "Galileo Sky v5.0";
 
     /// <summary>
     /// Внешний ID трекера
@@ -29,11 +29,11 @@ public class MonitoringTrackerInfoDto
     /// <summary>
     /// Параметры трекера
     /// </summary>
-    public TrackerParameter[] Parameters { get; set; }
+    public IList<TrackerParameter> Parameters { get; set; } = new List<TrackerParameter>();
 
     /// <summary>
     /// Список датчиков и значения датчиков с соответствующими единицами измерения,
     /// которые рассчитаны по последнему пришедшему сообщению у которых признак “видимость” = TRUE.
     /// </summary>
-    public TrackerSensorDto[] Sensors { get; set; }
+    public IList<TrackerSensorDto> Sensors { get; set; } = new List<TrackerSensorDto>();
 }

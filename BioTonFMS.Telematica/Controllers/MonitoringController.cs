@@ -5,6 +5,7 @@ using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos.Monitoring;
 using Microsoft.AspNetCore.Authorization;
@@ -93,8 +94,11 @@ public class MonitoringController : ValidationControllerBase
     /// <response code="400">Невозможно вернуть данные</response>
     [HttpPost("locations-and-tracks")]
     [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
-    public IActionResult LocationsAndTracks(DateTime trackStartTime, LocationAndTrackRequest[] requests)
+    public IActionResult LocationsAndTracks([FromQuery] DateTime? trackStartTime,
+        [FromBody] LocationAndTrackRequest[] requests)
     {
+        trackStartTime ??= DateTime.UtcNow.AddDays(-1);
+        
         IDictionary<int, int> externalIds = _vehicleRepository.GetExternalIds(
             requests.Select(x => x.VehicleId).ToArray());
 
@@ -102,7 +106,7 @@ public class MonitoringController : ValidationControllerBase
 
         IEnumerable<int> vehiclesNeedTrack = requests.Where(x => x.NeedReturnTrack).Select(x => x.VehicleId);
 
-        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(trackStartTime, 
+        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(trackStartTime.Value, 
             externalIds.Where(x => vehiclesNeedTrack.Contains(x.Key))
                 .Select(x => x.Value)
                 .ToArray()
@@ -110,7 +114,7 @@ public class MonitoringController : ValidationControllerBase
 
         List<LocationAndTrack> locationsAndTracks = GetLocationsAndTracks(requests, externalIds, locations, tracks);
 
-        ViewBounds viewBounds = CalculateViewBounds(locationsAndTracks);
+        ViewBounds? viewBounds = CalculateViewBounds(locationsAndTracks);
 
         return Ok(new LocationsAndTracksResponse
         {
@@ -118,6 +122,79 @@ public class MonitoringController : ValidationControllerBase
             Tracks = locationsAndTracks
         });
     }
+
+    /// <summary>
+    /// Возвращает общую информацию и данные трекеров
+    /// </summary>
+    [HttpGet("vehicle/{id:int}")]
+    [ProducesResponseType(typeof(MonitoringVehicleInfoDto), StatusCodes.Status200OK)]
+    public IActionResult GetVehicleInformation([FromRoute] int id)
+    {
+        var tracker = _vehicleRepository.GetTracker(id);
+
+        if (tracker == null)
+        {
+            return NotFound();
+        }
+        
+        var trackerInfo = _mapper.Map<MonitoringTrackerInfoDto>(tracker);
+        trackerInfo.Parameters = _messageRepository.GetParameters(tracker.ExternalId);
+
+        var lastMessage = _messageRepository.GetLastMessageFor(tracker.ExternalId);
+
+        if (lastMessage == null)
+        {
+            trackerInfo.Sensors = tracker.Sensors
+                .Select(x => new TrackerSensorDto
+                {
+                    Name = x.Name, Unit = x.Unit.Name
+                })
+                .ToList();
+            
+            return Ok(new MonitoringVehicleInfoDto
+            {
+                TrackerInfo = trackerInfo,
+                GeneralInfo = new MonitoringGeneralInfoDto()
+            });
+        }
+
+        var general = _mapper.Map<MonitoringGeneralInfoDto>(lastMessage);
+
+        var dict = tracker.Sensors.ToDictionary(x => x.Id,
+            x => new TrackerSensorDto
+            {
+                Name = x.Name,
+                Unit = x.Unit.Name
+            });
+
+        foreach (var tag in lastMessage.Tags)
+        {
+            if (tag.SensorId != null && dict.TryGetValue(tag.SensorId.Value, out var sensorDto))
+            {
+                sensorDto.Value = tag.ValueString;
+            }
+
+            switch (tag.TrackerTagId)
+            {
+                case TagsSeed.CanB0:
+                    general.Mileage = ((MessageTagInteger)tag).Value;
+                    break;
+                case TagsSeed.Can32BitR0Id:
+                    general.EngineHours = ((MessageTagInteger)tag).Value;
+                    break;
+            }
+        }
+
+        trackerInfo.Sensors = dict.Values.ToList();
+
+        return Ok(new MonitoringVehicleInfoDto
+        {
+            GeneralInfo = general,
+            TrackerInfo =  trackerInfo
+        });
+    }
+
+    #region Private
 
     private static List<LocationAndTrack> GetLocationsAndTracks(LocationAndTrackRequest[] requests, 
         IDictionary<int, int> externalIds, IDictionary<int, (double Lat, double Long)> locations, 
@@ -177,62 +254,5 @@ public class MonitoringController : ValidationControllerBase
         return viewBounds;
     }
 
-    [HttpGet("vehicle/{id:int}")]
-    [ProducesResponseType(typeof(MonitoringVehicleInfoDto), StatusCodes.Status200OK)]
-    public IActionResult GetVehicleInformation(int id)
-    {
-        return Ok(new MonitoringVehicleInfoDto
-        {
-            GeneralInfo = new MonitoringGeneralInfoDto
-            {
-                Latitude = 36.884816,
-                Longitude = 30.701173,
-                LastMessageTime = DateTime.UtcNow.AddMinutes(-25),
-                Mileage = 73000,
-                EngineHours = 246,
-                Speed = 73,
-                SatellitesNumber = 21
-            },
-            TrackerInfo = new MonitoringTrackerInfoDto
-            {
-                ExternalId = -1,
-                Imei = "6C6F6C6B656B636",
-                SimNumber = "88005553535",
-                TrackerType = "GalileoSkyV50",
-                Parameters = new[]
-                {
-                    new TrackerParameter
-                    {
-                        ParamName = "param decimal",
-                        LastValueDecimal = 123.12
-                    },
-                    new TrackerParameter
-                    {
-                        ParamName = "param str",
-                        LastValueString = "somthing"
-                    },
-                    new TrackerParameter
-                    {
-                        ParamName = "param date",
-                        LastValueDateTime = DateTime.UnixEpoch.AddDays(3304)
-                    },
-                },
-                Sensors = new[]
-                {
-                    new TrackerSensorDto
-                    {
-                        Name = "sensor 1",
-                        Value = "val",
-                        Unit = "unit"
-                    },
-                    new TrackerSensorDto
-                    {
-                        Name = "sensor 2",
-                        Value = "123",
-                        Unit = "miles"
-                    },
-                }
-            }
-        });
-    }
+    #endregion
 }

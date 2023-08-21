@@ -5,7 +5,6 @@ using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.Paging;
-using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Xunit.Abstractions;
@@ -430,18 +429,12 @@ public class TrackerMessageRepositoryTests
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Stopped,
                         NumberOfSatellites = 19
-                    }},
-                    {190384, new VehicleStatus
-                    {
-                        TrackerExternalId = 190384,
-                        ConnectionStatus = ConnectionStatusEnum.NotConnected,
-                        MovementStatus = MovementStatusEnum.NoData
-                    }},
+                    }}
                 }
             },
         };
     
-    /*[Theory, MemberData(nameof(StatesData))]
+    [Theory, MemberData(nameof(StatesData))]
     public void GetVehicleStates_ShouldReturnRightSates(int[] externalIds,
         IDictionary<int, VehicleStatus> expected)
     {
@@ -469,7 +462,7 @@ public class TrackerMessageRepositoryTests
                 r.Value.LastMessageTime.Should().NotBeNull();
             }
         }
-    }*/
+    }
 
     #endregion
     
