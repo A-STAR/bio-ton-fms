@@ -94,11 +94,9 @@ public class MonitoringController : ValidationControllerBase
     /// <response code="400">Невозможно вернуть данные</response>
     [HttpPost("locations-and-tracks")]
     [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
-    public IActionResult LocationsAndTracks([FromQuery] DateTime? trackStartTime,
+    public IActionResult LocationsAndTracks([FromQuery] DateTime trackStartTime,
         [FromBody] LocationAndTrackRequest[] requests)
     {
-        trackStartTime ??= DateTime.UtcNow.AddDays(-1);
-        
         IDictionary<int, int> externalIds = _vehicleRepository.GetExternalIds(
             requests.Select(x => x.VehicleId).ToArray());
 
@@ -106,7 +104,7 @@ public class MonitoringController : ValidationControllerBase
 
         IEnumerable<int> vehiclesNeedTrack = requests.Where(x => x.NeedReturnTrack).Select(x => x.VehicleId);
 
-        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(trackStartTime.Value, 
+        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(trackStartTime, 
             externalIds.Where(x => vehiclesNeedTrack.Contains(x.Key))
                 .Select(x => x.Value)
                 .ToArray()
@@ -221,38 +219,39 @@ public class MonitoringController : ValidationControllerBase
     private MonitoringVehicleInfoDto GetVehicleInfo(TrackerMessage lastMessage,
         IEnumerable<Sensor> sensors, MonitoringTrackerInfoDto trackerInfo)
     {
-        var general = _mapper.Map<MonitoringGeneralInfoDto>(lastMessage);
+        var generalInfo = _mapper.Map<MonitoringGeneralInfoDto>(lastMessage);
 
-        var dict = sensors.ToDictionary(x => x.Id,
+        var trackerSensors = sensors.ToDictionary(x => x.Id,
             x => new TrackerSensorDto
             {
                 Name = x.Name,
                 Unit = x.Unit.Name
             });
 
-        foreach (var tag in lastMessage.Tags)
+        foreach (MessageTag tag in lastMessage.Tags)
         {
-            if (tag.SensorId != null && dict.TryGetValue(tag.SensorId.Value, out var sensorDto))
+            if (tag.SensorId != null && trackerSensors.TryGetValue(tag.SensorId.Value, out var sensorDto))
             {
                 sensorDto.Value = tag.ValueString;
             }
 
+            // вычисление пробега и моточасов
             switch (tag.TrackerTagId)
             {
                 case TagsSeed.CanB0:
-                    general.Mileage = ((MessageTagInteger)tag).Value;
+                    generalInfo.Mileage = ((MessageTagInteger)tag).Value * 5;
                     break;
                 case TagsSeed.Can32BitR0Id:
-                    general.EngineHours = ((MessageTagInteger)tag).Value;
+                    generalInfo.EngineHours = ((MessageTagInteger)tag).Value / 100 ;
                     break;
             }
         }
 
-        trackerInfo.Sensors = dict.Values.ToList();
+        trackerInfo.Sensors = trackerSensors.Values.ToList();
 
         return new MonitoringVehicleInfoDto
         {
-            GeneralInfo = general,
+            GeneralInfo = generalInfo,
             TrackerInfo =  trackerInfo
         };
     }

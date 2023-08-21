@@ -1,5 +1,8 @@
 namespace BioTonFMS.Telematica.Dtos.Monitoring;
 
+/// <summary>
+/// Общая информация о трекере
+/// </summary>
 public class MonitoringGeneralInfoDto
 {
      /// <summary>
