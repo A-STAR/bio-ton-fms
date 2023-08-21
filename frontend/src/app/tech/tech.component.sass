@@ -5,6 +5,10 @@
 \:host
   display: flex
 
+aside > div,
+mat-selection-list
+  animation: map.get($fadein-animation, panel)
+
 aside
   display: flex
   flex-direction: column
@@ -21,6 +25,7 @@ aside
     margin-top: 20px
     font-size: 14px
     text-align: center
+    animation: map.get($fadein-animation, text)
 
 form
   flex: 1
