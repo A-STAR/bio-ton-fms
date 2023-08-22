@@ -1,5 +1,8 @@
 namespace BioTonFMS.Telematica.Dtos.Monitoring;
 
+/// <summary>
+/// Общая информация о трекере
+/// </summary>
 public class MonitoringGeneralInfoDto
 {
      /// <summary>
@@ -18,7 +21,7 @@ public class MonitoringGeneralInfoDto
      public int? Mileage {get;set;}
      
      /// <summary>
-     /// Моточасы из последнего сообщения
+     /// Моточасы из последнего сообщения (значение Can32BitR0Id поделённое на 100)
      /// </summary>
      public int? EngineHours {get;set;}
      

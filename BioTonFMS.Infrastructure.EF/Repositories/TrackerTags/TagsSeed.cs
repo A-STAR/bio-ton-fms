@@ -32,6 +32,7 @@ public static class TagsSeed
     public const int Rs4850Id = 23;
     public const int Rs4851Id = 24;
     public const int CanA0Id = 25;
+    public const int CanB0 = 27;
     public const int Can8BitR0Id = 28;
     public const int Can32BitR0Id = 34;
 
