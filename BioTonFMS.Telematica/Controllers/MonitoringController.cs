@@ -242,7 +242,7 @@ public class MonitoringController : ValidationControllerBase
                     generalInfo.Mileage = ((MessageTagInteger)tag).Value * 5;
                     break;
                 case TagsSeed.Can32BitR0Id:
-                    generalInfo.EngineHours = ((MessageTagInteger)tag).Value / 100 ;
+                    generalInfo.EngineHours = ((MessageTagInteger)tag).Value / 100;
                     break;
             }
         }
