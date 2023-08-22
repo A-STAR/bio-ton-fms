@@ -7,7 +7,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 
 import { ConfirmationDialogComponent, getConfirmationDialogContent } from './confirmation-dialog.component';
 
-import { testNewVehicle } from 'src/app/directory-tech/vehicle.service.spec';
+import { testNewVehicle } from '../../../app/directory-tech/vehicle.service.spec';
 
 describe('ConfirmationDialogComponent', () => {
   let component: ConfirmationDialogComponent;

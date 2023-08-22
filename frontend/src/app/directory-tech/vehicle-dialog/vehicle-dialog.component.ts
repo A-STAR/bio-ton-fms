@@ -12,7 +12,7 @@ import { forkJoin, map, Observable, Subscription } from 'rxjs';
 
 import { Fuel, NewVehicle, Vehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
-import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
+import { NumberOnlyInputDirective } from '../../../app/shared/number-only-input/number-only-input.directive';
 
 @Component({
   selector: 'bio-vehicle-dialog',
