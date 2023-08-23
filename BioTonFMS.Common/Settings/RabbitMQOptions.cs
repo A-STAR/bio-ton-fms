@@ -29,4 +29,9 @@ public class RabbitMQOptions
     /// пароль RabbitMQ
     /// </summary>
     public string Password { get; set; } = "guest";
+
+    /// <summary>
+    /// количество попыток повторной обработки сообщения  
+    /// </summary>
+    public int DeliveryLimit { get; set; } = 0;
 }

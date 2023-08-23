@@ -10,27 +10,39 @@ public class TcpSendCommandMessageHandler : IBusMessageHandler
 {
     private readonly ILogger<TcpSendCommandMessageHandler> _logger;
     private readonly TcpSendCommandMessages _commandMessages;
+    private readonly IMessageBus _trackerCommandBus;
 
     public TcpSendCommandMessageHandler(
         ILogger<TcpSendCommandMessageHandler> logger,
-        TcpSendCommandMessages commandMessages
+        TcpSendCommandMessages commandMessages,
+        Func<MessgingBusType, IMessageBus> busResolver
     )
     {
         _logger = logger;
         _commandMessages = commandMessages;
+        _trackerCommandBus = busResolver(MessgingBusType.TrackerCommandsSend);
     }
 
-    public Task HandleAsync(byte[] binaryMessage)
+    public Task HandleAsync(byte[] binaryMessage, MessageDeliverEventArgs messageDeliverEventArgs)
     {
-        var messageText = Encoding.UTF8.GetString(binaryMessage);
-        _logger.LogDebug("TcpCommandMessageHandler Получен пакет {MessageText}", messageText);
+        try
+        {
+            var messageText = Encoding.UTF8.GetString(binaryMessage);
+            _logger.LogDebug("TcpCommandMessageHandler Получен пакет {MessageText}", messageText);
 
-        var commandMessage = JsonSerializer.Deserialize<TrackerCommandMessage>(messageText)
-            ?? throw new ArgumentException("Невозможно разобрать сырое сообщение с командой", messageText);
-        _commandMessages.AddSendCommandMessage(commandMessage);
-        _logger.LogDebug("TcpCommandMessageHandler сообщение положено в очередь");
+            var commandMessage = JsonSerializer.Deserialize<TrackerCommandMessage>(messageText)
+                ?? throw new ArgumentException("Невозможно разобрать сырое сообщение с командой", messageText);
+            _commandMessages.AddSendCommandMessage(commandMessage);
+            _logger.LogDebug("TcpCommandMessageHandler сообщение положено в очередь");
 
-        return Task.CompletedTask;
+            _trackerCommandBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+            return Task.CompletedTask;
+        }
+        catch
+        {
+            _trackerCommandBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: false);
+            throw;
+        }
     }
 
 

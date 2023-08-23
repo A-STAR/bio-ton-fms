@@ -7,7 +7,7 @@ namespace BioTonFMS.TrackerMessageHandler.Workers;
 public class RetranslatorHandlerWorker : BackgroundService
 {
     private readonly ILogger<RetranslatorHandlerWorker> _logger;
-    private readonly IMessageBus _messageBus;
+    private readonly IMessageBus _retranslationBus;
 
     public RetranslatorHandlerWorker(
         ILogger<RetranslatorHandlerWorker> logger,
@@ -15,14 +15,14 @@ public class RetranslatorHandlerWorker : BackgroundService
     )
     {
         _logger = logger;
-        _messageBus = busResolver(MessgingBusType.Retranslation);
+        _retranslationBus = busResolver(MessgingBusType.Retranslation);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("RetranslatorHandlerWorker обработка начата в : {time}", DateTimeOffset.Now);
 
-        _messageBus.Subscribe<Handlers.RetranslatorHandler>();
+        _retranslationBus.Subscribe<Handlers.RetranslatorHandler>();
         await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
 
         _logger.LogInformation("RetranslatorHandlerWorker обработка закончена в : {time}", DateTimeOffset.Now);

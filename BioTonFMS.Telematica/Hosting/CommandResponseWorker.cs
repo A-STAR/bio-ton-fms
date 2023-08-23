@@ -7,7 +7,7 @@ namespace BioTonFMS.Telematica.Hosting;
 public class CommandResponseWorker : BackgroundService
 {
     private readonly ILogger<CommandResponseWorker> _logger;
-    private readonly IMessageBus _messageBus;
+    private readonly IMessageBus _commandsReceiveBus;
 
     public CommandResponseWorker(
         ILogger<CommandResponseWorker> logger,
@@ -15,14 +15,14 @@ public class CommandResponseWorker : BackgroundService
     )
     {
         _logger = logger;
-        _messageBus = busResolver.Invoke(MessgingBusType.TrackerCommandsReceive);
+        _commandsReceiveBus = busResolver.Invoke(MessgingBusType.TrackerCommandsReceive);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("CommandResponseWorker обработка начата в : {time}", DateTimeOffset.Now);
 
-        _messageBus.Subscribe<CommandResponseHandler>();
+        _commandsReceiveBus.Subscribe<CommandResponseHandler>();
         await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
 
         _logger.LogInformation("CommandResponseWorker обработка закончена в : {time}", DateTimeOffset.Now);

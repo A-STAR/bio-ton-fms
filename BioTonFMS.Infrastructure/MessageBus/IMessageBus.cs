@@ -6,5 +6,9 @@
 
         void Subscribe<TBusMessageHandler>()
             where TBusMessageHandler : IBusMessageHandler;
+
+        void Ack(ulong deliveryTag, bool multiple);
+
+        void Nack(ulong deliveryTag, bool multiple, bool requeue);
     }
 }

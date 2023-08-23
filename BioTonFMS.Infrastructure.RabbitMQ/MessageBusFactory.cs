@@ -10,7 +10,7 @@ public class MessageBusFactory
 {
     static Dictionary<MessgingBusType, IMessageBus> _busList = new();
 
-    public static IMessageBus CreateOrGetBus(MessgingBusType busType, IServiceProvider serviceProvider, Func<IServiceProvider, IMessageBus> rawMessageBusFunc = null)
+    public static IMessageBus CreateOrGetBus(MessgingBusType busType, IServiceProvider serviceProvider, Func<IServiceProvider, RabbitMQOptions, IMessageBus>? rawMessageBusFunc = null)
     {
         if (_busList.ContainsKey(busType))
         {
@@ -18,29 +18,24 @@ public class MessageBusFactory
         }
         else
         {
+            var rabbitLogger = serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>();
+            var rabbitOptions = serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>();
             IMessageBus bus = busType switch
             {
                 MessgingBusType.Retranslation => new RabbitMQMessageBus(
-                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
-                    "Retranslation"),
+                    rabbitLogger, serviceProvider, rabbitOptions,
+                    isDurable: true, "Retranslation", needDeadMessageQueue: true, deliveryLimit: rabbitOptions.Value.DeliveryLimit),
                 MessgingBusType.Consuming => new RabbitMQMessageBus(
-                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
-                    "RawTrackerMessages-primary"),
+                    rabbitLogger, serviceProvider, rabbitOptions,
+                    isDurable: true, "RawTrackerMessages-primary", needDeadMessageQueue: true,
+                    deliveryLimit: rabbitOptions.Value.DeliveryLimit),
                 MessgingBusType.TrackerCommandsReceive => new RabbitMQMessageBus(
-                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
-                    "tracker-command-receive"),
+                    rabbitLogger, serviceProvider, rabbitOptions, 
+                    isDurable: true, "tracker-command-receive", needDeadMessageQueue: true),
                 MessgingBusType.TrackerCommandsSend => new RabbitMQMessageBus(
-                    serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>(),
-                    "tracker-command-send"),
-                MessgingBusType.RawTrackerMessages => GetRawTrackerBus(rawMessageBusFunc, serviceProvider),
+                    rabbitLogger, serviceProvider, rabbitOptions,
+                    isDurable: true, "tracker-command-send", needDeadMessageQueue: true),
+                MessgingBusType.RawTrackerMessages => GetRawTrackerBus(rawMessageBusFunc, serviceProvider, rabbitOptions.Value),
 
                 _ => throw new ArgumentOutOfRangeException(nameof(busType), busType, null)
             };
@@ -49,7 +44,7 @@ public class MessageBusFactory
         }
     }
 
-    static private IMessageBus GetRawTrackerBus(Func<IServiceProvider, IMessageBus> rawMessageBusFunc, IServiceProvider serviceProvider)
+    static private IMessageBus GetRawTrackerBus(Func<IServiceProvider, RabbitMQOptions, IMessageBus>? rawMessageBusFunc, IServiceProvider serviceProvider, RabbitMQOptions rabbitOptions)
     {
         if (rawMessageBusFunc == null)
         {
@@ -57,7 +52,7 @@ public class MessageBusFactory
         }
         else
         {
-            return rawMessageBusFunc(serviceProvider);
+            return rawMessageBusFunc(serviceProvider, rabbitOptions);
         }
     }
 }
