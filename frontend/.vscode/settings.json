@@ -101,5 +101,7 @@
     }
   ],
   "html.format.maxPreserveNewLines": 1,
-  "html.format.wrapLineLength": 140
+  "html.format.wrapLineLength": 140,
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.importModuleSpecifier": "relative"
 }
