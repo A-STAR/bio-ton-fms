@@ -29,6 +29,7 @@ public class TrackerMessageHandler : IBusMessageHandler
     private readonly IMessageBus _retranslatorBus;
     private readonly IMessageBus _commandReceiveBus;
     private readonly RetranslatorOptions _retranslatorOptions;
+    private readonly IMessageBus _consumerBus;
 
     public TrackerMessageHandler(ILogger<TrackerMessageHandler> logger,
         Func<TrackerTypeEnum, ITrackerMessageParser> parserProvider,
@@ -36,7 +37,7 @@ public class TrackerMessageHandler : IBusMessageHandler
         ITrackerMessageRepository messageRepository,
         ITrackerTagRepository trackerTagRepository, 
         ITrackerRepository trackerRepository,
-        Func<MessgingBusType, IMessageBus> busResolver, 
+        Func<MessgingBusType, IMessageBus> busResolver,
         IOptions<RetranslatorOptions> retranslatorOptions)
     {
         _logger = logger;
@@ -46,106 +47,129 @@ public class TrackerMessageHandler : IBusMessageHandler
         _trackerTagRepository = trackerTagRepository;
         _trackerRepository = trackerRepository;
         _retranslatorOptions = retranslatorOptions.Value;
+        _consumerBus = busResolver(MessgingBusType.Consuming);
         _retranslatorBus = busResolver(MessgingBusType.Retranslation);
         _commandReceiveBus = busResolver(MessgingBusType.TrackerCommandsReceive);
     }
 
-    public Task HandleAsync(byte[] binaryMessage)
+    public Task HandleAsync(byte[] binaryMessage, MessageDeliverEventArgs messageDeliverEventArgs)
     {
         var messageText = Encoding.UTF8.GetString(binaryMessage);
         _logger.LogDebug("Получен пакет {MessageText}", messageText);
 
-        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText)
-            ?? throw new ArgumentException("Невозможно разобрать сырое сообщение", messageText);
-
-        /*if (_retranslatorOptions.Enabled)
+        var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText);
+        if (rawMessage == null)
         {
-            _retranslatorBus.Publish(binaryMessage);
-        }*/
+            _consumerBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: false);
+            throw new ArgumentException("Невозможно разобрать сырое сообщение", messageText);
+        }
 
-        if (_parserProvider(rawMessage.TrackerType).IsCommandReply(rawMessage.RawMessage))
+        try
         {
-            _logger.LogDebug("Получен ответ на команду RawMessage = {RawMessage}", string.Join(' ', rawMessage.RawMessage.Select(x => x.ToString("X"))));
-            CommandResponseInfo responseInfo = _commandCodecProvider(rawMessage.TrackerType).DecodeCommand(rawMessage.RawMessage);
-            _logger.LogDebug("Команда декодирована ExternalId={ExternalId}, CommandId={CommandId}, ResponseText={ResponseText}",
-                responseInfo.ExternalId, responseInfo.CommandId, responseInfo.ResponseText);
-            TrackerCommandResponseMessage commendResponseMessage = new()
+            if (_parserProvider(rawMessage.TrackerType).IsCommandReply(rawMessage.RawMessage))
             {
-                Imei = responseInfo.Imei,
-                ExternalId = responseInfo.ExternalId,
-                CommandId = responseInfo.CommandId,
-                ResponseText = responseInfo.ResponseText,
-                ResponseBinary = responseInfo.ResponseBinary,
-                ResponseDateTime = SystemTime.UtcNow
-            };
-            _commandReceiveBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(commendResponseMessage)));
-            return Task.CompletedTask;
-        }
+                ProcessCommandReply(rawMessage);
+                _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+                return Task.CompletedTask;
+            }
 
-        if (_messageRepository.ExistsByUid(rawMessage.PackageUID))
-        {
-            return Task.CompletedTask;
-        }
+            if (_messageRepository.ExistsByUid(rawMessage.PackageUID))
+            {
+                _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+                return Task.CompletedTask;
+            }
 
-        var parseStart = DateTime.UtcNow;
-        TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
-            .ToArray();
+            var parseStart = DateTime.UtcNow;
+            TrackerMessage[] messages = _parserProvider(rawMessage.TrackerType).ParseMessage(rawMessage.RawMessage, rawMessage.PackageUID)
+                .ToArray();
 
-        _logger.LogTrace("TrackerMessageHandler after parcing {PackageUID} parsing took {Time} ms", rawMessage.PackageUID, (DateTime.UtcNow - parseStart).TotalMilliseconds);
+            _logger.LogTrace("TrackerMessageHandler after parcing {PackageUID} parsing took {Time} ms", rawMessage.PackageUID, (DateTime.UtcNow - parseStart).TotalMilliseconds);
 
-        Tracker? tracker = null;
-        if (messages.Length > 0)
-        {
-            var firstMessage = messages[0];
-            tracker = _trackerRepository.FindTracker(firstMessage.Imei, firstMessage.ExternalTrackerId);
-        }
-        
-        if (tracker is not null)
-        {
-            foreach (var trackerMessage in messages)
+            Tracker? tracker = null;
+            if (messages.Length > 0)
+            {
+                var firstMessage = messages[0]; // все сообщения в пакете от одного трекера
+                tracker = _trackerRepository.FindTracker(firstMessage.Imei, firstMessage.ExternalTrackerId);
+            }
+
+            if (tracker is not null)
             {
                 tracker.SetTrackerAddress(rawMessage.IpAddress, rawMessage.Port);
                 _trackerRepository.Update(tracker);
-
-                trackerMessage.ExternalTrackerId = tracker.ExternalId;
+                foreach (var trackerMessage in messages)
+                {
+                    trackerMessage.ExternalTrackerId = tracker.ExternalId;
+                }
+                CalculateSensors(rawMessage.PackageUID, messages, tracker!);
             }
-            _logger.LogTrace("TrackerMessageHandler before calculating tags {PackageUID}", rawMessage.PackageUID);
-            try
+            else
             {
-                CalculateSensorTags(tracker, messages);
+                _logger.LogWarning("Пропущен расчет датчиков из-за того, что не удалось найти трекер");
             }
-            catch( Exception ex )
+            foreach (var trackerMessage in messages)
             {
-                _logger.LogError(ex, "Ошибка при вычислении тегов датчиков");
+                AddMessageToRepository(rawMessage, trackerMessage);
             }
-            _logger.LogTrace("TrackerMessageHandler after calculating tags {PackageUID}", rawMessage.PackageUID);
-        }
-        else
-        {
-            _logger.LogWarning("Пропущен расчет датчиков из-за того, что не удалось найти трекер");
-        }
 
-        foreach (var trackerMessage in messages)
-        {
-            _logger.LogTrace("TrackerMessageHandler перед добавлением нового сообщения из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId}, Imei={Imei}",
-                rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
-            _messageRepository.Add(trackerMessage);
-            _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId}, Imei={Imei}",
-                rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
-        }
+            if (_retranslatorOptions.Enabled &&
+                (_retranslatorOptions.AllowedExtIds is null ||
+                 (messages.Length > 0 && _retranslatorOptions.AllowedExtIds.Contains(messages[0].ExternalTrackerId.ToString()))))
+            {
+                _retranslatorBus.Publish(binaryMessage);
+            }
+            else
+            {
+                _logger.LogTrace("Retranslation skipped as {AllowedExtIdsIsNull} and {AllowedExtIds}", _retranslatorOptions.AllowedExtIds is null, _retranslatorOptions.AllowedExtIds);
+            }
 
-        if (_retranslatorOptions.Enabled && 
-            (_retranslatorOptions.AllowedExtIds is null || 
-             (messages.Length > 0 && _retranslatorOptions.AllowedExtIds.Contains(messages[0].ExternalTrackerId.ToString()))))
-        {
-            _retranslatorBus.Publish(binaryMessage);
+            _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+            return Task.CompletedTask;
         }
-        else
-        {
-            _logger.LogTrace("Retranslation skipped as {AllowedExtIdsIsNull} and {AllowedExtIds}", _retranslatorOptions.AllowedExtIds is null, _retranslatorOptions.AllowedExtIds);
+        catch {
+            _consumerBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: true);
+            throw;
         }
+    }
 
-        return Task.CompletedTask;
+    private void AddMessageToRepository(RawTrackerMessage rawMessage, TrackerMessage trackerMessage)
+    {
+        _logger.LogTrace("TrackerMessageHandler перед добавлением нового сообщения из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId}, Imei={Imei}",
+            rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
+        _messageRepository.Add(trackerMessage);
+        _logger.LogDebug("Добавлено новое сообщение из пакета {PackageUID} Id сообщения {MessageId} TrId={TrId}, Imei={Imei}",
+            rawMessage.PackageUID, trackerMessage.Id, trackerMessage.ExternalTrackerId, trackerMessage.Imei);
+    }
+
+    private void CalculateSensors(Guid packageUID, TrackerMessage[] messages, Tracker tracker)
+    {
+        _logger.LogTrace("TrackerMessageHandler before calculating tags {PackageUID}", packageUID);
+        try
+        {
+            CalculateSensorTags(tracker, messages);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при вычислении тегов датчиков");
+        }
+        _logger.LogTrace("TrackerMessageHandler after calculating tags {PackageUID}", packageUID);
+    }
+
+    private void ProcessCommandReply(RawTrackerMessage? rawMessage)
+    {
+        _logger.LogDebug("Получен ответ на команду RawMessage = {RawMessage}", string.Join(' ', rawMessage.RawMessage.Select(x => x.ToString("X"))));
+        CommandResponseInfo responseInfo = _commandCodecProvider(rawMessage.TrackerType).DecodeCommand(rawMessage.RawMessage);
+        _logger.LogDebug("Команда декодирована ExternalId={ExternalId}, CommandId={CommandId}, ResponseText={ResponseText}",
+            responseInfo.ExternalId, responseInfo.CommandId, responseInfo.ResponseText);
+        TrackerCommandResponseMessage commendResponseMessage = new()
+        {
+            Imei = responseInfo.Imei,
+            ExternalId = responseInfo.ExternalId,
+            CommandId = responseInfo.CommandId,
+            ResponseText = responseInfo.ResponseText,
+            ResponseBinary = responseInfo.ResponseBinary,
+            ResponseDateTime = SystemTime.UtcNow
+        };
+        _commandReceiveBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(commendResponseMessage)));
     }
 
     private void CalculateSensorTags(Tracker tracker, TrackerMessage[] messages)

@@ -25,7 +25,7 @@ public class TrackerCommandResponseMessage
     /// <summary>
     /// Массив байт с данными пакета ответа
     /// </summary>
-    public byte[] ResponseBinary { get; set; }
+    public byte[]? ResponseBinary { get; set; }
 
     /// <summary>
     /// Время получения ответа на команду (UTC)

@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
+using System.Threading.Channels;
 
 namespace BioTonFMS.Infrastructure.RabbitMQ
 {
@@ -16,20 +18,27 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
         private readonly IServiceProvider _serviceProvider;
         private readonly RabbitMQOptions _rabbitMqSettings;
         private readonly string _queueName;
+        private readonly bool _isDurable;
+        private readonly int _deliveryLimit;
 
         public RabbitMQMessageBus(
             ILogger<RabbitMQMessageBus> logger,
             IServiceProvider serviceProvider,
             IOptions<RabbitMQOptions> rabbitMqOptions,
-            string queueName
+            bool isDurable,
+            string queueName,
+            bool needDeadMessageQueue = false,
+            int deliveryLimit = 0
             )
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _rabbitMqSettings = rabbitMqOptions.Value;
             _queueName = queueName;
-            _logger.LogDebug("RabbitMQMessageBus параметры соединения - HostName = {HostName} Port = {Port} VirtualHost = {VirtualHost}, UserName = {UserName}, QueueName = {queueName}",
-                _rabbitMqSettings.Host, _rabbitMqSettings.Port, _rabbitMqSettings.VHost, _rabbitMqSettings.User, queueName);
+            _isDurable = isDurable;
+            _deliveryLimit = deliveryLimit;
+            _logger.LogDebug("RabbitMQMessageBus параметры соединения - HostName = {HostName} Port = {Port} VirtualHost = {VirtualHost}, UserName = {UserName}, QueueName = {QueueName}, DeliveryLimit = {DeliveryLimit}",
+                _rabbitMqSettings.Host, _rabbitMqSettings.Port, _rabbitMqSettings.VHost, _rabbitMqSettings.User, queueName, deliveryLimit);
             var factory = new ConnectionFactory
             {
                 HostName = _rabbitMqSettings.Host,
@@ -43,19 +52,49 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
 
             var connection = factory.CreateConnection();
             _channel = connection.CreateModel();
-            _channel.QueueDeclare(queue: _queueName,
-                                        durable: false,
-                                        exclusive: false,
-                                        autoDelete: false,
-                                        arguments: null);
+            try
+            {
+                CreateQueue(isDurable, needDeadMessageQueue);
+            }
+            catch (OperationInterruptedException)
+            {
+                // Очередь уже существует, но с другими параметрами. Удаляем её и пересоздаём.
+                _channel = connection.CreateModel();
+                _channel.QueueDelete(queue: _queueName, ifUnused: false, ifEmpty: false);
+                CreateQueue(isDurable, needDeadMessageQueue);
+            }
+        }
+
+        private void CreateQueue(bool isDurable, bool needDeadMessageQueue)
+        {
+            IDictionary<string, object> args = null;
+            if (needDeadMessageQueue)
+            {
+                args = new Dictionary<string, object>();
+                args["x-dead-letter-exchange"] = "";
+                args["x-dead-letter-routing-key"] = $"err_{_queueName}";
+                args["x-overflow"] = "reject-publish";
+                args["x-queue-type"] = "quorum";
+                // Количество попыток передоставки
+                args["x-delivery-limit"] = _deliveryLimit;
+            }
+            _channel.QueueDeclare(queue: _queueName, durable: isDurable, exclusive: false,
+                                    autoDelete: false, arguments: args);
+            if (needDeadMessageQueue)
+            {
+                _channel.QueueDeclare(queue: $"err_{_queueName}", durable: isDurable, exclusive: false,
+                                        autoDelete: false, arguments: null);
+            }
         }
 
         public void Publish(byte[] message)
         {
-
+            IBasicProperties props = _channel!.CreateBasicProperties();
+            props.Persistent = _isDurable;
+            
             _channel.BasicPublish(exchange: "",
                                     routingKey: _queueName,
-                                    basicProperties: null,
+                                    basicProperties: props,
                                     body: message);
         }
 
@@ -70,9 +109,25 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
             _channel.BasicConsume
             (
                 queue: _queueName,
-                autoAck: true,
+                autoAck: false,
                 consumer: consumer
             );
+        }
+
+        public void Ack(ulong deliveryTag, bool multiple)
+        {
+            if (_channel != null)
+            {
+                _channel.BasicAck(deliveryTag, multiple);
+            }
+        }
+
+        public void Nack(ulong deliveryTag, bool multiple, bool requeue)
+        {
+            if (_channel != null)
+            {
+                _channel.BasicNack(deliveryTag, multiple, requeue);
+            }
         }
 
         private void AddSubscription<TBusMessageHandler>() where TBusMessageHandler : IBusMessageHandler
@@ -88,9 +143,13 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
         private async Task Consumer_Received(object sender, BasicDeliverEventArgs eventArgs)
         {
             byte[] body = eventArgs.Body.ToArray();
+            var messageDeliverEventArgs = new MessageDeliverEventArgs
+            {
+                DeliveryTag = eventArgs.DeliveryTag
+            };
             try
             {
-                await ProcessEvent(body);
+                await ProcessEvent(body, messageDeliverEventArgs);
             }
             catch (Exception ex)
             {
@@ -98,7 +157,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
             }
         }
 
-        private async Task ProcessEvent(byte[] message)
+        private async Task ProcessEvent(byte[] message, MessageDeliverEventArgs messageDeliverEventArgs)
         {
             _logger.LogTrace("Обработка сообщения RabbitMQ");
 
@@ -114,7 +173,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
 
                 var eventHandler = (IBusMessageHandler)handler;
                 await Task.Yield();
-                await eventHandler.HandleAsync(message);
+                await eventHandler.HandleAsync(message, messageDeliverEventArgs);
             }
             _logger.LogTrace("Сообщение обработано");
         }

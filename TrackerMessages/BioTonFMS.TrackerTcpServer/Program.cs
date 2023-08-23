@@ -60,7 +60,7 @@ app.Lifetime.ApplicationStarted.Register(() =>
 });
 app.Run();
 
-IMessageBus GetRowTrackerMessageBus(IServiceProvider serviceProvider)
+IMessageBus GetRowTrackerMessageBus(IServiceProvider serviceProvider, RabbitMQOptions rabbitOptions)
 {
     var timeouts = serviceProvider.GetRequiredService<IOptions<RetryOptions>>()
         .Value.TimeoutsInMs.Select(x => TimeSpan.FromSeconds(x));
@@ -69,7 +69,10 @@ IMessageBus GetRowTrackerMessageBus(IServiceProvider serviceProvider)
         serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
         serviceProvider,
         rabbitMQOptions,
-        "RawTrackerMessages-primary");
+        isDurable: true,
+        "RawTrackerMessages-primary", 
+        needDeadMessageQueue: true,
+        deliveryLimit: rabbitOptions.DeliveryLimit);
     var secondaryOptions = builder.Configuration.GetSection("SecondaryMessageBrokerSettings").Get<MessageBrokerSettingsOptions>();
     RabbitMQMessageBus? secondary = null;
     if (secondaryOptions != null && secondaryOptions.Enabled)
@@ -78,7 +81,10 @@ IMessageBus GetRowTrackerMessageBus(IServiceProvider serviceProvider)
             serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
             serviceProvider,
             rabbitMQOptions,
-            "RawTrackerMessages-secondary");
+            isDurable: true,
+            "RawTrackerMessages-secondary",
+            needDeadMessageQueue: true,
+        deliveryLimit: rabbitOptions.DeliveryLimit);
     }
 
     return new MessageBusMux(primaryBus, secondary, Policy.Handle<Exception>().WaitAndRetry(timeouts));

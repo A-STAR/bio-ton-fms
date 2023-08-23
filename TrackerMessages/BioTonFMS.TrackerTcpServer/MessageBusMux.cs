@@ -16,6 +16,16 @@ internal class MessageBusMux : IMessageBus
         _retryPolicy = retryPolicy;
     }
 
+    public void Ack(ulong deliveryTag, bool multiple)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Nack(ulong deliveryTag, bool multiple, bool requeue)
+    {
+        throw new NotImplementedException();
+    }
+
     public void Publish(byte[] message)
     {
         _primaryBus.Publish(message);
