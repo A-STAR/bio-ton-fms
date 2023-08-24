@@ -12,7 +12,7 @@ RUN git describe \
 #Publish
 FROM build AS publish
 WORKDIR /app/
-RUN dotnet publish -c Release -o out TrackerMessages/BioTonFMS.TrackerTcpServer/BioTonFMS.TrackerTcpServer.csproj
+RUN dotnet publish -c Release -o out Backend/TrackerMessages/BioTonFMS.TrackerTcpServer/BioTonFMS.TrackerTcpServer.csproj
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0

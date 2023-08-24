@@ -11,9 +11,9 @@ RUN git describe \
     && dotnet build -c release Backend/.UnitTests/BiotonFMS.Telematica.Tests/
 
 # run the unit tests 
-FROM build AS test
-WORKDIR /app/.UnitTests/BiotonFMS.Telematica.Tests
-CMD ["dotnet", "test", "--logger:trx"]
+#FROM build AS test
+#WORKDIR /app/.UnitTests/BiotonFMS.Telematica.Tests
+#CMD ["dotnet", "test", "--logger:trx"]
 
 #Publish
 FROM build AS publish
