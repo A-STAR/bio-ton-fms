@@ -5,9 +5,9 @@ WORKDIR /app
 COPY . ./
 
 RUN git describe \
-    && dotnet restore BioTonFMSApp/BioTonFMSApp.sln \
-    && dotnet build -c release .tools/BioTonFMS.Version \
-    && dotnet build -c release TrackerMessages/BioTonFMS.TrackerTcpServer
+    && dotnet restore Backend/BioTonFMSApp/BioTonFMSApp.sln \
+    && dotnet build -c release Backend/.tools/BioTonFMS.Version \
+    && dotnet build -c release Backend/TrackerMessages/BioTonFMS.TrackerTcpServer
 
 #Publish
 FROM build AS publish

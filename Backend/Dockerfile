@@ -5,10 +5,10 @@ WORKDIR /app
 COPY . ./
 
 RUN git describe \
-    && dotnet restore BioTonFMSApp/BioTonFMSApp.sln \
-    && dotnet build -c release .tools/BioTonFMS.Version \
-    && dotnet build -c release BioTonFMSApp/BioTonFMSApp.csproj \
-    && dotnet build -c release .UnitTests/BiotonFMS.Telematica.Tests/
+    && dotnet restore Backend/BioTonFMSApp/BioTonFMSApp.sln \
+    && dotnet build -c release Backend/.tools/BioTonFMS.Version \
+    && dotnet build -c release Backend/BioTonFMSApp/BioTonFMSApp.csproj \
+    && dotnet build -c release Backend/.UnitTests/BiotonFMS.Telematica.Tests/
 
 # run the unit tests 
 FROM build AS test
