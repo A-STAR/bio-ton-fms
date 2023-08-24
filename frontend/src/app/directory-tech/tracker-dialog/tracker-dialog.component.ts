@@ -12,7 +12,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import { NewTracker, Tracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
-import { NumberOnlyInputDirective } from 'src/app/shared/number-only-input/number-only-input.directive';
+import { NumberOnlyInputDirective } from '../../../app/shared/number-only-input/number-only-input.directive';
 
 import { localeID } from '../../tech/shared/relative-time.pipe';
 

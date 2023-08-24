@@ -258,6 +258,19 @@
             "skipTemplates": true
           }
         ],
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "src/*"
+                ],
+                "message": "Please use the relative import instead."
+              }
+            ]
+          }
+        ],
         "no-whitespace-before-property": "error",
         "object-property-newline": [
           "error",
