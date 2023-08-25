@@ -4,6 +4,7 @@ using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.Utils.Network;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 
@@ -61,7 +62,7 @@ public class Retranslator : IRetranslator
             {
                 _logger.LogError("Ошибка при открытии соединения по адресу {Host}:{Port} для {MessageFrom} - {Message}",
                     _options.Host, _options.Port, messageFrom, e.Message);
-                return;
+                throw new RetranslatioException();
             }
         }
 
@@ -93,6 +94,8 @@ public class Retranslator : IRetranslator
                 {
                     _logger.LogError(ex, "Ошибка при повторной отправке сообщения для {MessageFrom} {Message}: {Exception}",
                         messageFrom, string.Join(' ', data.Select(x => x.ToString("X"))), e.Message);
+                    _clientDictionary.Remove(messageFrom);
+                    throw new RetranslatioException();
                 }
 
             }
@@ -100,9 +103,9 @@ public class Retranslator : IRetranslator
             {
                 _logger.LogError("Ошибка при открытии повторного соединения по адресу {Host}:{Port} для {MessageFrom} - {Message}",
                     _options.Host, _options.Port, messageFrom, ex.Message);
-                return;
+                _clientDictionary.Remove(messageFrom);
+                throw new RetranslatioException();
             }
-            return;
         }
 
         try
@@ -133,6 +136,7 @@ public class Retranslator : IRetranslator
         {
             _logger.LogError("Ошибка при получении ответа на сообщение {Message}: {Exception}",
                 string.Join(' ', data.Select(x => x.ToString("X"))), e.Message);
+            throw new RetranslatioException();
         }
     }
 
