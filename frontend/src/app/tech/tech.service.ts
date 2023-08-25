@@ -35,6 +35,36 @@ export class TechService {
     return this.httpClient.get<VehicleMonitoringInfo>(`/api/telematica/monitoring/vehicle/${id}`);
   }
 
+  /**
+   * Get monitoring vehicles location and track from the start of the day.
+   *
+   * @param vehiclesOptions Opted monitoring vehicles.
+   *
+   * @returns An `Observable` of the `LocationsAndTracksResponse` stream.
+   */
+  getVehiclesLocationAndTrack(vehiclesOptions: LocationOptions[]) {
+    const body = vehiclesOptions.map<LocationAndTrackRequest>(({ vehicleId, needReturnTrack }) => ({
+      vehicleId,
+      needReturnTrack: needReturnTrack ?? false
+    }));
+
+    const date = new Date();
+
+    date.setHours(0, 0, 0, 0);
+
+    const todayStart = date.toISOString();
+
+    const paramsOptions: HttpParamsOptions = {
+      fromObject: {
+        trackStartTime: todayStart
+      }
+    };
+
+    const params = new HttpParams(paramsOptions);
+
+    return this.httpClient.post<LocationAndTrackResponse>('/api/telematica/monitoring/locations-and-tracks', body, { params });
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 
@@ -84,4 +114,39 @@ type TrackerMonitoringInfo = Pick<Tracker, 'externalId' | 'simNumber' | 'imei'> 
 export type VehicleMonitoringInfo = {
   generalInfo: MonitoringInfo;
   trackerInfo: TrackerMonitoringInfo;
+};
+
+export type LocationAndTrackRequest = {
+  vehicleId: MonitoringVehicle['id'];
+  needReturnTrack: boolean;
+};
+
+export type LocationOptions = Pick<LocationAndTrackRequest, 'vehicleId'> & Partial<Pick<LocationAndTrackRequest, 'needReturnTrack'>>;
+
+type ViewBounds = {
+  upperLeftLatitude: number;
+  upperLeftLongitude: number;
+  bottomRightLatitude: number;
+  bottomRightLongitude: number;
+};
+
+type TrackPointInfo = {
+  messageId: number;
+  time: string;
+  latitude: number;
+  longitude: number;
+  speed: number;
+  altitude: number;
+};
+
+type LocationAndTrack = {
+  vehicleId: number;
+  latitude: number;
+  longitude: number;
+  track?: TrackPointInfo[];
+};
+
+export type LocationAndTrackResponse = {
+  viewBounds?: ViewBounds;
+  tracks: LocationAndTrack[];
 };

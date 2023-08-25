@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { createWebMap, MainLayerAdapter, WebMap } from '@nextgis/webmap';
@@ -8,6 +8,8 @@ import { LngLatArray } from '@nextgis/utils';
 import { createQmsAdapter } from '@nextgis/qms-kit';
 import { createNgwLayerAdapter, NgwLayerAdapterType, NgwLayerOptions } from '@nextgis/ngw-kit';
 import NgwConnector from '@nextgis/ngw-connector';
+
+import { LocationAndTrackResponse } from '../../tech/tech.service';
 
 import { environment } from '../../../environments/environment';
 
@@ -20,6 +22,8 @@ import { environment } from '../../../environments/environment';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements OnInit {
+  @Input() location: LocationAndTrackResponse | null = null;
+
   #map!: WebMap<MapAdapter, MainLayerAdapter>;
 
   /**

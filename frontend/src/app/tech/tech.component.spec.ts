@@ -14,9 +14,16 @@ import { MatDialogHarness } from '@angular/material/dialog/testing';
 
 import { Observable, of } from 'rxjs';
 
-import { MonitoringVehicle, MonitoringVehiclesOptions, TechService, VehicleMonitoringInfo } from './tech.service';
+import {
+  LocationAndTrackResponse,
+  LocationOptions,
+  MonitoringVehicle,
+  MonitoringVehiclesOptions,
+  TechService,
+  VehicleMonitoringInfo
+} from './tech.service';
 
-import TechComponent, { POLL_INTERVAL_PERIOD, SEARCH_DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
+import TechComponent, { POLL_INTERVAL_PERIOD, DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 import { MapComponent } from '../shared/map/map.component';
 
@@ -31,6 +38,7 @@ describe('TechComponent', () => {
   let techService: TechService;
 
   let vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>;
+  let locationAndTrackSpy: jasmine.Spy<(options: LocationOptions[]) => Observable<LocationAndTrackResponse>>;
   let vehicleInfoSpy: jasmine.Spy<(id: MonitoringVehicle['id']) => Observable<VehicleMonitoringInfo>>;
 
   beforeEach(async () => {
@@ -59,6 +67,9 @@ describe('TechComponent', () => {
     vehiclesSpy = spyOn(techService, 'getVehicles')
       .and.returnValue(vehicles$);
 
+    locationAndTrackSpy = spyOn(techService, 'getVehiclesLocationAndTrack')
+      .and.callThrough();
+
     vehicleInfoSpy = spyOn(techService, 'getVehicleInfo')
       .and.returnValue(vehicleInfo$);
 
@@ -85,6 +96,49 @@ describe('TechComponent', () => {
 
     expect(vehiclesSpy)
       .toHaveBeenCalledTimes(5);
+
+    discardPeriodicTasks();
+  }));
+
+  it('should poll tech location and tracks', fakeAsync(async () => {
+    retriggerAsyncPipe(loader, vehiclesSpy);
+
+    tick();
+
+    vehiclesSpy.calls.reset();
+
+    const checkbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    await checkbox.check();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalled();
+
+    tick(POLL_INTERVAL_PERIOD - DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledTimes(2);
+
+    tick(POLL_INTERVAL_PERIOD - DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(2);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledTimes(3);
 
     discardPeriodicTasks();
   }));
@@ -146,7 +200,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(testFindCriterion);
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     /* Coverage for selected tech become diverged. */
     const testUpdatedMonitoringVehicles = testMonitoringVehicles.slice(0, 2);
@@ -158,7 +212,7 @@ describe('TechComponent', () => {
     // clean search field to get back to normal tech requests
     await searchInput.setValue('');
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledTimes(3);
@@ -265,17 +319,24 @@ describe('TechComponent', () => {
       .toBe(testMonitoringVehicles.length);
   }));
 
-  it('should render map', () => {
+  it('should render map', fakeAsync(async () => {
     const mapDe = fixture.debugElement.query(
       By.directive(MapComponent)
     );
 
     expect(mapDe)
-      .withContext('render map component')
+      .withContext('render `bio-map` component')
       .not.toBeNull();
-  });
+
+    expect(mapDe.componentInstance.location)
+      .withContext('render `bio-map` component `location` input value')
+      .toBeNull();
+  }));
 
   it('should toggle all checkbox selecting options', fakeAsync(async () => {
+    expect(locationAndTrackSpy)
+      .not.toHaveBeenCalled();
+
     const checkbox = await loader.getHarness(
       MatCheckboxHarness.with({
         ancestor: 'aside'
@@ -295,6 +356,15 @@ describe('TechComponent', () => {
 
     await checkbox.check();
 
+    tick(DEBOUNCE_DUE_TIME);
+
+    let testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id
+    }));
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
+
     options = await loader.getAllHarnesses(
       MatListOptionHarness.with({
         ancestor: 'aside',
@@ -307,6 +377,13 @@ describe('TechComponent', () => {
       .toBe(testMonitoringVehicles.length);
 
     await checkbox.uncheck();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = [];
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
 
     options = await loader.getAllHarnesses(
       MatListOptionHarness.with({
@@ -321,6 +398,9 @@ describe('TechComponent', () => {
   }));
 
   it('should select options toggling all checkbox', fakeAsync(async () => {
+    expect(locationAndTrackSpy)
+      .not.toHaveBeenCalled();
+
     const checkbox = await loader.getHarness(
       MatCheckboxHarness.with({
         ancestor: 'aside'
@@ -339,9 +419,22 @@ describe('TechComponent', () => {
       .withContext('render all checkbox unchecked')
       .toBeResolvedTo(false);
 
+    let index = 0;
+
     await list.selectItems({
-      title: testMonitoringVehicles[0].name,
+      title: testMonitoringVehicles[index].name
     });
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let testVehicleOptions = [
+      {
+        vehicleId: testMonitoringVehicles[index].id
+      }
+    ];
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
 
     await expectAsync(
       checkbox.isIndeterminate()
@@ -349,7 +442,18 @@ describe('TechComponent', () => {
       .withContext('render all checkbox indeterminate')
       .toBeResolvedTo(true);
 
+    tick(DEBOUNCE_DUE_TIME);
+
     await list.selectItems();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id
+    }));
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
 
     await expectAsync(
       checkbox.isChecked()
@@ -357,9 +461,22 @@ describe('TechComponent', () => {
       .withContext('render all checkbox checked')
       .toBeResolvedTo(true);
 
+    index = 1;
+
     await list.deselectItems({
-      title: testMonitoringVehicles[1].name,
+      title: testMonitoringVehicles[index].name,
     });
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = testMonitoringVehicles
+      .filter(({ name }) => name !== testMonitoringVehicles[index].name)
+      .map(({ id }) => ({
+        vehicleId: id
+      }));
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
 
     await expectAsync(
       checkbox.isIndeterminate()
@@ -368,6 +485,13 @@ describe('TechComponent', () => {
       .toBeResolvedTo(true);
 
     await list.deselectItems();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = [];
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
 
     await expectAsync(
       checkbox.isChecked()
@@ -598,7 +722,7 @@ describe('TechComponent', () => {
   }));
 
   it('should search tech', fakeAsync(async () => {
-    // skip initial call
+    // skip initial vehicles call
     vehiclesSpy.calls.reset();
 
     const searchInput = await loader.getHarness(
@@ -611,7 +735,7 @@ describe('TechComponent', () => {
     // enter empty value
     await searchInput.setValue('');
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .not.toHaveBeenCalled();
@@ -623,7 +747,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(testInsufficientSearchQuery);
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .not.toHaveBeenCalledTimes(2);
@@ -636,7 +760,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(`${testFindCriterion}${spaceChar.repeat(2)}`);
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledWith({
@@ -650,7 +774,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue('');
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledTimes(2);
@@ -663,7 +787,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(testInsufficientSearchQuery);
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .not.toHaveBeenCalled();
@@ -678,7 +802,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(testInvalidIDSearchQuery);
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledWith({
@@ -721,7 +845,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue(testFindCriterion);
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledTimes(2);
@@ -756,7 +880,7 @@ describe('TechComponent', () => {
 
     await searchInput.setValue('');
 
-    tick(SEARCH_DEBOUNCE_DUE_TIME);
+    tick(DEBOUNCE_DUE_TIME);
 
     expect(vehiclesSpy)
       .toHaveBeenCalledTimes(5);
@@ -771,6 +895,61 @@ describe('TechComponent', () => {
 
     expect(vehiclesSpy)
       .toHaveBeenCalledWith();
+
+    discardPeriodicTasks();
+  }));
+
+  it('should poll tech search location and tracks', fakeAsync(async () => {
+    // skip initial vehicles call
+    vehiclesSpy.calls.reset();
+
+    const checkbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    await checkbox.check();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    // skip initial location and tracks call
+    locationAndTrackSpy.calls.reset();
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // enter satisfying search query
+    const testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
+    const vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    await searchInput.setValue(testFindCriterion);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalled();
+
+    tick(POLL_INTERVAL_PERIOD - DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(2);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledTimes(2);
 
     discardPeriodicTasks();
   }));
@@ -801,7 +980,7 @@ async function retriggerAsyncPipe(
 
   await searchInput.setValue(testFindCriterion);
 
-  tick(SEARCH_DEBOUNCE_DUE_TIME);
+  tick(DEBOUNCE_DUE_TIME);
 
   // clean search field to get back to normal tech requests
   vehicles$ = of(testMonitoringVehicles);
@@ -810,7 +989,7 @@ async function retriggerAsyncPipe(
 
   await searchInput.setValue('');
 
-  tick(SEARCH_DEBOUNCE_DUE_TIME);
+  tick(DEBOUNCE_DUE_TIME);
 
   expect(vehiclesSpy)
     .toHaveBeenCalledTimes(3);

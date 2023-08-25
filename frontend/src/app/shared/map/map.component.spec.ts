@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MapComponent } from './map.component';
 
+import { testLocationAndTrackResponse } from '../../tech/tech.service.spec';
+
 describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;
@@ -16,6 +18,7 @@ describe('MapComponent', () => {
     fixture = TestBed.createComponent(MapComponent);
 
     component = fixture.componentInstance;
+    component.location = testLocationAndTrackResponse;
 
     fixture.detectChanges();
   });
