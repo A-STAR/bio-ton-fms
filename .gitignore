@@ -21,3 +21,5 @@ StyleCop.Cache
 /**/ClientApp/.cache
 /BioTonFMSApp/ClientApp/package-lock.json
 /BioTonFMSApp/ClientApp/dist
+/Backend/GlobalAssemblyInfo.cs
+/Backend/libs/BioTonFMS.Version.dll

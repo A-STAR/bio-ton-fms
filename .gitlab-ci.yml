@@ -57,7 +57,6 @@ Build-frontend:
       when: manual
       allow_failure: true
            
-
 Test-frontend:
   stage: test
   needs: 
@@ -170,6 +169,7 @@ Build-backend:
     - cd dir
     - git clone git@git.bioton-fms.ru:BioTon/fms.git .
     - git checkout ${CI_COMMIT_BRANCH}
+    - cp Backend/Dockerfile .
     - docker build -t fms-back:$DOCKER_TAG .   
     - docker image tag fms-back:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/backend:$DOCKER_TAG
     - cat ~/registry.txt | docker login --username cicd --password-stdin git.bioton-fms.ru:5050
@@ -178,32 +178,31 @@ Build-backend:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
     - changes:
-      - "frontend/**/*"
+      - Backend/**/*
+    - if: $TrueVar == "true"
       when: manual
       allow_failure: true
-    - when: always
-
 
 Test-backend:  
   stage: test
-  needs: 
-    - Build-backend  
+  #needs: 
+  #  - Build-backend  
   script:
     - mkdir dir
     - cd dir
     - git clone git@git.bioton-fms.ru:BioTon/fms.git .
     - git checkout ${CI_COMMIT_BRANCH}
-    - dotnet build -c release .tools/BioTonFMS.Version
-    - cd .UnitTests/BiotonFMS.Telematica.Tests
+    - dotnet build -c release Backend/.tools/BioTonFMS.Version
+    - cd Backend/.UnitTests/BiotonFMS.Telematica.Tests
     - dotnet test --logger:trx 
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
     - changes:
-      - "frontend/**/*"
+      - Backend/**/*
+    - if: $TrueVar == "true"
       when: manual
       allow_failure: true
-    - when: always
 
 Deploy-backend-test.lan.bioton-fms-ru:
   stage: deploy
@@ -219,12 +218,12 @@ Deploy-backend-test.lan.bioton-fms-ru:
     - docker rm -f fms-tracker-message-test || true
     - docker run --name fms-tracker-message-test -p 8190:6000 -v /var/log/fms/tracker-message/test:/app/logs -v /etc/fms/tracker-message/test:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
-      when: always
-    - changes:
-      - frontend/**/*        
-      when: manual          
-    - when: manual
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always         
+
+    - if: $TrueVar == "true"
+      when: manual
+      allow_failure: true
   
 Deploy-backend-test2.lan.bioton-fms-ru:
   stage: deploy
@@ -240,10 +239,7 @@ Deploy-backend-test2.lan.bioton-fms-ru:
     - docker rm -f fms-tracker-message-test2 || true
     - docker run --name fms-tracker-message-test2 -p 8191:6000 -v /var/log/fms/tracker-message/test2:/app/logs -v /etc/fms/tracker-message/test2:/app/config --restart always -d fms-tracker-message:$DOCKER_TAG
   rules:    
-    - changes:
-        - frontend/**/*        
-      when: manual 
-    - when: manual   
+    - when: manual        
   allow_failure: true 
 
 Deploy-backend-test3.lan.bioton-fms-ru:
@@ -260,10 +256,7 @@ Deploy-backend-test3.lan.bioton-fms-ru:
     - docker rm -f fms-tracker-message-test3 || true
     - docker run --name fms-tracker-message-test3 -p 8192:6000 -v /var/log/fms/tracker-message/test3:/app/logs -v /etc/fms/tracker-message/test3:/app/config --restart always  -d fms-tracker-message:$DOCKER_TAG
   rules:    
-    - changes:
-        - frontend/**/*        
-      when: manual 
-    - when: manual   
+    - when: manual        
   allow_failure: true
 
 Deploy-backend-stage.bioton-fms.ru:
@@ -286,10 +279,7 @@ Deploy-backend-stage.bioton-fms.ru:
     - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-message || true
     - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-message --network bioton -v /var/log/fms/tracker-message:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:    
-    - changes:
-        - frontend/**/*        
-      when: manual 
-    - when: manual   
+    - when: manual        
   allow_failure: true
 
 Deploy-backend-production.bioton-fms.ru:
@@ -312,10 +302,7 @@ Deploy-backend-production.bioton-fms.ru:
     - ssh gitlab@production.bioton-fms.ru docker rm -f fms-tracker-message || true
     - ssh gitlab@production.bioton-fms.ru docker run --name fms-tracker-message --network bioton -v /var/log/fms/tracker-message:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:    
-    - changes:
-        - frontend/**/*        
-      when: manual 
-    - when: manual   
+    - when: manual        
   allow_failure: true
 
 Build-TrackerTcpServer:
@@ -325,7 +312,7 @@ Build-TrackerTcpServer:
     - cd dir
     - git clone git@git.bioton-fms.ru:BioTon/fms.git .
     - git checkout ${CI_COMMIT_BRANCH}
-    - cp TrackerMessages/BioTonFMS.TrackerTcpServer/Dockerfile .
+    - cp Backend/TrackerMessages/BioTonFMS.TrackerTcpServer/Dockerfile .
     - docker build -t fms-tracker-tcp-server:$DOCKER_TAG .   
     - docker image tag fms-tracker-tcp-server:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
     - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-tcp-server:$DOCKER_TAG
@@ -333,10 +320,10 @@ Build-TrackerTcpServer:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
     - changes:
-      - "frontend/**/*"
+      - Backend/**/*
+    - if: $TrueVar == "true"
       when: manual
       allow_failure: true
-    - when: always 
 
 Build-TrackerMessage:
   stage: build  
@@ -345,8 +332,8 @@ Build-TrackerMessage:
     - cd dir
     - git clone git@git.bioton-fms.ru:BioTon/fms.git .
     - git checkout ${CI_COMMIT_BRANCH}
-    - cp TrackerMessages/BioTonFMS.TrackerMessageHandler/Dockerfile .
-    - rm BioTonFMSApp/appsettings.Development.json BioTonFMSApp/appsettings.json
+    - cp Backend/TrackerMessages/BioTonFMS.TrackerMessageHandler/Dockerfile .
+    - rm Backend/BioTonFMSApp/appsettings.Development.json Backend/BioTonFMSApp/appsettings.json
     - docker build -t fms-tracker-message:$DOCKER_TAG .   
     - docker image tag fms-tracker-message:$DOCKER_TAG git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
     - docker image push git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
@@ -354,7 +341,7 @@ Build-TrackerMessage:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
     - changes:
-      - "frontend/**/*"
+      - Backend/**/*
+    - if: $TrueVar == "true"
       when: manual
-      allow_failure: true
-    - when: always 
+      allow_failure: true 
