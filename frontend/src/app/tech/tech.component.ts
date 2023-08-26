@@ -223,15 +223,21 @@ export default class TechComponent implements OnInit, OnDestroy {
       const techIDs = tech.map(({ id }) => id);
       const ids = new Set(techIDs);
 
+      let isDiverged: true | undefined;
+
       selected.forEach(id => {
         const hasTechID = ids.has(id);
 
         if (!hasTechID) {
           selected.delete(id);
+
+          isDiverged = true;
         }
       });
 
-      this.#options = { selected };
+      if (isDiverged) {
+        this.#options = { selected };
+      }
     }
   }
 
