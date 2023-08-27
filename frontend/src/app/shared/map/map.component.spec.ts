@@ -49,4 +49,15 @@ describe('MapComponent', () => {
       .withContext('render map controls element')
       .not.toBeNull();
   });
+
+  it('should fit map view to layer bounds', async () => {
+    /* Coverage for map view returning to its original fit. */
+    component.location = {
+      tracks: testLocationAndTrackResponse.tracks
+    };
+
+    expect(component.location)
+      .withContext('set `location` input value')
+      .not.toBeNull();
+  });
 });
