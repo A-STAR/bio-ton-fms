@@ -42,7 +42,27 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return query.ToList();
     }
 
-    public bool ExistsByUid(Guid uid) =>
+    public IList<TrackerMessage> GetMessagesForTrackers(int[] trackerExternalIds, bool forUpdate = false)
+    {
+        var query = forUpdate ? HydratedQuery : HydratedQuery.AsNoTracking();
+        query = query
+            .Where(m => trackerExternalIds.Contains(m.ExternalTrackerId))
+            .OrderBy(m => m.ExternalTrackerId)
+            .ThenBy(m => m.Id);
+        return query.ToList();
+    }
+
+    public IList<TrackerMessage> GetTrackerMessagesForDate(int externalTrackerId, DateOnly date)
+    {
+        var query = HydratedQuery.AsNoTracking();
+        query = query
+            .Where(m => m.ExternalTrackerId == externalTrackerId && DateOnly.FromDateTime(m.ServerDateTime) == date)
+            .OrderBy(m => m.ExternalTrackerId)
+            .ThenBy(m => m.Id);
+        return query.ToList();
+    }
+
+public bool ExistsByUid(Guid uid) =>
         QueryableProvider.Linq().AsNoTracking().Any(x => x.PackageUID == uid);
 
     public TrackerStandardParameters GetStandardParameters(int externalId)

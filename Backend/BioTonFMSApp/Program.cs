@@ -10,11 +10,11 @@ using BioTonFMS.Security.Controllers;
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Hosting;
 using BioTonFMS.TrackerProtocolSpecific;
+using BioTonFMSApp.Scheduler;
 using BioTonFMSApp.Startup;
 using BioTonFMSApp.Startup.Swagger;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("config/appsettings.json", true);
@@ -59,7 +59,8 @@ builder.Services
     .AddMappingProfiles()
     .RegisterInfrastructureComponents()
     .RegisterDataAccess()
-    .RegisterMessagesDataAccess();
+    .RegisterMessagesDataAccess()
+    .RegisterSchedulerJobs();
 
 builder.AddAuth();
 builder.AddValidation();
@@ -68,6 +69,8 @@ builder.AddSwagger();
 builder.ConfigureSerilog();
 
 var app = builder.Build();
+
+Scheduler.Init(app.Services);
 
 await app.ApplyMigrationsAsync(builder.Configuration);
 

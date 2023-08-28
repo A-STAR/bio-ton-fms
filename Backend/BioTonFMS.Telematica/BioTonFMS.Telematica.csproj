@@ -7,6 +7,49 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\TrackerMessages\1734-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\1734-messages.csv" />
+    <None Remove="Data\TrackerMessages\1822-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\1822-messages.csv" />
+    <None Remove="Data\TrackerMessages\1827-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\1827-messages.csv" />
+    <None Remove="Data\TrackerMessages\1834-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\1834-messages.csv" />
+    <None Remove="Data\TrackerMessages\2102-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\2102-messages.csv" />
+    <None Remove="Data\TrackerMessages\2703-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\2703-messages.csv" />
+    <None Remove="Data\TrackerMessages\2714-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\2714-messages.csv" />
+    <None Remove="Data\TrackerMessages\2717-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\2717-messages.csv" />
+    <None Remove="Data\TrackerMessages\3035-message-tags.csv" />
+    <None Remove="Data\TrackerMessages\3035-messages.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Data\TrackerMessages\1734-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\1734-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\1822-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\1822-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\1827-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\1827-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\1834-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\1834-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2102-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2102-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2703-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2703-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2714-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2714-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2717-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\2717-messages.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\3035-message-tags.csv" />
+    <EmbeddedResource Include="Data\TrackerMessages\3035-messages.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
   </ItemGroup>
