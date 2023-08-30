@@ -60,6 +60,7 @@ builder.Services
     .RegisterInfrastructureComponents()
     .RegisterDataAccess()
     .RegisterMessagesDataAccess()
+    .RegisterServices()
     .RegisterSchedulerJobs();
 
 builder.AddAuth();

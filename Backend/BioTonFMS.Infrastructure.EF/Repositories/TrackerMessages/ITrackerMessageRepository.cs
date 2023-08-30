@@ -14,7 +14,7 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 
     IList<TrackerMessage> GetMessagesForTrackers(int[] trackerExternalIds, bool forUpdate = false);
 
-    IList<TrackerMessage> GetTrackerMessagesForDate(int externalTrackerId, DateOnly date);
+    IList<TrackerMessage> GetTrackerMessagesForDate(int[] trackerExternalIds, DateOnly date, bool forUpdate = false);
 
     TrackerStandardParameters GetStandardParameters(int externalId);
 

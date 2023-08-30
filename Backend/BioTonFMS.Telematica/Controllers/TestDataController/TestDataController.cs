@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BioTonFMS.Domain;
 using BioTonFMS.Domain.Identity;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
@@ -14,16 +13,15 @@ using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.MessageProcessing;
 using BioTonFMS.Telematica.Data.Mapping;
-using Bogus.Bson;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
-using System.Text;
+using BioTonFMS.Common.Extensions;
+using BioTonFMS.Telematica.Services;
 
 namespace BioTonFMS.Telematica.Controllers.TestDataController;
 
@@ -48,6 +46,7 @@ public class TestDataController : ValidationControllerBase
     private readonly ITrackerMessageRepository _trackerMessageRepository;
     private readonly IVehicleGroupRepository _vehicleGroupRepository;
     private readonly IFuelTypeRepository _fuelTypeRepository;
+    private readonly MoveTestTrackerMessagesService _moveTestTrackerMessagesService;
     private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
 
@@ -60,6 +59,7 @@ public class TestDataController : ValidationControllerBase
         IVehicleRepository vehicleRepository, IUnitRepository unitRepository,
         ITrackerTagRepository trackerTagRepository, IVehicleGroupRepository vehicleGroupRepository,
         ITrackerMessageRepository trackerMessageRepository, IFuelTypeRepository fuelTypeRepository,
+        MoveTestTrackerMessagesService moveTestTrackerMessagesService,
         IMapper mapper)
     {
         _logger = logger;
@@ -74,6 +74,7 @@ public class TestDataController : ValidationControllerBase
         _trackerMessageRepository = trackerMessageRepository;
         _vehicleGroupRepository = vehicleGroupRepository;
         _fuelTypeRepository = fuelTypeRepository;
+        _moveTestTrackerMessagesService = moveTestTrackerMessagesService;
         _mapper = mapper;
     }
 
@@ -149,7 +150,6 @@ public class TestDataController : ValidationControllerBase
         return Ok();
     }
 
-
     /// <summary>
     /// Добавляет тестовые данные треков на сегодняшний день. 
     /// </summary>
@@ -188,7 +188,7 @@ public class TestDataController : ValidationControllerBase
             if (dataFileIndex > limit - 1)
                 continue;
             // Удаляем сообщения за текущий день
-            var todayMessages = _messageRepository.GetTrackerMessagesForDate(tracker.ExternalId, DateOnly.FromDateTime(DateTime.Today));
+            var todayMessages = _messageRepository.GetTrackerMessagesForDate(new int[] { tracker.ExternalId }, DateOnly.FromDateTime(DateTime.Today), false);
             foreach (var message in todayMessages)
             { 
                 _messageRepository.Remove(message);
@@ -216,15 +216,14 @@ public class TestDataController : ValidationControllerBase
 
                     var csvMessages = messageCsv.GetRecords<TrackerMessageCsv>().ToArray();
                     var csvTagsForMessages = tagsCsv.GetRecords<MessageTagCsv>().ToArray();
-                    //var messages = _mapper.Map<TrackerMessage[]>(csvMessages);
                     foreach (var csvMessage in csvMessages)
                     {
                         var message = _mapper.Map<TrackerMessage>(csvMessage);
 
-                        message.ServerDateTime = ToToday(message.ServerDateTime);
+                        message.ServerDateTime = message.ServerDateTime.ToToday();
                         if (message.TrackerDateTime is not null)
                         {
-                            message.TrackerDateTime = ToToday(message.TrackerDateTime.Value);
+                            message.TrackerDateTime = message.TrackerDateTime.Value.ToToday();
                         }
                         message.ExternalTrackerId = tracker.ExternalId;
                         message.Imei = tracker.Imei;
@@ -242,12 +241,6 @@ public class TestDataController : ValidationControllerBase
         return Ok();
     }
 
-    private DateTime ToToday(DateTime dateTime)
-    {
-        var now = DateTime.UtcNow;
-        return now.Add(-now.TimeOfDay).Add(dateTime.TimeOfDay).ToUniversalTime();
-    }
-
     private static void SetNullableOptions(CsvReader messageCsv)
     {
         messageCsv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().NullValues.Add("NULL");
@@ -256,6 +249,22 @@ public class TestDataController : ValidationControllerBase
         messageCsv.Context.TypeConverterOptionsCache.GetOptions<CoordCorrectnessEnum?>().NullValues.Add("NULL");
         messageCsv.Context.TypeConverterOptionsCache.GetOptions<byte?>().NullValues.Add("NULL");
         messageCsv.Context.TypeConverterOptionsCache.GetOptions<bool?>().NullValues.Add("NULL");
+    }
+
+    /// <summary>
+    /// Сдвигает тестовые данные треков на сегодняшний день. 
+    /// </summary>
+    /// <remarks>Это чисто отладочный метод. Поэтому тут нет обработки ошибок. В случае неудачи всегда возвращается статус 500</remarks>
+    /// <response code="200">Данные успешно обновлены</response>
+    /// <response code="500">Внутренняя ошибка сервиса</response>
+    [HttpPost("debug/move-test-messages-to-today/{fromDate}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult MoveTestMessagesToToday(DateTime fromDate)
+    {
+        _moveTestTrackerMessagesService.MoveTestTrackerMessagesForToday(DateOnly.FromDateTime(fromDate.Add(fromDate.TimeOfDay)));
+
+        return Ok();
     }
 
     /// <summary>
