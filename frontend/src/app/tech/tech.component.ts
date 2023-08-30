@@ -13,6 +13,7 @@ import {
   BehaviorSubject,
   Observable,
   Subscription,
+  debounce,
   debounceTime,
   defer,
   distinctUntilChanged,
@@ -22,10 +23,11 @@ import {
   skipWhile,
   startWith,
   switchMap,
-  tap
+  tap,
+  timer
 } from 'rxjs';
 
-import { MonitoringVehicle, TechService, VehicleMonitoringInfo } from './tech.service';
+import { LocationAndTrackResponse, LocationOptions, MonitoringVehicle, TechService, VehicleMonitoringInfo } from './tech.service';
 import { Tracker } from '../directory-tech/tracker.service';
 
 import { StopClickPropagationDirective } from '../shared/stop-click-propagation/stop-click-propagation.directive';
@@ -69,7 +71,7 @@ export default class TechComponent implements OnInit, OnDestroy {
     return this.searchForm
       .get('search')!
       .valueChanges.pipe(
-        debounceTime(SEARCH_DEBOUNCE_DUE_TIME),
+        debounceTime(DEBOUNCE_DUE_TIME),
         map(searchValue => searchValue
           ?.trim()
           ?.toLocaleLowerCase()
@@ -98,6 +100,7 @@ export default class TechComponent implements OnInit, OnDestroy {
   }
 
   protected tech$!: Observable<MonitoringTech[]>;
+  protected location$!: Observable<LocationAndTrackResponse>;
   protected searchForm!: TechSearchForm;
   protected expandedPanelTechID?: MonitoringTech['id'];
   protected techInfo?: TechMonitoringInfo;
@@ -167,7 +170,7 @@ export default class TechComponent implements OnInit, OnDestroy {
   /**
    * Get, set tech monitoring information.
    *
-   * Toggle tech panel, save expanded panel tech ID.
+   * Toggle tech panel, check tech, save expanded panel tech ID.
    *
    * @param panel `MatExpansionPanel` instance.
    * @param id `MonitoringTech` ID.
@@ -183,10 +186,20 @@ export default class TechComponent implements OnInit, OnDestroy {
       panel.toggle();
 
       this.expandedPanelTechID = undefined;
+
+      this.#location$.next();
     } else {
       this.#techInfoSubscription = this.techService
         .getVehicleInfo(id)
         .subscribe(info => {
+          const {
+            selected = new Set()
+          } = this.#options;
+
+          selected.add(id);
+
+          this.#options = { selected };
+
           this.expandedPanelTechID = id;
           this.techInfo = info;
 
@@ -195,6 +208,7 @@ export default class TechComponent implements OnInit, OnDestroy {
     }
   }
 
+  #location$ = new BehaviorSubject<void>(undefined);
   #options$ = new BehaviorSubject<TechOptions>({});
   #techInfoSubscription: Subscription | undefined;
 
@@ -219,20 +233,39 @@ export default class TechComponent implements OnInit, OnDestroy {
       const techIDs = tech.map(({ id }) => id);
       const ids = new Set(techIDs);
 
+      let isDiverged: true | undefined;
+
       selected.forEach(id => {
         const hasTechID = ids.has(id);
 
         if (!hasTechID) {
           selected.delete(id);
+
+          isDiverged = true;
         }
       });
 
-      this.#options = { selected };
+      if (isDiverged) {
+        this.#options = { selected };
+      }
     }
   }
 
   /**
-   * Get and set tech.
+   * Set tech location and track.
+   */
+  #setLocations() {
+    this.location$ = this.#location$.pipe(
+      switchMap(() => this.#options$),
+      debounce(() => timer(DEBOUNCE_DUE_TIME)),
+      skipWhile(({ selected }) => selected === undefined),
+      map(({ selected }) => Array.from(selected!, (vehicleId): LocationOptions => ({ vehicleId }))),
+      switchMap(options => this.techService.getVehiclesLocationAndTrack(options))
+    );
+  }
+
+  /**
+   * Set tech, update location, tech info.
    *
    * Update tech info.
    */
@@ -282,6 +315,9 @@ export default class TechComponent implements OnInit, OnDestroy {
       switchMap(searchQuery => timer$.pipe(
         switchMap(() => searchQuery ? searchTech(searchQuery) : tech$)
       )),
+      tap(() => {
+        this.#location$.next();
+      }),
       switchMap(tech => updateTechInfo(tech))
     );
   }
@@ -291,6 +327,7 @@ export default class TechComponent implements OnInit, OnDestroy {
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#initSearchForm();
+    this.#setLocations();
     this.#setTech();
   }
 
@@ -315,4 +352,5 @@ export type TechMonitoringInfo = VehicleMonitoringInfo;
 export const POLL_INTERVAL_PERIOD = 5000;
 
 export const SEARCH_MIN_LENGTH = 3;
-export const SEARCH_DEBOUNCE_DUE_TIME = 500;
+
+export const DEBOUNCE_DUE_TIME = 500;

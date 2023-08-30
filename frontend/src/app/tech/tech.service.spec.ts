@@ -3,6 +3,9 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import {
   ConnectionStatus,
+  LocationAndTrackRequest,
+  LocationAndTrackResponse,
+  LocationOptions,
   MonitoringVehicle,
   MonitoringVehiclesOptions,
   MovementStatus,
@@ -69,6 +72,81 @@ describe('TechService', () => {
     vehiclesRequest = httpTestingController.expectOne('/api/telematica/monitoring/vehicles', 'vehicles request');
 
     vehiclesRequest.flush(testMonitoringVehicles);
+  });
+
+  it('should get vehicles location and track', (done: DoneFn) => {
+    let vehiclesOptions: LocationOptions[] = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id
+    }));
+
+    const subscription = service
+      .getVehiclesLocationAndTrack(vehiclesOptions)
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get vehicles location without track')
+          .toEqual(testLocationAndTrackResponse);
+      });
+
+    let date = new Date();
+
+    date.setHours(0, 0, 0, 0);
+
+    let todayStart = date.toISOString();
+
+    let vehiclesLocationAndTrackRequest = httpTestingController.expectOne(
+      `/api/telematica/monitoring/locations-and-tracks?trackStartTime=${todayStart}`,
+      'vehicles location and track request'
+    );
+
+    let body = vehiclesOptions.map<LocationAndTrackRequest>(({ vehicleId, needReturnTrack }) => ({
+      vehicleId,
+      needReturnTrack: needReturnTrack ?? false
+    }));
+
+    expect(vehiclesLocationAndTrackRequest.request.body)
+      .withContext('valid request body')
+      .toEqual(body);
+
+    vehiclesLocationAndTrackRequest.flush(testLocationAndTrackResponse);
+
+    subscription.unsubscribe();
+
+    vehiclesOptions = vehiclesOptions.map(({ vehicleId }) => ({
+      vehicleId,
+      needReturnTrack: false
+    }));
+
+    service
+      .getVehiclesLocationAndTrack(vehiclesOptions)
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get vehicles location without track')
+          .toEqual(testLocationAndTrackResponse);
+
+        done();
+      });
+
+    date = new Date();
+
+    date.setHours(0, 0, 0, 0);
+
+    todayStart = date.toISOString();
+
+    vehiclesLocationAndTrackRequest = httpTestingController.expectOne(
+      `/api/telematica/monitoring/locations-and-tracks?trackStartTime=${todayStart}`,
+      'vehicles location and track request'
+    );
+
+    body = vehiclesOptions.map<LocationAndTrackRequest>(({ vehicleId, needReturnTrack }) => ({
+      vehicleId,
+      needReturnTrack: needReturnTrack ?? false
+    }));
+
+    expect(vehiclesLocationAndTrackRequest.request.body)
+      .withContext('valid request body')
+      .toEqual(body);
+
+    vehiclesLocationAndTrackRequest.flush(testLocationAndTrackResponse);
   });
 
   it('should get found vehicles', (done: DoneFn) => {
@@ -185,6 +263,32 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
     }
   }
 ];
+
+export const testLocationAndTrackResponse: LocationAndTrackResponse = {
+  viewBounds: {
+    upperLeftLatitude: 78.7459290635374,
+    upperLeftLongitude: -135.53042265952553,
+    bottomRightLatitude: 23.55172712040085,
+    bottomRightLongitude: 84.4637669364749
+  },
+  tracks: [
+    {
+      vehicleId: testMonitoringVehicles[0].id,
+      latitude: 26.060554481452513,
+      longitude: -127.30375742553639
+    },
+    {
+      vehicleId: testMonitoringVehicles[1].id,
+      latitude: 76.23710170248575,
+      longitude: -59.131765227269284
+    },
+    {
+      vehicleId: testMonitoringVehicles[2].id,
+      latitude: 35.029863049401996,
+      longitude: 37.22954725424654
+    }
+  ]
+};
 
 export const testFindCriterion = testMonitoringVehicles[0].name.substring(0, SEARCH_MIN_LENGTH);
 
