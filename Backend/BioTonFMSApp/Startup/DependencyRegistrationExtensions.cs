@@ -16,6 +16,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Persistence.Providers;
+using BioTonFMSApp.Scheduler;
 
 namespace BioTonFMSApp.Startup;
 
@@ -107,4 +108,12 @@ public static class DependencyRegistrationExtensions
 
         return services;
     }
+
+    public static IServiceCollection RegisterSchedulerJobs(this IServiceCollection services)
+    {
+        services.AddTransient<MoveTestTrackerMessagesJob, MoveTestTrackerMessagesJob>();
+
+        return services;
+    }
+    
 }

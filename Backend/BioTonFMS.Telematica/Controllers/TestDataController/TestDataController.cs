@@ -1,4 +1,6 @@
-﻿using BioTonFMS.Domain.Identity;
+﻿using AutoMapper;
+using BioTonFMS.Domain;
+using BioTonFMS.Domain.Identity;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.FuelTypes;
@@ -11,11 +13,17 @@ using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.MessageProcessing;
+using BioTonFMS.Telematica.Data.Mapping;
+using Bogus.Bson;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
+using System.Text;
 
 namespace BioTonFMS.Telematica.Controllers.TestDataController;
 
@@ -40,6 +48,7 @@ public class TestDataController : ValidationControllerBase
     private readonly ITrackerMessageRepository _trackerMessageRepository;
     private readonly IVehicleGroupRepository _vehicleGroupRepository;
     private readonly IFuelTypeRepository _fuelTypeRepository;
+    private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
 
     private bool ServiceEnabled => _configuration["TestDataEnabled"] == "True";
@@ -50,7 +59,8 @@ public class TestDataController : ValidationControllerBase
         ITrackerRepository trackerRepository, ISensorTypeRepository sensorTypeRepository,
         IVehicleRepository vehicleRepository, IUnitRepository unitRepository,
         ITrackerTagRepository trackerTagRepository, IVehicleGroupRepository vehicleGroupRepository,
-        ITrackerMessageRepository trackerMessageRepository, IFuelTypeRepository fuelTypeRepository)
+        ITrackerMessageRepository trackerMessageRepository, IFuelTypeRepository fuelTypeRepository,
+        IMapper mapper)
     {
         _logger = logger;
         _userManager = userManager;
@@ -64,6 +74,7 @@ public class TestDataController : ValidationControllerBase
         _trackerMessageRepository = trackerMessageRepository;
         _vehicleGroupRepository = vehicleGroupRepository;
         _fuelTypeRepository = fuelTypeRepository;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -136,6 +147,115 @@ public class TestDataController : ValidationControllerBase
         }
 
         return Ok();
+    }
+
+
+    /// <summary>
+    /// Добавляет тестовые данные треков на сегодняшний день. 
+    /// </summary>
+    /// <remarks>Это чисто отладочный метод. Поэтому тут нет обработки ошибок. В случае неудачи всегда возвращается статус 500</remarks>
+    /// <response code="200">Данные успешно добавлены в базу</response>
+    /// <response code="500">Внутренняя ошибка сервиса</response>
+    [HttpPost("debug/add-tracks-for-today/{limit:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult AddTestTrackDataForToday(int limit = 10)
+    {
+        var dataFiles = new List<(string MessageFile, string TagsFile)>()
+        {
+            ("1734-messages.csv", "1734-message-tags.csv"),
+            ("1822-messages.csv", "1822-message-tags.csv"),
+            ("1827-messages.csv", "1827-message-tags.csv"),
+            ("1834-messages.csv", "1834-message-tags.csv"),
+            ("2102-messages.csv", "2102-message-tags.csv"),
+            ("2703-messages.csv", "2703-message-tags.csv"),
+            ("2714-messages.csv", "2714-message-tags.csv"),
+            ("2717-messages.csv", "2717-message-tags.csv"),
+            ("3035-messages.csv", "3035-message-tags.csv")
+
+        }.ToArray();
+
+        var trackers = _trackerRepository.GetTrackers(new TrackersFilter()
+        {
+            PageSize = 100000
+        }, forUpdate: true);
+
+        var dataFileIndex = 0;
+        foreach (var tracker in trackers.Results)
+        {
+            if (tracker.Id >= 0)
+                continue;
+            if (dataFileIndex > limit - 1)
+                continue;
+            // Удаляем сообщения за текущий день
+            var todayMessages = _messageRepository.GetTrackerMessagesForDate(tracker.ExternalId, DateOnly.FromDateTime(DateTime.Today));
+            foreach (var message in todayMessages)
+            { 
+                _messageRepository.Remove(message);
+            }
+
+            if (dataFileIndex < dataFiles.Length -1)
+            {
+                var dataFile = dataFiles[dataFileIndex];
+
+                MemoryStream stream = new MemoryStream();
+
+                var type = GetType();
+                var messageFileName = @"BioTonFMS.Telematica.Data.TrackerMessages." + dataFile.MessageFile;
+                var tagsFileName = @"BioTonFMS.Telematica.Data.TrackerMessages." + dataFile.TagsFile;
+
+                var resources = type.Assembly.GetManifestResourceNames();
+
+                using (var messageFileStreamReader = new StreamReader(type.Assembly.GetManifestResourceStream(messageFileName)))
+                using (var tagsFileStreamReader = new StreamReader(type.Assembly.GetManifestResourceStream(tagsFileName)))
+                using (var messageCsv = new CsvReader(messageFileStreamReader, CultureInfo.InvariantCulture))
+                using (var tagsCsv = new CsvReader(tagsFileStreamReader, CultureInfo.InvariantCulture))
+                {
+                    SetNullableOptions(messageCsv);
+                    SetNullableOptions(tagsCsv);
+
+                    var csvMessages = messageCsv.GetRecords<TrackerMessageCsv>().ToArray();
+                    var csvTagsForMessages = tagsCsv.GetRecords<MessageTagCsv>().ToArray();
+                    //var messages = _mapper.Map<TrackerMessage[]>(csvMessages);
+                    foreach (var csvMessage in csvMessages)
+                    {
+                        var message = _mapper.Map<TrackerMessage>(csvMessage);
+
+                        message.ServerDateTime = ToToday(message.ServerDateTime);
+                        if (message.TrackerDateTime is not null)
+                        {
+                            message.TrackerDateTime = ToToday(message.TrackerDateTime.Value);
+                        }
+                        message.ExternalTrackerId = tracker.ExternalId;
+                        message.Imei = tracker.Imei;
+                        var csvMessageTags = csvTagsForMessages.Where(t => t.TrackerMessageId == csvMessage.Id);
+                        var messageTags = csvMessageTags.ConvertToMessageTags(message);
+                        message.Tags = messageTags;
+                        _trackerMessageRepository.Add(message);
+                    }
+                }
+
+                dataFileIndex++;
+            }
+        }
+
+        return Ok();
+    }
+
+    private DateTime ToToday(DateTime dateTime)
+    {
+        var now = DateTime.UtcNow;
+        return now.Add(-now.TimeOfDay).Add(dateTime.TimeOfDay).ToUniversalTime();
+    }
+
+    private static void SetNullableOptions(CsvReader messageCsv)
+    {
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<double?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<int?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<CoordCorrectnessEnum?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<byte?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<bool?>().NullValues.Add("NULL");
     }
 
     /// <summary>
