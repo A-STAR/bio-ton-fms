@@ -16,6 +16,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.Units;
 using BioTonFMS.Infrastructure.EF.Repositories.VehicleGroups;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Infrastructure.Persistence.Providers;
+using BioTonFMS.Telematica.Services;
 using BioTonFMSApp.Scheduler;
 
 namespace BioTonFMSApp.Startup;
@@ -105,6 +106,13 @@ public static class DependencyRegistrationExtensions
         services.AddTransient<IKeyValueProvider<TrackerMessage, int>, KeyValueProvider<TrackerMessage, MessagesDBContext, int>>();
         services.AddTransient<IQueryableProvider<TrackerMessage>, QueryableProvider<TrackerMessage, MessagesDBContext>>();
         services.AddTransient<ITrackerMessageRepository, TrackerMessageRepository>();
+
+        return services;
+    }
+
+    public static IServiceCollection RegisterServices(this IServiceCollection services)
+    {
+        services.AddTransient<MoveTestTrackerMessagesService, MoveTestTrackerMessagesService>();
 
         return services;
     }

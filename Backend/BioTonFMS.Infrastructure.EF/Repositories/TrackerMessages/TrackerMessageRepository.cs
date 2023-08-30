@@ -52,17 +52,17 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return query.ToList();
     }
 
-    public IList<TrackerMessage> GetTrackerMessagesForDate(int externalTrackerId, DateOnly date)
+    public IList<TrackerMessage> GetTrackerMessagesForDate(int[] trackerExternalIds, DateOnly date, bool forUpdate = false)
     {
-        var query = HydratedQuery.AsNoTracking();
+        var query = forUpdate ? HydratedQuery : HydratedQuery.AsNoTracking();
         query = query
-            .Where(m => m.ExternalTrackerId == externalTrackerId && DateOnly.FromDateTime(m.ServerDateTime) == date)
+            .Where(m => trackerExternalIds.Contains(m.ExternalTrackerId) && DateOnly.FromDateTime(m.ServerDateTime) == date)
             .OrderBy(m => m.ExternalTrackerId)
             .ThenBy(m => m.Id);
         return query.ToList();
     }
 
-public bool ExistsByUid(Guid uid) =>
+    public bool ExistsByUid(Guid uid) =>
         QueryableProvider.Linq().AsNoTracking().Any(x => x.PackageUID == uid);
 
     public TrackerStandardParameters GetStandardParameters(int externalId)
