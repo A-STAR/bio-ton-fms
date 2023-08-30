@@ -12,6 +12,7 @@ import { Feature, FeatureCollection, Point } from 'geojson';
 import { getIcon } from '@nextgis/icons';
 
 import { LocationAndTrackResponse } from '../../tech/tech.service';
+import { MonitoringTech } from '../../tech/tech.component';
 
 import { environment } from '../../../environments/environment';
 
@@ -26,12 +27,24 @@ import { environment } from '../../../environments/environment';
 export class MapComponent implements OnInit {
   @Input() set location(location: LocationAndTrackResponse | null) {
     if (location) {
+      this.#location = location;
+
       this.#setLocationLayer(location);
       this.#fitView(location);
     }
   }
 
+  @Input() set point(id: MonitoringTech['id'] | undefined) {
+    this.#point = id;
+
+    if (id) {
+      this.#pointMap();
+    }
+  }
+
   #map!: WebMap<MapAdapter, MainLayerAdapter>;
+  #location?: LocationAndTrackResponse;
+  #point?: MonitoringTech['id'];
 
   /**
    * Add map fullscreen control.
@@ -155,6 +168,19 @@ export class MapComponent implements OnInit {
   }
 
   /**
+   * Set map view center to the point.
+   */
+  #pointMap() {
+    const track = this.#location?.tracks.find(({ vehicleId }) => vehicleId === this.#point);
+
+    if (track) {
+      const coordinates: LngLatArray = [track.longitude, track.latitude];
+
+      this.#map?.setCenter(coordinates);
+    }
+  }
+
+  /**
    * Set a map view to the given geographical bounds or fit by default field layer bounds.
    *
    * @param location Location and tracks.
@@ -171,6 +197,10 @@ export class MapComponent implements OnInit {
       const bounds: LngLatBoundsArray = [west, south, east, north];
 
       this.#map?.fitBounds(bounds, FIT_OPTIONS);
+
+      if (this.#point) {
+        this.#pointMap();
+      }
     } else {
       this.#map?.fitLayer(FIELD_LAYER_DEFINITION, FIT_OPTIONS);
     }

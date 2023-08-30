@@ -554,6 +554,8 @@ describe('TechComponent', () => {
         .withContext('render `bio-tech-monitoring-info` component `info` input value')
         .toBe(testVehicleMonitoringInfo);
     });
+
+    discardPeriodicTasks();
   }));
 
   it('should toggle tech panels', fakeAsync(async () => {
@@ -592,6 +594,11 @@ describe('TechComponent', () => {
 
         expect(vehicleInfoSpy)
           .not.toHaveBeenCalled();
+
+        tick(DEBOUNCE_DUE_TIME);
+
+        expect(locationAndTrackSpy)
+          .toHaveBeenCalled();
       } else {
         expect(vehicleInfoSpy)
           .toHaveBeenCalledWith(testMonitoringVehicles[index].id);
@@ -631,6 +638,8 @@ describe('TechComponent', () => {
     await testTogglePanel(2);
     await testTogglePanel(2);
     await testTogglePanel(0);
+
+    discardPeriodicTasks();
   }));
 
   it('should persist tech panel state', fakeAsync(async () => {

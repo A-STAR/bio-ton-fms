@@ -170,7 +170,7 @@ export default class TechComponent implements OnInit, OnDestroy {
   /**
    * Get, set tech monitoring information.
    *
-   * Toggle tech panel, save expanded panel tech ID.
+   * Toggle tech panel, check tech, save expanded panel tech ID.
    *
    * @param panel `MatExpansionPanel` instance.
    * @param id `MonitoringTech` ID.
@@ -186,10 +186,20 @@ export default class TechComponent implements OnInit, OnDestroy {
       panel.toggle();
 
       this.expandedPanelTechID = undefined;
+
+      this.#location$.next();
     } else {
       this.#techInfoSubscription = this.techService
         .getVehicleInfo(id)
         .subscribe(info => {
+          const {
+            selected = new Set()
+          } = this.#options;
+
+          selected.add(id);
+
+          this.#options = { selected };
+
           this.expandedPanelTechID = id;
           this.techInfo = info;
 

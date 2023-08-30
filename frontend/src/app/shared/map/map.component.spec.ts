@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MapComponent } from './map.component';
 
-import { testLocationAndTrackResponse } from '../../tech/tech.service.spec';
+import { testLocationAndTrackResponse, testMonitoringVehicles } from '../../tech/tech.service.spec';
 
 describe('MapComponent', () => {
   let component: MapComponent;
@@ -59,5 +59,17 @@ describe('MapComponent', () => {
     expect(component.location)
       .withContext('set `location` input value')
       .not.toBeNull();
+  });
+
+  it('should point map view', async () => {
+    /* Coverage for map view setting to the point. */
+    component.point = testMonitoringVehicles[0].id;
+
+    expect(component.point)
+      .withContext('set `point` input value')
+      .not.toBeNull();
+
+    /* Coverage for map view returning to the point after updating location bounds. */
+    component.location = testLocationAndTrackResponse;
   });
 });
