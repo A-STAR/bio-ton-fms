@@ -1,39 +1,65 @@
 <dl *ngIf="info.generalInfo as info">
   <div>
     <dt>Последняя точка:</dt>
-    <dd><span>{{ info.lastMessageTime | relativeTime }}</span></dd>
-    <dd><span>{{ info.lastMessageTime | date }}</span></dd>
+
+    <dd>
+      <ng-container *ngIf="info.lastMessageTime; else default">{{ info.lastMessageTime | relativeTime }}</ng-container>
+    </dd>
+
+    <ng-container *ngIf="info.lastMessageTime">
+      <dd>{{ info.lastMessageTime | date }}</dd>
+    </ng-container>
   </div>
 
   <div>
     <dt>Скорость</dt>
-    <dd>{{ info.speed | number:'1.1-1':'en-US' }} км/ч</dd>
+
+    <dd>
+      <ng-container *ngIf="info.speed; else default">{{ info.speed | number:'1.1-1':'en-US' }} км/ч</ng-container>
+    </dd>
   </div>
 
   <div>
     <dt>Пробег</dt>
-    <dd>{{ info.mileage | number:'1.0-0' }} км</dd>
+
+    <dd>
+      <ng-container *ngIf="info.mileage; else default">{{ info.mileage | number:'1.0-0' }} км</ng-container>
+    </dd>
   </div>
 
   <div>
     <dt>Моточасы</dt>
-    <dd>{{ info.engineHours }} ч</dd>
+
+    <dd>
+      <ng-container *ngIf="info.engineHours; else default">{{ info.engineHours }} ч</ng-container>
+    </dd>
   </div>
 
   <div>
     <dt>Спутники</dt>
-    <dd>{{ info.satellitesNumber }}</dd>
+
+    <dd>
+      <ng-container *ngIf="info.satellitesNumber; else default">{{ info.satellitesNumber }}</ng-container>
+    </dd>
   </div>
 
   <div>
     <dt>Координаты</dt>
 
     <dd>
-      <span>ш: {{ info.latitude | number: '1.6-6':'en-US' }}&deg;</span>
-      <span>д: {{ info.longitude | number: '1.6-6':'en-US' }}&deg;</span>
+      <ng-container *ngIf="info.latitude || info.longitude; else default">
+        <span>
+          <ng-container *ngIf="info.latitude; else default">ш: {{ info.latitude | number: '1.6-6':'en-US' }}&deg;</ng-container>
+        </span>
+        <span>
+          <ng-container *ngIf="info.longitude; else default">д: {{ info.longitude | number: '1.6-6':'en-US' }}&deg;</ng-container>
+        </span>
+      </ng-container>
     </dd>
   </div>
 </dl>
+
+<ng-template #default>-</ng-template>
 
 <ng-container *ngIf="info.trackerInfo.sensors as sensors">
   <h1>Значения датчиков</h1>
@@ -52,17 +78,17 @@
   <h1>Настройки подключения</h1>
 
   <dl>
-      <dt>Тип устройства:</dt>
-      <dd>{{ tracker.trackerType }}</dd>
+    <dt>Тип устройства:</dt>
+    <dd>{{ tracker.trackerType }}</dd>
 
-      <dt>Уникальный ID:</dt>
-      <dd>{{ tracker.externalId }}</dd>
+    <dt>Уникальный ID:</dt>
+    <dd>{{ tracker.externalId }}</dd>
 
-      <dt>Телефон:</dt>
-      <dd>{{ tracker.simNumber.slice(0, 2) + '&nbsp;(' + tracker.simNumber.slice(2, 5) + ')&nbsp;' + tracker.simNumber.slice(4) }}</dd>
+    <dt>Телефон:</dt>
+    <dd>{{ tracker.simNumber.slice(0, 2) + '&nbsp;(' + tracker.simNumber.slice(2, 5) + ')&nbsp;' + tracker.simNumber.slice(4) }}</dd>
 
-      <dt>IMEI:</dt>
-      <dd>{{ tracker.imei }}</dd>
+    <dt>IMEI:</dt>
+    <dd>{{ tracker.imei }}</dd>
   </dl>
 </ng-container>
 
