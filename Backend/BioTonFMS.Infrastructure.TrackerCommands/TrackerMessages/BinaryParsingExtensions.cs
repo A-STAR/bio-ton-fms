@@ -68,8 +68,8 @@ internal static class BinaryParsingExtensions
 
         var coords = new Coordinates
         {
-            Longitude = ParseToInt(bytes[1..5]) / (double)1000000,
-            Latitude = ParseToInt(bytes[5..]) / (double)1000000,
+            Latitude = ParseToInt(bytes[1..5]) / (double)1000000,
+            Longitude = ParseToInt(bytes[5..]) / (double)1000000,
             SatNumber = bytes[0] & 0b00001111,
             Correctness = (CoordCorrectnessEnum)((bytes[0] & 0b11110000) >> 4)
         };

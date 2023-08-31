@@ -79,8 +79,8 @@ public class GalileoskyMessageParserTests
                             TrackerDateTime = new DateTime(638071130320000000),
                             SatNumber = 12,
                             CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-                            Longitude = 52556861 / (double)1000000,
-                            Latitude = 49432023 / (double)1000000,
+                            Longitude = 49432023 / (double)1000000,
+                            Latitude = 52556861 / (double)1000000,
                             Speed = 0,
                             Direction = 28 / (double)10,
                             Altitude = 97,
@@ -152,12 +152,12 @@ public class GalileoskyMessageParserTests
                                 new MessageTagDouble()
                                 {
                                     TrackerTagId = TagsSeed.LatitudeId,
-                                    Value = 49.432023000000001
+                                    Value = 52.556860999999998
                                 },
                                 new MessageTagDouble()
                                 {
                                     TrackerTagId = TagsSeed.LongitudeId,
-                                    Value = 52.556860999999998
+                                    Value = 49.432023000000001
                                 },
                                 new MessageTagInteger()
                                 {
@@ -217,8 +217,8 @@ public class GalileoskyMessageParserTests
                             TrackerDateTime = new DateTime(638071130200000000),
                             SatNumber = 12,
                             CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-                            Longitude = 52556861 / (double)1000000,
-                            Latitude = 49432023 / (double)1000000,
+                            Longitude = 49432023 / (double)1000000,
+                            Latitude = 52556861 / (double)1000000,
                             Speed = 0,
                             Direction = 28 / (double)10,
                             Altitude = 97,
@@ -290,12 +290,12 @@ public class GalileoskyMessageParserTests
                                 new MessageTagDouble()
                                 {
                                     TrackerTagId = TagsSeed.LatitudeId,
-                                    Value = 49.432023000000001
+                                    Value = 52.556860999999998
                                 },
                                 new MessageTagDouble()
                                 {
                                     TrackerTagId = TagsSeed.LongitudeId,
-                                    Value = 52.556860999999998
+                                    Value = 49.432023000000001
                                 },
                                 new MessageTagInteger()
                                 {
