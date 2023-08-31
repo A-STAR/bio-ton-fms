@@ -91,7 +91,7 @@ function mockTestTech(component: TechMonitoringStateComponent,
  * @param fixture `ComponentFixture` of `TechMonitoringStateComponent` test component.
  * @param loader `HarnessLoader` instance.
  * @param relativeTimePipe `RelativeTimePipe` instance.
- * @param testTech Test tech.
+ * @param testTech Test `MonitoringTech`.
  *
  * @returns `Promise` of `void` state rendering test.
  */

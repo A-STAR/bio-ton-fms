@@ -13,6 +13,7 @@ import { TechMonitoringInfoComponent } from './tech-monitoring-info.component';
 
 import { dateFormat } from '../../../../directory-tech/trackers/trackers.component.spec';
 import { testVehicleMonitoringInfo } from '../../../../../app/tech/tech.service.spec';
+import { TechMonitoringInfo } from '../../../tech.component';
 
 describe('TechMonitoringInfoComponent', () => {
   let component: TechMonitoringInfoComponent;
@@ -43,9 +44,6 @@ describe('TechMonitoringInfoComponent', () => {
     loader = TestbedHarnessEnvironment.loader(fixture);
 
     component = fixture.componentInstance;
-    component.info = testVehicleMonitoringInfo;
-
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -54,6 +52,8 @@ describe('TechMonitoringInfoComponent', () => {
   });
 
   it('should render basic info', () => {
+    mockTestInfo(component, fixture, testVehicleMonitoringInfo);
+
     const relativeTimePipe = TestBed.inject(RelativeTimePipe);
 
     const descriptionListDe = fixture.debugElement.query(
@@ -119,7 +119,86 @@ describe('TechMonitoringInfoComponent', () => {
     });
   });
 
+  it('should render basic info longitude defaults', () => {
+    const testInfo = {
+      ...testVehicleMonitoringInfo,
+      generalInfo: {
+        latitude: testVehicleMonitoringInfo.generalInfo.latitude
+      }
+    };
+
+    mockTestInfo(component, fixture, testInfo);
+
+    const descriptionDetailsSpanDes = fixture.debugElement.queryAll(
+      By.css('dl div:last-of-type > dd span')
+    );
+
+    expect(descriptionDetailsSpanDes[0].nativeElement.textContent)
+      .withContext('render description details latitude text')
+      .toBe(`ш: ${formatNumber(testVehicleMonitoringInfo.generalInfo.latitude!, 'en-US', '1.6-6')}°`);
+
+    expect(descriptionDetailsSpanDes[1].nativeElement.textContent)
+      .withContext('render description details longitude text')
+      .toBe('-');
+  });
+
+  it('should render basic info latitude defaults', () => {
+    const testInfo = {
+      ...testVehicleMonitoringInfo,
+      generalInfo: {
+        longitude: testVehicleMonitoringInfo.generalInfo.longitude
+      }
+    };
+
+    mockTestInfo(component, fixture, testInfo);
+
+    const descriptionDetailsSpanDes = fixture.debugElement.queryAll(
+      By.css('dl div:last-of-type > dd span')
+    );
+
+    expect(descriptionDetailsSpanDes[0].nativeElement.textContent)
+      .withContext('render description details latitude default text')
+      .toBe('-');
+
+    expect(descriptionDetailsSpanDes[1].nativeElement.textContent)
+      .withContext('render description details longitude text')
+      .toBe(`д: ${formatNumber(testVehicleMonitoringInfo.generalInfo.longitude!, 'en-US', '1.6-6')}°`);
+  });
+
+  it('should render basic info defaults', () => {
+    const testInfo = {
+      ...testVehicleMonitoringInfo,
+      generalInfo: {}
+    };
+
+    mockTestInfo(component, fixture, testInfo);
+
+    const descriptionListDe = fixture.debugElement.query(
+      By.css('dl')
+    );
+
+    const descriptionTermDes = descriptionListDe.queryAll(
+      By.css('dt')
+    );
+
+    const descriptionDetailsDes = descriptionListDe.queryAll(
+      By.css('dd')
+    );
+
+    expect(descriptionDetailsDes.length)
+      .withContext('render description detail elements')
+      .toBe(descriptionTermDes.length);
+
+    descriptionTermDes.forEach((_, index) => {
+      expect(descriptionDetailsDes[index].nativeElement.textContent)
+        .withContext('render description details default text')
+        .toBe('-');
+    });
+  });
+
   it('should render sensors info', () => {
+    mockTestInfo(component, fixture, testVehicleMonitoringInfo);
+
     const headingDe = fixture.debugElement.query(
       By.css('h1')
     );
@@ -162,6 +241,8 @@ describe('TechMonitoringInfoComponent', () => {
   });
 
   it('should render tracker info', () => {
+    mockTestInfo(component, fixture, testVehicleMonitoringInfo);
+
     const headingDe = fixture.debugElement.query(
       By.css('h1:nth-of-type(2)')
     );
@@ -219,6 +300,8 @@ describe('TechMonitoringInfoComponent', () => {
   });
 
   it('should render parameters info', async () => {
+    mockTestInfo(component, fixture, testVehicleMonitoringInfo);
+
     const headingDe = fixture.debugElement.query(
       By.css('h1:nth-of-type(3)')
     );
@@ -270,3 +353,20 @@ describe('TechMonitoringInfoComponent', () => {
     });
   });
 });
+
+/**
+ * Mock test info.
+ *
+ * @param component `TechMonitoringInfoComponent` test component.
+ * @param fixture `ComponentFixture` of `TechMonitoringInfoComponent` test component.
+ * @param testInfo Test `TechMonitoringInfo`.
+ */
+function mockTestInfo(
+  component: TechMonitoringInfoComponent,
+  fixture: ComponentFixture<TechMonitoringInfoComponent>,
+  testInfo: TechMonitoringInfo
+) {
+  component.info = testInfo;
+
+  fixture.detectChanges();
+}
