@@ -29,7 +29,7 @@ export class MapComponent implements OnInit {
     if (location) {
       this.#location = location;
 
-      this.#setLocationLayer(location);
+      this.#setLocationLayers(location);
       this.#fitView(location);
     }
   }
@@ -165,6 +165,15 @@ export class MapComponent implements OnInit {
 
     await locationLayer?.clearLayer?.( /* istanbul ignore next */ _ => true);
     await locationLayer?.addData?.(markers);
+  }
+
+  /**
+   * Helper method to handle asynchronous adding, updating map layers with location from `Input`.
+   *
+   * @param location Location and tracks.
+   */
+  async #setLocationLayers(location: LocationAndTrackResponse) {
+    await this.#setLocationLayer(location);
   }
 
   /**
