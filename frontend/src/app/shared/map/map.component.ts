@@ -4,11 +4,11 @@ import { CommonModule } from '@angular/common';
 import { createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
 import maplibregl from 'maplibre-gl';
-import { LngLatArray, LngLatBoundsArray } from '@nextgis/utils';
+import { FeatureProperties, LngLatArray, LngLatBoundsArray } from '@nextgis/utils';
 import { createQmsAdapter } from '@nextgis/qms-kit';
 import { createNgwLayerAdapter, NgwLayerAdapterType, NgwLayerOptions } from '@nextgis/ngw-kit';
 import NgwConnector, { ResourceDefinition } from '@nextgis/ngw-connector';
-import { Feature, FeatureCollection, Point } from 'geojson';
+import { Feature, FeatureCollection, LineString, Point, Position } from 'geojson';
 import { getIcon } from '@nextgis/icons';
 
 import { LocationAndTrackResponse } from '../../tech/tech.service';
@@ -120,6 +120,59 @@ export class MapComponent implements OnInit {
   }
 
   /**
+   * Add, update map layers with tracks.
+   *
+   * @param location Location and tracks.
+   */
+  async #setTrackLayers(location: LocationAndTrackResponse) {
+    const tracks: Feature<LineString>[] = [];
+
+    for (const { track } of location.tracks) {
+      if (track) {
+        const coordinates: Position[] = [];
+
+        for (const { latitude, longitude } of track) {
+          const position: Position = [longitude, latitude];
+
+          coordinates.push(position);
+        }
+
+        const trackFeature: Feature<LineString> = {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates
+          }
+        };
+
+        tracks.push(trackFeature);
+      }
+    }
+
+    const track: FeatureCollection<LineString> = {
+      type: 'FeatureCollection',
+      features: tracks
+    };
+
+    let trackLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, LineString>>(TRACK_LAYER_DEFINITION);
+
+    await this.#map?.setLayerData(TRACK_LAYER_DEFINITION, track);
+
+    if (!trackLayer) {
+      trackLayer = await this.#map?.addFeatureLayer({
+        id: TRACK_LAYER_DEFINITION,
+        data: track,
+        paint: {
+          strokeColor: '#AEAEAE',
+          strokeOpacity: 0.8,
+          weight: 15
+        }
+      });
+    }
+  }
+
+  /**
    * Add, update map layer with location markers.
    *
    * @param location Location and tracks.
@@ -173,6 +226,7 @@ export class MapComponent implements OnInit {
    * @param location Location and tracks.
    */
   async #setLocationLayers(location: LocationAndTrackResponse) {
+    await this.#setTrackLayers(location);
     await this.#setLocationLayer(location);
   }
 
@@ -235,6 +289,7 @@ const AUTH_PASSWORD = 'asdfghjkl13';
 const FIELD_RESOURCE_DEFINITION: ResourceDefinition = 109;
 const FIELD_LAYER_DEFINITION = 'field';
 
+const TRACK_LAYER_DEFINITION = 'track';
 const LOCATION_LAYER_DEFINITION = 'location';
 
 const INITIAL_DURATION = 500;
