@@ -120,21 +120,38 @@ export class MapComponent implements OnInit {
   }
 
   /**
-   * Add, update map layers with tracks.
+   * Add, update map layers with tracks and messages.
    *
    * @param location Location and tracks.
    */
   async #setTrackLayers(location: LocationAndTrackResponse) {
     const tracks: Feature<LineString>[] = [];
+    const messageCollections: FeatureCollection<Point>[] = [];
 
     for (const { track } of location.tracks) {
       if (track) {
         const coordinates: Position[] = [];
+        const messageFeatures: Feature<Point>[] = [];
 
-        for (const { latitude, longitude } of track) {
+        for (const {
+          messageId: id,
+          latitude,
+          longitude
+        } of track) {
           const position: Position = [longitude, latitude];
 
           coordinates.push(position);
+
+          const message: Feature<Point> = {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: position
+            },
+            properties: { id }
+          };
+
+          messageFeatures.push(message);
         }
 
         const trackFeature: Feature<LineString> = {
@@ -147,6 +164,13 @@ export class MapComponent implements OnInit {
         };
 
         tracks.push(trackFeature);
+
+        const messages: FeatureCollection<Point> = {
+          type: 'FeatureCollection',
+          features: messageFeatures
+        };
+
+        messageCollections.push(messages);
       }
     }
 
@@ -169,6 +193,31 @@ export class MapComponent implements OnInit {
           weight: 15
         }
       });
+    }
+
+    let messageLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(MESSAGE_LAYER_DEFINITION);
+
+    await messageLayer?.clearLayer?.();
+
+    if (!messageLayer) {
+      messageLayer = await this.#map?.addFeatureLayer({
+        id: MESSAGE_LAYER_DEFINITION,
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        },
+        paint: {
+          color: '#FAD565',
+          opacity: 1,
+          strokeColor: '#FFFFFF00',
+          radius: 3,
+          weight: 5
+        }
+      });
+    }
+
+    for (const messages of messageCollections) {
+      await messageLayer?.addData?.(messages);
     }
   }
 
@@ -289,6 +338,7 @@ const AUTH_PASSWORD = 'asdfghjkl13';
 const FIELD_RESOURCE_DEFINITION: ResourceDefinition = 109;
 const FIELD_LAYER_DEFINITION = 'field';
 
+const MESSAGE_LAYER_DEFINITION = 'message';
 const TRACK_LAYER_DEFINITION = 'track';
 const LOCATION_LAYER_DEFINITION = 'location';
 
