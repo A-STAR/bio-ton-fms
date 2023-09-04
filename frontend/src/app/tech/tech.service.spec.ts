@@ -79,7 +79,7 @@ describe('TechService', () => {
       vehicleId: id
     }));
 
-    const subscription = service
+    let subscription = service
       .getVehiclesLocationAndTrack(vehiclesOptions)
       .subscribe(vehicles => {
         expect(vehicles)
@@ -116,11 +116,48 @@ describe('TechService', () => {
       needReturnTrack: false
     }));
 
-    service
+    subscription = service
       .getVehiclesLocationAndTrack(vehiclesOptions)
       .subscribe(vehicles => {
         expect(vehicles)
           .withContext('get vehicles location without track')
+          .toEqual(testLocationAndTrackResponse);
+      });
+
+    date = new Date();
+
+    date.setHours(0, 0, 0, 0);
+
+    todayStart = date.toISOString();
+
+    vehiclesLocationAndTrackRequest = httpTestingController.expectOne(
+      `/api/telematica/monitoring/locations-and-tracks?trackStartTime=${todayStart}`,
+      'vehicles location and track request'
+    );
+
+    body = vehiclesOptions.map<LocationAndTrackRequest>(({ vehicleId, needReturnTrack }) => ({
+      vehicleId,
+      needReturnTrack: needReturnTrack ?? false
+    }));
+
+    expect(vehiclesLocationAndTrackRequest.request.body)
+      .withContext('valid request body')
+      .toEqual(body);
+
+    vehiclesLocationAndTrackRequest.flush(testLocationAndTrackResponse);
+
+    subscription.unsubscribe();
+
+    vehiclesOptions = vehiclesOptions.map(({ vehicleId }) => ({
+      vehicleId,
+      needReturnTrack: true
+    }));
+
+    service
+      .getVehiclesLocationAndTrack(vehiclesOptions)
+      .subscribe(vehicles => {
+        expect(vehicles)
+          .withContext('get vehicles location with track')
           .toEqual(testLocationAndTrackResponse);
 
         done();
@@ -266,26 +303,102 @@ export const testMonitoringVehicles: MonitoringVehicle[] = [
 
 export const testLocationAndTrackResponse: LocationAndTrackResponse = {
   viewBounds: {
-    upperLeftLatitude: 78.7459290635374,
-    upperLeftLongitude: -135.53042265952553,
-    bottomRightLatitude: 23.55172712040085,
-    bottomRightLongitude: 84.4637669364749
+    upperLeftLatitude: 53.336375849999996,
+    upperLeftLongitude: 45.08847725,
+    bottomRightLatitude: 52.263483150000006,
+    bottomRightLongitude: 53.53558075
   },
   tracks: [
     {
       vehicleId: testMonitoringVehicles[0].id,
-      latitude: 26.060554481452513,
-      longitude: -127.30375742553639
+      latitude: 50.14918,
+      longitude: 53.20434,
+      track: [
+        {
+          messageId: 44086,
+          time: '2023-08-31T12:08:40.141885Z',
+          latitude: 50.14918,
+          longitude: 53.20434,
+          speed: 0,
+          altitude: 113
+        },
+        {
+          messageId: 44088,
+          time: '2023-08-31T12:08:40.83533Z',
+          latitude: 50.14918,
+          longitude: 53.20434,
+          speed: 0,
+          altitude: 113
+        },
+        {
+          messageId: 44085,
+          time: '2023-08-31T12:08:39.811887Z',
+          latitude: 50.14918,
+          longitude: 53.20434,
+          speed: 0,
+          altitude: 113
+        },
+        {
+          messageId: 44087,
+          time: '2023-08-31T12:08:40.521726Z',
+          latitude: 50.14918,
+          longitude: 53.20434,
+          speed: 0,
+          altitude: 113
+        }
+      ]
     },
     {
       vehicleId: testMonitoringVehicles[1].id,
-      latitude: 76.23710170248575,
-      longitude: -59.131765227269284
+      latitude: 45.33645,
+      longitude: 52.312251
     },
     {
       vehicleId: testMonitoringVehicles[2].id,
-      latitude: 35.029863049401996,
-      longitude: 37.22954725424654
+      latitude: 50.295905,
+      longitude: 53.287243,
+      track: [
+        {
+          messageId: 45059,
+          time: '2023-08-31T12:18:21.360719Z',
+          latitude: 50.149358,
+          longitude: 53.204403,
+          speed: 10.7,
+          altitude: 121
+        },
+        {
+          messageId: 45058,
+          time: '2023-08-31T12:18:20.992514Z',
+          latitude: 50.149348,
+          longitude: 53.204378,
+          speed: 10.1,
+          altitude: 120
+        },
+        {
+          messageId: 45060,
+          time: '2023-08-31T12:18:21.683683Z',
+          latitude: 50.149345,
+          longitude: 53.204353,
+          speed: 9.8,
+          altitude: 120
+        },
+        {
+          messageId: 45061,
+          time: '2023-08-31T12:18:21.998364Z',
+          latitude: 50.14931,
+          longitude: 53.204205,
+          speed: 12.7,
+          altitude: 118
+        },
+        {
+          messageId: 45062,
+          time: '2023-08-31T12:18:22.303882Z',
+          latitude: 50.14929,
+          longitude: 53.204088,
+          speed: 11.6,
+          altitude: 117
+        }
+      ]
     }
   ]
 };
