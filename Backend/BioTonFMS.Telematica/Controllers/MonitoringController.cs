@@ -211,7 +211,7 @@ public class MonitoringController : ValidationControllerBase
             UpperLeftLatitude = lats.Max() + difLat,
             UpperLeftLongitude = lons.Min() - difLon,
             BottomRightLatitude = lats.Min() - difLat,
-            BottomRightLongitude = lats.Max() + difLon
+            BottomRightLongitude = lons.Max() + difLon
         };
         return viewBounds;
     }
