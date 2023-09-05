@@ -10,6 +10,11 @@ public class LocationAndTrack
     public int VehicleId { get; set; }
 
     /// <summary>
+    /// Имя машины
+    /// </summary>
+    public string VehicleName { get; set; }
+
+    /// <summary>
     /// Широта положения машины из последнего сообщения, полученного от её трекера
     /// </summary>
     public double Latitude { get; set; }

@@ -255,7 +255,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                     MessageId = x.Id,
                     Latitude = x.Latitude!.Value,
                     Longitude = x.Longitude!.Value,
-                    Altitude = x.Altitude,
+                    NumberOfSatellites = x.SatNumber,
                     Speed = x.Speed,
                     Time = x.ServerDateTime
                 })

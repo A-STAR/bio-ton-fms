@@ -100,6 +100,9 @@ public class MonitoringController : ValidationControllerBase
         IDictionary<int, int> externalIds = _vehicleRepository.GetExternalIds(
             requests.Select(x => x.VehicleId).ToArray());
 
+        IDictionary<int, string> names = _vehicleRepository.GetNames(
+            requests.Select(x => x.VehicleId).ToArray());
+
         IDictionary<int, (double Lat, double Long)> locations = _messageRepository.GetLocations(externalIds.Values.ToArray());
 
         IEnumerable<int> vehiclesNeedTrack = requests.Where(x => x.NeedReturnTrack).Select(x => x.VehicleId);
@@ -110,7 +113,7 @@ public class MonitoringController : ValidationControllerBase
                 .ToArray()
         );
 
-        List<LocationAndTrack> locationsAndTracks = GetLocationsAndTracks(requests, externalIds, locations, tracks);
+        List<LocationAndTrack> locationsAndTracks = GetLocationsAndTracks(requests, externalIds, names, locations, tracks);
 
         ViewBounds? viewBounds = CalculateViewBounds(locationsAndTracks);
 
@@ -159,8 +162,8 @@ public class MonitoringController : ValidationControllerBase
     #region Private
 
     private static List<LocationAndTrack> GetLocationsAndTracks(LocationAndTrackRequest[] requests, 
-        IDictionary<int, int> externalIds, IDictionary<int, (double Lat, double Long)> locations, 
-        IDictionary<int, TrackPointInfo[]> tracks)
+        IDictionary<int, int> externalIds, IDictionary<int, string> names, 
+        IDictionary<int, (double Lat, double Long)> locations, IDictionary<int, TrackPointInfo[]> tracks)
     {
         var locationsAndTracks = new List<LocationAndTrack>();
         foreach (var request in requests)
@@ -173,7 +176,8 @@ public class MonitoringController : ValidationControllerBase
             {
                 Longitude = location.Long,
                 Latitude = location.Lat,
-                VehicleId = request.VehicleId
+                VehicleId = request.VehicleId,
+                VehicleName = names[request.VehicleId]
             };
 
             if (!request.NeedReturnTrack || !tracks.TryGetValue(externalId, out var track))
@@ -267,6 +271,5 @@ public class MonitoringController : ValidationControllerBase
             TrackerInfo =  trackerInfo
         };
     }
-
     #endregion
 }

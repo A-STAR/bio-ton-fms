@@ -145,6 +145,12 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 .Where(x => vehicleIds.Contains(x.Id) && x.Tracker != null)
                 .ToDictionary(x => x.Id, x => x.Tracker!.ExternalId);
 
+        public IDictionary<int, string> GetNames(int[] vehicleIds) =>
+            QueryableProvider.Fetch(x => x.Tracker)
+                .Linq()
+                .Where(x => vehicleIds.Contains(x.Id) && x.Tracker != null)
+                .ToDictionary(x => x.Id, x => x.Name);
+
         public override void Add(Vehicle vehicle)
         {
             var vehicleWithTheSameName = QueryableProvider.Linq().Where(v => v.Name == vehicle.Name);

@@ -10,6 +10,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
         PagedResult<Vehicle> GetVehicles(VehiclesFilter filter, bool hydrate = true);
         Vehicle[] FindVehicles(string? findCriterion);
         IDictionary<int, int> GetExternalIds(int[] vehicleIds);
+        IDictionary<int, string> GetNames(int[] vehicleIds);
         Tracker? GetTracker(int vehicleId);
     }
 }

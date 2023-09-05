@@ -28,7 +28,7 @@ public class TrackPointInfo
     public double? Speed { get; set; }
 
     /// <summary>
-    /// Высота в точке (может быть пустым)
+    /// Количество спутников
     /// </summary>
-    public double? Altitude { get; set; }
+    public int? NumberOfSatellites { get; set; }
 }
