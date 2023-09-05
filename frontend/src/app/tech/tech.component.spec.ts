@@ -358,7 +358,7 @@ describe('TechComponent', () => {
 
     tick(DEBOUNCE_DUE_TIME);
 
-    let testVehicleOptions: LocationOptions[] = testMonitoringVehicles.map(({ id }) => ({
+    const testVehicleOptions: LocationOptions[] = testMonitoringVehicles.map(({ id }) => ({
       vehicleId: id,
       needReturnTrack: true
     }));
@@ -377,14 +377,14 @@ describe('TechComponent', () => {
       .withContext('render all options selected')
       .toBe(testMonitoringVehicles.length);
 
+    locationAndTrackSpy.calls.reset();
+
     await checkbox.uncheck();
 
     tick(DEBOUNCE_DUE_TIME);
 
-    testVehicleOptions = [];
-
     expect(locationAndTrackSpy)
-      .toHaveBeenCalledWith(testVehicleOptions);
+      .not.toHaveBeenCalled();
 
     options = await loader.getAllHarnesses(
       MatListOptionHarness.with({
@@ -488,14 +488,14 @@ describe('TechComponent', () => {
       .withContext('render all checkbox indeterminate')
       .toBeResolvedTo(true);
 
+    locationAndTrackSpy.calls.reset();
+
     await list.deselectItems();
 
     tick(DEBOUNCE_DUE_TIME);
 
-    testVehicleOptions = [];
-
     expect(locationAndTrackSpy)
-      .toHaveBeenCalledWith(testVehicleOptions);
+      .not.toHaveBeenCalled();
 
     await expectAsync(
       checkbox.isChecked()

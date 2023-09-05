@@ -255,15 +255,24 @@ export default class TechComponent implements OnInit, OnDestroy {
    * Set tech location and track.
    */
   #setLocations() {
+    const getLocation = (selected: TechOptions['selected']) => of(selected)
+      .pipe(
+        map(selected => Array.from(selected!, (vehicleId): LocationOptions => ({
+          vehicleId,
+          needReturnTrack: true
+        }))),
+        switchMap(options => this.techService.getVehiclesLocationAndTrack(options))
+      );
+
+    const unselectedLocation$ = of<LocationAndTrackResponse>({
+      tracks: []
+    });
+
     this.location$ = this.#location$.pipe(
       switchMap(() => this.#options$),
       debounce(() => timer(DEBOUNCE_DUE_TIME)),
       skipWhile(({ selected }) => selected === undefined),
-      map(({ selected }) => Array.from(selected!, (vehicleId): LocationOptions => ({
-        vehicleId,
-        needReturnTrack: true
-      }))),
-      switchMap(options => this.techService.getVehiclesLocationAndTrack(options))
+      switchMap(({ selected }) => selected?.size ? getLocation(selected) : unselectedLocation$)
     );
   }
 
