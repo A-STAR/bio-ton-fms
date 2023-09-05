@@ -206,6 +206,18 @@ public class MonitoringController : ValidationControllerBase
         var difLat = (lats.Max() - lats.Min()) / 20;
         var difLon = (lons.Max() - lons.Min()) / 20;
 
+        const double DefaultDifLon = 0.08;
+        const double DefaultDifLat = 0.05;
+
+        if (difLat < DefaultDifLat)
+        {
+            difLat = DefaultDifLat;
+        }
+        if (difLon < DefaultDifLon)
+        {
+            difLat = DefaultDifLon;
+        }
+
         var viewBounds = new ViewBounds
         {
             UpperLeftLatitude = lats.Max() + difLat,
