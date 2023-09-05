@@ -28,7 +28,7 @@ describe('MapComponent', () => {
       .toBeTruthy();
   });
 
-  it('should render map', async () => {
+  it('should render map', () => {
     expect(fixture.debugElement.classes)
       .withContext('render component map class')
       .toEqual(
@@ -50,18 +50,21 @@ describe('MapComponent', () => {
       .not.toBeNull();
   });
 
-  it('should fit map view to layer bounds', async () => {
+  it('should fit map view to layer bounds', () => {
     /* Coverage for map view returning to its original fit. */
     component.location = {
-      tracks: testLocationAndTrackResponse.tracks
+      tracks: []
     };
 
     expect(component.location)
       .withContext('set `location` input value')
       .not.toBeNull();
+
+    /* Coverage for map view fitting to layer bounds. */
+    component.location = testLocationAndTrackResponse;
   });
 
-  it('should point map view', async () => {
+  it('should point map view', () => {
     /* Coverage for map view setting to the point. */
     component.point = testMonitoringVehicles[0].id;
 

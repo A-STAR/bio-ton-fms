@@ -297,7 +297,7 @@ export class MapComponent implements OnInit {
    *
    * @param location Location and tracks.
    */
-  #fitView({ viewBounds }: LocationAndTrackResponse) {
+  #fitView({ viewBounds, tracks }: LocationAndTrackResponse) {
     if (viewBounds) {
       const {
         upperLeftLatitude: north,
@@ -313,7 +313,7 @@ export class MapComponent implements OnInit {
       if (this.#point) {
         this.#pointMap();
       }
-    } else {
+    } else if (!tracks.length) {
       this.#map?.fitLayer(FIELD_LAYER_DEFINITION, FIT_OPTIONS);
     }
   }

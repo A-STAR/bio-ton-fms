@@ -93,10 +93,11 @@ export default class TechComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Set tech options.
+   * Set tech options, reset location view bounds ignorance.
    */
   set #options(options: TechOptions) {
     this.#options$.next({ ...this.#options, ...options });
+    this.#location$.next({});
   }
 
   protected tech$!: Observable<MonitoringTech[]>;
@@ -170,7 +171,7 @@ export default class TechComponent implements OnInit, OnDestroy {
   /**
    * Get, set tech monitoring information.
    *
-   * Toggle tech panel, check tech, save expanded panel tech ID.
+   * Toggle tech panel, check tech, save expanded panel tech ID, update location bounds.
    *
    * @param panel `MatExpansionPanel` instance.
    * @param id `MonitoringTech` ID.
@@ -187,7 +188,7 @@ export default class TechComponent implements OnInit, OnDestroy {
 
       this.expandedPanelTechID = undefined;
 
-      this.#location$.next();
+      this.#location$.next({});
     } else {
       this.#techInfoSubscription = this.techService
         .getVehicleInfo(id)
@@ -208,7 +209,7 @@ export default class TechComponent implements OnInit, OnDestroy {
     }
   }
 
-  #location$ = new BehaviorSubject<void>(undefined);
+  #location$ = new BehaviorSubject<ViewOptions>({});
   #options$ = new BehaviorSubject<TechOptions>({});
   #techInfoSubscription: Subscription | undefined;
 
@@ -261,7 +262,14 @@ export default class TechComponent implements OnInit, OnDestroy {
           vehicleId,
           needReturnTrack: true
         }))),
-        switchMap(options => this.techService.getVehiclesLocationAndTrack(options))
+        switchMap(options => this.techService.getVehiclesLocationAndTrack(options)),
+        map(location => {
+          if (this.#location$.value.ignoreViewBounds) {
+            delete location.viewBounds;
+          }
+
+          return location;
+        })
       );
 
     const unselectedLocation$ = of<LocationAndTrackResponse>({
@@ -328,7 +336,11 @@ export default class TechComponent implements OnInit, OnDestroy {
         switchMap(() => searchQuery ? searchTech(searchQuery) : tech$)
       )),
       tap(() => {
-        this.#location$.next();
+        if (this.#options$.value.selected?.size) {
+          this.#location$.next({
+            ignoreViewBounds: true
+          });
+        }
       }),
       switchMap(tech => updateTechInfo(tech))
     );
@@ -358,6 +370,10 @@ export type MonitoringTech = MonitoringVehicle;
 type TechOptions = Partial<{
   selected: Set<MonitoringTech['id']>;
 }>;
+
+type ViewOptions = {
+  ignoreViewBounds?: true;
+};
 
 export type TechMonitoringInfo = VehicleMonitoringInfo;
 
