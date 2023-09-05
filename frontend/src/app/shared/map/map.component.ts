@@ -4,11 +4,11 @@ import { CommonModule } from '@angular/common';
 import { createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
 import maplibregl from 'maplibre-gl';
-import { LngLatArray, LngLatBoundsArray } from '@nextgis/utils';
+import { FeatureProperties, LngLatArray, LngLatBoundsArray } from '@nextgis/utils';
 import { createQmsAdapter } from '@nextgis/qms-kit';
 import { createNgwLayerAdapter, NgwLayerAdapterType, NgwLayerOptions } from '@nextgis/ngw-kit';
 import NgwConnector, { ResourceDefinition } from '@nextgis/ngw-connector';
-import { Feature, FeatureCollection, Point } from 'geojson';
+import { Feature, FeatureCollection, LineString, Point, Position } from 'geojson';
 import { getIcon } from '@nextgis/icons';
 
 import { LocationAndTrackResponse } from '../../tech/tech.service';
@@ -29,7 +29,7 @@ export class MapComponent implements OnInit {
     if (location) {
       this.#location = location;
 
-      this.#setLocationLayer(location);
+      this.#setLocationLayers(location);
       this.#fitView(location);
     }
   }
@@ -120,6 +120,108 @@ export class MapComponent implements OnInit {
   }
 
   /**
+   * Add, update map layers with tracks and messages.
+   *
+   * @param location Location and tracks.
+   */
+  async #setTrackLayers(location: LocationAndTrackResponse) {
+    const tracks: Feature<LineString>[] = [];
+    const messageCollections: FeatureCollection<Point>[] = [];
+
+    for (const { track } of location.tracks) {
+      if (track) {
+        const coordinates: Position[] = [];
+        const messageFeatures: Feature<Point>[] = [];
+
+        for (const {
+          messageId: id,
+          latitude,
+          longitude
+        } of track) {
+          const position: Position = [longitude, latitude];
+
+          coordinates.push(position);
+
+          const message: Feature<Point> = {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: position
+            },
+            properties: { id }
+          };
+
+          messageFeatures.push(message);
+        }
+
+        const trackFeature: Feature<LineString> = {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates
+          }
+        };
+
+        tracks.push(trackFeature);
+
+        const messages: FeatureCollection<Point> = {
+          type: 'FeatureCollection',
+          features: messageFeatures
+        };
+
+        messageCollections.push(messages);
+      }
+    }
+
+    const track: FeatureCollection<LineString> = {
+      type: 'FeatureCollection',
+      features: tracks
+    };
+
+    let trackLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, LineString>>(TRACK_LAYER_DEFINITION);
+
+    await this.#map?.setLayerData(TRACK_LAYER_DEFINITION, track);
+
+    if (!trackLayer) {
+      trackLayer = await this.#map?.addFeatureLayer({
+        id: TRACK_LAYER_DEFINITION,
+        data: track,
+        paint: {
+          strokeColor: '#AEAEAE',
+          strokeOpacity: 0.8,
+          weight: 15
+        }
+      });
+    }
+
+    let messageLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(MESSAGE_LAYER_DEFINITION);
+
+    await messageLayer?.clearLayer?.();
+
+    if (!messageLayer) {
+      messageLayer = await this.#map?.addFeatureLayer({
+        id: MESSAGE_LAYER_DEFINITION,
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        },
+        paint: {
+          color: '#FAD565',
+          opacity: 1,
+          strokeColor: '#FFFFFF00',
+          radius: 3,
+          weight: 5
+        }
+      });
+    }
+
+    for (const messages of messageCollections) {
+      await messageLayer?.addData?.(messages);
+    }
+  }
+
+  /**
    * Add, update map layer with location markers.
    *
    * @param location Location and tracks.
@@ -165,6 +267,16 @@ export class MapComponent implements OnInit {
 
     await locationLayer?.clearLayer?.( /* istanbul ignore next */ _ => true);
     await locationLayer?.addData?.(markers);
+  }
+
+  /**
+   * Helper method to handle asynchronous adding, updating map layers with location from `Input`.
+   *
+   * @param location Location and tracks.
+   */
+  async #setLocationLayers(location: LocationAndTrackResponse) {
+    await this.#setTrackLayers(location);
+    await this.#setLocationLayer(location);
   }
 
   /**
@@ -224,8 +336,10 @@ const AUTH_LOGIN = 'a.zubkova@bioton-agro.ru';
 const AUTH_PASSWORD = 'asdfghjkl13';
 
 const FIELD_RESOURCE_DEFINITION: ResourceDefinition = 109;
-const FIELD_LAYER_DEFINITION = 'fields';
+const FIELD_LAYER_DEFINITION = 'field';
 
+const MESSAGE_LAYER_DEFINITION = 'message';
+const TRACK_LAYER_DEFINITION = 'track';
 const LOCATION_LAYER_DEFINITION = 'location';
 
 const INITIAL_DURATION = 500;

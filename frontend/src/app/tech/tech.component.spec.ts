@@ -358,8 +358,9 @@ describe('TechComponent', () => {
 
     tick(DEBOUNCE_DUE_TIME);
 
-    let testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
-      vehicleId: id
+    let testVehicleOptions: LocationOptions[] = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id,
+      needReturnTrack: true
     }));
 
     expect(locationAndTrackSpy)
@@ -427,9 +428,10 @@ describe('TechComponent', () => {
 
     tick(DEBOUNCE_DUE_TIME);
 
-    let testVehicleOptions = [
+    let testVehicleOptions: LocationOptions[] = [
       {
-        vehicleId: testMonitoringVehicles[index].id
+        vehicleId: testMonitoringVehicles[index].id,
+        needReturnTrack: true
       }
     ];
 
@@ -449,7 +451,8 @@ describe('TechComponent', () => {
     tick(DEBOUNCE_DUE_TIME);
 
     testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
-      vehicleId: id
+      vehicleId: id,
+      needReturnTrack: true
     }));
 
     expect(locationAndTrackSpy)
@@ -472,7 +475,8 @@ describe('TechComponent', () => {
     testVehicleOptions = testMonitoringVehicles
       .filter(({ name }) => name !== testMonitoringVehicles[index].name)
       .map(({ id }) => ({
-        vehicleId: id
+        vehicleId: id,
+        needReturnTrack: true
       }));
 
     expect(locationAndTrackSpy)

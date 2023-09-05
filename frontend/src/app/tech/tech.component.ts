@@ -259,7 +259,10 @@ export default class TechComponent implements OnInit, OnDestroy {
       switchMap(() => this.#options$),
       debounce(() => timer(DEBOUNCE_DUE_TIME)),
       skipWhile(({ selected }) => selected === undefined),
-      map(({ selected }) => Array.from(selected!, (vehicleId): LocationOptions => ({ vehicleId }))),
+      map(({ selected }) => Array.from(selected!, (vehicleId): LocationOptions => ({
+        vehicleId,
+        needReturnTrack: true
+      }))),
       switchMap(options => this.techService.getVehiclesLocationAndTrack(options))
     );
   }
