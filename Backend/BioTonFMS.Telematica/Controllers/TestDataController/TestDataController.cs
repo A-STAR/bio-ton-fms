@@ -133,10 +133,10 @@ public class TestDataController : ValidationControllerBase
                 continue;
             _trackerRepository.Add(trackerData.Tracker);
         }
-        foreach (var message in trackerDatas.Where(t => t.Messages is not null).SelectMany(t => t.Messages!))
+        /*foreach (var message in trackerDatas.Where(t => t.Messages is not null).SelectMany(t => t.Messages!))
         {
             _trackerMessageRepository.Add(message);
-        }
+        }*/
 
         var vehicleGroupIds = _vehicleGroupRepository.GetVehicleGroups().Select(v => v.Id);
         var fuelTypeIds = _fuelTypeRepository.GetFuelTypes().Select(v => v.Id);

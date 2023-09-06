@@ -12,7 +12,6 @@ namespace BioTonFMS.Telematica.Controllers.TestDataController;
 public class TrackerData
 {
     public Tracker? Tracker;
-    public TrackerMessage[]? Messages;
 }
 
 public static class Seeds
@@ -32,25 +31,6 @@ public static class Seeds
             .RuleFor(v => v.SensorTypeId, (f, _) => sensorTypeIds[f.Random.Int(0, sensorTypeIds.Length - 1)])
             .RuleFor(v => v.UnitId, (f, _) => unitIds[f.Random.Int(0, unitIds.Length - 1)]);
 
-        var tagId = -1;
-        var messageId = -1;
-        var message = new Faker<TrackerMessage>()
-            .RuleFor(v => v.Id, () => messageId--)
-            .RuleFor(v => v.Tags, (f, v) => GenerateTags(f, v, trackerTags, ref tagId))
-            .RuleFor(v => v.Latitude, (f, _) => f.Random.Double(-90, 90).OrNull(f, .1f))
-            .RuleFor(v => v.Longitude, (f, v) => v.Latitude is null ? null : f.Random.Double(-180, 180))
-            .RuleFor(v => v.Speed, (f, _) => f.Random.Double(0, 120).OrNull(f, .1f))
-            .RuleFor(v => v.Altitude, (f, _) => f.Random.Double(-90, 90).OrNull(f, .1f))
-            .RuleFor(v => v.CoolantTemperature, (f, _) => f.Random.Int(-40, 180).OrNull(f, .1f))
-            .RuleFor(v => v.Direction, (f, _) => f.Random.Double(-180, 180).OrNull(f, .1f))
-            .RuleFor(v => v.FuelLevel, (f, _) => f.Random.Int(0, 100).OrNull(f, .1f))
-            .RuleFor(v => v.EngineSpeed, (f, _) => f.Random.Int(0, 10000).OrNull(f, .1f))
-            .RuleFor(v => v.SatNumber, (f, _) => f.Random.Int(0, 10).OrNull(f, .1f))
-            .RuleFor(v => v.CoordCorrectness, (f, _) => f.Random.Enum<CoordCorrectnessEnum>().OrNull(f, .1f))
-            .RuleFor(v => v.TrackerDateTime, (f, _) => f.Time())
-            .RuleFor(v => v.ServerDateTime, (f, _) => f.Time())
-            .RuleFor(v => v.PackageUID, Guid.NewGuid);
-
         var trackerId = -1;
         var tracker = new Faker<Tracker>()
             .RuleFor(v => v.Id, (_, _) => trackerId--)
@@ -68,17 +48,7 @@ public static class Seeds
 
 
         var trackerData = new Faker<TrackerData>()
-            .RuleFor(v => v.Tracker, () => tracker)
-            .RuleFor(v => v.Messages, (_, v) =>
-            {
-                var result = message.Generate(10);
-                result.ForEach(s =>
-                {
-                    s.ExternalTrackerId = v.Tracker!.ExternalId;
-                    s.Imei = v.Tracker.Imei;
-                });
-                return result.ToArray();
-            });
+            .RuleFor(v => v.Tracker, () => tracker);
 
         return trackerData.Generate(10);
     }
