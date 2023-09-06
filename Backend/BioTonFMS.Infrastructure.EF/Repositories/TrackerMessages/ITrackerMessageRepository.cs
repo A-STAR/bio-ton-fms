@@ -8,6 +8,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 
 public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 {
+    TrackerMessage? this[long key] { get; }
     bool ExistsByUid(Guid uid);
 
     IList<TrackerMessage> GetMessages(bool forUpdate = false);

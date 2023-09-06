@@ -4,7 +4,10 @@ using BioTonFMS.Domain;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
+using BioTonFMS.Infrastructure.EF.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos.Monitoring;
@@ -30,16 +33,22 @@ public class MonitoringController : ValidationControllerBase
     private readonly IMapper _mapper;
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly TrackerOptions _trackerOptions;
+    private readonly ITrackerTagRepository _tagsRepository;
+    private readonly ITrackerRepository _trackerRepository;
 
     public MonitoringController(
         IMapper mapper,
         ILogger<MonitoringController> logger,
         IVehicleRepository vehicleRepository,
         ITrackerMessageRepository messageRepository,
-        IOptions<TrackerOptions> trackerOptions)
+        IOptions<TrackerOptions> trackerOptions,
+        ITrackerTagRepository tagsRepository,
+        ITrackerRepository trackerRepository)
     {
         _vehicleRepository = vehicleRepository;
         _messageRepository = messageRepository;
+        _tagsRepository = tagsRepository;
+        _trackerRepository = trackerRepository;
         _trackerOptions = trackerOptions.Value;
         _mapper = mapper;
     }
@@ -159,6 +168,37 @@ public class MonitoringController : ValidationControllerBase
         });
     }
 
+    /// <summary>
+    /// Возвращает информацию по сообщению
+    /// </summary>
+    /// <param name="messageId">Идентификатор сообщения</param>
+    /// <response code="200">Данные успешно возвращены</response>
+    /// <response code="404">Сообщение не найдено</response>
+    [HttpGet("trackPoint/{messageId:long}")]
+    [ProducesResponseType(typeof(MonitoringTrackPointInfoDto), StatusCodes.Status200OK)]
+    public IActionResult GetTrackPointInformation(long messageId)
+    {
+        var msg = _messageRepository[messageId];
+
+        if (msg == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(new MonitoringTrackPointInfoDto
+        {
+            GeneralInfo = new TrackPointGeneralInfoDto
+            {
+                Longitude = msg.Longitude,
+                Latitude = msg.Latitude,
+                Speed = msg.Speed,
+                MessageTime = msg.TrackerDateTime,
+                NumberOfSatellites = msg.SatNumber
+            },
+            TrackerInfo = GetPointTrackerInfo(msg.Tags, msg.ExternalTrackerId)
+        });
+    }
+
     #region Private
 
     private static List<LocationAndTrack> GetLocationsAndTracks(LocationAndTrackRequest[] requests, 
@@ -271,5 +311,58 @@ public class MonitoringController : ValidationControllerBase
             TrackerInfo =  trackerInfo
         };
     }
+    private TrackPointTrackerInfoDto GetPointTrackerInfo(IEnumerable<MessageTag> tags, int trackerExternalId)
+    {
+        var result = new TrackPointTrackerInfoDto();
+        var trackerTags = _tagsRepository.GetTags().ToDictionary(x => x.Id);
+        var sensors = _trackerRepository.FindTracker(imei: null, trackerExternalId)
+            ?.Sensors.ToDictionary(x => x.Id);
+
+        foreach (var tag in tags)
+        {
+            if (tag.SensorId == null)
+            {
+                var parameter = new TrackerParameter();
+                if (tag.TrackerTagId.HasValue)
+                {
+                    parameter.ParamName = trackerTags[tag.TrackerTagId.Value].Name;
+                }
+
+                switch (tag.TagType)
+                {
+                    case TagDataTypeEnum.Integer:
+                        parameter.LastValueDecimal = ((MessageTagInteger)tag).Value;
+                        break;
+                    case TagDataTypeEnum.Bits or TagDataTypeEnum.Boolean or TagDataTypeEnum.String:
+                        parameter.LastValueString = tag.ValueString;
+                        break;
+                    case TagDataTypeEnum.Byte:
+                        parameter.LastValueDecimal = ((MessageTagByte)tag).Value;
+                        break;
+                    case TagDataTypeEnum.Double:
+                        parameter.LastValueDecimal = ((MessageTagDouble)tag).Value;
+                        break;
+                    case TagDataTypeEnum.DateTime:
+                        parameter.LastValueDateTime = ((MessageTagDateTime)tag).Value;
+                        break;
+                }
+
+                result.Parameters.Add(parameter);
+            }
+            else if (sensors != null && sensors.Any() &&
+                     sensors.TryGetValue(tag.SensorId.Value, out var sensor))
+            {
+                result.Sensors.Add(new TrackerSensorDto
+                {
+                    Name = sensor.Name,
+                    Unit = sensor.Unit.Name,
+                    Value = tag.ValueString
+                });
+            }
+        }
+
+        return result;
+    }
+
     #endregion
 }

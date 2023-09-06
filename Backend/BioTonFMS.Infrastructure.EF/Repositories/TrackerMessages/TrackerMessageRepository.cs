@@ -25,6 +25,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         _tagsRepository = tagsRepository;
     }
 
+    public TrackerMessage? this[long key] => HydratedQuery.FirstOrDefault(x => x.Id == key);
+
     private IQueryable<TrackerMessage> HydratedQuery => QueryableProvider.Fetch(m => m.Tags).Linq();
 
     public override void Add(TrackerMessage entity)
