@@ -251,11 +251,14 @@ export class MapComponent implements OnInit {
       features
     };
 
-    let locationLayer = this.#map?.getLayer<FeatureLayerAdapter>(LOCATION_LAYER_DEFINITION);
+    let locationLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(LOCATION_LAYER_DEFINITION);
+
+    await this.#map?.setLayerData(LOCATION_LAYER_DEFINITION, markers);
 
     if (!locationLayer) {
       locationLayer = await this.#map?.addFeatureLayer({
         id: LOCATION_LAYER_DEFINITION,
+        data: markers,
         paint: getIcon({
           svg: TECH_SVG_XML,
           color: '#8FAB93',
@@ -264,9 +267,6 @@ export class MapComponent implements OnInit {
         })
       });
     }
-
-    await locationLayer?.clearLayer?.( /* istanbul ignore next */ _ => true);
-    await locationLayer?.addData?.(markers);
   }
 
   /**
