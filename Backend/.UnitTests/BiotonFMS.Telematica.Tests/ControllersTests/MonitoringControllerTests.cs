@@ -283,7 +283,10 @@ public class MonitoringControllerTests
         var vehicleRepository = VehicleRepositoryMock.GetStub();
         var trackerMessageRepository = TrackerMessageRepositoryMock.GetStub();
         var options = Options.Create(new TrackerOptions { TrackerAddressValidMinutes = 60 });
+        var tagsRepository = TrackerTagRepositoryMock.GetStub();
+        var trackerRepository = TrackerRepositoryMock.GetStub();
 
-        return new MonitoringController(mapper, logger, vehicleRepository, trackerMessageRepository, options);
+        return new MonitoringController(mapper, logger, vehicleRepository,
+            trackerMessageRepository, options, tagsRepository, trackerRepository);
     }
 }

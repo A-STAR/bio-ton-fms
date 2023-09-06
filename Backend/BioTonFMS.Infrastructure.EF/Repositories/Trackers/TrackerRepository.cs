@@ -168,7 +168,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Trackers
                 throw new ArgumentException("Один из входных параметров должен быть не пустым");
             }
 
-            return QueryableProvider.Linq()
+            return QueryableProvider.Linq().Include(x => x.Sensors).ThenInclude(x => x.Unit)
                 .FirstOrDefault(x => x.ExternalId == externalId || x.Imei == imei);
         }
 
