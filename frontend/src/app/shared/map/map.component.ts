@@ -251,22 +251,22 @@ export class MapComponent implements OnInit {
       features
     };
 
-    let locationLayer = this.#map?.getLayer<FeatureLayerAdapter>(LOCATION_LAYER_DEFINITION);
+    let locationLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(LOCATION_LAYER_DEFINITION);
+
+    await this.#map?.setLayerData(LOCATION_LAYER_DEFINITION, markers);
 
     if (!locationLayer) {
       locationLayer = await this.#map?.addFeatureLayer({
         id: LOCATION_LAYER_DEFINITION,
+        data: markers,
         paint: getIcon({
-          svg: TECH_SVG_XML,
+          svg: TECH_SVG,
           color: '#8FAB93',
-          stroke: 10,
-          size: 60
+          stroke: TECH_SVG_STROKE,
+          size: TECH_SVG_SIZE
         })
       });
     }
-
-    await locationLayer?.clearLayer?.( /* istanbul ignore next */ _ => true);
-    await locationLayer?.addData?.(markers);
   }
 
   /**
@@ -297,7 +297,7 @@ export class MapComponent implements OnInit {
    *
    * @param location Location and tracks.
    */
-  #fitView({ viewBounds }: LocationAndTrackResponse) {
+  #fitView({ viewBounds, tracks }: LocationAndTrackResponse) {
     if (viewBounds) {
       const {
         upperLeftLatitude: north,
@@ -313,7 +313,7 @@ export class MapComponent implements OnInit {
       if (this.#point) {
         this.#pointMap();
       }
-    } else {
+    } else if (!tracks.length) {
       this.#map?.fitLayer(FIELD_LAYER_DEFINITION, FIT_OPTIONS);
     }
   }
@@ -348,7 +348,15 @@ const padding = 60;
 
 const FIT_OPTIONS: FitOptions = { duration, padding };
 
-const TECH_SVG_SIZE_FACTOR = 5;
+const TECH_SVG_SIZE = 38;
+const TECH_SVG_HEIGHT_RATIO = 377.637 / 463.52;
+const TECH_SVG_HEIGHT = TECH_SVG_HEIGHT_RATIO * TECH_SVG_SIZE;
+const TECH_SVG_STROKE = 3;
+const TECH_SVG_VIEW_BOX_MIN_X = TECH_SVG_STROKE;
+const TECH_SVG_VIEW_BOX_MIN_Y = TECH_SVG_STROKE - TECH_SVG_HEIGHT;
+const TECH_SVG_VIEW_BOX_SIZE_FACTOR = 10.25;
+const TECH_SVG_VIEW_BOX_SIZE = 2 * TECH_SVG_STROKE + TECH_SVG_VIEW_BOX_SIZE_FACTOR * TECH_SVG_SIZE;
+const TECH_SVG_VIEW_BOX = `-${TECH_SVG_VIEW_BOX_MIN_X} ${TECH_SVG_VIEW_BOX_MIN_Y} ${TECH_SVG_VIEW_BOX_SIZE} ${TECH_SVG_VIEW_BOX_SIZE}`;
 
 // eslint-disable-next-line max-len
-const TECH_SVG_XML = `<svg viewBox="0 0 ${TECH_SVG_SIZE_FACTOR * 752} ${TECH_SVG_SIZE_FACTOR * 752}"><path d="M332 187.6c-2.5.2-10.8.8-18.5 1.4-26.8 2.1-55.3 7.1-64.4 11.3-5.5 2.6-15.4 11.7-18.7 17.2-1.3 2.3-7.6 18.2-13.9 35.3-6.3 17.1-12.1 32.6-12.9 34.6l-1.5 3.6h-17.4c-21.2 0-24.8.9-32.4 8.5-11 11.1-11 28.5-.1 39.2 5.7 5.5 11.9 8.2 21.3 9 6.4.5 7.6.9 7.1 2.2-.2.9-2.5 7.4-5 14.6-7.7 22.1-7.7 21.5-7.4 102.1l.3 70.9 3.2 6.6c3.9 7.9 10.2 14 18.1 17.7 5 2.4 7 2.7 15.7 2.7s10.7-.3 15.7-2.7c7.9-3.7 14.2-9.8 18.1-17.6 3.1-6.4 3.2-7.1 3.5-20.9l.3-14.3h265.8l.3 14.3c.3 13.8.4 14.5 3.5 20.9 3.9 7.8 10.2 13.9 18.1 17.6 5 2.4 7 2.7 15.7 2.7s10.7-.3 15.7-2.7c7.9-3.7 14.2-9.8 18.1-17.7l3.2-6.6.3-70.9c.3-80.6.3-80-7.4-102.1-2.5-7.2-4.8-13.7-5-14.6-.5-1.3.7-1.7 7.1-2.2 10-.9 16.5-3.8 21.9-9.8 10.4-11.6 10.1-27.5-.7-38.4-7.6-7.6-11.2-8.5-32.4-8.5h-17.4l-1.5-3.6c-.8-2-6.6-17.5-12.9-34.6-6.3-17.1-12.6-32.9-13.9-35.2-3.5-5.8-12.2-14.1-18.1-16.9-8.5-4.2-29.9-8.3-58.5-11.3-11.3-1.2-28-1.7-62-1.9-25.6-.1-48.5-.1-51 .1zm166.6 87.6c7.5 22.7 13.9 41.9 14.2 42.5.3 1-27.5 1.3-136.8 1.3-109.3 0-137.1-.3-136.8-1.3.3-.6 6.7-19.8 14.2-42.5l13.8-41.2h217.6l13.8 41.2zm-256 102.3c14.5 4.3 23 21.3 18 36.2-5.2 15.6-24.6 23.6-39.2 16-10-5.1-15.3-13.9-15.4-25.2 0-19.5 17.8-32.6 36.6-27zm284.1 0c6.5 1.9 13.9 8.5 16.9 15 3 6.4 3.3 17 .5 23.1-2.7 5.9-7.7 11.2-13.5 14.2-4.2 2.1-6.5 2.6-12.6 2.6-6.4 0-8.3-.4-12.9-2.9-10.7-5.9-15.7-15.2-14.9-27.6 1.3-18.2 18.6-29.7 36.5-24.4z"/></svg>`;
+const TECH_SVG = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="${TECH_SVG_SIZE}" height="${TECH_SVG_SIZE}" viewBox="${TECH_SVG_VIEW_BOX}"><path d="M12.565 99.331c-1.913-.802-3.596-2.167-4.668-3.786-1.638-2.473-1.61-2.087-1.61-22.19 0-20.747-.006-20.672 2.015-26.445.662-1.891 1.263-3.63 1.335-3.864.11-.354-.21-.455-1.929-.611-2.716-.246-4.33-.97-5.796-2.602a7.409 7.409 0 01.69-10.606c1.786-1.528 2.876-1.764 8.165-1.764h4.651l3.275-8.93c1.801-4.91 3.575-9.494 3.943-10.185.897-1.689 3.412-4.039 5.195-4.855 3-1.374 11.817-2.746 21.261-3.31 5.82-.347 24.405-.17 29.029.275 7.974.77 14.231 1.914 16.743 3.062 1.733.792 4.253 3.158 5.14 4.828.367.69 2.142 5.274 3.943 10.186l3.274 8.93h4.651c5.29 0 6.38.235 8.165 1.763a7.409 7.409 0 01.691 10.606c-1.467 1.632-3.08 2.356-5.797 2.602-1.719.156-2.037.257-1.928.611.072.234.673 1.973 1.335 3.864 2.05 5.849 2.039 5.702 1.956 27.012l-.073 18.761-.69 1.455c-1.025 2.159-2.628 3.811-4.676 4.82-1.641.807-1.955.869-4.418.869-2.31 0-2.839-.09-4.107-.69-2.157-1.024-3.81-2.628-4.819-4.675-.84-1.706-.872-1.893-.96-5.542l-.091-3.777H26.18l-.093 3.77c-.083 3.405-.159 3.911-.781 5.225-1.02 2.156-2.625 3.81-4.673 4.82-1.54.758-2.07.878-4.153.941-2.033.062-2.616-.023-3.915-.568zm14.568-35.195c1.356-.687 2.635-1.959 3.423-3.405.348-.638.467-1.463.468-3.237.001-2.121-.078-2.517-.725-3.616-2.533-4.31-7.892-5.203-11.54-1.924-1.666 1.499-2.451 3.276-2.451 5.552 0 3.444 2.058 6.132 5.589 7.297 1.154.381 3.845.038 5.236-.667zm75.132 0c4.71-2.407 5.538-8.655 1.615-12.182-2.911-2.618-6.972-2.657-9.884-.094-2.927 2.577-3.415 7.019-1.103 10.059.908 1.194 3.202 2.738 4.374 2.944 1.422.25 3.75-.09 4.998-.727zM97.503 34.54a3402.59 3402.59 0 01-3.755-11.245l-3.633-10.914H32.524l-3.633 10.914a3404.522 3404.522 0 01-3.754 11.245c-.097.264 7.25.33 36.183.33 28.932 0 36.28-.066 36.183-.33z"/></svg>`;

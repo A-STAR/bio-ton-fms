@@ -27,7 +27,13 @@ import TechComponent, { POLL_INTERVAL_PERIOD, DEBOUNCE_DUE_TIME, SEARCH_MIN_LENG
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 import { MapComponent } from '../shared/map/map.component';
 
-import { mockTestFoundMonitoringVehicles, testFindCriterion, testVehicleMonitoringInfo, testMonitoringVehicles } from './tech.service.spec';
+import {
+  mockTestFoundMonitoringVehicles,
+  testFindCriterion,
+  testVehicleMonitoringInfo,
+  testMonitoringVehicles,
+  testLocationAndTrackResponse
+} from './tech.service.spec';
 
 describe('TechComponent', () => {
   let component: TechComponent;
@@ -358,7 +364,7 @@ describe('TechComponent', () => {
 
     tick(DEBOUNCE_DUE_TIME);
 
-    let testVehicleOptions: LocationOptions[] = testMonitoringVehicles.map(({ id }) => ({
+    const testVehicleOptions: LocationOptions[] = testMonitoringVehicles.map(({ id }) => ({
       vehicleId: id,
       needReturnTrack: true
     }));
@@ -377,14 +383,14 @@ describe('TechComponent', () => {
       .withContext('render all options selected')
       .toBe(testMonitoringVehicles.length);
 
+    locationAndTrackSpy.calls.reset();
+
     await checkbox.uncheck();
 
     tick(DEBOUNCE_DUE_TIME);
 
-    testVehicleOptions = [];
-
     expect(locationAndTrackSpy)
-      .toHaveBeenCalledWith(testVehicleOptions);
+      .not.toHaveBeenCalled();
 
     options = await loader.getAllHarnesses(
       MatListOptionHarness.with({
@@ -488,20 +494,53 @@ describe('TechComponent', () => {
       .withContext('render all checkbox indeterminate')
       .toBeResolvedTo(true);
 
+    locationAndTrackSpy.calls.reset();
+
     await list.deselectItems();
 
     tick(DEBOUNCE_DUE_TIME);
 
-    testVehicleOptions = [];
-
     expect(locationAndTrackSpy)
-      .toHaveBeenCalledWith(testVehicleOptions);
+      .not.toHaveBeenCalled();
 
     await expectAsync(
       checkbox.isChecked()
     )
       .withContext('render all checkbox unchecked')
       .toBeResolvedTo(false);
+  }));
+
+  it('should ignore location view bounds', fakeAsync(async () => {
+    retriggerAsyncPipe(loader, vehiclesSpy);
+
+    const checkbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: 'aside'
+      })
+    );
+
+    const location$ = of(testLocationAndTrackResponse);
+
+    locationAndTrackSpy.and.returnValue(location$);
+
+    await checkbox.check();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalled();
+
+    tick(POLL_INTERVAL_PERIOD - DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledTimes(2);
+
+    discardPeriodicTasks();
   }));
 
   it('should render GPS tracker command dialog', fakeAsync(async () => {
@@ -912,7 +951,7 @@ describe('TechComponent', () => {
     discardPeriodicTasks();
   }));
 
-  it('should poll tech search location and tracks', fakeAsync(async () => {
+  it('should poll tech search location', fakeAsync(async () => {
     // skip initial vehicles call
     vehiclesSpy.calls.reset();
 
