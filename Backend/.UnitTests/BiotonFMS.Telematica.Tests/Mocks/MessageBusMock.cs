@@ -5,6 +5,7 @@ namespace BiotonFMS.Telematica.Tests.Mocks;
 public class MessageBusMock : IMessageBus
 {
     public readonly List<byte[]> Messages = new();
+    private IPublisherConfirmsHandler? _confirmHandler = null;
 
     public void Ack(ulong deliveryTag, bool multiple)
     {
@@ -16,13 +17,19 @@ public class MessageBusMock : IMessageBus
         throw new NotImplementedException();
     }
 
-    public void Publish(byte[] message)
+    public ulong Publish(byte[] message)
     {
         Messages.Add(message);
+        return 0;
     }
 
     public void Subscribe<TBusMessageHandler>() where TBusMessageHandler : IBusMessageHandler
     {
         throw new NotImplementedException();
+    }
+
+    public void SetPublisherConfirmsHandler(IPublisherConfirmsHandler confirmHandler)
+    {
+        _confirmHandler = confirmHandler;
     }
 }

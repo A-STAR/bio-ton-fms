@@ -45,7 +45,7 @@ public class GalileoskyMessageHandlerTests
         };
     
     [Theory, MemberData(nameof(Files))]
-    public void HandleMessage_ValidCheckSumFromFile_ShouldPublishMessage(
+    public async Task HandleMessage_ValidCheckSumFromFile_ShouldPublishMessage(
         string title, string messagePath, bool shouldPublish = true)
     {
         var logStub = new Mock<ILogger<GalileoskyProtocolMessageHandler>>();
@@ -60,8 +60,9 @@ public class GalileoskyMessageHandlerTests
             .Select(x => byte.Parse(x, NumberStyles.HexNumber))
             .ToArray();
 
-        var resp = handler.HandleMessage(bytes, IPAddress.None, 0).Select(x => x.ToString("X"));
-        
+        var respBytes = await handler.HandleMessage(bytes, IPAddress.None, 0);
+        var resp = respBytes.Select(x => x.ToString("X"));
+
         _testOutputHelper.WriteLine($"Response for tracker: {string.Join(' ', resp)}");
 
         busMock.Messages.Count.Should().Be(shouldPublish ? 1 : 0);

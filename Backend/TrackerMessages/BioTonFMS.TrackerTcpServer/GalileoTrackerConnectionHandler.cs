@@ -61,7 +61,7 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
                         ip = endpoint.Address;
                         port = endpoint.Port;
                     }
-                    response = _handler.HandleMessage(message.ToArray(), ip, port);
+                    response = await _handler.HandleMessage(message.ToArray(), ip, port);
 
                     await connection.Transport.Output.WriteAsync(response);
 
@@ -71,7 +71,7 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
                     if (command != null)
                     {
                         await connection.Transport.Output.WriteAsync(command.EncodedCommand);
-                        _logger.LogInformation("Команда CommandId = {CommandId} была отправлена трекеру по адресу {Ip}:{Port} данные: {Message}", 
+                        _logger.LogInformation("Команда CommandId = {CommandId} была отправлена трекеру по адресу {Ip}:{Port} данные: {Message}",
                             command.CommandId, ip, port, string.Join(' ', command.EncodedCommand.Select(x => x.ToString("X"))));
                     }
 

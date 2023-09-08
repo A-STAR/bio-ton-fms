@@ -1,27 +1,34 @@
-﻿using System.Net;
-using System.Text;
-using System.Text.Json;
-using BioTonFMS.Common.Constants;
+﻿using BioTonFMS.Common.Constants;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Messaging;
 using BioTonFMS.Infrastructure.MessageBus;
+using System.Collections.Concurrent;
+using System.Net;
+using System.Text;
+using System.Text.Json;
 
 namespace BioTonFMS.TrackerTcpServer.ProtocolMessageHandlers;
 
-public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
+public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler, IPublisherConfirmsHandler
 {
     private readonly IMessageBus _rawTrackerMessageBus;
     private readonly ILogger<GalileoskyProtocolMessageHandler> _logger;
+
+    const int confirmDelayMs = 50;
+    const int confirmTimeoutMs = 1000;
+
+    private readonly ConcurrentDictionary<ulong, ulong> _outstandingConfirms = new ConcurrentDictionary<ulong, ulong>();
 
     public GalileoskyProtocolMessageHandler(
         Func<MessgingBusType, IMessageBus> busResolver,
         ILogger<GalileoskyProtocolMessageHandler> logger)
     {
         _rawTrackerMessageBus = busResolver(MessgingBusType.RawTrackerMessages);
+        _rawTrackerMessageBus.SetPublisherConfirmsHandler(this);
         _logger = logger;
     }
 
-    public byte[] HandleMessage(byte[] message, IPAddress ip, int port)
+    public async Task<byte[]> HandleMessage(byte[] message, IPAddress ip, int port)
     {
         _logger.LogInformation("Получено сообщение длиной {Len} байт", message.Length);
         _logger.LogDebug("Текст сообщения {Message}", string.Join(' ', message.Select(x => x.ToString("X"))));
@@ -39,8 +46,34 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
                 IpAddress = ip.ToString(),
                 Port = port
             };
-            _rawTrackerMessageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
-            _logger.LogInformation("Сообщение опубликовано. Len = {Length} PackageUID = {PackageUID}", message.Length, raw.PackageUID);
+            var publishNumber = _rawTrackerMessageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
+            _logger.LogInformation("Сообщение отправлено. Len = {Length} PackageUID = {PackageUID}", message.Length, raw.PackageUID);
+            _outstandingConfirms.TryAdd(publishNumber, publishNumber);
+
+            var confirmTaskFinished = false;
+            var confirmTask = Task.Run(async () =>
+            {
+                while (!confirmTaskFinished)
+                {
+                    await Task.Delay(confirmDelayMs);
+
+                    if (!IsOutstanding(publishNumber))
+                    {
+                        _logger.LogDebug("Сообщение {PublishNumber} опубликовано", publishNumber);
+                        break;
+                    }
+                }
+            });
+
+            var timeoutTask = Task.Delay(confirmTimeoutMs);
+            var success = await Task.WhenAny(confirmTask, timeoutTask) == confirmTask;
+            confirmTaskFinished = true;
+
+            if (!success)
+            {
+                counted = 0;
+                _logger.LogDebug("Нет подтверждения отправки сообщения {publishNumber}, вовращаем ошибку CRC, чтобы трекер повторил сообщение", publishNumber);
+            }
         }
         else
         {
@@ -66,6 +99,39 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler
 
         // Общая длина пакета = 3 (заголовок) + длина данных + 2 (SRC)
         return dataLen + 5;
+    }
+
+    private bool IsOutstanding(ulong publishNumber)
+    {
+        return _outstandingConfirms.ContainsKey(publishNumber);
+    }
+
+    public void PublisherConfirm_Acked(ulong deliveryTag, bool multiple)
+    {
+        _logger.LogDebug("Подтверждение для {deliveryTag} {multiple}", deliveryTag, multiple);
+        CleanOutstandingConfirms(deliveryTag, multiple);
+    }
+
+    public void PublisherConfirm_Nacked(ulong deliveryTag, bool multiple)
+    {
+        _outstandingConfirms.TryGetValue(deliveryTag, out _);
+        _logger.LogDebug("Сообщение было отвергнуто шиной данных. Sequence number: {deliveryTag}, multiple: {multiple}", deliveryTag, multiple);
+    }
+
+    private void CleanOutstandingConfirms(ulong deliveryTag, bool multiple)
+    {
+        if (multiple)
+        {
+            var confirmed = _outstandingConfirms.Where(k => k.Key <= deliveryTag);
+            foreach (var entry in confirmed)
+            {
+                _outstandingConfirms.TryRemove(entry.Key, out _);
+            }
+        }
+        else
+        {
+            _outstandingConfirms.TryRemove(deliveryTag, out _);
+        }
     }
 
     private static byte[] GetResponseForTracker(ushort crc)

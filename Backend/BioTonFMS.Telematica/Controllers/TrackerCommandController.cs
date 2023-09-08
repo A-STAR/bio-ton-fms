@@ -87,9 +87,10 @@ public class TrackerCommandController : ValidationControllerBase
             _logger.LogDebug("TrackerCommandController.SendCommand отправлена команда с Id = {CommandId}", command.Id);
 
             TrackerCommand? updatedCommand = null;
+            var readTaskFinished = false;
             var readTask = Task.Run(async () =>
             {
-                while (true)
+                while (!readTaskFinished)
                 {
                     await Task.Delay(delayMs);
                     updatedCommand = _trackerCommandRepository.GetWithoutCaching(command!.Id);
@@ -105,7 +106,8 @@ public class TrackerCommandController : ValidationControllerBase
             
             var timeoutTask = Task.Delay(_options.CommandTimeoutSec * 1000);
             var success = await Task.WhenAny(readTask, timeoutTask) == readTask;
-            
+            readTaskFinished = true;
+
             if (success && updatedCommand != null)
             {
                 _logger.LogDebug("TrackerCommandController.SendCommand проверка команды с с Id = {CommandId} ответ = {ResponseText}", command.Id, updatedCommand.ResponseText);

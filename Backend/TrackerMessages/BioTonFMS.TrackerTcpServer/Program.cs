@@ -22,7 +22,7 @@ builder.Services.Configure<RetryOptions>(builder.Configuration.GetSection("Retry
 builder.Services.AddTransient<TcpSendCommandMessageHandler>();
 
 builder.Services.AddSingleton<Func<MessgingBusType, IMessageBus>>(serviceProvider => busType =>
-    MessageBusFactory.CreateOrGetBus(busType, serviceProvider, GetRowTrackerMessageBus)
+    MessageBusFactory.CreateOrGetBus(busType, serviceProvider, GetRawTrackerMessageBus)
 );
 
 builder.Services.AddSingleton<TcpSendCommandMessages>();
@@ -60,7 +60,7 @@ app.Lifetime.ApplicationStarted.Register(() =>
 });
 app.Run();
 
-IMessageBus GetRowTrackerMessageBus(IServiceProvider serviceProvider, RabbitMQOptions rabbitOptions)
+IMessageBus GetRawTrackerMessageBus(IServiceProvider serviceProvider, RabbitMQOptions rabbitOptions)
 {
     var timeouts = serviceProvider.GetRequiredService<IOptions<RetryOptions>>()
         .Value.TimeoutsInMs.Select(x => TimeSpan.FromSeconds(x));
@@ -72,7 +72,8 @@ IMessageBus GetRowTrackerMessageBus(IServiceProvider serviceProvider, RabbitMQOp
         isDurable: true,
         "RawTrackerMessages-primary", 
         needDeadMessageQueue: true,
-        deliveryLimit: rabbitOptions.DeliveryLimit);
+        deliveryLimit: rabbitOptions.DeliveryLimit,
+        queueMaxLength: rabbitOptions.TrackerQueueMaxLength);
     var secondaryOptions = builder.Configuration.GetSection("SecondaryMessageBrokerSettings").Get<MessageBrokerSettingsOptions>();
     RabbitMQMessageBus? secondary = null;
     if (secondaryOptions != null && secondaryOptions.Enabled)

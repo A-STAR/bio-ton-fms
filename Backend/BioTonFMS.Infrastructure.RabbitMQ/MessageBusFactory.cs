@@ -28,9 +28,9 @@ public class MessageBusFactory
                 MessgingBusType.Consuming => new RabbitMQMessageBus(
                     rabbitLogger, serviceProvider, rabbitOptions,
                     isDurable: true, "RawTrackerMessages-primary", needDeadMessageQueue: true,
-                    deliveryLimit: rabbitOptions.Value.DeliveryLimit),
+                    deliveryLimit: rabbitOptions.Value.DeliveryLimit, queueMaxLength: rabbitOptions.Value.TrackerQueueMaxLength),
                 MessgingBusType.TrackerCommandsReceive => new RabbitMQMessageBus(
-                    rabbitLogger, serviceProvider, rabbitOptions, 
+                    rabbitLogger, serviceProvider, rabbitOptions,
                     isDurable: true, "tracker-command-receive", needDeadMessageQueue: true),
                 MessgingBusType.TrackerCommandsSend => new RabbitMQMessageBus(
                     rabbitLogger, serviceProvider, rabbitOptions,
