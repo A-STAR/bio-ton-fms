@@ -1,14 +1,15 @@
-﻿namespace BioTonFMS.Infrastructure.MessageBus
+﻿namespace BioTonFMS.Infrastructure.MessageBus;
+
+public interface IMessageBus
 {
-    public interface IMessageBus
-    {
-        void Publish(byte[] message);
+    void SetPublisherConfirmsHandler(IPublisherConfirmsHandler confirmHandler);
 
-        void Subscribe<TBusMessageHandler>()
-            where TBusMessageHandler : IBusMessageHandler;
+    ulong Publish(byte[] message);
 
-        void Ack(ulong deliveryTag, bool multiple);
+    void Subscribe<TBusMessageHandler>()
+        where TBusMessageHandler : IBusMessageHandler;
 
-        void Nack(ulong deliveryTag, bool multiple, bool requeue);
-    }
+    void Ack(ulong deliveryTag, bool multiple);
+
+    void Nack(ulong deliveryTag, bool multiple, bool requeue);
 }

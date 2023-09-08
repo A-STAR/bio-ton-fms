@@ -26,13 +26,20 @@ internal class MessageBusMux : IMessageBus
         throw new NotImplementedException();
     }
 
-    public void Publish(byte[] message)
+    public void SetPublisherConfirmsHandler(IPublisherConfirmsHandler confirmHandler)
     {
-        _primaryBus.Publish(message);
+        _primaryBus.SetPublisherConfirmsHandler(confirmHandler);
+        _secondaryBus?.SetPublisherConfirmsHandler(confirmHandler);
+    }
+
+    public ulong Publish(byte[] message)
+    {
+        var publishNumber = _primaryBus.Publish(message);
         if (_secondaryBus is not null)
         {
             _retryPolicy.Execute(() => _secondaryBus.Publish(message));
         }
+        return publishNumber;
     }
 
     public void Subscribe<TBusMessageHandler>()
