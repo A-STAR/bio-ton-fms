@@ -215,9 +215,9 @@ describe('TechService', () => {
   it('should get vehicle info', (done: DoneFn) => {
     service
       .getVehicleInfo(testMonitoringVehicles[0].id)
-      .subscribe(vehicle => {
-        expect(vehicle)
-          .withContext('emit vehicle')
+      .subscribe(info => {
+        expect(info)
+          .withContext('emit vehicle info')
           .toBe(testVehicleMonitoringInfo);
 
         done();
@@ -225,10 +225,29 @@ describe('TechService', () => {
 
     const vehicleRequest = httpTestingController.expectOne(
       `/api/telematica/monitoring/vehicle/${testMonitoringVehicles[0].id}`,
-      'get vehicle request'
+      'get vehicle info request'
     );
 
     vehicleRequest.flush(testVehicleMonitoringInfo);
+  });
+
+  it('should get message', (done: DoneFn) => {
+    service
+      .getMessage(testMonitoringVehicles[0].id)
+      .subscribe(message => {
+        expect(message)
+          .withContext('emit message')
+          .toBe(testMonitoringMessageInfo);
+
+        done();
+      });
+
+    const messageRequest = httpTestingController.expectOne(
+      `/api/telematica/monitoring/trackPoint/${testMonitoringVehicles[0].id}`,
+      'get message request'
+    );
+
+    messageRequest.flush(testMonitoringMessageInfo);
   });
 });
 
@@ -399,6 +418,17 @@ export const testLocationAndTrackResponse: LocationAndTrackResponse = {
       ]
     }
   ]
+};
+
+const testMonitoringMessageInfo = {
+  generalInfo: {
+    messageTime: testVehicleMonitoringInfo.generalInfo.lastMessageTime,
+    speed: testVehicleMonitoringInfo.generalInfo.speed,
+    numberOfSatellites: testVehicleMonitoringInfo.generalInfo.satellitesNumber,
+    latitude: testVehicleMonitoringInfo.generalInfo.latitude,
+    longitude: testVehicleMonitoringInfo.generalInfo.longitude
+  },
+  trackerInfo: { ...testVehicleMonitoringInfo.trackerInfo }
 };
 
 export const testFindCriterion = testMonitoringVehicles[0].name.substring(0, SEARCH_MIN_LENGTH);
