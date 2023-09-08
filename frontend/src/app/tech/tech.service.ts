@@ -130,13 +130,10 @@ type ViewBounds = {
   bottomRightLongitude: number;
 };
 
-type TrackPointInfo = {
+type TrackPointInfo = Pick<MonitoringInfo, 'speed' | 'latitude' | 'longitude'> & {
   messageId: number;
-  time: string;
-  latitude: number;
-  longitude: number;
-  speed: number;
-  altitude: number;
+  time?: MonitoringInfo['lastMessageTime'];
+  numberOfSatellites?: MonitoringInfo['satellitesNumber'];
 };
 
 type LocationAndTrack = {

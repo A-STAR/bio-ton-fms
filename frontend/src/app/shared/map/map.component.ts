@@ -138,20 +138,22 @@ export class MapComponent implements OnInit {
           latitude,
           longitude
         } of track) {
-          const position: Position = [longitude, latitude];
+          if (longitude && latitude) {
+            const position: Position = [longitude, latitude];
 
-          coordinates.push(position);
+            coordinates.push(position);
 
-          const message: Feature<Point> = {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: position
-            },
-            properties: { id }
-          };
+            const message: Feature<Point> = {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: position
+              },
+              properties: { id }
+            };
 
-          messageFeatures.push(message);
+            messageFeatures.push(message);
+          }
         }
 
         const trackFeature: Feature<LineString> = {
