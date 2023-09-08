@@ -140,7 +140,8 @@ type TrackPointInfo = {
 };
 
 type LocationAndTrack = {
-  vehicleId: number;
+  vehicleId: MonitoringVehicle['id'];
+  vehicleName: MonitoringVehicle['name'];
   latitude: number;
   longitude: number;
   track?: TrackPointInfo[];

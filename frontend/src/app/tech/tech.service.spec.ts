@@ -311,6 +311,7 @@ export const testLocationAndTrackResponse: LocationAndTrackResponse = {
   tracks: [
     {
       vehicleId: testMonitoringVehicles[0].id,
+      vehicleName: testMonitoringVehicles[0].name,
       latitude: 50.14918,
       longitude: 53.20434,
       track: [
@@ -350,11 +351,13 @@ export const testLocationAndTrackResponse: LocationAndTrackResponse = {
     },
     {
       vehicleId: testMonitoringVehicles[1].id,
+      vehicleName: testMonitoringVehicles[1].name,
       latitude: 45.33645,
       longitude: 52.312251
     },
     {
       vehicleId: testMonitoringVehicles[2].id,
+      vehicleName: testMonitoringVehicles[2].name,
       latitude: 50.295905,
       longitude: 53.287243,
       track: [
