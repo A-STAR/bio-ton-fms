@@ -214,6 +214,13 @@ export class MapComponent implements OnInit {
           strokeColor: '#FFFFFF00',
           radius: 3,
           weight: 5
+        },
+        selectable: true,
+        popupOnSelect: true,
+        popupOptions: {
+          autoPan: true,
+          maxWidth: 400,
+          unselectOnClose: true
         }
       });
     }
