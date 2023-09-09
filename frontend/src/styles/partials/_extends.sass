@@ -239,3 +239,72 @@
         $field-gap: math.div($column-gap, 2)
 
         width: calc($field-width - $field-gap)
+
+%info-layout
+
+  dl
+    display: flex
+    flex-wrap: wrap
+    margin-bottom: 25px
+
+    dt,
+    dd
+      display: flex
+      color: $light-dark
+
+  dl:first-of-type
+    gap: 15px
+
+    div
+      flex: 1
+
+      &:first-child,
+      &:last-child
+
+        dd
+          font-size: 10px
+
+      &:last-child span,
+      &:not(:first-child, :last-child) dd
+        text-wrap: nowrap
+
+      &:first-child
+        display: flex
+        column-gap: 10px
+        flex-basis: 100%
+
+        dd:last-of-type
+          justify-content: flex-end
+          flex: 1
+          text-align: right
+
+      &:not(:first-child)
+        flex-direction: column
+        row-gap: 10px
+
+        &,
+        dd
+          display: flex
+
+        dd
+          flex: 1
+          font-weight: 500
+
+      &:last-child
+        padding-right: 10px
+
+        dd span
+          display: inline-block
+          line-height: normal
+
+    dt,
+    dd
+      align-items: center
+      flex-wrap: wrap
+
+    dt
+      color: $darker-gray
+      font-size: 9px
+
+    dd
+      font-size: 13px

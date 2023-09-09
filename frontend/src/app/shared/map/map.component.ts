@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate, formatNumber } from '@angular/common';
 
 import { CreatePopupContentProps, createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
@@ -11,7 +11,11 @@ import NgwConnector, { ResourceDefinition } from '@nextgis/ngw-connector';
 import { Feature, FeatureCollection, LineString, Point, Position } from 'geojson';
 import { getIcon } from '@nextgis/icons';
 
-import { LocationAndTrackResponse } from '../../tech/tech.service';
+import { firstValueFrom, map } from 'rxjs';
+
+import { LocationAndTrackResponse, TechService } from '../../tech/tech.service';
+import { localeID, RelativeTimePipe } from '../../tech/shared/relative-time.pipe';
+
 import { MonitoringTech } from '../../tech/tech.component';
 
 import { environment } from '../../../environments/environment';
@@ -20,6 +24,7 @@ import { environment } from '../../../environments/environment';
   selector: 'bio-map',
   standalone: true,
   imports: [CommonModule],
+  providers: [RelativeTimePipe],
   template: '',
   styleUrls: ['./map.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -121,24 +126,136 @@ export class MapComponent implements OnInit {
 
   /* istanbul ignore next */
   /**
-   * Create a message popup content.
+   * Get a message, create a message popup content.
    *
    * @param properties Popup content properties.
    *
-   * @returns Inner HTML of popup content.
+   * @returns Promise of popup content inner HTML.
    */
   #createMessagePopupContent = ({
     feature: { properties }
   }: CreatePopupContentProps<Feature<Point, FeatureProperties>>) => {
-    const divEl = document.createElement('div');
+    const popup$ = this.techService
+      .getMessage(properties['id'])
+      .pipe(
+        map(({ generalInfo }) => {
+          const divEl = document.createElement('div');
 
-    const headingEl = document.createElement('h1');
+          const headingEl = document.createElement('h1');
 
-    headingEl.textContent = properties['techName'];
+          headingEl.textContent = properties['techName'];
 
-    divEl.append(headingEl);
+          const DEFAULT_DETAILS = '-';
 
-    return divEl.innerHTML;
+          const descriptionListEl = document.createElement('dl');
+
+          for (const property in generalInfo) {
+            if (property === 'longitude') {
+              continue;
+            }
+
+            const divEl = document.createElement('div');
+
+            const descriptionTermEl = document.createElement('dt');
+
+            const TERMS = {
+              messageTime: 'Последняя точка:',
+              numberOfSatellites: 'Спутники',
+              speed: 'Скорость',
+              latitude: 'Координаты'
+            };
+
+            const term = TERMS[property as keyof typeof TERMS];
+
+            descriptionTermEl.textContent = term;
+
+            divEl.appendChild(descriptionTermEl);
+
+            const descriptionDetailsEls: HTMLElement[] = [];
+
+            switch (property) {
+              case 'messageTime': {
+                // relative time
+                let descriptionDetailsEl = document.createElement('dd');
+
+                descriptionDetailsEl.textContent = this.relativeTimePipe.transform(generalInfo[property]);
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                // date
+                descriptionDetailsEl = document.createElement('dd');
+
+                const details = generalInfo['messageTime']
+                  ? formatDate(generalInfo['messageTime'], 'd MMMM y, H:mm', localeID)
+                  : generalInfo[property]?.toString();
+
+                descriptionDetailsEl.textContent = details ?? DEFAULT_DETAILS;
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                break;
+              }
+
+              case 'speed': {
+                const descriptionDetailsEl = document.createElement('dd');
+
+                descriptionDetailsEl.textContent = generalInfo['speed']
+                  ? `${formatNumber(generalInfo['speed'], 'en-US', '1.1-1')}  км/ч`
+                  : DEFAULT_DETAILS;
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                break;
+              }
+
+              case 'numberOfSatellites': {
+                const descriptionDetailsEl = document.createElement('dd');
+
+                descriptionDetailsEl.textContent = generalInfo[property]?.toString() ?? DEFAULT_DETAILS;
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                break;
+              }
+
+              case 'latitude': {
+                const descriptionDetailsEl = document.createElement('dd');
+
+                // latitude
+                let spanEl = document.createElement('span');
+
+                spanEl.textContent = generalInfo['latitude']
+                  ? `ш: ${formatNumber(generalInfo['latitude'], 'en-US', '1.6-6')}°`
+                  : DEFAULT_DETAILS;
+
+                descriptionDetailsEl.appendChild(spanEl);
+
+                // longitude
+                if (generalInfo['longitude']) {
+                  spanEl = document.createElement('span');
+
+                  spanEl.textContent = generalInfo['longitude']
+                    ? `д: ${formatNumber(generalInfo['longitude'], 'en-US', '1.6-6')}°`
+                    : DEFAULT_DETAILS;
+
+                  descriptionDetailsEl.appendChild(spanEl);
+                }
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+              }
+            }
+
+            divEl.append(...descriptionDetailsEls);
+            descriptionListEl.appendChild(divEl);
+          }
+
+          divEl.append(headingEl, descriptionListEl);
+
+          return divEl.innerHTML;
+        })
+      );
+
+    return firstValueFrom(popup$);
   };
 
   /**
@@ -353,7 +470,7 @@ export class MapComponent implements OnInit {
     }
   }
 
-  constructor(private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef, private techService: TechService, private relativeTimePipe: RelativeTimePipe) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   async ngOnInit() {

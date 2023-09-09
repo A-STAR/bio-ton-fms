@@ -38,8 +38,13 @@ legend
   margin-bottom: 20px
   font-size: 15px
 
-.maplibregl-popup-content h1
-  @extend %heading-with-border
+.maplibregl-popup-content
+  @extend %info-layout
 
-  margin-bottom: 30px
-  font-size: 18px
+  $horizontal-spacing: 30px
+
+  h1
+    @extend %heading-with-border
+
+    margin-bottom: 30px
+    font-size: 18px
