@@ -2,6 +2,7 @@
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Expressions;
 using BioTonFMS.Expressions.Compilation;
+using Serilog;
 
 namespace BioTonFMS.MessageProcessing;
 
@@ -54,7 +55,7 @@ public static class MessageProcessing
     /// ASTs to sorted sequences of runnable lambda expressions. Resulting sequences are paired with ids of their
     /// trackers</remarks>
     /// <returns>A sequence of compiled sensor formulas per tracker: (externalTrackerId1, {(name1, expression1), ...}), (externalTrackerId2, {}), ...</returns>
-    public static IEnumerable<(int ExternalTrackerId, CompiledExpression<SensorExpressionProperties>[])> BuildSensors(
+    public static IEnumerable<(int ExternalTrackerId, CompiledExpression<SensorExpressionProperties>[] SensorsCompiledExpressions)> BuildSensors(
         this IEnumerable<Tracker> trackers,
         IEnumerable<TrackerTag> trackerTags, IExceptionHandler? exceptionHandler = null)
     {
@@ -188,10 +189,15 @@ public static class MessageProcessing
             return;
 
         // Calculate sensor values and put the values to message tags
-        var newTags = builtTrackerSensors
+        IEnumerable<MessageTag> newTags = builtTrackerSensors
             .CalculateSensors(message.Tags, previousMessage?.Tags, tagNameByIdDict)
             .ConvertSensorValuesToTags(message);
-
+        if (Log.IsEnabled(Serilog.Events.LogEventLevel.Verbose))
+        {
+            var newTagsList = newTags.Select(t => $"Id={t.Id} SensorId={t.SensorId} Value={t.ValueString} TrackerMessageId={t.TrackerMessageId}");
+            Log.Verbose("Теги для датчиков {@newTags}", newTagsList);
+        }
+        
         // Create new tag list then fill it with existing message tags and
         // add message tags for sensors 
         var newListOfTags = message.Tags.Where(tag => !tag.SensorId.HasValue).ToList();
@@ -219,10 +225,10 @@ public static class MessageProcessing
         // Построить по набору выражений датчиков для каждого из трекеров
         Dictionary<int, CompiledExpression<SensorExpressionProperties>[]> builtSensorsByExternalTrackerId = trackers
             .BuildSensors(trackerTags, exceptionHandler)
-            .ToDictionary(t => t.Item1 /* Tracker id */, t => t.Item2);
+            .ToDictionary(t => t.ExternalTrackerId, t => t.SensorsCompiledExpressions);
 
-        // Build dictionary which maps tad ids to tag names
-        Dictionary<int, string> tagNameById = trackerTags
+        // Build dictionary which maps tag ids to tag names
+        Dictionary<int, string> tagNameByIdDict = trackerTags
             .Where(tag => tag.DataType is TagDataTypeEnum.Double or TagDataTypeEnum.Byte
                 or TagDataTypeEnum.Integer /* For the moment we can process doubles only */)
             .ToDictionary(tag => tag.Id, tag => tag.Name);
@@ -231,7 +237,8 @@ public static class MessageProcessing
         foreach (var message in messages)
         {
             previousMessages.TryGetValue(message.ExternalTrackerId, out var previousMessage);
-            message.UpdateSensorTags(previousMessage, builtSensorsByExternalTrackerId, tagNameById);
+            Log.Verbose("Перед UpdateSensorTags для сообщения {MessageId}", message.Id);
+            message.UpdateSensorTags(previousMessage, builtSensorsByExternalTrackerId, tagNameByIdDict);
             previousMessages[message.ExternalTrackerId] = message;
         }
     }

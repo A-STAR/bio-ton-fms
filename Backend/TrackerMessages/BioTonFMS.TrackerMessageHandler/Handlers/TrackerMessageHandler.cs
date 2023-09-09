@@ -180,6 +180,7 @@ public class TrackerMessageHandler : IBusMessageHandler
 
         if (previousMessage is not null)
         {
+            _logger.LogTrace("Перед UpdateSensorTags");
             messages.UpdateSensorTags(new Dictionary<int, TrackerMessage>() { { previousMessage.ExternalTrackerId, previousMessage } },
                 new[] { tracker }, trackerTags, new LoggingExceptionHandler(_logger));
         }

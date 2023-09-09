@@ -47,7 +47,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler, IPublis
                 Port = port
             };
             var publishNumber = _rawTrackerMessageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(raw)));
-            _logger.LogInformation("Сообщение отправлено. Len = {Length} PackageUID = {PackageUID}", message.Length, raw.PackageUID);
+            _logger.LogInformation("Сообщение отправлено. SeqNum = {SeqNum} Len = {Length} PackageUID = {PackageUID}", publishNumber, message.Length, raw.PackageUID);
             _outstandingConfirms.TryAdd(publishNumber, publishNumber);
 
             var confirmTaskFinished = false;
@@ -103,6 +103,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler, IPublis
 
     private bool IsOutstanding(ulong publishNumber)
     {
+        _logger.LogTrace("IsOutstanding = {Keys}", string.Join(' ', _outstandingConfirms.Keys.Select(x => x.ToString())));
         return _outstandingConfirms.ContainsKey(publishNumber);
     }
 
@@ -132,6 +133,7 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler, IPublis
         {
             _outstandingConfirms.TryRemove(deliveryTag, out _);
         }
+        _logger.LogTrace("After CleanOutstandingConfirms = {Keys}", string.Join(' ', _outstandingConfirms.Keys.Select(x => x.ToString())));
     }
 
     private static byte[] GetResponseForTracker(ushort crc)
