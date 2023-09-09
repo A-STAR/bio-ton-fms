@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
+import { CreatePopupContentProps, createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
 import maplibregl from 'maplibre-gl';
 import { FeatureProperties, LngLatArray, LngLatBoundsArray } from '@nextgis/utils';
@@ -119,6 +119,28 @@ export class MapComponent implements OnInit {
     });
   }
 
+  /* istanbul ignore next */
+  /**
+   * Create a message popup content.
+   *
+   * @param properties Popup content properties.
+   *
+   * @returns Inner HTML of popup content.
+   */
+  #createMessagePopupContent = ({
+    feature: { properties }
+  }: CreatePopupContentProps<Feature<Point, FeatureProperties>>) => {
+    const divEl = document.createElement('div');
+
+    const headingEl = document.createElement('h1');
+
+    headingEl.textContent = properties['techName'];
+
+    divEl.append(headingEl);
+
+    return divEl.innerHTML;
+  };
+
   /**
    * Add, update map layers with tracks and messages.
    *
@@ -128,7 +150,10 @@ export class MapComponent implements OnInit {
     const tracks: Feature<LineString>[] = [];
     const messageCollections: FeatureCollection<Point>[] = [];
 
-    for (const { track } of location.tracks) {
+    for (const {
+      vehicleName: techName,
+      track
+    } of location.tracks) {
       if (track) {
         const coordinates: Position[] = [];
         const messageFeatures: Feature<Point>[] = [];
@@ -149,7 +174,7 @@ export class MapComponent implements OnInit {
                 type: 'Point',
                 coordinates: position
               },
-              properties: { id }
+              properties: { id, techName }
             };
 
             messageFeatures.push(message);
@@ -220,7 +245,8 @@ export class MapComponent implements OnInit {
         popupOptions: {
           autoPan: true,
           maxWidth: 400,
-          unselectOnClose: true
+          unselectOnClose: true,
+          createPopupContent: this.#createMessagePopupContent
         }
       });
     }
