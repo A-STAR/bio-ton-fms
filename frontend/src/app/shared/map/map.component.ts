@@ -138,7 +138,7 @@ export class MapComponent implements OnInit {
     const popup$ = this.techService
       .getMessage(properties['id'])
       .pipe(
-        map(({ generalInfo }) => {
+        map(({ generalInfo, trackerInfo }) => {
           const divEl = document.createElement('div');
 
           const headingEl = document.createElement('h1');
@@ -250,6 +250,25 @@ export class MapComponent implements OnInit {
           }
 
           divEl.append(headingEl, descriptionListEl);
+
+          if (trackerInfo.sensors?.length) {
+            const headingEl = document.createElement('h2');
+            const descriptionListEl = document.createElement('dl');
+
+            headingEl.textContent = 'Значения датчиков';
+
+            for (const { name, value, unit } of trackerInfo.sensors) {
+              const descriptionTermEl = document.createElement('dt');
+              const descriptionDetailsEl = document.createElement('dd');
+
+              descriptionTermEl.textContent = name;
+              descriptionDetailsEl.textContent = `${value} ${unit}`;
+
+              descriptionListEl.append(descriptionTermEl, descriptionDetailsEl);
+            }
+
+            divEl.append(headingEl, descriptionListEl);
+          }
 
           return divEl.innerHTML;
         })

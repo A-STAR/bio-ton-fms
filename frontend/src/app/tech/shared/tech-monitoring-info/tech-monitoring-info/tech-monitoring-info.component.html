@@ -65,11 +65,11 @@
 
 <ng-template #default>-</ng-template>
 
-<ng-container *ngIf="info.trackerInfo.sensors as sensors">
+<ng-container *ngIf="info.trackerInfo.sensors?.length">
   <h1>Значения датчиков</h1>
 
   <dl>
-    <ng-container *ngFor="let sensor of sensors">
+    <ng-container *ngFor="let sensor of info.trackerInfo.sensors">
       <dt>{{ sensor.name }}:</dt>
       <dd>
         <ng-container *ngIf="sensor.value">{{ sensor.value }} {{ sensor.unit }}</ng-container>
