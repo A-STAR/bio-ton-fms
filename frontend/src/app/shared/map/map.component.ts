@@ -270,6 +270,23 @@ export class MapComponent implements OnInit {
             divEl.append(headingEl, descriptionListEl);
           }
 
+          if (trackerInfo.parameters?.length) {
+            const headingEl = document.createElement('h2');
+            const wrapperDivEl = document.createElement('div');
+
+            headingEl.textContent = 'Параметры';
+
+            for (const { paramName, lastValueDateTime, lastValueDecimal, lastValueString } of trackerInfo.parameters) {
+              const spanEl = document.createElement('span');
+
+              spanEl.textContent = `${paramName}=${lastValueString ?? lastValueDecimal ?? lastValueDateTime}`;
+
+              wrapperDivEl.append(spanEl);
+            }
+
+            divEl.append(headingEl, wrapperDivEl);
+          }
+
           return divEl.innerHTML;
         })
       );

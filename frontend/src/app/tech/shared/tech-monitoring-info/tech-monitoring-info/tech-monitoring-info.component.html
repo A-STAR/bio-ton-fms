@@ -96,11 +96,11 @@
   </dl>
 </ng-container>
 
-<ng-container *ngIf="info.trackerInfo.parameters as parameters">
+<ng-container *ngIf="info.trackerInfo.parameters?.length">
   <h1>Параметры</h1>
 
   <mat-chip-set>
-    <mat-chip disableRipple *ngFor="let parameter of parameters">
+    <mat-chip disableRipple *ngFor="let parameter of info.trackerInfo.parameters">
       {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
     </mat-chip>
   </mat-chip-set>
