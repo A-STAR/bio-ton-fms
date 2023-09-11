@@ -3,7 +3,7 @@
     <dt>Последняя точка:</dt>
 
     <dd>
-      <ng-container *ngIf="info.lastMessageTime; else default">{{ info.lastMessageTime | relativeTime }}</ng-container>
+      <ng-container *ngIf="info.lastMessageTime !== undefined; else default">{{ info.lastMessageTime | relativeTime }}</ng-container>
     </dd>
 
     <ng-container *ngIf="info.lastMessageTime">
@@ -15,7 +15,7 @@
     <dt>Скорость</dt>
 
     <dd>
-      <ng-container *ngIf="info.speed; else default">{{ info.speed | number:'1.1-1':'en-US' }} км/ч</ng-container>
+      <ng-container *ngIf="info.speed !== undefined; else default">{{ info.speed | number:'1.1-1':'en-US' }} км/ч</ng-container>
     </dd>
   </div>
 
@@ -23,7 +23,7 @@
     <dt>Пробег</dt>
 
     <dd>
-      <ng-container *ngIf="info.mileage; else default">{{ info.mileage | number:'1.0-0' }} км</ng-container>
+      <ng-container *ngIf="info.mileage !== undefined; else default">{{ info.mileage | number:'1.0-0' }} км</ng-container>
     </dd>
   </div>
 
@@ -31,7 +31,7 @@
     <dt>Моточасы</dt>
 
     <dd>
-      <ng-container *ngIf="info.engineHours; else default">{{ info.engineHours }} ч</ng-container>
+      <ng-container *ngIf="info.engineHours !== undefined; else default">{{ info.engineHours }} ч</ng-container>
     </dd>
   </div>
 
@@ -39,7 +39,7 @@
     <dt>Спутники</dt>
 
     <dd>
-      <ng-container *ngIf="info.satellitesNumber; else default">{{ info.satellitesNumber }}</ng-container>
+      <ng-container *ngIf="info.satellitesNumber !== undefined; else default">{{ info.satellitesNumber }}</ng-container>
     </dd>
   </div>
 
@@ -47,12 +47,16 @@
     <dt>Координаты</dt>
 
     <dd>
-      <ng-container *ngIf="info.latitude || info.longitude; else default">
+      <ng-container *ngIf="info.latitude !== undefined || info.longitude !== undefined; else default">
         <span>
-          <ng-container *ngIf="info.latitude; else default">ш: {{ info.latitude | number: '1.6-6':'en-US' }}&deg;</ng-container>
+          <ng-container *ngIf="info.latitude !== undefined; else default">
+            ш: {{ info.latitude | number: '1.6-6':'en-US' }}&deg;
+          </ng-container>
         </span>
         <span>
-          <ng-container *ngIf="info.longitude; else default">д: {{ info.longitude | number: '1.6-6':'en-US' }}&deg;</ng-container>
+          <ng-container *ngIf="info.longitude !== undefined; else default">
+            д: {{ info.longitude | number: '1.6-6':'en-US' }}&deg;
+          </ng-container>
         </span>
       </ng-container>
     </dd>
@@ -61,11 +65,11 @@
 
 <ng-template #default>-</ng-template>
 
-<ng-container *ngIf="info.trackerInfo.sensors as sensors">
+<ng-container *ngIf="info.trackerInfo.sensors?.length">
   <h1>Значения датчиков</h1>
 
   <dl>
-    <ng-container *ngFor="let sensor of sensors">
+    <ng-container *ngFor="let sensor of info.trackerInfo.sensors">
       <dt>{{ sensor.name }}:</dt>
       <dd>
         <ng-container *ngIf="sensor.value">{{ sensor.value }} {{ sensor.unit }}</ng-container>
@@ -92,11 +96,11 @@
   </dl>
 </ng-container>
 
-<ng-container *ngIf="info.trackerInfo.parameters as parameters">
+<ng-container *ngIf="info.trackerInfo.parameters?.length">
   <h1>Параметры</h1>
 
   <mat-chip-set>
-    <mat-chip disableRipple *ngFor="let parameter of parameters">
+    <mat-chip disableRipple *ngFor="let parameter of info.trackerInfo.parameters">
       {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
     </mat-chip>
   </mat-chip-set>

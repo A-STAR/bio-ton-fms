@@ -1,3 +1,9 @@
+@use 'sass:map'
+@use 'variables' as *
+
+.maplibregl-map
+  line-height: unset
+
 .maplibregl-ctrl-top-right
   top: 50%
   transform: translateY(-50%)
@@ -7,3 +13,31 @@
 
   &:first-child
     margin-top: unset
+
+.maplibregl-popup-content
+  overflow: hidden
+  padding: unset
+  border-radius: 4px
+
+  > div
+    margin: 30px 30px 20px
+
+.maplibregl-popup-close-button
+  $position: 7px
+  $padding-bottom: 4px
+
+  top: $position
+  right: $position
+  width: $padding-bottom + 20px
+  padding: unset
+  padding-bottom: $padding-bottom
+  color: $red
+  font-size: 22px
+  border-top-right-radius: unset
+  transition-property: color, text-shadow
+  transition-duration: map.get($transition, button, duration)
+  transition-timing-function: map.get($transition, button, timing-function)
+
+  &:hover
+    background-color: unset
+    text-shadow: $box-shadow

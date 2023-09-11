@@ -98,7 +98,7 @@ describe('TechMonitoringInfoComponent', () => {
       },
       {
         term: 'Координаты',
-        details: [`ш: ${formatNumber(latitude!, 'en-US', '1.6-6')}°д: ${formatNumber(longitude!, 'en-US', '1.6-6')}°`]
+        details: [`ш: ${formatNumber(latitude!, 'en-US', '1.6-6')}°  д: ${formatNumber(longitude!, 'en-US', '1.6-6')}°`]
       }
     ];
 
@@ -110,7 +110,9 @@ describe('TechMonitoringInfoComponent', () => {
         .toBe(DESCRIPTION_TEXTS[index].term);
 
       DESCRIPTION_TEXTS[index].details.forEach(detailsText => {
-        expect(descriptionDetailsDes[descriptionDetailsDeIndex].nativeElement.textContent)
+        expect(
+          descriptionDetailsDes[descriptionDetailsDeIndex].nativeElement.textContent.trim()
+        )
           .withContext('render description details text')
           .toBe(detailsText);
 
@@ -133,7 +135,9 @@ describe('TechMonitoringInfoComponent', () => {
       By.css('dl div:last-of-type > dd span')
     );
 
-    expect(descriptionDetailsSpanDes[0].nativeElement.textContent)
+    expect(
+      descriptionDetailsSpanDes[0].nativeElement.textContent.trim()
+    )
       .withContext('render description details latitude text')
       .toBe(`ш: ${formatNumber(testVehicleMonitoringInfo.generalInfo.latitude!, 'en-US', '1.6-6')}°`);
 
@@ -160,7 +164,9 @@ describe('TechMonitoringInfoComponent', () => {
       .withContext('render description details latitude default text')
       .toBe('-');
 
-    expect(descriptionDetailsSpanDes[1].nativeElement.textContent)
+    expect(
+      descriptionDetailsSpanDes[1].nativeElement.textContent.trim()
+    )
       .withContext('render description details longitude text')
       .toBe(`д: ${formatNumber(testVehicleMonitoringInfo.generalInfo.longitude!, 'en-US', '1.6-6')}°`);
   });

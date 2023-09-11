@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate, formatNumber } from '@angular/common';
 
-import { createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
+import { CreatePopupContentProps, createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
 import maplibregl from 'maplibre-gl';
 import { FeatureProperties, LngLatArray, LngLatBoundsArray } from '@nextgis/utils';
@@ -11,7 +11,11 @@ import NgwConnector, { ResourceDefinition } from '@nextgis/ngw-connector';
 import { Feature, FeatureCollection, LineString, Point, Position } from 'geojson';
 import { getIcon } from '@nextgis/icons';
 
-import { LocationAndTrackResponse } from '../../tech/tech.service';
+import { firstValueFrom, map } from 'rxjs';
+
+import { LocationAndTrackResponse, TechService } from '../../tech/tech.service';
+import { localeID, RelativeTimePipe } from '../../tech/shared/relative-time.pipe';
+
 import { MonitoringTech } from '../../tech/tech.component';
 
 import { environment } from '../../../environments/environment';
@@ -20,6 +24,7 @@ import { environment } from '../../../environments/environment';
   selector: 'bio-map',
   standalone: true,
   imports: [CommonModule],
+  providers: [RelativeTimePipe],
   template: '',
   styleUrls: ['./map.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -119,6 +124,176 @@ export class MapComponent implements OnInit {
     });
   }
 
+  /* istanbul ignore next */
+  /**
+   * Get a message, create a message popup content.
+   *
+   * @param properties Popup content properties.
+   *
+   * @returns Promise of popup content inner HTML.
+   */
+  #createMessagePopupContent = ({
+    feature: { properties }
+  }: CreatePopupContentProps<Feature<Point, FeatureProperties>>) => {
+    const popup$ = this.techService
+      .getMessage(properties['id'])
+      .pipe(
+        map(({ generalInfo, trackerInfo }) => {
+          const divEl = document.createElement('div');
+
+          const headingEl = document.createElement('h1');
+
+          headingEl.textContent = properties['techName'];
+
+          const DEFAULT_DETAILS = '-';
+
+          const descriptionListEl = document.createElement('dl');
+
+          for (const property in generalInfo) {
+            if (property === 'longitude') {
+              continue;
+            }
+
+            const divEl = document.createElement('div');
+
+            const descriptionTermEl = document.createElement('dt');
+
+            const TERMS = {
+              messageTime: 'Последняя точка:',
+              numberOfSatellites: 'Спутники',
+              speed: 'Скорость',
+              latitude: 'Координаты'
+            };
+
+            const term = TERMS[property as keyof typeof TERMS];
+
+            descriptionTermEl.textContent = term;
+
+            divEl.appendChild(descriptionTermEl);
+
+            const descriptionDetailsEls: HTMLElement[] = [];
+
+            switch (property) {
+              case 'messageTime': {
+                // relative time
+                let descriptionDetailsEl = document.createElement('dd');
+
+                descriptionDetailsEl.textContent = this.relativeTimePipe.transform(generalInfo[property]);
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                // date
+                descriptionDetailsEl = document.createElement('dd');
+
+                const details = generalInfo['messageTime']
+                  ? formatDate(generalInfo['messageTime'], 'd MMMM y, H:mm', localeID)
+                  : generalInfo[property]?.toString();
+
+                descriptionDetailsEl.textContent = details ?? DEFAULT_DETAILS;
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                break;
+              }
+
+              case 'speed': {
+                const descriptionDetailsEl = document.createElement('dd');
+
+                descriptionDetailsEl.textContent = generalInfo['speed']
+                  ? `${formatNumber(generalInfo['speed'], 'en-US', '1.1-1')}  км/ч`
+                  : DEFAULT_DETAILS;
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                break;
+              }
+
+              case 'numberOfSatellites': {
+                const descriptionDetailsEl = document.createElement('dd');
+
+                descriptionDetailsEl.textContent = generalInfo[property]?.toString() ?? DEFAULT_DETAILS;
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+
+                break;
+              }
+
+              case 'latitude': {
+                const descriptionDetailsEl = document.createElement('dd');
+
+                // latitude
+                let spanEl = document.createElement('span');
+
+                spanEl.textContent = generalInfo['latitude']
+                  ? `ш: ${formatNumber(generalInfo['latitude'], 'en-US', '1.6-6')}°`
+                  : DEFAULT_DETAILS;
+
+                descriptionDetailsEl.appendChild(spanEl);
+
+                // longitude
+                if (generalInfo['longitude']) {
+                  spanEl = document.createElement('span');
+
+                  spanEl.textContent = generalInfo['longitude']
+                    ? `д: ${formatNumber(generalInfo['longitude'], 'en-US', '1.6-6')}°`
+                    : DEFAULT_DETAILS;
+
+                  descriptionDetailsEl.appendChild(spanEl);
+                }
+
+                descriptionDetailsEls.push(descriptionDetailsEl);
+              }
+            }
+
+            divEl.append(...descriptionDetailsEls);
+            descriptionListEl.appendChild(divEl);
+          }
+
+          divEl.append(headingEl, descriptionListEl);
+
+          if (trackerInfo.sensors?.length) {
+            const headingEl = document.createElement('h2');
+            const descriptionListEl = document.createElement('dl');
+
+            headingEl.textContent = 'Значения датчиков';
+
+            for (const { name, value, unit } of trackerInfo.sensors) {
+              const descriptionTermEl = document.createElement('dt');
+              const descriptionDetailsEl = document.createElement('dd');
+
+              descriptionTermEl.textContent = name;
+              descriptionDetailsEl.textContent = `${value} ${unit}`;
+
+              descriptionListEl.append(descriptionTermEl, descriptionDetailsEl);
+            }
+
+            divEl.append(headingEl, descriptionListEl);
+          }
+
+          if (trackerInfo.parameters?.length) {
+            const headingEl = document.createElement('h2');
+            const wrapperDivEl = document.createElement('div');
+
+            headingEl.textContent = 'Параметры';
+
+            for (const { paramName, lastValueDateTime, lastValueDecimal, lastValueString } of trackerInfo.parameters) {
+              const spanEl = document.createElement('span');
+
+              spanEl.textContent = `${paramName}=${lastValueString ?? lastValueDecimal ?? lastValueDateTime}`;
+
+              wrapperDivEl.append(spanEl);
+            }
+
+            divEl.append(headingEl, wrapperDivEl);
+          }
+
+          return divEl.innerHTML;
+        })
+      );
+
+    return firstValueFrom(popup$);
+  };
+
   /**
    * Add, update map layers with tracks and messages.
    *
@@ -128,7 +303,10 @@ export class MapComponent implements OnInit {
     const tracks: Feature<LineString>[] = [];
     const messageCollections: FeatureCollection<Point>[] = [];
 
-    for (const { track } of location.tracks) {
+    for (const {
+      vehicleName: techName,
+      track
+    } of location.tracks) {
       if (track) {
         const coordinates: Position[] = [];
         const messageFeatures: Feature<Point>[] = [];
@@ -138,20 +316,22 @@ export class MapComponent implements OnInit {
           latitude,
           longitude
         } of track) {
-          const position: Position = [longitude, latitude];
+          if (longitude && latitude) {
+            const position: Position = [longitude, latitude];
 
-          coordinates.push(position);
+            coordinates.push(position);
 
-          const message: Feature<Point> = {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: position
-            },
-            properties: { id }
-          };
+            const message: Feature<Point> = {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: position
+              },
+              properties: { id, techName }
+            };
 
-          messageFeatures.push(message);
+            messageFeatures.push(message);
+          }
         }
 
         const trackFeature: Feature<LineString> = {
@@ -212,6 +392,14 @@ export class MapComponent implements OnInit {
           strokeColor: '#FFFFFF00',
           radius: 3,
           weight: 5
+        },
+        selectable: true,
+        popupOnSelect: true,
+        popupOptions: {
+          autoPan: true,
+          maxWidth: 400,
+          unselectOnClose: true,
+          createPopupContent: this.#createMessagePopupContent
         }
       });
     }
@@ -318,7 +506,7 @@ export class MapComponent implements OnInit {
     }
   }
 
-  constructor(private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef, private techService: TechService, private relativeTimePipe: RelativeTimePipe) { }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   async ngOnInit() {

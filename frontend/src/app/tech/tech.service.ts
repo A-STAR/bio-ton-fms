@@ -65,6 +65,17 @@ export class TechService {
     return this.httpClient.post<LocationAndTrackResponse>('/api/telematica/monitoring/locations-and-tracks', body, { params });
   }
 
+  /**
+   * Get a monitoring track message.
+   *
+   * @param id An message ID.
+   *
+   * @returns An `Observable` of the `MonitoringMessageInfo` stream.
+   */
+  getMessage(id: TrackPointInfo['messageId']) {
+    return this.httpClient.get<MonitoringMessageInfo>(`/api/telematica/monitoring/trackPoint/${id}`);
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 
@@ -130,17 +141,15 @@ type ViewBounds = {
   bottomRightLongitude: number;
 };
 
-type TrackPointInfo = {
+type TrackPointInfo = Pick<MonitoringInfo, 'speed' | 'latitude' | 'longitude'> & {
   messageId: number;
-  time: string;
-  latitude: number;
-  longitude: number;
-  speed: number;
-  altitude: number;
+  time?: MonitoringInfo['lastMessageTime'];
+  numberOfSatellites?: MonitoringInfo['satellitesNumber'];
 };
 
 type LocationAndTrack = {
-  vehicleId: number;
+  vehicleId: MonitoringVehicle['id'];
+  vehicleName: MonitoringVehicle['name'];
   latitude: number;
   longitude: number;
   track?: TrackPointInfo[];
@@ -149,4 +158,12 @@ type LocationAndTrack = {
 export type LocationAndTrackResponse = {
   viewBounds?: ViewBounds;
   tracks: LocationAndTrack[];
+};
+
+type MonitoringMessageInfo = {
+  generalInfo: Pick<MonitoringInfo, 'speed' | 'latitude' | 'longitude'> & {
+    messageTime: MonitoringInfo['lastMessageTime'];
+    numberOfSatellites: MonitoringInfo['satellitesNumber'];
+  };
+  trackerInfo: Pick<TrackerMonitoringInfo, 'parameters' | 'sensors'>;
 };
