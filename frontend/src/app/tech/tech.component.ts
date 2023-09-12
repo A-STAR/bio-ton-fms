@@ -107,6 +107,18 @@ export default class TechComponent implements OnInit, OnDestroy {
   protected techInfo?: TechMonitoringInfo;
 
   /**
+   * `TrackByFunction` to compute the identity of tech.
+   *
+   * @param index The index of the item within the iterable.
+   * @param tech The `MonitoringTech` in the iterable.
+   *
+   * @returns `MonitoringTech` ID.
+   */
+  protected techTrackBy(index: number, { id }: MonitoringTech) {
+    return id;
+  }
+
+  /**
    * Tech option selected state.
    *
    * @param id `MonitoringTech` ID.
