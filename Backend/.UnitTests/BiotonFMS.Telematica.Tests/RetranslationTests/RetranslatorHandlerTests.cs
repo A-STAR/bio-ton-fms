@@ -21,7 +21,7 @@ public class RetranslatorHandlerTests
 
         var handler = new RetranslatorHandler(mock, busResolver);
 
-        await handler.HandleAsync(new byte[] {0,1,2}, new MessageDeliverEventArgs());
+        await handler.HandleAsync(new byte[] {0,1,2}, 0);
 
         mock.Toggled.Should().BeTrue();
     }

@@ -23,7 +23,7 @@ public class TcpSendCommandMessageHandler : IBusMessageHandler
         _trackerCommandBus = busResolver(MessgingBusType.TrackerCommandsSend);
     }
 
-    public Task HandleAsync(byte[] binaryMessage, MessageDeliverEventArgs messageDeliverEventArgs)
+    public Task HandleAsync(byte[] binaryMessage, ulong deliveryTag)
     {
         try
         {
@@ -35,12 +35,12 @@ public class TcpSendCommandMessageHandler : IBusMessageHandler
             _commandMessages.AddSendCommandMessage(commandMessage);
             _logger.LogDebug("TcpCommandMessageHandler сообщение положено в очередь");
 
-            _trackerCommandBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+            _trackerCommandBus.Ack(deliveryTag, multiple: false);
             return Task.CompletedTask;
         }
         catch
         {
-            _trackerCommandBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: false);
+            _trackerCommandBus.Nack(deliveryTag, multiple: false, requeue: false);
             throw;
         }
     }
