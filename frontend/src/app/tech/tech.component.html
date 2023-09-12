@@ -17,7 +17,7 @@
 
     <mat-selection-list #list [hidden]="!tech.length" (selectionChange)="handleSelectionChange($event.options)">
       <mat-accordion hideToggle displayMode="flat">
-        <ng-container *ngFor="let tech of tech">
+        <ng-container *ngFor="let tech of tech; trackBy: techTrackBy">
           <div>
             <mat-list-option checkboxPosition="before" [value]="tech.id" [selected]="isSelected(tech.id)">
               <button bioStopClickPropagation (click)="onPanelToggle(panel, tech.id)">{{ tech.name }}</button>
