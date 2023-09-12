@@ -7,7 +7,7 @@ public class TcpSendCommandMessages
 {
     private readonly Dictionary<(string IpAddress, int Port), Queue<TrackerCommandMessage>>  _messages = new Dictionary<(string IpAddress, int Port), Queue<TrackerCommandMessage>>();
 
-    public void AddSendCommandMessage(TrackerCommandMessage message) 
+    public virtual void AddSendCommandMessage(TrackerCommandMessage message) 
     {
         Queue<TrackerCommandMessage> queue;
         if (_messages.ContainsKey((message.IpAddress, message.Port))) 
@@ -22,7 +22,7 @@ public class TcpSendCommandMessages
         queue.Enqueue(message);
     }
 
-    public TrackerCommandMessage? GetCommandForTracker(IPAddress ip, int port)
+    public virtual TrackerCommandMessage? GetCommandForTracker(IPAddress ip, int port)
     {
         TrackerCommandMessage? command = null;
         if (_messages.ContainsKey((ip.ToString(), port)))

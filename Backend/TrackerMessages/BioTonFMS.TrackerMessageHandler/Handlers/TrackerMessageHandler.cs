@@ -14,7 +14,6 @@ using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
 using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog.Core;
 
 namespace BioTonFMS.TrackerMessageHandler.Handlers;
 

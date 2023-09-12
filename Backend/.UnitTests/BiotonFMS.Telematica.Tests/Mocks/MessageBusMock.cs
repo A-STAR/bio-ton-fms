@@ -6,15 +6,17 @@ public class MessageBusMock : IMessageBus
 {
     public readonly List<byte[]> Messages = new();
     private IPublisherConfirmsHandler? _confirmHandler = null;
+    public readonly List<(ulong, bool)> ackList = new();
+    public readonly List<(ulong, bool, bool)> nackList = new();
 
     public void Ack(ulong deliveryTag, bool multiple)
     {
-        throw new NotImplementedException();
+        ackList.Add((deliveryTag, multiple));
     }
 
     public void Nack(ulong deliveryTag, bool multiple, bool requeue)
     {
-        throw new NotImplementedException();
+        nackList.Add((deliveryTag, multiple, requeue));
     }
 
     public ulong Publish(byte[] message)
