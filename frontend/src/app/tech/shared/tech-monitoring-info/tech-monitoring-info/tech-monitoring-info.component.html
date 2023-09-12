@@ -69,7 +69,7 @@
   <h1>Значения датчиков</h1>
 
   <dl>
-    <ng-container *ngFor="let sensor of info.trackerInfo.sensors">
+    <ng-container *ngFor="let sensor of info.trackerInfo.sensors; trackBy: sensorTrackBy">
       <dt>{{ sensor.name }}:</dt>
       <dd>
         <ng-container *ngIf="sensor.value">{{ sensor.value }} {{ sensor.unit }}</ng-container>
@@ -100,7 +100,7 @@
   <h1>Параметры</h1>
 
   <mat-chip-set>
-    <mat-chip disableRipple *ngFor="let parameter of info.trackerInfo.parameters">
+    <mat-chip disableRipple *ngFor="let parameter of info.trackerInfo.parameters; trackBy: parameterTrackBy">
       {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
     </mat-chip>
   </mat-chip-set>

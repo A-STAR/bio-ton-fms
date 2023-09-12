@@ -111,7 +111,7 @@ export type MonitoringVehicle = Pick<Vehicle, 'id' | 'name'> & Pick<MonitoringIn
   tracker?: Pick<Tracker, 'id' | 'externalId' | 'imei'>;
 };
 
-type MonitoringSensor = Pick<Sensor, 'name'> & {
+export type MonitoringSensor = Pick<Sensor, 'name'> & {
   value?: string;
   unit?: Unit['name'];
 };
