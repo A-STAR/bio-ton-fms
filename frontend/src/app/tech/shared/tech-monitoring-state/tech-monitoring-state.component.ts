@@ -27,6 +27,14 @@ export class TechMonitoringStateComponent {
 
   @Output() protected sendTrackerCommand = new EventEmitter<Tracker['id']>();
 
+  protected selectedTrack?: boolean;
   protected MovementStatus = MovementStatus;
   protected ConnectionStatus = ConnectionStatus;
+
+  /**
+   * Handle tech track toggle.
+   */
+  protected onTrackToggle() {
+    this.selectedTrack = !this.selectedTrack;
+  }
 }
