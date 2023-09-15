@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, QueryList } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, QueryList, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -62,6 +62,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class TechComponent implements OnInit, OnDestroy {
+  @ViewChild(MatSelectionList) selectionList?: MatSelectionList;
+
   /**
    * Get search stream.
    *
@@ -167,6 +169,39 @@ export default class TechComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle tech track toggle. Set selected track, select tech.
+   *
+   * @param id `TechMonitoring` ID.
+   */
+  protected onTrackToggle(id: MonitoringTech['id']) {
+    const {
+      selection = new Set(),
+      trackSelection = new Set()
+    } = this.#options;
+
+    const hasSelectedTrack = trackSelection.has(id);
+
+    if (hasSelectedTrack) {
+      trackSelection.delete(id);
+    } else {
+      trackSelection.add(id);
+
+      const hasSelected = selection.has(id);
+
+      if (!hasSelected) {
+        selection.add(id);
+
+        // select option in template to retrigger all checkbox state update in time
+        const option = this.selectionList?.options.find(({ value }) => value === id);
+
+        option?.toggle();
+      }
+    }
+
+    this.#options = { selection, trackSelection };
+  }
+
+  /**
    * Send a command to tech GPS-tracker.
    *
    * @param id `Tracker` ID.
@@ -269,11 +304,11 @@ export default class TechComponent implements OnInit, OnDestroy {
    * Set tech location and track.
    */
   #setLocations() {
-    const getLocation = (selection: TechOptions['selection']) => of(selection)
+    const getLocation = (options: TechOptions) => of(options)
       .pipe(
-        map(selection => Array.from(selection!, (vehicleId): LocationOptions => ({
+        map(options => Array.from(options.selection!, (vehicleId): LocationOptions => ({
           vehicleId,
-          needReturnTrack: true
+          needReturnTrack: options.trackSelection?.has(vehicleId)
         }))),
         switchMap(options => this.techService.getVehiclesLocationAndTrack(options)),
         map(location => {
@@ -292,8 +327,8 @@ export default class TechComponent implements OnInit, OnDestroy {
     this.location$ = this.#location$.pipe(
       switchMap(() => this.#options$),
       debounce(() => timer(DEBOUNCE_DUE_TIME)),
-      skipWhile(({ selection }) => selection === undefined),
-      switchMap(({ selection }) => selection?.size ? getLocation(selection) : unselectedLocation$)
+      skipWhile(({ selection }) => selection?.size === undefined),
+      switchMap(options => options.selection?.size ? getLocation(options) : unselectedLocation$)
     );
   }
 
