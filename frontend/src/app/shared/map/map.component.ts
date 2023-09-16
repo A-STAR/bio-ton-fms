@@ -363,7 +363,7 @@ export class MapComponent implements OnInit {
 
     await this.#map?.setLayerData(TRACK_LAYER_DEFINITION, track);
 
-    if (!trackLayer) {
+    if (!trackLayer && location.tracks.length) {
       trackLayer = await this.#map?.addFeatureLayer({
         id: TRACK_LAYER_DEFINITION,
         data: track,
@@ -379,7 +379,7 @@ export class MapComponent implements OnInit {
 
     await messageLayer?.clearLayer?.();
 
-    if (!messageLayer) {
+    if (!messageLayer && location.tracks.length) {
       messageLayer = await this.#map?.addFeatureLayer({
         id: MESSAGE_LAYER_DEFINITION,
         data: {
@@ -443,7 +443,7 @@ export class MapComponent implements OnInit {
 
     await this.#map?.setLayerData(LOCATION_LAYER_DEFINITION, markers);
 
-    if (!locationLayer) {
+    if (!locationLayer && tracks.length) {
       locationLayer = await this.#map?.addFeatureLayer({
         id: LOCATION_LAYER_DEFINITION,
         data: markers,
