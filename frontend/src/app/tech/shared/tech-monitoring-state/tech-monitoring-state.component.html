@@ -1,4 +1,4 @@
-<button mat-icon-button title="Построить трек" color="primary">
+<button mat-icon-button title="Построить трек" [color]="selectedTrack ? 'accent' : 'primary'" (click)="onTrackToggle()">
   <mat-icon class="md-18">route</mat-icon>
 </button>
 

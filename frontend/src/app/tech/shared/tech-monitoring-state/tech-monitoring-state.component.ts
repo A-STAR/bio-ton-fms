@@ -25,8 +25,19 @@ import { MonitoringTech } from '../../tech.component';
 export class TechMonitoringStateComponent {
   @Input() tech!: MonitoringTech;
 
+  @Output() protected trackToggle = new EventEmitter<MonitoringTech['id']>();
   @Output() protected sendTrackerCommand = new EventEmitter<Tracker['id']>();
 
+  protected selectedTrack?: boolean;
   protected MovementStatus = MovementStatus;
   protected ConnectionStatus = ConnectionStatus;
+
+  /**
+   * Handle tech track toggle, emit toggled track tech ID.
+   */
+  protected onTrackToggle() {
+    this.selectedTrack = !this.selectedTrack;
+
+    this.trackToggle.emit(this.tech.id);
+  }
 }

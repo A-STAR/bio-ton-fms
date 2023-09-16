@@ -68,6 +68,41 @@ describe('TechMonitoringStateComponent', () => {
   it('should render stopped tech with satellites state', fakeAsync(async () => {
     await testStateRendering(component, fixture, loader, relativeTimePipe, testMonitoringVehicles[2]);
   }));
+
+  it('should toggle tech track state', async () => {
+    mockTestTech(component, fixture, testMonitoringVehicles[0]);
+
+    const trackButton = await loader.getHarness(
+      MatButtonHarness.with({
+        variant: 'icon',
+        text: 'route'
+      })
+    );
+
+    const buttonHost = await trackButton.host();
+
+    let colorAttribute = await buttonHost.getAttribute('ng-reflect-color');
+
+    expect(colorAttribute)
+      .withContext('render unselected track button color attribute')
+      .toBe('primary');
+
+    await trackButton.click();
+
+    colorAttribute = await buttonHost?.getAttribute('ng-reflect-color');
+
+    expect(colorAttribute)
+      .withContext('render selected track button color attribute')
+      .toBe('accent');
+
+    await trackButton.click();
+
+    colorAttribute = await buttonHost?.getAttribute('ng-reflect-color');
+
+    expect(colorAttribute)
+      .withContext('render unselected track button color attribute')
+      .toBe('primary');
+  });
 });
 
 /**

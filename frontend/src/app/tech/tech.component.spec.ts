@@ -300,7 +300,7 @@ describe('TechComponent', () => {
     );
 
     expect(techMonitoringStateDes.length)
-      .withContext('render `bio-tech-monitoring-state` component elements')
+      .withContext('render `bio-tech-monitoring-state` components')
       .toBe(testMonitoringVehicles.length);
 
     techMonitoringStateDes.forEach((techMonitoringStateDe, index) => {
@@ -366,7 +366,7 @@ describe('TechComponent', () => {
 
     const testVehicleOptions: LocationOptions[] = testMonitoringVehicles.map(({ id }) => ({
       vehicleId: id,
-      needReturnTrack: true
+      needReturnTrack: undefined
     }));
 
     expect(locationAndTrackSpy)
@@ -437,7 +437,7 @@ describe('TechComponent', () => {
     let testVehicleOptions: LocationOptions[] = [
       {
         vehicleId: testMonitoringVehicles[index].id,
-        needReturnTrack: true
+        needReturnTrack: undefined
       }
     ];
 
@@ -458,7 +458,7 @@ describe('TechComponent', () => {
 
     testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
       vehicleId: id,
-      needReturnTrack: true
+      needReturnTrack: undefined
     }));
 
     expect(locationAndTrackSpy)
@@ -479,10 +479,10 @@ describe('TechComponent', () => {
     tick(DEBOUNCE_DUE_TIME);
 
     testVehicleOptions = testMonitoringVehicles
-      .filter(({ name }) => name !== testMonitoringVehicles[index].name)
+      .filter(({ id }) => id !== testMonitoringVehicles[index].id)
       .map(({ id }) => ({
         vehicleId: id,
-        needReturnTrack: true
+        needReturnTrack: undefined
       }));
 
     expect(locationAndTrackSpy)
@@ -508,6 +508,104 @@ describe('TechComponent', () => {
     )
       .withContext('render all checkbox unchecked')
       .toBeResolvedTo(false);
+  }));
+
+  it('should toggle track', fakeAsync(async () => {
+    const techMonitoringStateDes = fixture.debugElement.queryAll(
+      By.directive(TechMonitoringStateComponent)
+    );
+
+    // select a track
+    const index = 0;
+
+    techMonitoringStateDes[index].triggerEventHandler('trackToggle', testMonitoringVehicles[index].id);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let testVehicleOptions: LocationOptions[] = [
+      {
+        vehicleId: testMonitoringVehicles[index].id,
+        needReturnTrack: true
+      }
+    ];
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
+
+    // deselect a track
+    techMonitoringStateDes[index].triggerEventHandler('trackToggle', testMonitoringVehicles[index].id);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = [
+      {
+        vehicleId: testMonitoringVehicles[index].id,
+        needReturnTrack: false
+      }
+    ];
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
+
+    // select a few tracks
+    testMonitoringVehicles.forEach(({ id }, i) => {
+      if (id !== testMonitoringVehicles[index].id) {
+        techMonitoringStateDes[i].triggerEventHandler('trackToggle', id);
+      }
+    });
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id,
+      needReturnTrack: id !== testMonitoringVehicles[index].id
+    }));
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
+
+    // select all remaining tracks
+    techMonitoringStateDes[index].triggerEventHandler('trackToggle', testMonitoringVehicles[index].id);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id,
+      needReturnTrack: true
+    }));
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
+
+    // deselect a few tracks
+    testMonitoringVehicles.forEach(({ id }, i) => {
+      if (id !== testMonitoringVehicles[index].id) {
+        techMonitoringStateDes[i].triggerEventHandler('trackToggle', id);
+      }
+    });
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id,
+      needReturnTrack: id === testMonitoringVehicles[index].id
+    }));
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
+
+    // deselect all remaining tracks
+    techMonitoringStateDes[index].triggerEventHandler('trackToggle', testMonitoringVehicles[index].id);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    testVehicleOptions = testMonitoringVehicles.map(({ id }) => ({
+      vehicleId: id,
+      needReturnTrack: false
+    }));
+
+    expect(locationAndTrackSpy)
+      .toHaveBeenCalledWith(testVehicleOptions);
   }));
 
   it('should ignore location view bounds', fakeAsync(async () => {
@@ -590,7 +688,7 @@ describe('TechComponent', () => {
       );
 
       expect(techMonitoringInfoDe)
-        .withContext('render `bio-tech-monitoring-info` component element')
+        .withContext('render `bio-tech-monitoring-info` component')
         .not.toBeNull();
 
       expect(techMonitoringInfoDe.componentInstance.info)

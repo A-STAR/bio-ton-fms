@@ -23,7 +23,8 @@
               <button bioStopClickPropagation (click)="onPanelToggle(panel, tech.id)">{{ tech.name }}</button>
             </mat-list-option>
 
-            <bio-tech-monitoring-state [tech]="tech" (sendTrackerCommand)="onSendTrackerCommand($event)"></bio-tech-monitoring-state>
+            <bio-tech-monitoring-state [tech]="tech" (trackToggle)="onTrackToggle($event)"
+              (sendTrackerCommand)="onSendTrackerCommand($event)"></bio-tech-monitoring-state>
           </div>
 
           <mat-expansion-panel #panel [expanded]="tech.id === expandedPanelTechID">

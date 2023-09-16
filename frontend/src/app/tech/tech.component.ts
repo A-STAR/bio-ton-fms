@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, QueryList } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, QueryList, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -62,6 +62,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class TechComponent implements OnInit, OnDestroy {
+  @ViewChild(MatSelectionList) selectionList?: MatSelectionList;
+
   /**
    * Get search stream.
    *
@@ -126,7 +128,7 @@ export default class TechComponent implements OnInit, OnDestroy {
    * @returns Option selected state.
    */
   protected isSelected(id: MonitoringTech['id']) {
-    return this.#options.selected?.has(id);
+    return this.#options.selection?.has(id);
   }
 
   /**
@@ -136,18 +138,18 @@ export default class TechComponent implements OnInit, OnDestroy {
    */
   protected handleSelectionChange(options: QueryList<MatListOption> | MatListOption[]) {
     const {
-      selected = new Set()
+      selection = new Set()
     } = this.#options;
 
     options.forEach(option => {
       if (option.selected) {
-        selected.add(option.value);
+        selection.add(option.value);
       } else {
-        selected.delete(option.value);
+        selection.delete(option.value);
       }
     });
 
-    this.#options = { selected };
+    this.#options = { selection };
   }
 
   /**
@@ -164,6 +166,39 @@ export default class TechComponent implements OnInit, OnDestroy {
     }
 
     this.handleSelectionChange(list.options);
+  }
+
+  /**
+   * Handle tech track toggle. Set selected track, select tech.
+   *
+   * @param id `TechMonitoring` ID.
+   */
+  protected onTrackToggle(id: MonitoringTech['id']) {
+    const {
+      selection = new Set(),
+      trackSelection = new Set()
+    } = this.#options;
+
+    const hasSelectedTrack = trackSelection.has(id);
+
+    if (hasSelectedTrack) {
+      trackSelection.delete(id);
+    } else {
+      trackSelection.add(id);
+
+      const hasSelected = selection.has(id);
+
+      if (!hasSelected) {
+        selection.add(id);
+
+        // select option in template to retrigger all checkbox state update in time
+        const option = this.selectionList?.options.find(({ value }) => value === id);
+
+        option?.toggle();
+      }
+    }
+
+    this.#options = { selection, trackSelection };
   }
 
   /**
@@ -206,12 +241,12 @@ export default class TechComponent implements OnInit, OnDestroy {
         .getVehicleInfo(id)
         .subscribe(info => {
           const {
-            selected = new Set()
+            selection = new Set()
           } = this.#options;
 
-          selected.add(id);
+          selection.add(id);
 
-          this.#options = { selected };
+          this.#options = { selection };
 
           this.expandedPanelTechID = id;
           this.techInfo = info;
@@ -240,26 +275,27 @@ export default class TechComponent implements OnInit, OnDestroy {
    * @param tech `MonitoringTech[]` tech.
    */
   #convergeSelection(tech: MonitoringTech[]) {
-    const { selected } = this.#options;
+    const { selection, trackSelection } = this.#options;
 
-    if (selected?.size) {
+    if (selection?.size) {
       const techIDs = tech.map(({ id }) => id);
       const ids = new Set(techIDs);
 
       let isDiverged: true | undefined;
 
-      selected.forEach(id => {
+      selection.forEach(id => {
         const hasTechID = ids.has(id);
 
         if (!hasTechID) {
-          selected.delete(id);
+          selection.delete(id);
+          trackSelection?.delete(id);
 
           isDiverged = true;
         }
       });
 
       if (isDiverged) {
-        this.#options = { selected };
+        this.#options = { selection, trackSelection };
       }
     }
   }
@@ -268,11 +304,11 @@ export default class TechComponent implements OnInit, OnDestroy {
    * Set tech location and track.
    */
   #setLocations() {
-    const getLocation = (selected: TechOptions['selected']) => of(selected)
+    const getLocation = (options: TechOptions) => of(options)
       .pipe(
-        map(selected => Array.from(selected!, (vehicleId): LocationOptions => ({
+        map(options => Array.from(options.selection!, (vehicleId): LocationOptions => ({
           vehicleId,
-          needReturnTrack: true
+          needReturnTrack: options.trackSelection?.has(vehicleId)
         }))),
         switchMap(options => this.techService.getVehiclesLocationAndTrack(options)),
         map(location => {
@@ -291,8 +327,8 @@ export default class TechComponent implements OnInit, OnDestroy {
     this.location$ = this.#location$.pipe(
       switchMap(() => this.#options$),
       debounce(() => timer(DEBOUNCE_DUE_TIME)),
-      skipWhile(({ selected }) => selected === undefined),
-      switchMap(({ selected }) => selected?.size ? getLocation(selected) : unselectedLocation$)
+      skipWhile(({ selection }) => selection?.size === undefined),
+      switchMap(options => options.selection?.size ? getLocation(options) : unselectedLocation$)
     );
   }
 
@@ -348,7 +384,7 @@ export default class TechComponent implements OnInit, OnDestroy {
         switchMap(() => searchQuery ? searchTech(searchQuery) : tech$)
       )),
       tap(() => {
-        if (this.#options$.value.selected?.size) {
+        if (this.#options$.value.selection?.size) {
           this.#location$.next({
             ignoreViewBounds: true
           });
@@ -380,7 +416,8 @@ type TechSearchForm = FormGroup<{
 export type MonitoringTech = MonitoringVehicle;
 
 type TechOptions = Partial<{
-  selected: Set<MonitoringTech['id']>;
+  selection: Set<MonitoringTech['id']>;
+  trackSelection: Set<MonitoringTech['id']>;
 }>;
 
 type ViewOptions = {
