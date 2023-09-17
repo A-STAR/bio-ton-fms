@@ -11,7 +11,7 @@ import NgwConnector, { ResourceDefinition } from '@nextgis/ngw-connector';
 import { Feature, FeatureCollection, LineString, Point, Position } from 'geojson';
 import { getIcon } from '@nextgis/icons';
 
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom, map, tap } from 'rxjs';
 
 import { LocationAndTrackResponse, TechService } from '../../tech/tech.service';
 import { localeID, RelativeTimePipe } from '../../tech/shared/relative-time.pipe';
@@ -34,6 +34,7 @@ export class MapComponent implements OnInit {
     if (location) {
       this.#location = location;
 
+      this.#closeMessagePopup(location);
       this.#setLocationLayers(location);
       this.#fitView(location);
     }
@@ -50,6 +51,7 @@ export class MapComponent implements OnInit {
   #map!: WebMap<MapAdapter, MainLayerAdapter>;
   #location?: LocationAndTrackResponse;
   #point?: MonitoringTech['id'];
+  #messagePopupTechID?: MonitoringTech['id'];
 
   /**
    * Add map fullscreen control.
@@ -138,6 +140,9 @@ export class MapComponent implements OnInit {
     const popup$ = this.techService
       .getMessage(properties['id'])
       .pipe(
+        tap(() => {
+          this.#messagePopupTechID = properties['techID'];
+        }),
         map(({ generalInfo, trackerInfo }) => {
           const divEl = document.createElement('div');
 
@@ -304,6 +309,7 @@ export class MapComponent implements OnInit {
     const messageCollections: FeatureCollection<Point>[] = [];
 
     for (const {
+      vehicleId: techID,
       vehicleName: techName,
       track
     } of location.tracks) {
@@ -327,7 +333,7 @@ export class MapComponent implements OnInit {
                 type: 'Point',
                 coordinates: position
               },
-              properties: { id, techName }
+              properties: { id, techID, techName }
             };
 
             messageFeatures.push(message);
@@ -503,6 +509,22 @@ export class MapComponent implements OnInit {
       }
     } else if (!tracks.length) {
       this.#map?.fitLayer(FIELD_LAYER_DEFINITION, FIT_OPTIONS);
+    }
+  }
+
+  /**
+   * Close message layer popup for unselected track.
+   *
+   * @param location Location and tracks.
+   */
+  #closeMessagePopup({ tracks }: LocationAndTrackResponse) {
+    const track = tracks.find(({ vehicleId, track }) => vehicleId === this.#messagePopupTechID && /* istanbul ignore next */ track?.length);
+
+    if (!track) {
+      // close popup by unselecting the message layer as `closePopup` is not implemented
+      this.#map?.unSelectLayer(MESSAGE_LAYER_DEFINITION);
+
+      this.#messagePopupTechID = undefined;
     }
   }
 
