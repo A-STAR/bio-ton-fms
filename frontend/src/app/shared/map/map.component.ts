@@ -374,9 +374,9 @@ export class MapComponent implements OnInit {
         id: TRACK_LAYER_DEFINITION,
         data: track,
         paint: {
-          strokeColor: '#AEAEAE',
+          strokeColor: '#0306DF',
           strokeOpacity: 0.8,
-          weight: 15
+          weight: 3
         }
       });
     }
@@ -393,10 +393,10 @@ export class MapComponent implements OnInit {
           features: []
         },
         paint: {
-          color: '#FAD565',
+          color: '#1413FA',
           opacity: 1,
           strokeColor: '#FFFFFF00',
-          radius: 3,
+          radius: 4,
           weight: 5
         },
         selectable: true,
