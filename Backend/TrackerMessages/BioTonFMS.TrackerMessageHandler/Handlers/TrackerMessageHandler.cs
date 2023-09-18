@@ -54,6 +54,7 @@ public class TrackerMessageHandler : IBusMessageHandler
 
     public Task HandleAsync(byte[] binaryMessage, MessageDeliverEventArgs messageDeliverEventArgs)
     {
+        var startTime = DateTime.Now;
         var messageText = Encoding.UTF8.GetString(binaryMessage);
         _logger.LogDebug("Получен пакет {MessageText}", messageText);
 
@@ -70,12 +71,14 @@ public class TrackerMessageHandler : IBusMessageHandler
             {
                 ProcessCommandReply(rawMessage);
                 _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+                _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
                 return Task.CompletedTask;
             }
 
             if (_messageRepository.ExistsByUid(rawMessage.PackageUID))
             {
                 _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+                _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
                 return Task.CompletedTask;
             }
 
@@ -123,10 +126,12 @@ public class TrackerMessageHandler : IBusMessageHandler
             }
 
             _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+            _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
             return Task.CompletedTask;
         }
         catch {
             _consumerBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: true);
+            _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
             throw;
         }
     }
