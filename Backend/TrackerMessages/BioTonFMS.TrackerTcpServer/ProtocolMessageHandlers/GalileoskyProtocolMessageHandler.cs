@@ -19,6 +19,11 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler, IPublis
 
     private readonly ConcurrentDictionary<ulong, ulong> _outstandingConfirms = new ConcurrentDictionary<ulong, ulong>();
 
+    private readonly DateTime _startTime = DateTime.UtcNow;
+    private long _messagesReceived = 0;
+    private List<DateTime> lastMinuteMessages = new List<DateTime>();
+    private List<DateTime> last5MinutesMessages = new List<DateTime>();
+
     public GalileoskyProtocolMessageHandler(
         Func<MessgingBusType, IMessageBus> busResolver,
         ILogger<GalileoskyProtocolMessageHandler> logger)
@@ -81,8 +86,32 @@ public class GalileoskyProtocolMessageHandler : IProtocolMessageHandler, IPublis
         }
 
         byte[] response = GetResponseForTracker(counted);
+
         _logger.LogDebug("Текст ответа {Response}", string.Join(' ', response.Select(x => x.ToString("X"))));
+
+        // статистика
+        _messagesReceived++;
+        var now = DateTime.UtcNow;
+        lastMinuteMessages.Add(now);
+        last5MinutesMessages.Add(now);
+        CleanPeriodWindow(lastMinuteMessages, 60);
+        CleanPeriodWindow(last5MinutesMessages, 300);
+        var totalTime = DateTime.UtcNow - _startTime;
+        _logger.LogInformation("Сообщений всего {Total} за последнюю минуту {MessagesPerMinutes} за последние 5 минут {MessagesPer5Minutes}", _messagesReceived, lastMinuteMessages.Count, last5MinutesMessages.Count);
+        _logger.LogInformation("Период приёма {Period} мин. рейт {Rate} в сек.", string.Format("{0,6:f}", totalTime.TotalMinutes), string.Format("{0,5:f}", _messagesReceived / totalTime.TotalSeconds));
         return response;
+    }
+
+    private void CleanPeriodWindow(List<DateTime> messages, int periodSecs)
+    {
+        var now = DateTime.UtcNow;
+        foreach(var moment in messages.ToArray()) 
+        { 
+            if (moment < now.AddSeconds(-periodSecs))
+            {
+                messages.Remove(moment);
+            }
+        }
     }
 
     public int GetPacketLength(byte[] message)

@@ -129,7 +129,8 @@ public class TrackerMessageHandler : IBusMessageHandler
             _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
             return Task.CompletedTask;
         }
-        catch {
+        catch (Exception ex) {
+            _logger.LogError(ex, "Ошибка в TrackerMessageHandler.HandleAsync");
             _consumerBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: true);
             _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
             throw;
