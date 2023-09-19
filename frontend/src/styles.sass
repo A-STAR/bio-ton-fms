@@ -1,3 +1,4 @@
+@use 'sass:math'
 @use 'variables' as *
 @use 'extends' as *
 
@@ -26,7 +27,7 @@ bio-root
     min-height: 100vh
 
 bio-sidebar ~ router-outlet + *
-  margin-left: $bio-sidebar-width
+    margin-left: $bio-sidebar-width
 
 fieldset:not(:last-child)
   margin-bottom: 25px
@@ -37,3 +38,30 @@ legend
   width: 100%
   margin-bottom: 20px
   font-size: 15px
+
+.maplibregl-popup-content
+  @extend %info-layout
+
+  $horizontal-spacing: 30px
+
+  h1
+    @extend %heading-with-border
+
+    margin-bottom: 30px
+    font-size: 18px
+
+  h2 ~ div
+    display: flex
+    flex-wrap: wrap
+    gap: 8px 10px
+
+    span
+      padding-left: 6px
+      padding-right: 6px
+      background: $lighter-gray
+      color: $green
+      border: 1px solid $light-green
+      font-size: 10px
+      font-weight: 500
+      line-height: 18px
+      border-radius: 6px

@@ -155,9 +155,11 @@ public class MonitoringController : ValidationControllerBase
         if (lastMessage != null) return Ok(GetVehicleInfo(lastMessage, tracker.Sensors, trackerInfo));
         
         trackerInfo.Sensors = tracker.Sensors
+            .Where(x => x.IsVisible)
             .Select(x => new TrackerSensorDto
             {
-                Name = x.Name, Unit = x.Unit.Name
+                Name = x.Name, 
+                Unit = x.Unit.Name
             })
             .ToList();
             
@@ -277,12 +279,14 @@ public class MonitoringController : ValidationControllerBase
     {
         var generalInfo = _mapper.Map<MonitoringGeneralInfoDto>(lastMessage);
 
-        var trackerSensors = sensors.ToDictionary(x => x.Id,
-            x => new TrackerSensorDto
-            {
-                Name = x.Name,
-                Unit = x.Unit.Name
-            });
+        var trackerSensors = sensors
+            .Where(x => x.IsVisible)
+            .ToDictionary(x => x.Id,
+                x => new TrackerSensorDto
+                {
+                    Name = x.Name,
+                    Unit = x.Unit.Name
+                });
 
         foreach (MessageTag tag in lastMessage.Tags)
         {
@@ -294,7 +298,7 @@ public class MonitoringController : ValidationControllerBase
             // вычисление пробега и моточасов
             switch (tag.TrackerTagId)
             {
-                case TagsSeed.CanB0:
+                case TagsSeed.CanB0Id:
                     generalInfo.Mileage = ((MessageTagInteger)tag).Value * 5;
                     break;
                 case TagsSeed.Can32BitR0Id:

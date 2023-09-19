@@ -32,9 +32,11 @@ public static class TagsSeed
     public const int Rs4850Id = 23;
     public const int Rs4851Id = 24;
     public const int CanA0Id = 25;
-    public const int CanB0 = 27;
+    public const int CanB0Id = 27;
     public const int Can8BitR0Id = 28;
     public const int Can32BitR0Id = 34;
+    public const int MileageId = 41; 
+
 
     public static readonly IEnumerable<ProtocolTag> ProtocolTags = new[]
     {
@@ -237,7 +239,12 @@ public static class TagsSeed
         {
             Id = 40, TagId = 40, ProtocolTagCode = 0x48, Size = 2,
             TrackerType = TrackerTypeEnum.GalileoSkyV50
-        }
+        },
+        new ProtocolTag
+        {
+            Id = MileageId, TagId = MileageId, ProtocolTagCode = 0xD4, Size = 4,
+            TrackerType = TrackerTypeEnum.GalileoSkyV50
+        },
     };
 
     public static readonly IEnumerable<TrackerTag> TrackerTags = new[]
@@ -508,6 +515,11 @@ CAN32BITR0
 4 – признак глушения GPS/GLONASS. 1- обнаружено глушение, 0 – нет.
 5 – признак подключения к терминалу кабеля USB. 1 – подключен, 0 – не подключен.
 6 – признак наличия SD карты в терминале. 1 – присутствует, 0 – отсутствует."
+        },
+        new TrackerTag
+        {
+            Id = MileageId, Name = "mileage", DataType = TagDataTypeEnum.Integer,
+            Description = @"Общий пробег по данным GPS/ГЛОНАСС-модулей, м."
         },
     };
 }
