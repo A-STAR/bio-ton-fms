@@ -14,7 +14,6 @@ using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
 using BioTonFMS.TrackerProtocolSpecific.TrackerMessages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog.Core;
 
 namespace BioTonFMS.TrackerMessageHandler.Handlers;
 
@@ -52,7 +51,7 @@ public class TrackerMessageHandler : IBusMessageHandler
         _commandReceiveBus = busResolver(MessgingBusType.TrackerCommandsReceive);
     }
 
-    public Task HandleAsync(byte[] binaryMessage, MessageDeliverEventArgs messageDeliverEventArgs)
+    public Task HandleAsync(byte[] binaryMessage, ulong deliveryTag)
     {
         var startTime = DateTime.Now;
         var messageText = Encoding.UTF8.GetString(binaryMessage);
@@ -61,7 +60,7 @@ public class TrackerMessageHandler : IBusMessageHandler
         var rawMessage = JsonSerializer.Deserialize<RawTrackerMessage>(messageText);
         if (rawMessage == null)
         {
-            _consumerBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: false);
+            _consumerBus.Nack(deliveryTag, multiple: false, requeue: false);
             throw new ArgumentException("Невозможно разобрать сырое сообщение", messageText);
         }
 
@@ -70,14 +69,14 @@ public class TrackerMessageHandler : IBusMessageHandler
             if (_parserProvider(rawMessage.TrackerType).IsCommandReply(rawMessage.RawMessage))
             {
                 ProcessCommandReply(rawMessage);
-                _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+                _consumerBus.Ack(deliveryTag, multiple: false);
                 _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
                 return Task.CompletedTask;
             }
 
             if (_messageRepository.ExistsByUid(rawMessage.PackageUID))
             {
-                _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+                _consumerBus.Ack(deliveryTag, multiple: false);
                 _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
                 return Task.CompletedTask;
             }
@@ -125,13 +124,13 @@ public class TrackerMessageHandler : IBusMessageHandler
                 _logger.LogTrace("Retranslation skipped as {AllowedExtIdsIsNull} and {AllowedExtIds}", _retranslatorOptions.AllowedExtIds is null, _retranslatorOptions.AllowedExtIds);
             }
 
-            _consumerBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+            _consumerBus.Ack(deliveryTag, multiple: false);
             _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
             return Task.CompletedTask;
         }
         catch (Exception ex) {
             _logger.LogError(ex, "Ошибка в TrackerMessageHandler.HandleAsync");
-            _consumerBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: true);
+            _consumerBus.Nack(deliveryTag, multiple: false, requeue: true);
             _logger.LogInformation("Обработано за {ProcessTime} мс", (DateTime.Now - startTime).TotalMilliseconds);
             throw;
         }

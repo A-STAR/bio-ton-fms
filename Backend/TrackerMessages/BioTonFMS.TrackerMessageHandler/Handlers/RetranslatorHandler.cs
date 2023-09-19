@@ -15,16 +15,16 @@ public class RetranslatorHandler : IBusMessageHandler
         _retranslationBus = busResolver(MessgingBusType.Retranslation);
     }
 
-    public async Task HandleAsync(byte[] binaryMessage, MessageDeliverEventArgs messageDeliverEventArgs)
+    public async Task HandleAsync(byte[] binaryMessage, ulong deliveryTag)
     {
         try
         {
             await _retranslator.Retranslate(binaryMessage);
-            _retranslationBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+            _retranslationBus.Ack(deliveryTag, multiple: false);
         }
         catch
         {
-            _retranslationBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: false);
+            _retranslationBus.Nack(deliveryTag, multiple: false, requeue: false);
             throw;
         }
     }

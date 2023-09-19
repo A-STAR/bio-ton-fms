@@ -67,13 +67,7 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
 
                     // после обработки пакета нужно проверить есть ли команда для этого трекера
                     // если есть отправляем эту команду и удаляем команду из очереди
-                    TrackerCommandMessage? command = _commandMessages.GetCommandForTracker(ip, port);
-                    if (command != null)
-                    {
-                        await connection.Transport.Output.WriteAsync(command.EncodedCommand);
-                        _logger.LogInformation("Команда CommandId = {CommandId} была отправлена трекеру по адресу {Ip}:{Port} данные: {Message}",
-                            command.CommandId, ip, port, string.Join(' ', command.EncodedCommand.Select(x => x.ToString("X"))));
-                    }
+                    await CheckAndSendCommand(connection, ip, port);
 
                     message = new();
                 }
@@ -94,5 +88,16 @@ public class GalileoTrackerConnectionHandler : ConnectionHandler
         }
 
         _logger.LogInformation("{Id} disconnected", connection.ConnectionId);
+    }
+
+    public virtual async Task CheckAndSendCommand(ConnectionContext connection, IPAddress ip, int port)
+    {
+        TrackerCommandMessage? command = _commandMessages.GetCommandForTracker(ip, port);
+        if (command != null)
+        {
+            await connection.Transport.Output.WriteAsync(command.EncodedCommand);
+            _logger.LogInformation("Команда CommandId = {CommandId} была отправлена трекеру по адресу {Ip}:{Port} данные: {Message}",
+                command.CommandId, ip, port, string.Join(' ', command.EncodedCommand.Select(x => x.ToString("X"))));
+        }
     }
 }

@@ -4,7 +4,7 @@ using BioTonFMS.TrackerProtocolSpecific.CommandCodecs;
 using FluentAssertions;
 using Xunit.Abstractions;
 
-namespace BiotonFMS.Telematica.Tests.CodecsTests;
+namespace BiotonFMS.Telematica.Tests.TrackerCommandTests.CodecsTests;
 
 public class GalileoskyCommandCodecTests
 {
@@ -69,23 +69,23 @@ public class GalileoskyCommandCodecTests
         decoded.ResponseBinary.Should().Equal(expectedBinary);
     }
 
-/*    [Theory]
-    [InlineData("34 30 30 35 36 34 37 38 33 38 04 32 00 77 44 65 76 35 63 " +
-                "6B 3D 31 31 36 20 54 6D 53 61 74 43 6E 74 3D 30 20 41")]
-    public void Decode_InvalidData_ShouldNotLoop(string response)
-    {
-        var codec = new GalileoskyCommandCodec();
-        byte[] bytes = response.Split()
-            .Select(x => byte.Parse(x, NumberStyles.HexNumber))
-            .ToArray();
+    /*    [Theory]
+        [InlineData("34 30 30 35 36 34 37 38 33 38 04 32 00 77 44 65 76 35 63 " +
+                    "6B 3D 31 31 36 20 54 6D 53 61 74 43 6E 74 3D 30 20 41")]
+        public void Decode_InvalidData_ShouldNotLoop(string response)
+        {
+            var codec = new GalileoskyCommandCodec();
+            byte[] bytes = response.Split()
+                .Select(x => byte.Parse(x, NumberStyles.HexNumber))
+                .ToArray();
 
-        var decoded = codec.DecodeCommand(bytes);
+            var decoded = codec.DecodeCommand(bytes);
 
 
-        decoded.ResponseText.Should().Be("");
-        //decoded.ResponseBynaryInfo.Should().Equal(Array.Empty<byte>());
-        throw new NotImplementedException();
-    }*/
+            decoded.ResponseText.Should().Be("");
+            //decoded.ResponseBynaryInfo.Should().Equal(Array.Empty<byte>());
+            throw new NotImplementedException();
+        }*/
 
     #endregion
 

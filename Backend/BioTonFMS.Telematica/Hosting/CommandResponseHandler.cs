@@ -29,7 +29,7 @@ public class CommandResponseHandler : IBusMessageHandler
         _logger = logger;
     }
 
-    public async Task HandleAsync(byte[] binaryMessage, MessageDeliverEventArgs messageDeliverEventArgs)
+    public async Task HandleAsync(byte[] binaryMessage, ulong deliveryTag)
     {
         try
         {
@@ -58,11 +58,11 @@ public class CommandResponseHandler : IBusMessageHandler
             command.BinaryResponse = msg.ResponseBinary;
             command.ResponseDateTime = msg.ResponseDateTime;
             _trackerCommandRepository.Update(command);
-            _commandsReceiveBus.Ack(messageDeliverEventArgs.DeliveryTag, multiple: false);
+            _commandsReceiveBus.Ack(deliveryTag, multiple: false);
         }
         catch
         {
-            _commandsReceiveBus.Nack(messageDeliverEventArgs.DeliveryTag, multiple: false, requeue: false);
+            _commandsReceiveBus.Nack(deliveryTag, multiple: false, requeue: false);
             throw;
         }
     }

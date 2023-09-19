@@ -236,7 +236,7 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
 
                 var eventHandler = (IBusMessageHandler)handler;
                 await Task.Yield();
-                await eventHandler.HandleAsync(message, messageDeliverEventArgs);
+                await eventHandler.HandleAsync(message, messageDeliverEventArgs.DeliveryTag);
             }
             _logger.LogTrace("Сообщение обработано");
         }
