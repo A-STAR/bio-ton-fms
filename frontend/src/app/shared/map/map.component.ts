@@ -300,19 +300,134 @@ export class MapComponent implements OnInit {
   };
 
   /**
-   * Add, update map layers with tracks and messages.
+   * Add, update map layers with tracks.
    *
-   * @param location Location and tracks.
+   * @param features Map track features.
    */
-  async #setTrackLayers(location: LocationAndTrackResponse) {
+  async #setTrackLayer(features: Feature<LineString>[]) {
+    const track: FeatureCollection<LineString> = {
+      type: 'FeatureCollection',
+      features
+    };
+
+    await this.#map?.setLayerData(TRACK_LAYER_DEFINITION, track);
+
+    let trackLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, LineString>>(TRACK_LAYER_DEFINITION);
+
+    if (!trackLayer && features.length) {
+      trackLayer = await this.#map?.addFeatureLayer({
+        id: TRACK_LAYER_DEFINITION,
+        data: track,
+        paint: {
+          strokeColor: '#0306DF',
+          strokeOpacity: 0.8,
+          weight: 3
+        }
+      });
+    }
+  }
+
+  /**
+   * Add, update map layer with location icons.
+   *
+   * @param features Map location features.
+   */
+  async #setLocationLayer(features: Feature<Point>[]) {
+    const icons: FeatureCollection<Point> = {
+      type: 'FeatureCollection',
+      features
+    };
+
+    await this.#map?.setLayerData(LOCATION_LAYER_DEFINITION, icons);
+
+    let locationLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(LOCATION_LAYER_DEFINITION);
+
+    if (!locationLayer && features.length) {
+      locationLayer = await this.#map?.addFeatureLayer({
+        id: LOCATION_LAYER_DEFINITION,
+        data: icons,
+        paint: getIcon({
+          svg: TECH_SVG,
+          color: '#8FAB93',
+          stroke: TECH_SVG_STROKE,
+          size: TECH_SVG_SIZE
+        })
+      });
+    }
+  }
+
+  /**
+   * Add, update map layers with message icons.
+   *
+   * @param collections Map message feature collections.
+   */
+  async #setMessageLayer(collections: FeatureCollection<Point>[]) {
+    let messageLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(MESSAGE_LAYER_DEFINITION);
+
+    await messageLayer?.clearLayer?.();
+
+    if (!messageLayer && collections.length) {
+      messageLayer = await this.#map?.addFeatureLayer({
+        id: MESSAGE_LAYER_DEFINITION,
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        },
+        paint: {
+          color: '#1413FA',
+          opacity: 1,
+          strokeColor: '#FFFFFF00',
+          radius: 4,
+          weight: 5
+        },
+        selectable: true,
+        popupOnSelect: true,
+        popupOptions: {
+          autoPan: true,
+          maxWidth: 400,
+          unselectOnClose: true,
+          createPopupContent: this.#createMessagePopupContent
+        }
+      });
+    }
+
+    for (const messages of collections) {
+      await messageLayer?.addData?.(messages);
+    }
+  }
+
+  /**
+   * Gather location data, set track, location, message layers.
+   *
+   * A helper method to handle asynchronous adding, updating map layers with location from `Input`.
+   *
+   * @param location Location and tracks with messages.
+   */
+  async #setLocationLayers(location: LocationAndTrackResponse) {
     const tracks: Feature<LineString>[] = [];
-    const messageCollections: FeatureCollection<Point>[] = [];
+    const locations: Feature<Point>[] = [];
+    const messages: FeatureCollection<Point>[] = [];
 
     for (const {
       vehicleId: techID,
       vehicleName: techName,
+      latitude,
+      longitude,
       track
     } of location.tracks) {
+      const location: Feature<Point> = {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [longitude, latitude]
+        },
+        properties: {
+          id: techID
+        }
+      };
+
+      locations.push(location);
+
       if (track) {
         const coordinates: Position[] = [];
         const messageFeatures: Feature<Point>[] = [];
@@ -351,126 +466,18 @@ export class MapComponent implements OnInit {
 
         tracks.push(trackFeature);
 
-        const messages: FeatureCollection<Point> = {
+        const trackMessages: FeatureCollection<Point> = {
           type: 'FeatureCollection',
           features: messageFeatures
         };
 
-        messageCollections.push(messages);
+        messages.push(trackMessages);
       }
     }
 
-    const track: FeatureCollection<LineString> = {
-      type: 'FeatureCollection',
-      features: tracks
-    };
-
-    let trackLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, LineString>>(TRACK_LAYER_DEFINITION);
-
-    await this.#map?.setLayerData(TRACK_LAYER_DEFINITION, track);
-
-    if (!trackLayer && location.tracks.length) {
-      trackLayer = await this.#map?.addFeatureLayer({
-        id: TRACK_LAYER_DEFINITION,
-        data: track,
-        paint: {
-          strokeColor: '#0306DF',
-          strokeOpacity: 0.8,
-          weight: 3
-        }
-      });
-    }
-
-    let messageLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(MESSAGE_LAYER_DEFINITION);
-
-    await messageLayer?.clearLayer?.();
-
-    if (!messageLayer && location.tracks.length) {
-      messageLayer = await this.#map?.addFeatureLayer({
-        id: MESSAGE_LAYER_DEFINITION,
-        data: {
-          type: 'FeatureCollection',
-          features: []
-        },
-        paint: {
-          color: '#1413FA',
-          opacity: 1,
-          strokeColor: '#FFFFFF00',
-          radius: 4,
-          weight: 5
-        },
-        selectable: true,
-        popupOnSelect: true,
-        popupOptions: {
-          autoPan: true,
-          maxWidth: 400,
-          unselectOnClose: true,
-          createPopupContent: this.#createMessagePopupContent
-        }
-      });
-    }
-
-    for (const messages of messageCollections) {
-      await messageLayer?.addData?.(messages);
-    }
-  }
-
-  /**
-   * Add, update map layer with location markers.
-   *
-   * @param location Location and tracks.
-   */
-  async #setLocationLayer({ tracks }: LocationAndTrackResponse) {
-    const features: Feature<Point>[] = [];
-
-    for (const {
-      vehicleId: id,
-      latitude,
-      longitude
-    } of tracks) {
-      const marker: Feature<Point> = {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [longitude, latitude]
-        },
-        properties: { id }
-      };
-
-      features.push(marker);
-    }
-
-    const markers: FeatureCollection<Point> = {
-      type: 'FeatureCollection',
-      features
-    };
-
-    let locationLayer = this.#map?.getLayer<FeatureLayerAdapter<FeatureProperties, Point>>(LOCATION_LAYER_DEFINITION);
-
-    await this.#map?.setLayerData(LOCATION_LAYER_DEFINITION, markers);
-
-    if (!locationLayer && tracks.length) {
-      locationLayer = await this.#map?.addFeatureLayer({
-        id: LOCATION_LAYER_DEFINITION,
-        data: markers,
-        paint: getIcon({
-          svg: TECH_SVG,
-          color: '#8FAB93',
-          stroke: TECH_SVG_STROKE,
-          size: TECH_SVG_SIZE
-        })
-      });
-    }
-  }
-
-  /**
-   * Helper method to handle asynchronous adding, updating map layers with location from `Input`.
-   *
-   * @param location Location and tracks.
-   */
-  async #setLocationLayers(location: LocationAndTrackResponse) {
-    await this.#setTrackLayers(location);
-    await this.#setLocationLayer(location);
+    await this.#setTrackLayer(tracks);
+    await this.#setLocationLayer(locations);
+    await this.#setMessageLayer(messages);
   }
 
   /**
@@ -548,9 +555,9 @@ const AUTH_PASSWORD = 'asdfghjkl13';
 const FIELD_RESOURCE_DEFINITION: ResourceDefinition = 109;
 const FIELD_LAYER_DEFINITION = 'field';
 
-const MESSAGE_LAYER_DEFINITION = 'message';
 const TRACK_LAYER_DEFINITION = 'track';
 const LOCATION_LAYER_DEFINITION = 'location';
+const MESSAGE_LAYER_DEFINITION = 'message';
 
 const INITIAL_DURATION = 500;
 const duration = 2500;
