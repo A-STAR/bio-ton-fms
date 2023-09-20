@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit.Abstractions;
+using BioTonFMS.Common.Testable;
+using BioTonFMS.Domain.TrackerMessages;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
@@ -40,7 +42,7 @@ public class MonitoringControllerTests
                     {
                         Id = 1,
                         Name = "Красная машина",
-                        NumberOfSatellites = 12,
+                        NumberOfSatellites = 14,
                         Tracker = new MonitoringTrackerDto
                         {
                             Id = 1,
@@ -71,8 +73,8 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        LastMessageTime = DateTime.UtcNow,
-                        NumberOfSatellites = 12
+                        LastMessageTime = SystemTime.UtcNow,
+                        NumberOfSatellites = 14
                     },
                     new MonitoringVehicleDto
                     {
@@ -153,8 +155,8 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        LastMessageTime = DateTime.UtcNow,
-                        NumberOfSatellites = 12
+                        LastMessageTime = SystemTime.UtcNow,
+                        NumberOfSatellites = 14
                     },
                     new MonitoringVehicleDto
                     {
@@ -182,6 +184,21 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.NotConnected,
                         MovementStatus = MovementStatusEnum.NoData
+                    },
+                    new MonitoringVehicleDto
+                    {
+                        Id = 4,
+                        Name = "Чёрный трактор",
+                        Tracker = new MonitoringTrackerDto
+                        {
+                            Id = 4,
+                            Imei = "6412825699",
+                            ExternalId = 1555
+                        },
+                        ConnectionStatus = ConnectionStatusEnum.Connected,
+                        MovementStatus = MovementStatusEnum.NoData,
+                        NumberOfSatellites = 1,
+                        LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20)
                     }
                 }
             },
@@ -207,8 +224,8 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        LastMessageTime = DateTime.UtcNow,
-                        NumberOfSatellites = 12
+                        LastMessageTime = SystemTime.UtcNow,
+                        NumberOfSatellites = 14
                     },
                     new MonitoringVehicleDto
                     {
@@ -236,6 +253,21 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.NotConnected,
                         MovementStatus = MovementStatusEnum.NoData
+                    },
+                    new MonitoringVehicleDto
+                    {
+                        Id = 4,
+                        Name = "Чёрный трактор",
+                        Tracker = new MonitoringTrackerDto
+                        {
+                            Id = 4,
+                            Imei = "6412825699",
+                            ExternalId = 1555
+                        },
+                        ConnectionStatus = ConnectionStatusEnum.Connected,
+                        MovementStatus = MovementStatusEnum.NoData,
+                        NumberOfSatellites = 1,
+                        LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20)
                     }
                 }
             }
@@ -245,6 +277,8 @@ public class MonitoringControllerTests
     public void FindVehicles(string? criterion, MonitoringVehicleDto[] expected)
     {
         _testOutputHelper.WriteLine("Criterion = \"" + criterion + "\"");
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
 
         var result = GetController().FindVehicles(criterion);
 
@@ -276,12 +310,274 @@ public class MonitoringControllerTests
         }
     }
 
-    private static MonitoringController GetController()
+    [Fact]
+    public void LocationsAndTracks_ShoulReturnLocationFromLastMessage_ForOneVehicle()
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+        var vehicle = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
+
+        var request = new LocationAndTrackRequest
+        {
+            VehicleId = 1,
+            NeedReturnTrack = false
+        };
+        var messages = TrackerMessageRepositoryMock.Messages;
+        var lastMessage = messages.Where(m => m.ExternalTrackerId == vehicle!.Tracker!.ExternalId ).OrderBy(m => m.ServerDateTime).Last();
+
+        var actionResult = GetController(messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request } );
+        var okResult = actionResult as OkObjectResult;
+        var response = okResult!.Value as LocationsAndTracksResponse;
+
+        response.Should().NotBeNull();
+        response!.Tracks.Should().HaveCount(1);
+        response.Tracks.First().VehicleId.Should().Be(vehicle.Id);
+        response.Tracks.First().VehicleName.Should().Be(vehicle.Name);
+        response.Tracks.First().Track.Length.Should().Be(0);
+        response.Tracks.First().Latitude.Should().Be(lastMessage.Latitude);
+        response.Tracks.First().Longitude.Should().Be(lastMessage.Longitude);
+    }
+
+    [Fact]
+    public void LocationsAndTracks_ShoulReturnCorrectViewBounds_ForOneVehicle()
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+        var vehicle = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
+
+        var request = new LocationAndTrackRequest
+        {
+            VehicleId = 1,
+            NeedReturnTrack = false
+        };
+        var messages = TrackerMessageRepositoryMock.Messages;
+        var lastMessage = messages.Where(m => m.ExternalTrackerId == vehicle!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
+
+        var actionResult = GetController(messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request });
+        var okResult = actionResult as OkObjectResult;
+        var response = okResult!.Value as LocationsAndTracksResponse;
+
+        response.Should().NotBeNull();
+        response!.Tracks.Should().HaveCount(1);
+        response.ViewBounds.Should().NotBeNull();
+        response.ViewBounds!.UpperLeftLatitude.Should().Be(lastMessage.Latitude + MonitoringController.DefaultDifLat);
+        response.ViewBounds!.UpperLeftLongitude.Should().Be(lastMessage.Longitude - MonitoringController.DefaultDifLon);
+        response.ViewBounds!.BottomRightLatitude.Should().Be(lastMessage.Latitude - MonitoringController.DefaultDifLat);
+        response.ViewBounds!.BottomRightLongitude.Should().Be(lastMessage.Longitude + MonitoringController.DefaultDifLon);
+    }
+
+    [Fact]
+    public void LocationsAndTracks_ShoulReturnCorrectViewBounds_For3Vehicles()
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+        var vehicle1 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
+        var vehicle2 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 4).Single();
+        var vehicle3 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 3).Single();
+
+        var request1 = new LocationAndTrackRequest
+        {
+            VehicleId = 1,
+            NeedReturnTrack = false
+        };
+        var request2 = new LocationAndTrackRequest
+        {
+            VehicleId = 4,
+            NeedReturnTrack = false
+        };
+        var request3 = new LocationAndTrackRequest
+        {
+            VehicleId = 3,
+            NeedReturnTrack = false
+        };
+
+        var messages = TrackerMessageRepositoryMock.Messages;
+        var lastMessage1 = messages.Where(m => m.ExternalTrackerId == vehicle1!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
+        var lastMessage2 = messages.Where(m => m.ExternalTrackerId == vehicle2!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
+        var lastMessage3 = messages.Where(m => m.ExternalTrackerId == vehicle3!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
+
+        List<double> lats = new()
+        {
+            lastMessage1.Latitude!.Value,
+            lastMessage2.Latitude!.Value,
+            lastMessage3.Latitude!.Value
+        };
+
+        List<double> lons = new()
+        {
+            lastMessage1.Longitude!.Value,
+            lastMessage2.Longitude!.Value,
+            lastMessage3.Longitude!.Value
+        };
+        var difLat = (lats.Max() - lats.Min()) / 20;
+        var difLon = (lons.Max() - lons.Min()) / 20;
+        if (difLat < MonitoringController.DefaultDifLat)
+        {
+            difLat = MonitoringController.DefaultDifLat;
+        }
+        if (difLon < MonitoringController.DefaultDifLon)
+        {
+            difLon = MonitoringController.DefaultDifLon;
+        }
+        var expectedViewBounds = new ViewBounds
+        {
+            UpperLeftLatitude = lats.Max() + difLat,
+            UpperLeftLongitude = lons.Min() - difLon,
+            BottomRightLatitude = lats.Min() - difLat,
+            BottomRightLongitude = lons.Max() + difLon
+        };
+
+        var actionResult = GetController(messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1,  request2, request3 });
+        var okResult = actionResult as OkObjectResult;
+        var response = okResult!.Value as LocationsAndTracksResponse;
+
+        response.Should().NotBeNull();
+        response!.Tracks.Should().HaveCount(3);
+        response.ViewBounds.Should().NotBeNull();
+        response.ViewBounds.Should().BeEquivalentTo(expectedViewBounds);
+    }
+
+    [Fact]
+    public void LocationsAndTracks_ShoulReturnCorrectTrack_ForVehicleRequiresTrack()
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+        var vehicle1 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
+        var vehicle2 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 4).Single();
+        var vehicle3 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 3).Single();
+
+        var request1 = new LocationAndTrackRequest
+        {
+            VehicleId = 1,
+            NeedReturnTrack = true
+        };
+        var request2 = new LocationAndTrackRequest
+        {
+            VehicleId = 4,
+            NeedReturnTrack = false
+        };
+        var request3 = new LocationAndTrackRequest
+        {
+            VehicleId = 3,
+            NeedReturnTrack = false
+        };
+
+        var messages = TrackerMessageRepositoryMock.Messages;
+        var expectedTrack = new TrackPointInfo[]
+        {
+            new TrackPointInfo
+            {
+                MessageId = 1,
+                Time = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+                Latitude = 49.432023,
+                Longitude = 52.556861,
+                Speed = null,
+                NumberOfSatellites = 12
+            },
+            new TrackPointInfo
+            {
+                MessageId = 2,
+                Time = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+                Latitude = 49.432023,
+                Longitude = 52.556861,
+                Speed = 12.1,
+                NumberOfSatellites = 14
+            }
+        };
+
+        var actionResult = GetController(messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
+        var okResult = actionResult as OkObjectResult;
+        var response = okResult!.Value as LocationsAndTracksResponse;
+
+        response.Should().NotBeNull();
+        response!.Tracks.Should().HaveCount(3);
+        response.ViewBounds.Should().NotBeNull();
+        var responseWithTrack = response.Tracks.Where(t => t.VehicleId == 1).Single();
+        responseWithTrack.Track.Length.Should().Be(2);
+    }
+
+    [Fact]
+    public void LocationsAndTracks_ShoulReturnCorrectViewBounds_For3VehiclesWithTrack()
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+        var vehicle1 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
+        var vehicle2 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 4).Single();
+        var vehicle3 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 3).Single();
+
+        var request1 = new LocationAndTrackRequest
+        {
+            VehicleId = 1,
+            NeedReturnTrack = true
+        };
+        var request2 = new LocationAndTrackRequest
+        {
+            VehicleId = 4,
+            NeedReturnTrack = false
+        };
+        var request3 = new LocationAndTrackRequest
+        {
+            VehicleId = 3,
+            NeedReturnTrack = false
+        };
+
+        var messages = TrackerMessageRepositoryMock.Messages;
+        var lastMessage1 = messages.Where(m => m.ExternalTrackerId == vehicle1!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
+        var lastMessage2 = messages.Where(m => m.ExternalTrackerId == vehicle2!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
+        var lastMessage3 = messages.Where(m => m.ExternalTrackerId == vehicle3!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
+
+        var trackMessages = messages.Where(m => m.ExternalTrackerId == vehicle1!.Tracker!.ExternalId && m.ServerDateTime > today.ToUniversalTime()).ToArray();
+
+        List<double> lats = new()
+        {
+            lastMessage1.Latitude!.Value,
+            lastMessage2.Latitude!.Value,
+            lastMessage3.Latitude!.Value
+        };
+        lats.AddRange(trackMessages.Select(m => m.Latitude!.Value));
+
+        List<double> lons = new()
+        {
+            lastMessage1.Longitude!.Value,
+            lastMessage2.Longitude!.Value,
+            lastMessage3.Longitude!.Value
+        };
+        lons.AddRange(trackMessages.Select(m => m.Longitude!.Value));
+
+        var difLat = (lats.Max() - lats.Min()) / 20;
+        var difLon = (lons.Max() - lons.Min()) / 20;
+        if (difLat < MonitoringController.DefaultDifLat)
+        {
+            difLat = MonitoringController.DefaultDifLat;
+        }
+        if (difLon < MonitoringController.DefaultDifLon)
+        {
+            difLon = MonitoringController.DefaultDifLon;
+        }
+        var expectedViewBounds = new ViewBounds
+        {
+            UpperLeftLatitude = lats.Max() + difLat,
+            UpperLeftLongitude = lons.Min() - difLon,
+            BottomRightLatitude = lats.Min() - difLat,
+            BottomRightLongitude = lons.Max() + difLon
+        };
+
+        var actionResult = GetController(messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
+        var okResult = actionResult as OkObjectResult;
+        var response = okResult!.Value as LocationsAndTracksResponse;
+
+        response.Should().NotBeNull();
+        response!.Tracks.Should().HaveCount(3);
+        response.ViewBounds.Should().NotBeNull();
+        response.ViewBounds.Should().BeEquivalentTo(expectedViewBounds);
+    }
+
+    private static MonitoringController GetController(ICollection<TrackerMessage>? messages = null)
     {
         var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MonitoringMappingProfile())));
         var logger = new Mock<ILogger<MonitoringController>>().Object;
         var vehicleRepository = VehicleRepositoryMock.GetStub();
-        var trackerMessageRepository = TrackerMessageRepositoryMock.GetStub();
+        var trackerMessageRepository = TrackerMessageRepositoryMock.GetStub(messages);
         var options = Options.Create(new TrackerOptions { TrackerAddressValidMinutes = 60 });
         var tagsRepository = TrackerTagRepositoryMock.GetStub();
         var trackerRepository = TrackerRepositoryMock.GetStub();

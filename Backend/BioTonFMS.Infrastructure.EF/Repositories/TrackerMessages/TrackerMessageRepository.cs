@@ -246,11 +246,13 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
         var trackStartTimeUtc = trackStartTime.ToUniversalTime();
 
-        var result = QueryableProvider.Linq()
+        var filteredMessages = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
                         x.Latitude != null && x.Longitude != null &&
                         x.ServerDateTime > trackStartTimeUtc)
-            .OrderBy(x => x.TrackerDateTime)
+            .OrderBy(x => x.TrackerDateTime);
+
+        var result = filteredMessages
             .ToLookup(x => x.ExternalTrackerId,
                 x => new TrackPointInfo
                 {

@@ -4,8 +4,6 @@ using BioTonFMS.Domain;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;
-using BioTonFMS.Infrastructure.EF.Models.Filters;
-using BioTonFMS.Infrastructure.EF.Repositories.Sensors;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
@@ -35,6 +33,9 @@ public class MonitoringController : ValidationControllerBase
     private readonly TrackerOptions _trackerOptions;
     private readonly ITrackerTagRepository _tagsRepository;
     private readonly ITrackerRepository _trackerRepository;
+
+    public const double DefaultDifLon = 0.08;
+    public const double DefaultDifLat = 0.05;
 
     public MonitoringController(
         IMapper mapper,
@@ -243,17 +244,14 @@ public class MonitoringController : ValidationControllerBase
         {
             return null;
         }
-        var lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
+        List<double> lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
         lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
 
-        var lats = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Latitude).ToList();
+        List<double> lats = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Latitude).ToList();
         lats.AddRange(locationsAndTracks.Select(x => x.Latitude));
 
         var difLat = (lats.Max() - lats.Min()) / 20;
         var difLon = (lons.Max() - lons.Min()) / 20;
-
-        const double DefaultDifLon = 0.08;
-        const double DefaultDifLat = 0.05;
 
         if (difLat < DefaultDifLat)
         {
@@ -261,7 +259,7 @@ public class MonitoringController : ValidationControllerBase
         }
         if (difLon < DefaultDifLon)
         {
-            difLat = DefaultDifLon;
+            difLon = DefaultDifLon;
         }
 
         var viewBounds = new ViewBounds

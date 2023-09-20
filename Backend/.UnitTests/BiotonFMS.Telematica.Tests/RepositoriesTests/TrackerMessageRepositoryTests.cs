@@ -8,6 +8,7 @@ using BioTonFMS.Infrastructure.Paging;
 using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Xunit.Abstractions;
+using BioTonFMS.Common.Testable;
 
 namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
@@ -141,8 +142,8 @@ public class TrackerMessageRepositoryTests
         var parameters = repo.GetStandardParameters(externalId);
         parameters.Speed.Should().Be(12.1);
         parameters.Alt.Should().Be(97.0);
-        parameters.Long.Should().Be(52.556861);
-        parameters.Lat.Should().Be(49.432023);
+        parameters.Long.Should().Be(54.556861);
+        parameters.Lat.Should().Be(42.432023);
         parameters.Time.Should().NotBeNull();
     }
 
@@ -392,7 +393,7 @@ public class TrackerMessageRepositoryTests
                         TrackerExternalId = 2552,
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        NumberOfSatellites = 12,
+                        NumberOfSatellites = 14,
                         LastMessageTime = DateTime.UtcNow
                     }}
                 }
@@ -412,7 +413,7 @@ public class TrackerMessageRepositoryTests
                         TrackerExternalId = 2552,
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        NumberOfSatellites = 12,
+                        NumberOfSatellites = 14,
                         LastMessageTime = DateTime.UtcNow
                     }},
                     {1024, new VehicleStatus
@@ -464,6 +465,225 @@ public class TrackerMessageRepositoryTests
         }
     }
 
+    public static IEnumerable<object[]> LocationsData =>
+        new List<object[]>
+        {
+            // пустой запрос
+            new object[]
+            {
+                new int[] {},
+                new Dictionary<int, (double Lat, double Long)>()
+            },
+            // одна машина
+            new object[]
+            {
+                new [] {2552},
+                new Dictionary<int, (double Lat, double Long)>
+                {
+                    { 2552, (42.432023, 54.556861) }
+                }
+            },
+            // три машины
+            new object[]
+            {
+                new [] { 2552, 1555, 128 },
+                new Dictionary<int, (double Lat, double Long)>
+                {
+                    { 2552, (42.432023, 54.556861) },
+                    { 1555, (36.4323, 28.55861) },
+                    { 128, (39.4323, 12.55861) }
+                }
+            },
+            // две машины и одна несуществующая
+            new object[]
+            {
+                new [] { 2552, 1555, 100 },
+                new Dictionary<int, (double Lat, double Long)>
+                {
+                    { 2552, (42.432023, 54.556861) },
+                    { 1555, (36.4323, 28.55861) },
+                }
+            },
+        };
+
+    [Theory, MemberData(nameof(LocationsData))]
+    public void GetLocations_ShouldReturnRightLocations(int[] externalIds,
+        IDictionary<int, (double Lat, double Long)> expected)
+    {
+        _testOutputHelper.WriteLine("External IDs: " + string.Join(" ", externalIds));
+
+        var results = TrackerMessageRepositoryMock.GetStub().GetLocations(externalIds);
+
+        Assert.Equal(expected.Count, results.Count);
+
+        results.Keys.Should().BeEquivalentTo(expected.Keys);
+
+        foreach (var r in results)
+        {
+            expected[r.Key].Lat.Should().Be(r.Value.Lat);
+            expected[r.Key].Long.Should().Be(r.Value.Long);
+        }
+    }
+
+    public static IEnumerable<object[]> TracksData {
+        get
+        {
+            var today = DateTime.Today;
+            SystemTime.Set(today.AddHours(14));
+
+            return new List<object[]>
+            {
+                // пустой запрос
+                new object[]
+                {
+                    new int[] {},
+                    new Dictionary<int, TrackPointInfo[]>()
+                },
+                // одна машина
+                new object[]
+                {
+                    new [] {2552},
+                    new Dictionary<int, TrackPointInfo[]>
+                    {
+                        { 2552, new TrackPointInfo[]
+                            {
+                                new TrackPointInfo{
+                                    MessageId = 1,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+                                    Latitude = 49.432023,
+                                    Longitude = 52.556861,
+                                    NumberOfSatellites = 12,
+                                    Speed = null
+                                },
+                                new TrackPointInfo{
+                                    MessageId = 2,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+                                    Latitude = 42.432023,
+                                    Longitude = 54.556861,
+                                    NumberOfSatellites = 14,
+                                    Speed = 12.1
+                                },
+                            }
+                        }
+                    }
+                },
+                // три машины
+                new object[]
+                {
+                    new [] { 2552, 1555, 128 },
+                    new Dictionary<int, TrackPointInfo[]>
+                    {
+                        { 2552, new TrackPointInfo[]
+                            {
+                                new TrackPointInfo{
+                                    MessageId = 1,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+                                    Latitude = 49.432023,
+                                    Longitude = 52.556861,
+                                    NumberOfSatellites = 12,
+                                    Speed = null
+                                },
+                                new TrackPointInfo{
+                                    MessageId = 2,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+                                    Latitude = 42.432023,
+                                    Longitude = 54.556861,
+                                    NumberOfSatellites = 14,
+                                    Speed = 12.1
+                                },
+                            }
+                        },
+                        { 1555, new TrackPointInfo[]
+                            {
+                                new TrackPointInfo{
+                                    MessageId = 4,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+                                    Latitude = 36.4323,
+                                    Longitude = 28.55861,
+                                    NumberOfSatellites = 1,
+                                    Speed = null
+                                }
+                            }
+                        },
+                        { 128, new TrackPointInfo[]
+                            {
+                                new TrackPointInfo{
+                                    MessageId = 5,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+                                    Latitude = 39.4323,
+                                    Longitude = 12.55861,
+                                    NumberOfSatellites = 19,
+                                    Speed = 0
+                                }
+                            }
+                        }
+                    }
+                },
+                // две машины и одна несуществующая
+                new object[]
+                {
+                    new [] { 2552, 1555, 100 },
+                    new Dictionary<int, TrackPointInfo[]>
+                    {
+                        { 2552, new TrackPointInfo[]
+                            {
+                                new TrackPointInfo{
+                                    MessageId = 1,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+                                    Latitude = 49.432023,
+                                    Longitude = 52.556861,
+                                    NumberOfSatellites = 12,
+                                    Speed = null
+                                },
+                                new TrackPointInfo{
+                                    MessageId = 2,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+                                    Latitude = 42.432023,
+                                    Longitude = 54.556861,
+                                    NumberOfSatellites = 14,
+                                    Speed = 12.1
+                                },
+                            }
+                        },
+                        { 1555, new TrackPointInfo[]
+                            {
+                                new TrackPointInfo{
+                                    MessageId = 4,
+                                    Time = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+                                    Latitude = 36.4323,
+                                    Longitude = 28.55861,
+                                    NumberOfSatellites = 1,
+                                    Speed = null
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    [Theory, MemberData(nameof(TracksData))]
+    public void GetTracks_ShouldReturnRightTracks(int[] externalIds,
+        IDictionary<int, TrackPointInfo[]> expected)
+    {
+        _testOutputHelper.WriteLine("External IDs: " + string.Join(" ", externalIds));
+
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+
+        var results = TrackerMessageRepositoryMock.GetStub().GetTracks(today.ToUniversalTime(), externalIds);
+
+        Assert.Equal(expected.Count, results.Count);
+
+        results.Keys.Should().BeEquivalentTo(expected.Keys);
+
+        foreach (var r in results)
+        {
+            expected[r.Key].Should().BeEquivalentTo(r.Value);
+        }
+    }
+
     #endregion
-    
+
 }
