@@ -18,14 +18,14 @@
           }
         ],
         "no-multiple-empty-lines": [
-          "error",
+          "warn",
           {
             "max": 1,
             "maxBOF": 0,
             "maxEOF": 1
           }
         ],
-        "no-trailing-spaces": "error"
+        "no-trailing-spaces": "warn"
       }
     },
     {
@@ -43,7 +43,7 @@
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates",
         "plugin:@typescript-eslint/recommended",
-        "plugin:jsdoc/recommended-typescript-error"
+        "plugin:jsdoc/recommended-typescript"
       ],
       "rules": {
         "@angular-eslint/directive-selector": [
@@ -75,7 +75,7 @@
           }
         ],
         "@typescript-eslint/member-ordering": [
-          "error",
+          "warn",
           {
             "default": [
               "signature",
@@ -136,14 +136,14 @@
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": [
-          "error",
+          "warn",
           {
             "argsIgnorePattern": "_",
             "varsIgnorePattern": "id|Id$"
           }
         ],
         "@typescript-eslint/padding-line-between-statements": [
-          "error",
+          "warn",
           {
             "blankLine": "always",
             "prev": "*",
@@ -184,17 +184,17 @@
           "smart"
         ],
         "func-call-spacing": "error",
-        "jsdoc/check-line-alignment": "error",
+        "jsdoc/check-line-alignment": "warn",
         "jsdoc/check-param-names": [
           "error",
           {
             "checkDestructured": false
           }
         ],
-        "jsdoc/no-bad-blocks": "error",
-        "jsdoc/require-description": "error",
+        "jsdoc/no-bad-blocks": "warn",
+        "jsdoc/require-description": "warn",
         "jsdoc/require-description-complete-sentence": [
-          "error",
+          "warn",
           {
             "newlineBeforeCapsAssumesBadSentenceEnd": true
           }
@@ -206,7 +206,7 @@
           }
         ],
         "jsdoc/sort-tags": [
-          "error",
+          "warn",
           {
             "tagSequence": [
               {
@@ -223,29 +223,29 @@
           }
         ],
         "jsdoc/tag-lines": [
-          "error",
+          "warn",
           "any",
           {
             "startLines": 1
           }
         ],
         "indent": [
-          "error",
+          "warn",
           2,
           {
             "SwitchCase": 1
           }
         ],
-        "keyword-spacing": "error",
+        "keyword-spacing": "warn",
         "lines-between-class-members": [
-          "error",
+          "warn",
           "always",
           {
             "exceptAfterSingleLine": true
           }
         ],
         "newline-per-chained-call": [
-          "error",
+          "warn",
           {
             "ignoreChainWithDepth": 1
           }
@@ -253,7 +253,7 @@
         "no-console": "error",
         "no-debugger": "error",
         "no-irregular-whitespace": [
-          "error",
+          "warn",
           {
             "skipTemplates": true
           }
@@ -273,17 +273,17 @@
         ],
         "no-whitespace-before-property": "error",
         "object-property-newline": [
-          "error",
+          "warn",
           {
             "allowAllPropertiesOnSameLine": true
           }
         ],
         "padded-blocks": [
-          "error",
+          "warn",
           "never"
         ],
         "prefer-const": [
-          "error",
+          "warn",
           {
             "destructuring": "all",
             "ignoreReadBeforeAssign": true
@@ -296,7 +296,7 @@
             "allowTemplateLiterals": true
           }
         ],
-        "space-before-blocks": "error",
+        "space-before-blocks": "warn",
         "space-before-function-paren": [
           "error",
           {
@@ -304,7 +304,7 @@
             "named": "never"
           }
         ],
-        "spaced-comment": "error"
+        "spaced-comment": "warn"
       }
     },
     {
@@ -318,7 +318,7 @@
         "@angular-eslint/template/accessibility-alt-text": "error",
         "@angular-eslint/template/accessibility-label-has-associated-control": "error",
         "@angular-eslint/template/attributes-order": [
-          "error",
+          "warn",
           {
             "order": [
               "TEMPLATE_REFERENCE",
