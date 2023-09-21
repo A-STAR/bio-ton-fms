@@ -63,7 +63,7 @@ public static class VehicleRepositoryMock
             ManufacturingYear = 2015,
             RegistrationNumber = "В167АР 172",
             InventoryNumber = "1235",
-            TrackerId = 1,
+            TrackerId = 2,
             Tracker = new Tracker
             {
                 Id = 2,
@@ -87,12 +87,36 @@ public static class VehicleRepositoryMock
             ManufacturingYear = 2010,
             RegistrationNumber = "В167АР 174",
             InventoryNumber = "1236",
-            TrackerId = 1,
+            TrackerId = 3,
             Tracker = new Tracker
             {
                 Id = 3,
                 Imei = "64128256",
                 ExternalId = 128
+            }
+        },
+        new()
+        {
+            Id = 4,
+            Name = "Чёрный трактор",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Sprayer,
+            FuelType = new FuelType { Id = 2, Name = "Дизель" },
+            FuelTypeId = 2,
+            VehicleGroup = new VehicleGroup { Id = 2, Name = "Группа 2" },
+            VehicleGroupId = 2,
+            Description = "Описание 4",
+            Make = "Mazda",
+            Model = "CX6",
+            ManufacturingYear = 2012,
+            RegistrationNumber = "В187АР 163",
+            InventoryNumber = "12367",
+            TrackerId = 4,
+            Tracker = new Tracker
+            {
+                Id = 4,
+                Imei = "6412825699",
+                ExternalId = 1555
             }
         }
     };

@@ -3,6 +3,7 @@ using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
+using BioTonFMS.Common.Testable;
 
 namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
@@ -20,15 +21,15 @@ public class TrackerMessageRepositoryMock
         return repo;
     }
     
-    private static TrackerMessage[] Messages => new TrackerMessage[]
+    public static TrackerMessage[] Messages => new TrackerMessage[]
     {
         new()
         {
-            Id = 0,
+            Id = 1,
             ExternalTrackerId = 2552,
             Imei = "123",
-            ServerDateTime = DateTime.UtcNow - TimeSpan.FromSeconds(4),
-            TrackerDateTime = DateTime.UtcNow - TimeSpan.FromSeconds(4),
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
             Latitude = 49.432023,
             Longitude = 52.556861,
             SatNumber = 12,
@@ -63,14 +64,14 @@ public class TrackerMessageRepositoryMock
         },
         new()
         {
-            Id = 1,
+            Id = 2,
             ExternalTrackerId = 2552,
             Imei = "123",
-            ServerDateTime = DateTime.UtcNow - TimeSpan.FromSeconds(2),
-            TrackerDateTime = DateTime.UtcNow - TimeSpan.FromSeconds(2),
-            Latitude = 49.432023,
-            Longitude = 52.556861,
-            SatNumber = 12,
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            Latitude = 42.432023,
+            Longitude = 54.556861,
+            SatNumber = 14,
             CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
             Altitude = 97.0,
             Speed = 12.1,
@@ -103,11 +104,11 @@ public class TrackerMessageRepositoryMock
         },
         new()
         {
-            Id = 2,
+            Id = 3,
             ExternalTrackerId = 1024,
             Imei = "512128256",
-            ServerDateTime = DateTime.UtcNow - TimeSpan.FromSeconds(1),
-            TrackerDateTime = DateTime.UtcNow - TimeSpan.FromSeconds(1),
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
             Latitude = 39.4323,
             Longitude = 12.55861,
             SatNumber = 1,
@@ -143,10 +144,50 @@ public class TrackerMessageRepositoryMock
         },
         new()
         {
-            Id = 3,
+            Id = 4,
+            ExternalTrackerId = 1555,
+            Imei = "6412825699",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            Latitude = 36.4323,
+            Longitude = 28.55861,
+            SatNumber = 1,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 92.0,
+            Speed = null,
+            Direction = 2.1,
+            FuelLevel = 90,
+            CoolantTemperature = 40,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 12345,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagInteger
+                {
+                    Value = 2134,
+                    TrackerTagId = 24,
+                    TagType = TagDataTypeEnum.Integer
+                }
+            }
+        },
+        new()
+        {
+            Id = 5,
             ExternalTrackerId = 128,
             Imei = "64128256",
-            ServerDateTime = DateTime.UtcNow - TimeSpan.FromSeconds(1),
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
             Latitude = 39.4323,
             Longitude = 12.55861,
             SatNumber = 19,
