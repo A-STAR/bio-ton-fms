@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run port:kill && ng serve",
+    "start:hmr": "npm run port:kill && ng serve --hmr",
     "build": "ng build",
     "build:stage": "ng build --configuration 'production, stage'",
     "build:test": "ng build --configuration 'production, test'",
