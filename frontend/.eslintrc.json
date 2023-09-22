@@ -329,7 +329,8 @@
               "OUTPUT_BINDING"
             ]
           }
-        ]
+        ],
+        "@angular-eslint/template/no-any": "warn"
       }
     }
   ]
