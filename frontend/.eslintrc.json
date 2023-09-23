@@ -330,7 +330,8 @@
             ]
           }
         ],
-        "@angular-eslint/template/no-any": "warn"
+        "@angular-eslint/template/no-any": "warn",
+        "@angular-eslint/template/no-duplicate-attributes": "error"
       }
     }
   ]
