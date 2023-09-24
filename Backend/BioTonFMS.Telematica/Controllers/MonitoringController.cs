@@ -137,11 +137,11 @@ public class MonitoringController : ValidationControllerBase
     /// <summary>
     /// Возвращает общую информацию и данные трекеров
     /// </summary>
-    [HttpGet("vehicle/{id:int}")]
+    [HttpGet("vehicle/{vehicleId:int}")]
     [ProducesResponseType(typeof(MonitoringVehicleInfoDto), StatusCodes.Status200OK)]
-    public IActionResult GetVehicleInformation([FromRoute] int id)
+    public IActionResult GetVehicleInformation([FromRoute] int vehicleId)
     {
-        var tracker = _vehicleRepository.GetTracker(id);
+        var tracker = _vehicleRepository.GetTracker(vehicleId);
 
         if (tracker == null)
         {

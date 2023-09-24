@@ -1,19 +1,20 @@
 using AutoMapper;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using BioTonFMS.Common.Settings;
+using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.Monitoring;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Dtos.Monitoring;
 using BioTonFMS.Telematica.Mapping;
-using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.Collections;
 using Xunit.Abstractions;
-using BioTonFMS.Common.Testable;
-using BioTonFMS.Domain.TrackerMessages;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
@@ -272,7 +273,7 @@ public class MonitoringControllerTests
                 }
             }
         };
-    
+
     [Theory, MemberData(nameof(CriterionData))]
     public void FindVehicles(string? criterion, MonitoringVehicleDto[] expected)
     {
@@ -280,17 +281,17 @@ public class MonitoringControllerTests
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
 
-        var result = GetController(SampleVehiclesForFindVehicles).FindVehicles(criterion);
+        var result = GetController(MonitoringVehicles).FindVehicles(criterion);
 
         var actual = result.As<OkObjectResult>().Value.As<MonitoringVehicleDto[]>();
-        
+
         Assert.Equal(expected.Length, actual.Length);
 
         foreach (var a in actual)
         {
             var e = expected.FirstOrDefault(x => x.Id == a.Id);
             e.Should().NotBeNull();
-            
+
             a.ConnectionStatus.Should().Be(e!.ConnectionStatus);
             a.MovementStatus.Should().Be(e.MovementStatus);
             a.NumberOfSatellites.Should().Be(e.NumberOfSatellites);
@@ -303,7 +304,7 @@ public class MonitoringControllerTests
             {
                 a.LastMessageTime.Should().NotBeNull();
             }
-            
+
             a.Tracker.Should().BeEquivalentTo(e.Tracker);
             a.Id.Should().Be(e.Id);
             a.Name.Should().Be(e.Name);
@@ -323,9 +324,9 @@ public class MonitoringControllerTests
             NeedReturnTrack = false
         };
         var messages = TrackerMessageRepositoryMock.Messages;
-        var lastMessage = messages.Where(m => m.ExternalTrackerId == vehicle!.Tracker!.ExternalId ).OrderBy(m => m.ServerDateTime).Last();
+        var lastMessage = messages.Where(m => m.ExternalTrackerId == vehicle!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
 
-        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request } );
+        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request });
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as LocationsAndTracksResponse;
 
@@ -427,7 +428,7 @@ public class MonitoringControllerTests
             BottomRightLongitude = lons.Max() + difLon
         };
 
-        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1,  request2, request3 });
+        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as LocationsAndTracksResponse;
 
@@ -572,6 +573,188 @@ public class MonitoringControllerTests
         response.ViewBounds.Should().BeEquivalentTo(expectedViewBounds);
     }
 
+    [Fact]
+    public void GetVehicleInformation_ShoulReturnNotFound_ForVehicleWithoutTracker()
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+
+        var vehicleWithoutTracker = MonitoringVehicles.Where(v => v.Id == 5).Single();
+
+        var actionResult = GetController(MonitoringVehicles, MonitoringMessages).GetVehicleInformation(vehicleWithoutTracker.Id);
+        var notFoundResult = actionResult as NotFoundResult;
+
+        notFoundResult.Should().NotBeNull();
+    }
+
+    public static IEnumerable<object[]> VehicleInfoData
+    {
+        get
+        {
+            var today = DateTime.Today;
+            SystemTime.Set(today.AddHours(14));
+
+            return new List<object[]>
+            {
+                // Машина с сообщениями и без настроенных датчиков
+                new object[]
+                {
+                    1,
+                    new MonitoringVehicleInfoDto
+                    {
+                        GeneralInfo = new MonitoringGeneralInfoDto
+                        {
+                            LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+                            Speed = 12.1,
+                            Mileage = null,
+                            EngineHours = null,
+                            SatellitesNumber = 14,
+                            Latitude = 42.432023,
+                            Longitude = 54.556861
+                        },
+                        TrackerInfo = new MonitoringTrackerInfoDto
+                        {
+                            ExternalId = 2552,
+                            Imei = "123",
+                            SimNumber = "",
+                            Parameters = new List<TrackerParameter>
+                            {
+                                new TrackerParameter {
+                                    LastValueDecimal = 12345.0,
+                                    ParamName = "rec_sn"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 6.0,
+                                    ParamName = "hdop"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 2134.0,
+                                    ParamName = "rs485_1"
+                                }
+                            }
+                        }
+                    }
+                },
+                // Машина без сообщений и без настроенных датчиков
+                new object[]
+                {
+                    2,
+                    new MonitoringVehicleInfoDto
+                    {
+                        GeneralInfo = new MonitoringGeneralInfoDto(),
+                        TrackerInfo = new MonitoringTrackerInfoDto
+                        {
+                            ExternalId = 15,
+                            Imei = "128128",
+                            SimNumber = "",
+                            Parameters = new List<TrackerParameter>()
+                        }
+                    }
+                },
+                // Машина без сообщений и с настроенными датчиками
+                new object[]
+                {
+                    6,
+                    new MonitoringVehicleInfoDto
+                    {
+                        GeneralInfo = new MonitoringGeneralInfoDto(),
+                        TrackerInfo = new MonitoringTrackerInfoDto
+                        {
+                            ExternalId = 1444,
+                            Imei = "6412825699",
+                            SimNumber = "",
+                            Parameters = new List<TrackerParameter>(),
+                            Sensors = new List<TrackerSensorDto>
+                            {
+                                new TrackerSensorDto{
+                                    Name = "Датчик 1",
+                                    Unit = "Килограмм"
+                                },
+                                new TrackerSensorDto
+                                {
+                                    Name = "Датчик 2",
+                                    Unit = "Метр",
+                                }
+                            }
+                        }
+                    }
+                },
+                // Машина с сообщениями и с настроенными датчиками
+                new object[]
+                {
+                    3,
+                    new MonitoringVehicleInfoDto
+                    {
+                        GeneralInfo = new MonitoringGeneralInfoDto
+                        {
+                            LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+                            Speed = 0,
+                            Mileage = null,
+                            EngineHours = null,
+                            SatellitesNumber = 19,
+                            Latitude = 39.4323,
+                            Longitude = 12.55861
+                        },
+                        TrackerInfo = new MonitoringTrackerInfoDto
+                        {
+                            ExternalId = 128,
+                            Imei = "64128256",
+                            SimNumber = "",
+                                                        Parameters = new List<TrackerParameter>
+                            {
+                                new TrackerParameter {
+                                    LastValueDecimal = 12345.0,
+                                    ParamName = "rec_sn"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 6.0,
+                                    ParamName = "hdop"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 2134.0,
+                                    ParamName = "rs485_1"
+                                }
+                            },
+                            Sensors = new List<TrackerSensorDto>
+                            {
+                                new TrackerSensorDto{
+                                    Name = "Датчик 1",
+                                    Unit = "Килограмм"
+                                },
+                                new TrackerSensorDto
+                                {
+                                    Name = "Датчик 2",
+                                    Unit = "Метр",
+                                }
+                            }
+                        }
+                    }
+                }
+
+            };
+        }
+    }
+
+    [Theory, MemberData(nameof(VehicleInfoData))]
+    public void GetVehicleInformation_ShoulReturnVehicleInformation_ForVehicleWithTrackerAndMessages(int vehicleId, MonitoringVehicleInfoDto expected )
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+
+        var vehicleWithoutTracker = MonitoringGetInfoVehicles.Where(v => v.Id == vehicleId).Single();
+
+        var actionResult = GetController(MonitoringGetInfoVehicles, MonitoringMessages).GetVehicleInformation(vehicleWithoutTracker.Id);
+        var okResult = actionResult as OkObjectResult;
+        var response = okResult!.Value as MonitoringVehicleInfoDto;
+
+        response.Should().NotBeNull();
+        response.Should().BeEquivalentTo(expected);
+    }
+
     private static MonitoringController GetController(
         ICollection<Vehicle>? vehicles = null,
         ICollection<TrackerMessage>? messages = null)
@@ -588,7 +771,7 @@ public class MonitoringControllerTests
             trackerMessageRepository, options, tagsRepository, trackerRepository);
     }
 
-    private static IList<Vehicle> SampleVehiclesForFindVehicles => new List<Vehicle>
+    private static IList<Vehicle> MonitoringVehicles => new List<Vehicle>
     {
         new()
         {
@@ -686,7 +869,7 @@ public class MonitoringControllerTests
         },
         new()
         {
-            Id = 1,
+            Id = 5,
             Name = "Красная машина без трекера",
             Type = VehicleTypeEnum.Transport,
             VehicleSubType = VehicleSubTypeEnum.Car,
@@ -700,4 +883,383 @@ public class MonitoringControllerTests
             InventoryNumber = "1234"
         },
     };
+
+    private static IList<Vehicle> MonitoringGetInfoVehicles => new List<Vehicle>
+    {
+        new()
+        {
+            Id = 1,
+            Name = "Красная машина",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 1",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 199",
+            InventoryNumber = "1234",
+            TrackerId = 1,
+            Tracker = new Tracker
+            {
+                Id = 1,
+                Imei = "123",
+                ExternalId = 2552
+            }
+        },
+        new()
+        {
+            Id = 2,
+            Name = "Синяя машина",
+            Type = VehicleTypeEnum.Agro,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            VehicleGroup = new VehicleGroup { Id = 1, Name = "Группа 1" },
+            VehicleGroupId = 1,
+            Description = "Описание 2",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2015,
+            RegistrationNumber = "В167АР 172",
+            InventoryNumber = "1235",
+            TrackerId = 2,
+            Tracker = new Tracker
+            {
+                Id = 2,
+                Imei = "128128",
+                ExternalId = 15
+            }
+        },
+        new()
+        {
+            Id = 3,
+            Name = "Желтая машина",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Sprayer,
+            FuelType = new FuelType { Id = 2, Name = "Дизель" },
+            FuelTypeId = 2,
+            VehicleGroup = new VehicleGroup { Id = 2, Name = "Группа 2" },
+            VehicleGroupId = 2,
+            Description = "Описание 3",
+            Make = "Mazda",
+            Model = "CX5",
+            ManufacturingYear = 2010,
+            RegistrationNumber = "В167АР 174",
+            InventoryNumber = "1236",
+            TrackerId = 3,
+            Tracker = new Tracker
+            {
+                Id = 3,
+                Imei = "64128256",
+                ExternalId = 128,
+                Sensors = new List<Sensor>
+                {
+                    new Sensor
+                    {
+                        Id = 3,
+                        Name = "Датчик 1",
+                        IsVisible = true,
+                        UnitId = 1,
+                        Unit = new Unit(1, "Килограмм", "кг")
+                    },
+                    new Sensor
+                    {
+                        Id = 4,
+                        Name = "Датчик 2",
+                        IsVisible = true,
+                        UnitId = 2,
+                        Unit = new Unit(2, "Метр", "м")
+                    }
+                }
+            }
+        },
+        new()
+        {
+            Id = 4,
+            Name = "Чёрный трактор",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Sprayer,
+            FuelType = new FuelType { Id = 2, Name = "Дизель" },
+            FuelTypeId = 2,
+            VehicleGroup = new VehicleGroup { Id = 2, Name = "Группа 2" },
+            VehicleGroupId = 2,
+            Description = "Описание 4",
+            Make = "Mazda",
+            Model = "CX6",
+            ManufacturingYear = 2012,
+            RegistrationNumber = "В187АР 163",
+            InventoryNumber = "12367",
+            TrackerId = 4,
+            Tracker = new Tracker
+            {
+                Id = 4,
+                Imei = "6412825699",
+                ExternalId = 1555
+            }
+        },
+        new()
+        {
+            Id = 5,
+            Name = "Красная машина без трекера",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 1",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 189",
+            InventoryNumber = "1234"
+        },
+        new()
+        {
+            Id = 6,
+            Name = "Чёрный трактор 6",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Sprayer,
+            FuelType = new FuelType { Id = 2, Name = "Дизель" },
+            FuelTypeId = 2,
+            VehicleGroup = new VehicleGroup { Id = 2, Name = "Группа 2" },
+            VehicleGroupId = 2,
+            Description = "Описание 4",
+            Make = "Mazda",
+            Model = "CX6",
+            ManufacturingYear = 2012,
+            RegistrationNumber = "В187АР 163",
+            InventoryNumber = "12367",
+            TrackerId = 6,
+            Tracker = new Tracker
+            {
+                Id = 6,
+                Imei = "6412825699",
+                ExternalId = 1444,
+                Sensors = new List<Sensor>
+                {
+                    new Sensor
+                    {
+                        Id = 1,
+                        Name = "Датчик 1",
+                        IsVisible = true,
+                        UnitId = 1,
+                        Unit = new Unit(1, "Килограмм", "кг")
+                    },
+                    new Sensor
+                    {
+                        Id = 2,
+                        Name = "Датчик 2",
+                        IsVisible = true,
+                        UnitId = 2,
+                        Unit = new Unit(2, "Метр", "м")
+                    }
+                }
+            }
+        },
+    };
+
+    public static TrackerMessage[] MonitoringMessages => new TrackerMessage[]
+    {
+        new()
+        {
+            Id = 1,
+            ExternalTrackerId = 2552,
+            Imei = "123",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            Latitude = 49.432023,
+            Longitude = 52.556861,
+            SatNumber = 12,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 97.0,
+            Direction = 2.8,
+            FuelLevel = 100,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("F28AC4A2-5DD0-49DC-B8B5-3B161C39546A"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 1234,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagBits
+                {
+                    Value = new BitArray(new byte[] { 215 }),
+                    TrackerTagId = 15,
+                    TagType = TagDataTypeEnum.Bits
+                }
+            }
+        },
+        new()
+        {
+            Id = 2,
+            ExternalTrackerId = 2552,
+            Imei = "123",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            Latitude = 42.432023,
+            Longitude = 54.556861,
+            SatNumber = 14,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 97.0,
+            Speed = 12.1,
+            Direction = 2.8,
+            FuelLevel = 100,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 12345,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagInteger
+                {
+                    Value = 2134,
+                    TrackerTagId = 24,
+                    TagType = TagDataTypeEnum.Integer
+                }
+            }
+        },
+        new()
+        {
+            Id = 3,
+            ExternalTrackerId = 1024,
+            Imei = "512128256",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            Latitude = 39.4323,
+            Longitude = 12.55861,
+            SatNumber = 1,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 92.0,
+            Speed = null,
+            Direction = 2.1,
+            FuelLevel = 90,
+            CoolantTemperature = 40,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 12345,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagInteger
+                {
+                    Value = 2134,
+                    TrackerTagId = 24,
+                    TagType = TagDataTypeEnum.Integer
+                }
+            }
+        },
+        new()
+        {
+            Id = 4,
+            ExternalTrackerId = 1555,
+            Imei = "6412825699",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            Latitude = 36.4323,
+            Longitude = 28.55861,
+            SatNumber = 1,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 92.0,
+            Speed = null,
+            Direction = 2.1,
+            FuelLevel = 90,
+            CoolantTemperature = 40,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 12345,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagInteger
+                {
+                    Value = 2134,
+                    TrackerTagId = 24,
+                    TagType = TagDataTypeEnum.Integer
+                }
+            }
+        },
+        new()
+        {
+            Id = 5,
+            ExternalTrackerId = 128,
+            Imei = "64128256",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+            Latitude = 39.4323,
+            Longitude = 12.55861,
+            SatNumber = 19,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGsm,
+            Altitude = 92.0,
+            Speed = 0,
+            Direction = 2.1,
+            FuelLevel = 90,
+            CoolantTemperature = 40,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 12345,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagInteger
+                {
+                    Value = 2134,
+                    TrackerTagId = 24,
+                    TagType = TagDataTypeEnum.Integer
+                }
+            }
+        }
+    };
+
 }

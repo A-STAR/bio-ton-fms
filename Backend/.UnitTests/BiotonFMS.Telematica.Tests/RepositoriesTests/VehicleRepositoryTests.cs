@@ -10,6 +10,7 @@ using FluentAssertions;
 using Xunit.Abstractions;
 using BioTonFMS.Infrastructure.EF;
 using BiotonFMS.Telematica.Tests.Mocks.Repositories;
+using BioTonFMS.Common.Testable;
 
 namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
@@ -209,7 +210,7 @@ public class VehicleRepositoryTests
         var existingVehicle = new Vehicle
         {
             Id = 1,
-            Name = "Сущесвующая",
+            Name = "Существующая",
             Type = VehicleTypeEnum.Transport,
             VehicleSubType = VehicleSubTypeEnum.Car,
             FuelType = new FuelType { Id = 1, Name = "Бензин" },
@@ -226,7 +227,7 @@ public class VehicleRepositoryTests
 
         var newVehicle = new Vehicle
         {
-            Name = "Сущесвующая",
+            Name = "Существующая",
             Type = VehicleTypeEnum.Transport,
             VehicleSubType = VehicleSubTypeEnum.Car,
             FuelType = new FuelType { Id = 1, Name = "Бензин" },
@@ -249,7 +250,7 @@ public class VehicleRepositoryTests
         var existingVehicle = new Vehicle
         {
             Id = 1,
-            Name = "Сущесвующая",
+            Name = "Существующая",
             Type = VehicleTypeEnum.Transport,
             VehicleSubType = VehicleSubTypeEnum.Car,
             FuelType = new FuelType { Id = 1, Name = "Бензин" },
@@ -279,7 +280,7 @@ public class VehicleRepositoryTests
 
         var repo = VehicleRepositoryMock.GetStub(new List<Vehicle> { existingVehicle, updatingVehicle });
 
-        updatingVehicle.Name = "Сущесвующая";
+        updatingVehicle.Name = "Существующая";
 
         repo.Invoking(r => r.Update(updatingVehicle)).Should().Throw<ArgumentException>()
             .WithMessage($"Машина с именем {existingVehicle.Name} уже существует");
@@ -348,7 +349,7 @@ public class VehicleRepositoryTests
         var existingVehicle = new Vehicle
         {
             Id = 1,
-            Name = "Сущесвующая",
+            Name = "Существующая",
             Type = VehicleTypeEnum.Transport,
             VehicleSubType = VehicleSubTypeEnum.Car,
             FuelType = new FuelType { Id = 1, Name = "Бензин" },
@@ -400,5 +401,85 @@ public class VehicleRepositoryTests
             .WithMessage($"Трекер {existingTracker.Name} уже используется для машины {existingVehicle.Name}");
     }
 
-    
+    public static IEnumerable<object[]> VehicleGetTrackerData =>
+        new List<object[]>
+        {
+            // Машина с сообщениями и без настроенных датчиков
+            new object[]
+            {
+                1,
+                new Tracker
+                {
+                    Id = 1,
+                    Imei = "123",
+                    ExternalId = 2552
+                }
+            },
+            new object[]
+            {
+                2,
+                null!
+            }
+        };
+
+    [Theory, MemberData(nameof(VehicleGetTrackerData))]
+    public void GetTracker_ShoulReturnCorrectTracker(int vehicleId, Tracker? expected)
+    {
+        var repository = VehicleRepositoryMock.GetStub(VehiclesForGetTracker);
+        var tracker = repository.GetTracker(vehicleId);
+        if (expected != null)
+        {
+            tracker.Should().BeEquivalentTo(expected);
+        }
+    }
+
+    public static IList<Vehicle> VehiclesForGetTracker => new List<Vehicle>
+    {
+        new()
+        {
+            Id = 1,
+            Name = "Красная машина",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 1",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 199",
+            InventoryNumber = "1234",
+            TrackerId = 1,
+            Tracker = new Tracker
+            {
+                Id = 1,
+                Imei = "123",
+                ExternalId = 2552
+            }
+        },
+        new()
+        {
+            Id = 2,
+            Name = "Синяя машина",
+            Type = VehicleTypeEnum.Agro,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            VehicleGroup = new VehicleGroup { Id = 1, Name = "Группа 1" },
+            VehicleGroupId = 1,
+            Description = "Описание 2",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2015,
+            RegistrationNumber = "В167АР 172",
+            InventoryNumber = "1235",
+            TrackerId = 2,
+            Tracker = new Tracker
+            {
+                Id = 2,
+                Imei = "128128",
+                ExternalId = 15
+            }
+        }
+    };
 }
