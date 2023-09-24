@@ -331,7 +331,14 @@
           }
         ],
         "@angular-eslint/template/no-any": "warn",
-        "@angular-eslint/template/no-duplicate-attributes": "error"
+        "@angular-eslint/template/no-duplicate-attributes": "error",
+        "@angular-eslint/template/no-inline-styles": [
+          "error",
+          {
+            "allowNgStyle": true,
+            "allowBindToStyle": true
+          }
+        ]
       }
     }
   ]
