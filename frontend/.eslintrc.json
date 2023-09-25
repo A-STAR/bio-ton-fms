@@ -271,6 +271,7 @@
             ]
           }
         ],
+        "no-undef-init": "error",
         "no-void": "error",
         "no-whitespace-before-property": "error",
         "object-property-newline": [
