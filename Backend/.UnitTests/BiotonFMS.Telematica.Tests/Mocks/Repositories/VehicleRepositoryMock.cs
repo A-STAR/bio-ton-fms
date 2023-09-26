@@ -19,8 +19,8 @@ public static class VehicleRepositoryMock
         IQueryableProvider<Vehicle> vehicleQueryProviderMock = new QueryableProviderMock<Vehicle>(vehicleList);
         UnitOfWorkFactory<BioTonDBContext> unitOfWorkFactoryMock = new BioTonDBContextUnitOfWorkFactoryMock();
 
-        var repo = new VehicleRepository(keyValueProviderMock, vehicleQueryProviderMock, unitOfWorkFactoryMock);
-        return repo;
+        var repository = new VehicleRepository(keyValueProviderMock, vehicleQueryProviderMock, unitOfWorkFactoryMock);
+        return repository;
     }
 
     public static IList<Vehicle> SampleVehicles => new List<Vehicle>
