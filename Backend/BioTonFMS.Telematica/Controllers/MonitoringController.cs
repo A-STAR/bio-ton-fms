@@ -318,7 +318,9 @@ public class MonitoringController : ValidationControllerBase
         var result = new TrackPointTrackerInfoDto();
         var trackerTags = _tagsRepository.GetTags().ToDictionary(x => x.Id);
         var sensors = _trackerRepository.FindTracker(imei: null, trackerExternalId)
-            ?.Sensors.ToDictionary(x => x.Id);
+            ?.Sensors
+            .Where(s => s.IsVisible)
+            .ToDictionary(x => x.Id);
 
         foreach (var tag in tags)
         {

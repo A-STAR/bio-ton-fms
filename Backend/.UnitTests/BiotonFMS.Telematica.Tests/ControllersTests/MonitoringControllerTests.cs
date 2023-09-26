@@ -312,7 +312,7 @@ public class MonitoringControllerTests
     }
 
     [Fact]
-    public void LocationsAndTracks_ShoulReturnLocationFromLastMessage_ForOneVehicle()
+    public void LocationsAndTracks_ShouldReturnLocationFromLastMessage_ForOneVehicle()
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -340,7 +340,7 @@ public class MonitoringControllerTests
     }
 
     [Fact]
-    public void LocationsAndTracks_ShoulReturnCorrectViewBounds_ForOneVehicle()
+    public void LocationsAndTracks_ShouldReturnCorrectViewBounds_ForOneVehicle()
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -368,7 +368,7 @@ public class MonitoringControllerTests
     }
 
     [Fact]
-    public void LocationsAndTracks_ShoulReturnCorrectViewBounds_For3Vehicles()
+    public void LocationsAndTracks_ShouldReturnCorrectViewBounds_For3Vehicles()
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -439,7 +439,7 @@ public class MonitoringControllerTests
     }
 
     [Fact]
-    public void LocationsAndTracks_ShoulReturnCorrectTrack_ForVehicleRequiresTrack()
+    public void LocationsAndTracks_ShouldReturnCorrectTrack_ForVehicleRequiresTrack()
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -498,7 +498,7 @@ public class MonitoringControllerTests
     }
 
     [Fact]
-    public void LocationsAndTracks_ShoulReturnCorrectViewBounds_For3VehiclesWithTrack()
+    public void LocationsAndTracks_ShouldReturnCorrectViewBounds_For3VehiclesWithTrack()
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -574,7 +574,7 @@ public class MonitoringControllerTests
     }
 
     [Fact]
-    public void GetVehicleInformation_ShoulReturnNotFound_ForVehicleWithoutTracker()
+    public void GetVehicleInformation_ShouldReturnNotFound_ForVehicleWithoutTracker()
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -752,7 +752,7 @@ public class MonitoringControllerTests
     }
 
     [Theory, MemberData(nameof(VehicleInfoData))]
-    public void GetVehicleInformation_ShoulReturnVehicleInformation_ForVehicleWithTrackerAndMessages(int vehicleId, MonitoringVehicleInfoDto expected )
+    public void GetVehicleInformation_ShouldReturnVehicleInformation_ForVehicleWithTrackerAndMessages(int vehicleId, MonitoringVehicleInfoDto expected )
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -768,7 +768,7 @@ public class MonitoringControllerTests
     }
 
     [Fact]
-    public void GetTrackPointInformation_ShoulReturnNotFound_IfMessageNotExists()
+    public void GetTrackPointInformation_ShouldReturnNotFound_IfMessageNotExists()
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -879,7 +879,7 @@ public class MonitoringControllerTests
     }
 
     [Theory, MemberData(nameof(TrackPointInfoData))]
-    public void GetTrackPointInformation_ShoulReturnTrackPointInformation_ForMessages(int messageId, MonitoringTrackPointInfoDto expected)
+    public void GetTrackPointInformation_ShouldReturnTrackPointInformation_ForMessages(int messageId, MonitoringTrackPointInfoDto expected)
     {
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
@@ -1407,6 +1407,12 @@ public class MonitoringControllerTests
                     SensorId = 4,
                     Value = 11,
                     TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagInteger
+                {
+                    SensorId = 5,
+                    Value = 11,
+                    TagType = TagDataTypeEnum.Integer
                 }
             }
         }
@@ -1477,6 +1483,14 @@ public class MonitoringControllerTests
                         Id = 4,
                         Name = "Датчик 2",
                         IsVisible = true,
+                        UnitId = 2,
+                        Unit = new Unit(2, "Метр", "м")
+                    },
+                    new Sensor
+                    {
+                        Id = 5,
+                        Name = "Датчик 3",
+                        IsVisible = false,
                         UnitId = 2,
                         Unit = new Unit(2, "Метр", "м")
                     }

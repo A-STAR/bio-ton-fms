@@ -423,7 +423,7 @@ public class VehicleRepositoryTests
         };
 
     [Theory, MemberData(nameof(VehicleGetTrackerData))]
-    public void GetTracker_ShoulReturnCorrectTracker(int vehicleId, Tracker? expected)
+    public void GetTracker_ShouldReturnCorrectTracker(int vehicleId, Tracker? expected)
     {
         var repository = VehicleRepositoryMock.GetStub(VehiclesForGetTracker);
         var tracker = repository.GetTracker(vehicleId);
