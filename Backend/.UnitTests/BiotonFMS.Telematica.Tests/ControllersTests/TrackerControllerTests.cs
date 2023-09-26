@@ -64,7 +64,7 @@ public class TrackerControllerTests
             Name = "трекер GalileoSky",
             Description = "Описание 1",
             Imei = "12341",
-            ExternalId = 111,
+            ExternalId = 1111,
             StartDate = DateTime.UtcNow,
             TrackerType = TrackerTypeEnum.GalileoSkyV50,
             SimNumber = "905518101010"
@@ -142,9 +142,10 @@ public class TrackerControllerTests
     [Fact]
     public void DeleteTracker_TrackerExists_ShouldReturn200Status()
     {
+        var entityIdForDelete = 121;
         var controller = GetController();
 
-        var result = (OkResult)controller.DeleteTracker(ExistingEntityId);
+        var result = (OkResult)controller.DeleteTracker(entityIdForDelete);
 
         result.StatusCode.Should().Be(200);
     }

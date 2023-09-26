@@ -717,24 +717,36 @@ public class MonitoringControllerTests
                                 {
                                     LastValueDecimal = 2134.0,
                                     ParamName = "rs485_1"
+                                },
+                                // следующие два параметра (датчики) появляются здесь из-за несовершенства тестовой модели репозитория (не реализована фильтрация для Fetch)
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 25,
+                                    ParamName = ""
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 11,
+                                    ParamName = ""
                                 }
                             },
                             Sensors = new List<TrackerSensorDto>
                             {
                                 new TrackerSensorDto{
                                     Name = "Датчик 1",
-                                    Unit = "Килограмм"
+                                    Unit = "Килограмм",
+                                    Value = "25"
                                 },
                                 new TrackerSensorDto
                                 {
                                     Name = "Датчик 2",
                                     Unit = "Метр",
+                                    Value = "11"
                                 }
                             }
                         }
                     }
                 }
-
             };
         }
     }
@@ -745,9 +757,9 @@ public class MonitoringControllerTests
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
 
-        var vehicleWithoutTracker = MonitoringGetInfoVehicles.Where(v => v.Id == vehicleId).Single();
+        var testVehicle = MonitoringGetInfoVehicles.Where(v => v.Id == vehicleId).Single();
 
-        var actionResult = GetController(MonitoringGetInfoVehicles, MonitoringMessages).GetVehicleInformation(vehicleWithoutTracker.Id);
+        var actionResult = GetController(MonitoringGetInfoVehicles, MonitoringMessages).GetVehicleInformation(testVehicle.Id);
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as MonitoringVehicleInfoDto;
 
@@ -755,9 +767,135 @@ public class MonitoringControllerTests
         response.Should().BeEquivalentTo(expected);
     }
 
+    [Fact]
+    public void GetTrackPointInformation_ShoulReturnNotFound_IfMessageNotExists()
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+
+        var actionResult = GetController(MonitoringVehicles, MonitoringMessages).GetTrackPointInformation(1000);
+        var notFoundResult = actionResult as NotFoundResult;
+
+        notFoundResult.Should().NotBeNull();
+    }
+
+    public static IEnumerable<object[]> TrackPointInfoData
+    {
+        get
+        {
+            var today = DateTime.Today;
+            SystemTime.Set(today.AddHours(14));
+
+            return new List<object[]>
+            {
+                // Сообщение без датчиков
+                new object[]
+                {
+                    1,
+                    new MonitoringTrackPointInfoDto
+                    {
+                        GeneralInfo = new TrackPointGeneralInfoDto
+                        {
+                            MessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+                            Speed = null,
+                            NumberOfSatellites = 12,
+                            Latitude = 49.432023,
+                            Longitude = 52.556861
+                        },
+                        TrackerInfo = new TrackPointTrackerInfoDto
+                        {
+                            Parameters = new List<TrackerParameter>
+                            {
+                                new TrackerParameter {
+                                    LastValueDecimal = 1234,
+                                    ParamName = "rec_sn"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 6.0,
+                                    ParamName = "hdop"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueString = "11101011",
+                                    ParamName = "out"
+                                }
+                            }
+                        }
+                    }
+                },
+                // Сообщение c датчиками
+                new object[]
+                {
+                    5,
+                    new MonitoringTrackPointInfoDto
+                    {
+                        GeneralInfo = new TrackPointGeneralInfoDto
+                        {
+                            MessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+                            Speed = 0,
+                            NumberOfSatellites = 19,
+                            Latitude = 39.4323,
+                            Longitude = 12.55861
+                        },
+                        TrackerInfo = new TrackPointTrackerInfoDto
+                        {
+                            Parameters = new List<TrackerParameter>
+                            {
+                                new TrackerParameter {
+                                    LastValueDecimal = 12345,
+                                    ParamName = "rec_sn"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 6.0,
+                                    ParamName = "hdop"
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 2134,
+                                    ParamName = "rs485_1"
+                                },
+                            },
+                            Sensors = new List<TrackerSensorDto> {
+                                new TrackerSensorDto
+                                {
+                                    Name = "Датчик 1",
+                                    Unit = "Килограмм",
+                                    Value = "25"
+                                },
+                                new TrackerSensorDto
+                                {
+                                    Name = "Датчик 2",
+                                    Unit = "Метр",
+                                    Value = "11"
+                                }
+                            }
+                        }
+                    }
+                },
+            };
+        }
+    }
+
+    [Theory, MemberData(nameof(TrackPointInfoData))]
+    public void GetTrackPointInformation_ShoulReturnTrackPointInformation_ForMessages(int messageId, MonitoringTrackPointInfoDto expected)
+    {
+        var today = DateTime.Today;
+        SystemTime.Set(today.AddHours(14));
+
+        var actionResult = GetController(MonitoringGetInfoVehicles, MonitoringMessages, GetTrackers()).GetTrackPointInformation(messageId);
+        var okResult = actionResult as OkObjectResult;
+        var response = okResult!.Value as MonitoringTrackPointInfoDto;
+
+        response.Should().NotBeNull();
+        response.Should().BeEquivalentTo(expected);
+    }
+
     private static MonitoringController GetController(
         ICollection<Vehicle>? vehicles = null,
-        ICollection<TrackerMessage>? messages = null)
+        ICollection<TrackerMessage>? messages = null,
+        ICollection<Tracker>? trackers = null)
     {
         var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MonitoringMappingProfile())));
         var logger = new Mock<ILogger<MonitoringController>>().Object;
@@ -765,7 +903,7 @@ public class MonitoringControllerTests
         var trackerMessageRepository = TrackerMessageRepositoryMock.GetStub(messages);
         var options = Options.Create(new TrackerOptions { TrackerAddressValidMinutes = 60 });
         var tagsRepository = TrackerTagRepositoryMock.GetStub();
-        var trackerRepository = TrackerRepositoryMock.GetStub();
+        var trackerRepository = TrackerRepositoryMock.GetStub(trackers);
 
         return new MonitoringController(mapper, logger, vehicleRepository,
             trackerMessageRepository, options, tagsRepository, trackerRepository);
@@ -1257,9 +1395,93 @@ public class MonitoringControllerTests
                     Value = 2134,
                     TrackerTagId = 24,
                     TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagInteger
+                {
+                    SensorId = 3,
+                    Value = 25,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagInteger
+                {
+                    SensorId = 4,
+                    Value = 11,
+                    TagType = TagDataTypeEnum.Integer
                 }
             }
         }
     };
 
+    public static ICollection<Tracker> GetTrackers()
+    {
+        var sensors = SensorRepositoryMock.GetSensors().ToList();
+        return new List<Tracker>
+        {
+            new()
+            {
+                Id = 1,
+                Name = "трекер GalileoSky",
+                Description = "Описание 1",
+                Imei = "12341",
+                ExternalId = 111,
+                StartDate = DateTime.MinValue,
+                TrackerType = TrackerTypeEnum.GalileoSkyV50,
+                SimNumber = "905518101010",
+                Sensors = sensors.Where(s => s.TrackerId == 1).ToList()
+            },
+            new()
+            {
+                Id = 2,
+                Name = "трекер Retranslator",
+                Description = "Описание 2",
+                Imei = "12342",
+                ExternalId = 222,
+                StartDate = DateTime.UnixEpoch,
+                TrackerType = TrackerTypeEnum.Retranslator,
+                SimNumber = "905518101020",
+                Sensors = sensors.Where(s => s.TrackerId == 2).ToList()
+            },
+            new()
+            {
+                Id = 3,
+                Name = "трекер WialonIPS",
+                Description = "Описание 3",
+                Imei = "12343",
+                ExternalId = 333,
+                StartDate = DateTime.MaxValue,
+                TrackerType = TrackerTypeEnum.WialonIPS,
+                SimNumber = "905518101030",
+                Sensors = sensors.Where(s => s.TrackerId == 3).ToList()
+            },
+            new()
+            {
+                Id = 4,
+                Name = "трекер WialonIPS",
+                Description = "Описание 4",
+                Imei = "64128256",
+                ExternalId = 128,
+                StartDate = DateTime.MaxValue,
+                TrackerType = TrackerTypeEnum.WialonIPS,
+                Sensors = new List<Sensor>
+                {
+                    new Sensor
+                    {
+                        Id = 3,
+                        Name = "Датчик 1",
+                        IsVisible = true,
+                        UnitId = 1,
+                        Unit = new Unit(1, "Килограмм", "кг")
+                    },
+                    new Sensor
+                    {
+                        Id = 4,
+                        Name = "Датчик 2",
+                        IsVisible = true,
+                        UnitId = 2,
+                        Unit = new Unit(2, "Метр", "м")
+                    }
+                }
+            }
+        };
+    }
 }
