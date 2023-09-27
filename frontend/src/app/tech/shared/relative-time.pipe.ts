@@ -16,6 +16,7 @@ export class RelativeTimePipe implements PipeTransform {
   transform(date: Date | string | number | null | undefined): string | null {
     let relativeTime: string | null = null;
 
+    // eslint-disable-next-line no-self-compare
     if (date != null && date !== '' && date === date) {
       const relativeTimeFormat = new Intl.RelativeTimeFormat(localeID, {
         numeric: 'auto'

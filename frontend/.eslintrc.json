@@ -271,6 +271,7 @@
             ]
           }
         ],
+        "no-self-compare": "warn",
         "no-undef-init": "error",
         "no-void": "error",
         "no-whitespace-before-property": "error",
