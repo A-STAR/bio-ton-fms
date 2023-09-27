@@ -104,8 +104,12 @@ Deploy-frontend-test2.lan.bioton-fms-ru:
     - npm run build:test2    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/*    
-  rules:    
-    - when: manual        
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always         
+
+    - if: $TrueVar == "true"
+      when: manual
   allow_failure: true
   artifacts:
     expire_in: 1 hour
@@ -122,7 +126,11 @@ Deploy-frontend-test3.lan.bioton-fms-ru:
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test3.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test3.lan.bioton-fms-ru/*     
   rules:    
-    - when: manual        
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always         
+
+    - if: $TrueVar == "true"
+      when: manual
   allow_failure: true
   artifacts:
     expire_in: 1 hour
@@ -138,7 +146,11 @@ Deploy-frontend-stage.bioton-fms.ru:
     - npm run build:stage
     - rsync -avu dist/bio-ton-field-management-system/ user@stage.bioton-fms.ru:/var/www/stage   
   rules:    
-    - when: manual        
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always         
+
+    - if: $TrueVar == "true"
+      when: manual
   allow_failure: true
   artifacts:
     expire_in: 1 hour
@@ -154,7 +166,11 @@ Deploy-frontend-production.bioton-fms.ru:
     - npm run build
     - rsync -avu dist/bio-ton-field-management-system/ gitlab@production.bioton-fms.ru:/var/www/production.bioton-fms.ru/   
   rules:    
-    - when: manual        
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always         
+
+    - if: $TrueVar == "true"
+      when: manual
   allow_failure: true
   artifacts:
     expire_in: 1 hour
