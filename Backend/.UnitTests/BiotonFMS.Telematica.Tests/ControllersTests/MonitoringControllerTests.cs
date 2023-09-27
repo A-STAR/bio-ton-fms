@@ -728,6 +728,11 @@ public class MonitoringControllerTests
                                 {
                                     LastValueDecimal = 11,
                                     ParamName = ""
+                                },
+                                new TrackerParameter
+                                {
+                                    LastValueDecimal = 11,
+                                    ParamName = ""
                                 }
                             },
                             Sensors = new List<TrackerSensorDto>
