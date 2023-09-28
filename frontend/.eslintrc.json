@@ -252,6 +252,12 @@
         ],
         "no-console": "error",
         "no-debugger": "error",
+        "no-duplicate-imports": [
+          "warn",
+          {
+            "includeExports": true
+          }
+        ],
         "no-irregular-whitespace": [
           "warn",
           {
@@ -271,6 +277,7 @@
             ]
           }
         ],
+        "no-self-compare": "warn",
         "no-undef-init": "error",
         "no-void": "error",
         "no-whitespace-before-property": "error",
