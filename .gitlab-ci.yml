@@ -97,7 +97,8 @@ Deploy-frontend-test.lan.bioton-fms-ru:
 
 Deploy-frontend-test2.lan.bioton-fms-ru:
   stage: deploy
-  #needs: 
+  needs: 
+     - Build-frontend
   #  - Test-frontend
   extends: .node-job
   script:    
