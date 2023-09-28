@@ -252,6 +252,12 @@
         ],
         "no-console": "error",
         "no-debugger": "error",
+        "no-duplicate-imports": [
+          "warn",
+          {
+            "includeExports": true
+          }
+        ],
         "no-irregular-whitespace": [
           "warn",
           {
