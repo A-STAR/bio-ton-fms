@@ -99,7 +99,6 @@ Deploy-frontend-test2.lan.bioton-fms-ru:
   stage: deploy
   needs: 
      - Build-frontend
-  #  - Test-frontend
   extends: .node-job
   script:    
     - npm run build:test2    
@@ -115,8 +114,8 @@ Deploy-frontend-test2.lan.bioton-fms-ru:
 
 Deploy-frontend-test3.lan.bioton-fms-ru:
   stage: deploy
-  #needs: 
-  #  - Test-frontend
+  needs: 
+     - Build-frontend
   extends: .node-job
   script:      
     - npm run build:test3        
@@ -133,8 +132,8 @@ Deploy-frontend-test3.lan.bioton-fms-ru:
 
 Deploy-frontend-stage.bioton-fms.ru:
   stage: deploy
-  #needs: 
-  #  - Test-frontend
+  needs: 
+     - Build-frontend
   extends: .node-job
   script:        
     - npm run build:stage
@@ -150,8 +149,8 @@ Deploy-frontend-stage.bioton-fms.ru:
 
 Deploy-frontend-production.bioton-fms.ru:
   stage: deploy
-  #needs: 
-  #  - Test-frontend
+  needs: 
+     - Build-frontend
   extends: .node-job
   script:        
     - npm run build
@@ -189,8 +188,8 @@ Build-backend:
 
 Test-backend:  
   stage: test
-  #needs: 
-  #  - Build-backend  
+  needs: 
+    - Build-backend  
   script:
     - mkdir dir
     - cd dir
