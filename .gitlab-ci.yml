@@ -97,17 +97,14 @@ Deploy-frontend-test.lan.bioton-fms-ru:
 
 Deploy-frontend-test2.lan.bioton-fms-ru:
   stage: deploy
-  needs: 
-    - Test-frontend
+  #needs: 
+  #  - Test-frontend
   extends: .node-job
   script:    
     - npm run build:test2    
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/*    
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: always         
-
     - if: $TrueVar == "true"
       when: manual
   allow_failure: true
@@ -118,17 +115,14 @@ Deploy-frontend-test2.lan.bioton-fms-ru:
 
 Deploy-frontend-test3.lan.bioton-fms-ru:
   stage: deploy
-  needs: 
-    - Test-frontend
+  #needs: 
+  #  - Test-frontend
   extends: .node-job
   script:      
     - npm run build:test3        
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test3.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test3.lan.bioton-fms-ru/*     
   rules:    
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: always         
-
     - if: $TrueVar == "true"
       when: manual
   allow_failure: true
@@ -139,16 +133,13 @@ Deploy-frontend-test3.lan.bioton-fms-ru:
 
 Deploy-frontend-stage.bioton-fms.ru:
   stage: deploy
-  needs: 
-    - Test-frontend
+  #needs: 
+  #  - Test-frontend
   extends: .node-job
   script:        
     - npm run build:stage
     - rsync -avu dist/bio-ton-field-management-system/ user@stage.bioton-fms.ru:/var/www/stage   
   rules:    
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: always         
-
     - if: $TrueVar == "true"
       when: manual
   allow_failure: true
@@ -159,16 +150,13 @@ Deploy-frontend-stage.bioton-fms.ru:
 
 Deploy-frontend-production.bioton-fms.ru:
   stage: deploy
-  needs: 
-    - Test-frontend
+  #needs: 
+  #  - Test-frontend
   extends: .node-job
   script:        
     - npm run build
     - rsync -avu dist/bio-ton-field-management-system/ gitlab@production.bioton-fms.ru:/var/www/production.bioton-fms.ru/   
   rules:    
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: always         
-
     - if: $TrueVar == "true"
       when: manual
   allow_failure: true
