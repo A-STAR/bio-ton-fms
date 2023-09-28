@@ -105,8 +105,7 @@ Deploy-frontend-test2.lan.bioton-fms-ru:
     - sudo rsync -avu dist/bio-ton-field-management-system/ /var/www/test2.lan.bioton-fms-ru
     - sudo chown www-data:www-data /var/www/test2.lan.bioton-fms-ru/*    
   rules:
-    - if: $TrueVar == "true"
-      when: manual
+    - when: manual        
   allow_failure: true
   artifacts:
     expire_in: 1 hour
