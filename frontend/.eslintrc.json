@@ -251,6 +251,7 @@
           }
         ],
         "no-console": "error",
+        "no-constant-binary-expression": "warn",
         "no-debugger": "error",
         "no-duplicate-imports": [
           "warn",
