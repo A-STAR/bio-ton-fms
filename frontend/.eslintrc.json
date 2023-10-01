@@ -281,6 +281,7 @@
         "no-self-compare": "warn",
         "no-template-curly-in-string": "warn",
         "no-undef-init": "error",
+        "no-unmodified-loop-condition": "error",
         "no-void": "error",
         "no-whitespace-before-property": "error",
         "object-property-newline": [
