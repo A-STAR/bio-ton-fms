@@ -228,19 +228,16 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
             List<Type> subscriptions = _handlers;
             foreach (var subscription in subscriptions)
             {
-                using (var scope = _serviceProvider.CreateScope())
+                var handler = _serviceProvider.GetService(subscription);
+                if (handler == null)
                 {
-                    var handler = scope.ServiceProvider.GetService(subscription);
-                    if (handler == null)
-                    {
-                        _logger.LogWarning($"Нет зарегистрированных обработчиков для подписки на сообщение типа {subscription.Name}");
-                        continue;
-                    }
-
-                    var eventHandler = (IBusMessageHandler)handler;
-                    await Task.Yield();
-                    await eventHandler.HandleAsync(message, messageDeliverEventArgs.DeliveryTag);
+                    _logger.LogWarning($"Нет зарегистрированных обработчиков для подписки на сообщение типа {subscription.Name}");
+                    continue;
                 }
+
+                var eventHandler = (IBusMessageHandler)handler;
+                await Task.Yield();
+                await eventHandler.HandleAsync(message, messageDeliverEventArgs.DeliveryTag);
             }
             _logger.LogTrace("Сообщение обработано");
         }
