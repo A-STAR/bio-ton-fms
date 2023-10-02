@@ -77,7 +77,7 @@ Test-frontend:
 Deploy-frontend-test.lan.bioton-fms-ru:
   stage: deploy
   needs: 
-    - Test-frontend
+     - Build-frontend
   extends: .node-job
   script:
     - npm run build:test    
