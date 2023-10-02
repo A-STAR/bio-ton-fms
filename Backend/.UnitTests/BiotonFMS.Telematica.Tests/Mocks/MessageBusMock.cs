@@ -11,11 +11,13 @@ public class MessageBusMock : IMessageBus
 
     public void Ack(ulong deliveryTag, bool multiple)
     {
+        // ack mock
         ackList.Add((deliveryTag, multiple));
     }
 
     public void Nack(ulong deliveryTag, bool multiple, bool requeue)
     {
+        // nack mock
         nackList.Add((deliveryTag, multiple, requeue));
     }
 
