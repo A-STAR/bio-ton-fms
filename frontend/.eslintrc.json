@@ -283,6 +283,7 @@
         "no-undef-init": "error",
         "no-unmodified-loop-condition": "error",
         "no-unreachable-loop": "error",
+        "no-unused-private-class-members": "warn",
         "no-void": "error",
         "no-whitespace-before-property": "error",
         "object-property-newline": [
