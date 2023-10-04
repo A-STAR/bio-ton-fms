@@ -179,6 +179,7 @@
           }
         ],
         "@typescript-eslint/semi": "error",
+        "camelcase": "warn",
         "eqeqeq": [
           "error",
           "smart"
