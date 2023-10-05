@@ -180,6 +180,7 @@
         ],
         "@typescript-eslint/semi": "error",
         "camelcase": "warn",
+        "curly": "warn",
         "eqeqeq": [
           "error",
           "smart"
