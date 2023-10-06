@@ -181,6 +181,7 @@
         "@typescript-eslint/semi": "error",
         "camelcase": "warn",
         "curly": "warn",
+        "default-case-last": "warn",
         "eqeqeq": [
           "error",
           "smart"
