@@ -182,6 +182,7 @@
         "camelcase": "warn",
         "curly": "warn",
         "default-case-last": "warn",
+        "default-param-last": "warn",
         "eqeqeq": [
           "error",
           "smart"
