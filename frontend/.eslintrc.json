@@ -188,6 +188,10 @@
           "smart"
         ],
         "func-call-spacing": "error",
+        "func-names": [
+          "error",
+          "as-needed"
+        ],
         "jsdoc/check-line-alignment": "warn",
         "jsdoc/check-param-names": [
           "error",
