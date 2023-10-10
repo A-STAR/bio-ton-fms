@@ -189,7 +189,7 @@
         ],
         "func-call-spacing": "error",
         "func-names": [
-          "error",
+          "warn",
           "as-needed"
         ],
         "grouped-accessor-pairs": [
