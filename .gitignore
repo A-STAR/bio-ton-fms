@@ -23,3 +23,4 @@ StyleCop.Cache
 /BioTonFMSApp/ClientApp/dist
 /Backend/GlobalAssemblyInfo.cs
 /Backend/libs/BioTonFMS.Version.dll
+/**/.npm

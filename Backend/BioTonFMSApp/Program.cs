@@ -16,7 +16,11 @@ using BioTonFMSApp.Startup.Swagger;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    WebRootPath = "../../frontend/dist/bio-ton-field-management-system"
+});
 builder.Configuration.AddJsonFile("config/appsettings.json", true);
 
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -81,6 +85,8 @@ await app.ApplyMigrationsAsync(builder.Configuration);
     app.UseSwaggerUI();
 //}
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
