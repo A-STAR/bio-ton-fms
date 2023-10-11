@@ -256,6 +256,13 @@
             "exceptAfterSingleLine": true
           }
         ],
+        "logical-assignment-operators": [
+          "warn",
+          "always",
+          {
+            "enforceForIfStatements": true
+          }
+        ],
         "newline-per-chained-call": [
           "warn",
           {
