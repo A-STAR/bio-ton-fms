@@ -269,6 +269,7 @@
             "ignoreChainWithDepth": 1
           }
         ],
+        "no-alert": "error",
         "no-console": "error",
         "no-constant-binary-expression": "warn",
         "no-debugger": "error",
