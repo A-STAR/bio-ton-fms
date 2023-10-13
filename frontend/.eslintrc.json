@@ -270,6 +270,7 @@
           }
         ],
         "no-alert": "error",
+        "no-array-constructor": "error",
         "no-console": "error",
         "no-constant-binary-expression": "warn",
         "no-debugger": "error",
