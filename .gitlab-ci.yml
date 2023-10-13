@@ -27,8 +27,7 @@ Lint-frontend:
   extends: .node-job
   script:
     - export
-    - npm run lint 
-    - sudo ufw allow OpenSSH
+    - npm run lint     
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
