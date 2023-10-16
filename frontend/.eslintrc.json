@@ -282,6 +282,14 @@
           }
         ],
         "no-else-return": "warn",
+        "no-empty-function": [
+          "warn",
+          {
+            "allow": [
+              "constructors"
+            ]
+          }
+        ],
         "no-irregular-whitespace": [
           "warn",
           {
