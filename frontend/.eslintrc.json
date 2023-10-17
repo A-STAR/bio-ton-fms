@@ -290,6 +290,7 @@
             ]
           }
         ],
+        "no-empty-static-block": "warn",
         "no-irregular-whitespace": [
           "warn",
           {
