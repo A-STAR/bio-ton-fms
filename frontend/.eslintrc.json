@@ -291,6 +291,7 @@
           }
         ],
         "no-empty-static-block": "warn",
+        "no-eval": "warn",
         "no-irregular-whitespace": [
           "warn",
           {
