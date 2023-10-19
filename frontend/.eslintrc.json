@@ -292,6 +292,7 @@
         ],
         "no-empty-static-block": "warn",
         "no-eval": "warn",
+        "no-extend-native": "warn",
         "no-irregular-whitespace": [
           "warn",
           {
