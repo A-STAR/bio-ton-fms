@@ -294,6 +294,7 @@
         "no-eval": "warn",
         "no-extend-native": "warn",
         "no-extra-boolean-cast": "warn",
+        "no-floating-decimal": "warn",
         "no-irregular-whitespace": [
           "warn",
           {
