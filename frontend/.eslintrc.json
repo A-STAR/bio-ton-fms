@@ -296,6 +296,12 @@
         "no-extra-boolean-cast": "warn",
         "no-floating-decimal": "warn",
         "no-implicit-coercion": "warn",
+        "no-inline-comments": [
+          "warn",
+          {
+            "ignorePattern": "istanbul ignore\\s.+"
+          }
+        ],
         "no-irregular-whitespace": [
           "warn",
           {
