@@ -308,6 +308,7 @@
             "skipTemplates": true
           }
         ],
+        "no-lonely-if": "warn",
         "no-restricted-imports": [
           "error",
           {
