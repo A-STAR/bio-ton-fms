@@ -1,3 +1,4 @@
+@use 'sass:map'
 @use 'sass:math'
 @use 'variables' as *
 @use 'extends' as *
@@ -41,6 +42,16 @@ legend
 
 form > mat-error
   margin-bottom: 20px
+  animation: transitionmessages map.get($animation, text, duration) map.get($animation, fill-mode) map.get($animation, timing-function)
+
+  @keyframes transitionmessages
+    from
+      opacity: 0
+      transform: translateY(-5px)
+
+    to
+      opacity: 1
+      transform: translateY(0)
 
 .maplibregl-popup-content
   @extend %info-layout
