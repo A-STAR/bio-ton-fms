@@ -73,19 +73,10 @@
       bottom: 0
       width: 100%
       height: map.get($mat-mdc-form-field, subscript-wrapper, padding, vertical) + 2 * map.get($mat-mdc-form-field, subscript-wrapper, line-height)
+      margin-bottom: unset
       padding-left: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       padding-right: map.get($mat-mdc-form-field, subscript-wrapper, padding, horizontal)
       font-size: map.get($mat-mdc-form-field, font-size)
-      animation: transitionmessages map.get($animation, text, duration) map.get($animation, fill-mode) map.get($animation, timing-function)
-
-      @keyframes transitionmessages
-        from
-          opacity: 0
-          transform: translateY(-5px)
-
-        to
-          opacity: 1
-          transform: translateY(0)
 
       &.mat-mdc-form-field-bottom-align::before
         display: block
