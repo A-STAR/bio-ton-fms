@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ErrorHandler, Inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ErrorHandler, Inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
@@ -111,6 +111,14 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
           };
 
           this.vehicleForm.setErrors(errors);
+
+          setTimeout(() => {
+            this.elementRef.nativeElement
+              .querySelector('form > mat-error')
+              .scrollIntoView({
+                behavior: 'smooth'
+              });
+          });
         } else {
           this.errorHandler.handleError(error);
         }
@@ -191,6 +199,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     private errorHandler: ErrorHandler,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
+    private elementRef: ElementRef,
     private dialogRef: MatDialogRef<VehicleDialogComponent, true | '' | undefined>,
     private snackBar: MatSnackBar,
     private vehicleService: VehicleService
