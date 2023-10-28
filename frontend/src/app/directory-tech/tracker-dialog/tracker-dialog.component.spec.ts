@@ -1,8 +1,9 @@
-import { LOCALE_ID } from '@angular/core';
+import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
@@ -14,13 +15,14 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { NewTracker, Tracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { inputDateFormat, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
 
+import { environment } from '../../../environments/environment';
 import { localeID } from '../../tech/shared/relative-time.pipe';
 import { testNewTracker, testTrackerTypeEnum } from '../tracker.service.spec';
 
@@ -374,7 +376,7 @@ describe('TrackerDialogComponent', () => {
       startDate: testNewTracker.startDate!
     };
 
-    spyOn(trackerService, 'createTracker')
+    const createTrackerSpy = spyOn(trackerService, 'createTracker')
       .and.callFake(() => of(testTrackerResponse));
 
     const saveButton = await loader.getHarness(
@@ -402,6 +404,108 @@ describe('TrackerDialogComponent', () => {
 
     expect(dialogRef.close)
       .toHaveBeenCalledWith(true);
+
+    const url = `${environment.api}/api/telematica/tracker`;
+
+    let testErrorResponse = new HttpErrorResponse({
+      error: {
+        messages: [
+          `Имя GPS-трекера ${testTrackerResponse.name} зарезервировано`,
+          `GPS-трекер уже имеет назначенные датчики`
+        ]
+      },
+      status: 409,
+      statusText: 'Conflict',
+      url
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
+
+    createTrackerSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    // test for the tracker request error response
+    await saveButton.click();
+
+    let formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render form error elements')
+      .toBe(testErrorResponse.error.messages.length);
+
+    formErrorDes.forEach((formErrorDe, index) => {
+      expect(formErrorDe.nativeElement.textContent)
+        .withContext('render form error element text')
+        .toBe(testErrorResponse.error.messages[index]);
+    });
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    /* Coverage for a common server error fallback. */
+
+    testErrorResponse = new HttpErrorResponse({
+      error: `GPS-трекер с зарезервированным именем ${testTrackerResponse.name}`,
+      status: 409,
+      statusText: 'Conflict',
+      url
+    });
+
+    createTrackerSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    await saveButton.click();
+
+    formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render form error element')
+      .toBe(1);
+
+    expect(formErrorDes[0].nativeElement.textContent)
+      .withContext('render form error element text')
+      .toBe(testErrorResponse.error);
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    handleErrorSpy.calls.reset();
+
+    /* Coverage for authorization error response */
+
+    testErrorResponse = new HttpErrorResponse({
+      status: 403,
+      statusText: 'Forbidden',
+      url
+    });
+
+    createTrackerSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    await saveButton.click();
+
+    formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render no form error element')
+      .toBe(0);
+
+    expect(handleErrorSpy)
+      .toHaveBeenCalledWith(testErrorResponse);
   });
 
   it('should submit update tracker form', async () => {
