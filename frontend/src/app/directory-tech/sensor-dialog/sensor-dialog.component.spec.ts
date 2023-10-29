@@ -15,7 +15,7 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { NewSensor, Sensor, SensorGroup, SensorService, Unit } from '../sensor.service';
 
@@ -32,6 +32,9 @@ import {
   testUnits,
   testValidationTypeEnum
 } from '../sensor.service.spec';
+import { environment } from '../../../environments/environment';
+import { ErrorHandler } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 describe('SensorDialogComponent', () => {
   let component: SensorDialogComponent;
@@ -841,6 +844,108 @@ describe('SensorDialogComponent', () => {
 
     expect(sensorService.createSensor)
       .toHaveBeenCalledWith(newSensor);
+
+    const url = `${environment.api}/api/telematica/sensor`;
+
+    let testErrorResponse = new HttpErrorResponse({
+      error: {
+        messages: [
+          `Имя датчика ${testSensorResponse.name} зарезервировано`,
+          `Датчик уже назначен на GPS-трекер`
+        ]
+      },
+      status: 409,
+      statusText: 'Conflict',
+      url
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
+
+    createSensorSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    // test for the sensor request error response
+    await saveButton.click();
+
+    let formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render form error elements')
+      .toBe(testErrorResponse.error.messages.length);
+
+    formErrorDes.forEach((formErrorDe, index) => {
+      expect(formErrorDe.nativeElement.textContent)
+        .withContext('render form error element text')
+        .toBe(testErrorResponse.error.messages[index]);
+    });
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    /* Coverage for a common server error fallback. */
+
+    testErrorResponse = new HttpErrorResponse({
+      error: `Имя датчика ${testSensorResponse.name} зарезервировано`,
+      status: 409,
+      statusText: 'Conflict',
+      url
+    });
+
+    createSensorSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    await saveButton.click();
+
+    formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render form error element')
+      .toBe(1);
+
+    expect(formErrorDes[0].nativeElement.textContent)
+      .withContext('render form error element text')
+      .toBe(testErrorResponse.error);
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    handleErrorSpy.calls.reset();
+
+    /* Coverage for authorization error response */
+
+    testErrorResponse = new HttpErrorResponse({
+      status: 403,
+      statusText: 'Forbidden',
+      url
+    });
+
+    createSensorSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    await saveButton.click();
+
+    formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render no form error element')
+      .toBe(0);
+
+    expect(handleErrorSpy)
+      .toHaveBeenCalledWith(testErrorResponse);
   });
 
   it('should submit update sensor form', async () => {

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, Inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -86,21 +87,26 @@ export class TrackerCommandDialogComponent implements OnInit, OnDestroy {
             message: commandResponse
           });
         },
-        error: error => {
-          const isAuthError = [401, 403].includes(error.status);
+        error: (error: HttpErrorResponse) => {
+          const isClientError = error.status
+            .toString()
+            .startsWith('4');
 
-          if (isAuthError) {
+          const isAuthError = isClientError && [401, 403].includes(error.status);
+          const isCommandError = isClientError && !isAuthError;
+
+          if (isCommandError) {
+            this.commandResponse$.next({
+              message: error.error.messages.join('\n'),
+              error: true
+            });
+          } else {
             // hide message paragraph
             this.commandResponse$.next({
               message: null
             });
 
             this.errorHandler.handleError(error);
-          } else {
-            this.commandResponse$.next({
-              message: error.error.messages.join(' '),
-              error: true
-            });
           }
         }
       });

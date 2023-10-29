@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ErrorHandler, Inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -85,12 +86,43 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
       ? this.vehicleService.updateVehicle(vehicle)
       : this.vehicleService.createVehicle(vehicle);
 
-    this.#subscription = vehicle$.subscribe(() => {
-      const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
+    this.#subscription = vehicle$.subscribe({
+      next: () => {
+        const message = this.data ? VEHICLE_UPDATED : VEHICLE_CREATED;
 
-      this.snackBar.open(message);
+        this.snackBar.open(message);
 
-      this.dialogRef.close(true);
+        this.dialogRef.close(true);
+      },
+      error: (error: HttpErrorResponse) => {
+        const isClientError = error.status
+          .toString()
+          .startsWith('4');
+
+        const isBadRequestError = error.status === 400;
+        const isAuthError = isClientError && [401, 403].includes(error.status);
+        const isFormError = isClientError && !isAuthError;
+
+        if (isFormError && !isBadRequestError) {
+          const errors: ValidationErrors = {
+            serverErrors: {
+              messages: error.error?.messages ?? [error.error]
+            }
+          };
+
+          this.vehicleForm.setErrors(errors);
+
+          setTimeout(() => {
+            this.elementRef.nativeElement
+              .querySelector('form > mat-error')
+              .scrollIntoView({
+                behavior: 'smooth'
+              });
+          });
+        } else {
+          this.errorHandler.handleError(error);
+        }
+      }
     });
   }
 
@@ -164,8 +196,10 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   }
 
   constructor(
+    private errorHandler: ErrorHandler,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) protected data: NewVehicle | undefined,
+    private elementRef: ElementRef,
     private dialogRef: MatDialogRef<VehicleDialogComponent, true | '' | undefined>,
     private snackBar: MatSnackBar,
     private vehicleService: VehicleService

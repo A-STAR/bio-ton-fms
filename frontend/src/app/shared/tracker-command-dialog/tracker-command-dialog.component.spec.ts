@@ -248,7 +248,7 @@ describe('TrackerCommandDialogComponent', () => {
 
     await messageInput.setValue(commandText);
 
-    const url = `${environment.api}/api/api/telematica/tracker-command/${TEST_TRACKER_ID}`;
+    const url = `${environment.api}/api/telematica/tracker-command/${TEST_TRACKER_ID}`;
 
     let testErrorResponse = new HttpErrorResponse({
       error: {
@@ -295,8 +295,8 @@ describe('TrackerCommandDialogComponent', () => {
     /* Coverage for authorization error response */
 
     testErrorResponse = new HttpErrorResponse({
-      status: 401,
-      statusText: 'Unauthorized',
+      status: 403,
+      statusText: 'Forbidden',
       url
     });
 

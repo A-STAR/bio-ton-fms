@@ -1,7 +1,9 @@
+import { ErrorHandler } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyValue } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -12,13 +14,14 @@ import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { Fuel, NewVehicle, Vehicle, VehicleGroup, VehicleService, VehicleSubtype, VehicleType } from '../vehicle.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
 import { VehicleDialogComponent, VEHICLE_CREATED, VEHICLE_UPDATED } from './vehicle-dialog.component';
 
+import { environment } from '../../../environments/environment';
 import { testFuels, testNewVehicle, testVehicleGroups, testVehicleSubtypeEnum, testVehicleTypeEnum } from '../vehicle.service.spec';
 
 describe('VehicleDialogComponent', () => {
@@ -427,14 +430,14 @@ describe('VehicleDialogComponent', () => {
       model: testNewVehicle.model,
       manufacturingYear: testNewVehicle.manufacturingYear,
       type: testVehicleTypeEnum[0],
-      subType:  testVehicleSubtypeEnum[2],
+      subType: testVehicleSubtypeEnum[2],
       fuelType: {
         id: testNewVehicle.fuelTypeId,
         value: testFuels[0].name
       }
     };
 
-    spyOn(vehicleService, 'createVehicle')
+    const createVehicleSpy = spyOn(vehicleService, 'createVehicle')
       .and.callFake(() => of(testVehicleResponse));
 
     const saveButton = await loader.getHarness(
@@ -470,6 +473,108 @@ describe('VehicleDialogComponent', () => {
     });
 
     await saveButton.click();
+
+    const url = `${environment.api}/api/telematica/vehicle`;
+
+    let testErrorResponse = new HttpErrorResponse({
+      error: {
+        messages: [
+          `Имя машины ${testVehicleResponse.name} зарезервировано`,
+          `Инвентарный номер машины ${testVehicleResponse.name} зарезервирован`
+        ]
+      },
+      status: 409,
+      statusText: 'Conflict',
+      url
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
+
+    createVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    // test for the vehicle request error response
+    await saveButton.click();
+
+    let formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render form error elements')
+      .toBe(testErrorResponse.error.messages.length);
+
+    formErrorDes.forEach((formErrorDe, index) => {
+      expect(formErrorDe.nativeElement.textContent)
+        .withContext('render form error element text')
+        .toBe(testErrorResponse.error.messages[index]);
+    });
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    /* Coverage for a common server error fallback. */
+
+    testErrorResponse = new HttpErrorResponse({
+      error: `Имя машины ${testVehicleResponse.name} зарезервировано`,
+      status: 409,
+      statusText: 'Conflict',
+      url
+    });
+
+    createVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    await saveButton.click();
+
+    formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render form error element')
+      .toBe(1);
+
+    expect(formErrorDes[0].nativeElement.textContent)
+      .withContext('render form error element text')
+      .toBe(testErrorResponse.error);
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    handleErrorSpy.calls.reset();
+
+    /* Coverage for authorization error response */
+
+    testErrorResponse = new HttpErrorResponse({
+      status: 403,
+      statusText: 'Forbidden',
+      url
+    });
+
+    createVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    await saveButton.click();
+
+    formErrorDes = fixture.debugElement.queryAll(
+      By.css('form > mat-error')
+    );
+
+    expect(formErrorDes.length)
+      .withContext('render no form error element')
+      .toBe(0);
+
+    expect(handleErrorSpy)
+      .toHaveBeenCalledWith(testErrorResponse);
   });
 
   it('should submit update vehicle form', async () => {

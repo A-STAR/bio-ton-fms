@@ -18,11 +18,11 @@ export class ErrorHandler implements ErrorHandlerClass {
     }
 
     this.zone.run(() => {
-      let message: string = error?.error?.messages?.join(' ')
-        ?? error?.error?.message
-        ?? `${DEFAULT_ERROR_MESSAGE}${error?.message ? `: ${error.message}` : ''}`;
+      let message: string = error.error?.messages?.join(' ')
+        ?? error.error?.message
+        ?? `${DEFAULT_ERROR_MESSAGE}${error.message ? `: ${error.message}` : ''}`;
 
-      if (error?.error?.errors) {
+      if (error.error?.errors) {
         message = this.#getErrorsMessage(error.error.errors);
       }
 

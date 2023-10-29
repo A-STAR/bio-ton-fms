@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ErrorHandler, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -143,39 +144,70 @@ export class SensorDialogComponent implements OnInit {
       sensor$ = this.sensorService.createSensor(newSensor);
     }
 
-    this.#subscription = sensor$.subscribe((response: Sensor | null) => {
-      const message = this.data.sensor && 'id' in this.data.sensor ? SENSOR_UPDATED : SENSOR_CREATED;
+    this.#subscription = sensor$.subscribe({
+      next: (response: Sensor | null) => {
+        const message = this.data.sensor && 'id' in this.data.sensor ? SENSOR_UPDATED : SENSOR_CREATED;
 
-      this.snackBar.open(message);
+        this.snackBar.open(message);
 
-      let sensor: Sensor;
+        let sensor: Sensor;
 
-      if (this.data.sensor && 'id' in this.data.sensor) {
-        sensor = this.#serializeSensor(newSensor);
-      } else {
-        // TODO: remove local settings
-        sensor = {
-          ...response!,
-          startTimeout: startTimeout ?? undefined,
-          fixErrors: fixErrors ?? undefined,
-          fuelUseCalculation: fuelUseCalculation ?? undefined,
-          fuelUseTimeCalculation: fuelUseTimeCalculation ?? undefined,
-          minRefueling: refueling?.min ?? undefined,
-          refuelingTimeout: refueling?.timeout ?? undefined,
-          fullRefuelingTimeout: refueling?.fullTimeout ?? undefined,
-          refuelingLookup: refueling?.lookup ?? undefined,
-          refuelingCalculation: refueling?.calculation ?? undefined,
-          refuelingRawCalculation: refueling?.rawCalculation ?? undefined,
-          minDrain: drain?.min ?? undefined,
-          drainTimeout: drain?.timeout ?? undefined,
-          drainStopTimeout: drain?.stopTimeout ?? undefined,
-          drainLookup: drain?.lookup ?? undefined,
-          drainCalculation: drain?.calculation ?? undefined,
-          drainRawCalculation: drain?.rawCalculation ?? undefined
-        };
+        if (this.data.sensor && 'id' in this.data.sensor) {
+          sensor = this.#serializeSensor(newSensor);
+        } else {
+          // TODO: remove local settings
+          sensor = {
+            ...response!,
+            startTimeout: startTimeout ?? undefined,
+            fixErrors: fixErrors ?? undefined,
+            fuelUseCalculation: fuelUseCalculation ?? undefined,
+            fuelUseTimeCalculation: fuelUseTimeCalculation ?? undefined,
+            minRefueling: refueling?.min ?? undefined,
+            refuelingTimeout: refueling?.timeout ?? undefined,
+            fullRefuelingTimeout: refueling?.fullTimeout ?? undefined,
+            refuelingLookup: refueling?.lookup ?? undefined,
+            refuelingCalculation: refueling?.calculation ?? undefined,
+            refuelingRawCalculation: refueling?.rawCalculation ?? undefined,
+            minDrain: drain?.min ?? undefined,
+            drainTimeout: drain?.timeout ?? undefined,
+            drainStopTimeout: drain?.stopTimeout ?? undefined,
+            drainLookup: drain?.lookup ?? undefined,
+            drainCalculation: drain?.calculation ?? undefined,
+            drainRawCalculation: drain?.rawCalculation ?? undefined
+          };
+        }
+
+        this.dialogRef.close(sensor);
+      },
+      error: (error: HttpErrorResponse) => {
+        const isClientError = error.status
+          .toString()
+          .startsWith('4');
+
+        const isBadRequestError = error.status === 400;
+        const isAuthError = isClientError && [401, 403].includes(error.status);
+        const isFormError = isClientError && !isAuthError;
+
+        if (isFormError && !isBadRequestError) {
+          const errors: ValidationErrors = {
+            serverErrors: {
+              messages: error.error?.messages ?? [error.error]
+            }
+          };
+
+          this.sensorForm.setErrors(errors);
+
+          setTimeout(() => {
+            this.elementRef.nativeElement
+              .querySelector('form > mat-error')
+              .scrollIntoView({
+                behavior: 'smooth'
+              });
+          });
+        } else {
+          this.errorHandler.handleError(error);
+        }
       }
-
-      this.dialogRef.close(sensor);
     });
   }
 
@@ -372,8 +404,10 @@ export class SensorDialogComponent implements OnInit {
   }
 
   constructor(
+    private errorHandler: ErrorHandler,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) protected data: SensorDialogData,
+    private elementRef: ElementRef,
     private dialogRef: MatDialogRef<SensorDialogComponent, Sensor>,
     private snackBar: MatSnackBar,
     private sensorService: SensorService
