@@ -342,6 +342,10 @@
         </fieldset>
       </mat-tab>
     </mat-tab-group>
+
+    <ng-container *ngIf="(sensorForm.statusChanges | async) && sensorForm.errors?.['serverErrors'] as error">
+      <mat-error *ngFor="let message of error.messages">{{ message }}</mat-error>
+    </ng-container>
   </form>
 </mat-dialog-content>
 
