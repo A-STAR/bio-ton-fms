@@ -7,6 +7,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatTabGroupHarness } from '@angular/material/tabs/testing';
+import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing';
@@ -704,7 +705,7 @@ describe('SensorDialogComponent', () => {
 
     await nameInput.setValue(name);
 
-    const [typeSelect, dataTypeSelect, unitSelect] = await loader.getAllHarnesses(
+    const [typeSelect, dataTypeSelect, unitSelect, validatorSelect] = await loader.getAllHarnesses(
       MatSelectHarness.with({
         ancestor: 'form#sensor-form'
       })
@@ -847,7 +848,64 @@ describe('SensorDialogComponent', () => {
 
     const url = `${environment.api}/api/telematica/sensor`;
 
+    const nameErrorText = `Датчик с именем ${testSensorResponse.name} уже существует`;
+    const formulaErrorText = 'Выражение содержит ссылку на несуществующий параметр трекера или датчик';
+    const validatorErrorText = 'Валидатор может ссылаться только на датчики своего трекера';
+
     let testErrorResponse = new HttpErrorResponse({
+      error: {
+        errors: {
+          Name: [nameErrorText],
+          Formula: [formulaErrorText],
+          ValidatorId: [validatorErrorText]
+        }
+      },
+      status: 400,
+      statusText: 'Bad Request',
+      url
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
+
+    createSensorSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    // test for the sensor request `400 Bad Request` error response
+    await saveButton.click();
+
+    const [nameFormField, , , formulaFormField] = await loader.getAllHarnesses(
+      MatFormFieldHarness.with({
+        ancestor: 'form#sensor-form'
+      })
+    );
+
+    const [nameError] = await nameFormField.getErrors();
+
+    await expectAsync(
+      nameError.getText()
+    )
+      .withContext('render name field error text')
+      .toBeResolvedTo(nameErrorText);
+
+    const [formulaError] = await formulaFormField.getErrors();
+
+    await expectAsync(
+      formulaError.getText()
+    )
+      .withContext('render formula field error text')
+      .toBeResolvedTo(formulaErrorText);
+
+    handleErrorSpy.calls.reset();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    await formulaInput.setValue(formula!);
+
+    testErrorResponse = new HttpErrorResponse({
       error: {
         messages: [
           `Имя датчика ${testSensorResponse.name} зарезервировано`,
@@ -858,11 +916,6 @@ describe('SensorDialogComponent', () => {
       statusText: 'Conflict',
       url
     });
-
-    const errorHandler = TestBed.inject(ErrorHandler);
-
-    spyOn(console, 'error');
-    const handleErrorSpy = spyOn(errorHandler, 'handleError');
 
     createSensorSpy.and.callFake(() => throwError(() => testErrorResponse));
 

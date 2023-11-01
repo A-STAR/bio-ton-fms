@@ -188,7 +188,49 @@ export class SensorDialogComponent implements OnInit {
         const isAuthError = isClientError && [401, 403].includes(error.status);
         const isFormError = isClientError && !isAuthError;
 
-        if (isFormError && !isBadRequestError) {
+        if (isBadRequestError) {
+          Object
+            .entries<string[]>(error.error.errors)
+            .forEach(([key, value]) => {
+              let path: string | undefined;
+
+              switch (key) {
+                case 'Name':
+                  path = 'basic.name';
+
+                  break;
+
+                case 'Formula': {
+                  path = 'basic.formula';
+
+                  break;
+                }
+              }
+
+              if (path) {
+                const errors: ValidationErrors = {
+                  serverErrors: {
+                    messages: value.join('\n')
+                  }
+                };
+
+                this.sensorForm
+                  .get(path)
+                  ?.setErrors(errors);
+
+                delete error.error.errors[key];
+              }
+            });
+
+          const hasErrors = Object
+            .keys(error.error.errors)
+            .length;
+
+          if (hasErrors) {
+            // print remaining unprocessed errors
+            this.errorHandler.handleError(error);
+          }
+        } else if (isFormError) {
           const errors: ValidationErrors = {
             serverErrors: {
               messages: error.error?.messages ?? [error.error]
