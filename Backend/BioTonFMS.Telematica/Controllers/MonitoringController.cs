@@ -18,7 +18,7 @@ using Microsoft.Extensions.Options;
 namespace BioTonFMS.Telematica.Controllers;
 
 /// <summary>
-/// API cервиса для работы с машинами
+/// API cервиса мониторинг
 /// </summary>
 [Authorize]
 [ApiController]
