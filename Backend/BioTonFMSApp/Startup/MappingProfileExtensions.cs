@@ -11,6 +11,7 @@ namespace BioTonFMSApp.Startup
             services.AddAutoMapper(typeof(VehicleGroupMappingProfile).Assembly);
             services.AddAutoMapper(typeof(FuelTypeMappingProfile).Assembly);
             services.AddAutoMapper(typeof(MonitoringMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(MessagesViewMappingProfile).Assembly);
             return services;
         }
     }
