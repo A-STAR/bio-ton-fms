@@ -10,6 +10,7 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
+using BioTonFMS.Telematica.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,13 +31,16 @@ public class MessagesViewController : ValidationControllerBase
 {
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IMapper _mapper;
+    private readonly ITrackerMessageRepository _messageRepository;
 
     public MessagesViewController(
         IMapper mapper,
         ILogger<MessagesViewController> logger,
-        IVehicleRepository vehicleRepository)
+        IVehicleRepository vehicleRepository,
+        ITrackerMessageRepository messageRepository)
     {
         _vehicleRepository = vehicleRepository;
+        _messageRepository = messageRepository;
         _mapper = mapper;
     }
 
@@ -56,4 +60,68 @@ public class MessagesViewController : ValidationControllerBase
 
         return Ok(messagesViewVehicleDtos);
     }
+    
+    /// <summary>
+    /// Возвращает точки для трека для выбранной машины и периода
+    /// </summary>
+    [HttpGet("track")]
+    [ProducesResponseType(typeof(MessagesViewTrackResponse), StatusCodes.Status200OK)]
+    public IActionResult GetMessagesViewTrack([FromQuery] int vehicleId,
+        [FromQuery] DateTime periodStart, [FromQuery] DateTime periodEnd)
+    {
+        if (!_vehicleRepository.GetExternalIds(vehicleId).TryGetValue(vehicleId, out var externalId))
+        {
+            return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
+        }
+        
+        if (!_messageRepository.GetTracks(periodStart, periodEnd, externalId)
+            .TryGetValue(externalId, out var points))
+        {
+            return Ok(new MessagesViewTrackResponse());
+        }
+
+        ViewBounds? viewBounds = CalculateViewBounds(points);
+
+        return Ok(new MessagesViewTrackResponse
+        {
+            ViewBounds = viewBounds,
+            Track = points
+        });
+    }
+
+    #region Private
+
+    private static ViewBounds? CalculateViewBounds(ICollection<TrackPointInfo> points)
+    {
+        if (points.Count == 0)
+        {
+            return null;
+        }
+        
+        List<double> lons = points.Select(x => x.Longitude).ToList();
+        List<double> lats = points.Select(x => x.Latitude).ToList();
+
+        var difLat = (lats.Max() - lats.Min()) / 20;
+        var difLon = (lons.Max() - lons.Min()) / 20;
+
+        if (difLat < MonitoringController.DefaultDifLat)
+        {
+            difLat = MonitoringController.DefaultDifLat;
+        }
+        if (difLon < MonitoringController.DefaultDifLon)
+        {
+            difLon = MonitoringController.DefaultDifLon;
+        }
+
+        var viewBounds = new ViewBounds
+        {
+            UpperLeftLatitude = lats.Max() + difLat,
+            UpperLeftLongitude = lons.Min() - difLon,
+            BottomRightLatitude = lats.Min() - difLat,
+            BottomRightLongitude = lons.Max() + difLon
+        };
+        return viewBounds;
+    }
+
+    #endregion
 }

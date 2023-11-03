@@ -27,12 +27,13 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 
     IDictionary<int, VehicleStatus> GetVehicleStates(int[] externalIds, int trackerAddressValidMinutes);
 
-    IDictionary<int, TrackPointInfo[]> GetTracks(DateTime trackStartTime, int[] externalIds);
+    IDictionary<int, TrackPointInfo[]> GetTracks(DateTime trackStartTime, DateTime trackEndTime,
+        params int[] externalIds);
 
     /// <summary>
     /// Информация о местонахождении трекеров
     /// </summary>
     /// <param name="externalIds">Внешние id трекеров</param>
     /// <returns>Локации трекеров в формате Longitude, Latitude</returns>
-    IDictionary<int, (double Lat, double Long)> GetLocations(int[] externalIds);
+    IDictionary<int, (double Lat, double Long)> GetLocations(params int[] externalIds);
 }

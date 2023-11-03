@@ -117,7 +117,8 @@ public class MonitoringController : ValidationControllerBase
 
         IEnumerable<int> vehiclesNeedTrack = requests.Where(x => x.NeedReturnTrack).Select(x => x.VehicleId);
 
-        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(trackStartTime, 
+        IDictionary<int, TrackPointInfo[]> tracks = _messageRepository.GetTracks(trackStartTime,
+            DateTime.MaxValue,
             externalIds.Where(x => vehiclesNeedTrack.Contains(x.Key))
                 .Select(x => x.Value)
                 .ToArray()

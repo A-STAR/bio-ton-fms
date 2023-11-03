@@ -139,7 +139,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
             ).ToArray();
         }
 
-        public IDictionary<int, int> GetExternalIds(int[] vehicleIds) =>
+        public IDictionary<int, int> GetExternalIds(params int[] vehicleIds) =>
             QueryableProvider.Fetch(x => x.Tracker)
                 .Linq()
                 .Where(x => vehicleIds.Contains(x.Id) && x.Tracker != null)
