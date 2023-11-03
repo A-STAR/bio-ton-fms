@@ -9,6 +9,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
+import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -476,7 +477,55 @@ describe('VehicleDialogComponent', () => {
 
     const url = `${environment.api}/api/telematica/vehicle`;
 
+    const nameErrorText = `Машина с именем ${testVehicleResponse.name} уже существует`;
+    const manufacturingYearText = `Год производства должен быть больше 0`;
+
     let testErrorResponse = new HttpErrorResponse({
+      error: {
+        errors: {
+          Name: [nameErrorText],
+          ManufacturingYear: [manufacturingYearText]
+        }
+      },
+      status: 400,
+      statusText: 'Bad Request',
+      url
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
+
+    createVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    // test for the vehicle request `400 Bad Request` error response
+    await saveButton.click();
+
+    const [nameFormField] = await loader.getAllHarnesses(
+      MatFormFieldHarness.with({
+        ancestor: 'form#vehicle-form'
+      })
+    );
+
+    const [nameError] = await nameFormField.getErrors();
+
+    await expectAsync(
+      nameError.getText()
+    )
+      .withContext('render name field error text')
+      .toBeResolvedTo(nameErrorText);
+
+    expect(handleErrorSpy)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    handleErrorSpy.calls.reset();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    testErrorResponse = new HttpErrorResponse({
       error: {
         messages: [
           `Имя машины ${testVehicleResponse.name} зарезервировано`,
@@ -487,11 +536,6 @@ describe('VehicleDialogComponent', () => {
       statusText: 'Conflict',
       url
     });
-
-    const errorHandler = TestBed.inject(ErrorHandler);
-
-    spyOn(console, 'error');
-    const handleErrorSpy = spyOn(errorHandler, 'handleError');
 
     createVehicleSpy.and.callFake(() => throwError(() => testErrorResponse));
 

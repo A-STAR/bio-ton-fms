@@ -16,6 +16,8 @@
           <mat-error *ngIf="vehicleForm.controls.basic.controls.name.errors?.['maxlength'] as error">
             Поле должно быть не более {{ error.requiredLength }} символов
           </mat-error>
+
+          <mat-error *ngIf="vehicleForm.controls.basic.controls.name.errors?.['serverErrors'] as error">{{ error.messages }}</mat-error>
         </mat-form-field>
       </div>
 

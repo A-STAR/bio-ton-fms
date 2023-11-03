@@ -9,6 +9,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialogRef, MatDialogTitle, MAT_DIALOG_DATA, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
+import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -295,7 +296,7 @@ describe('TrackerDialogComponent', () => {
     );
   });
 
-  it('should submit invalid vehicle form', async () => {
+  it('should submit invalid tracker form', async () => {
     spyOn(trackerService, 'createTracker')
       .and.callThrough();
 
@@ -407,7 +408,55 @@ describe('TrackerDialogComponent', () => {
 
     const url = `${environment.api}/api/telematica/tracker`;
 
+    const nameErrorText = `GPS-трекер с именем ${testTrackerResponse.name} уже существует`;
+    const externalIdErrorText = 'Внешний ID обязательное поле';
+
     let testErrorResponse = new HttpErrorResponse({
+      error: {
+        errors: {
+          Name: [nameErrorText],
+          ExternalId: [externalIdErrorText]
+        }
+      },
+      status: 400,
+      statusText: 'Bad Request',
+      url
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
+
+    createTrackerSpy.and.callFake(() => throwError(() => testErrorResponse));
+
+    // test for the tracker request `400 Bad Request` error response
+    await saveButton.click();
+
+    const [nameFormField] = await loader.getAllHarnesses(
+      MatFormFieldHarness.with({
+        ancestor: 'form#tracker-form'
+      })
+    );
+
+    const [nameError] = await nameFormField.getErrors();
+
+    await expectAsync(
+      nameError.getText()
+    )
+      .withContext('render name field error text')
+      .toBeResolvedTo(nameErrorText);
+
+    expect(handleErrorSpy)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    handleErrorSpy.calls.reset();
+
+    // reset form invalid state
+    await nameInput.setValue('');
+    await nameInput.setValue(name);
+
+    testErrorResponse = new HttpErrorResponse({
       error: {
         messages: [
           `Имя GPS-трекера ${testTrackerResponse.name} зарезервировано`,
@@ -418,11 +467,6 @@ describe('TrackerDialogComponent', () => {
       statusText: 'Conflict',
       url
     });
-
-    const errorHandler = TestBed.inject(ErrorHandler);
-
-    spyOn(console, 'error');
-    const handleErrorSpy = spyOn(errorHandler, 'handleError');
 
     createTrackerSpy.and.callFake(() => throwError(() => testErrorResponse));
 

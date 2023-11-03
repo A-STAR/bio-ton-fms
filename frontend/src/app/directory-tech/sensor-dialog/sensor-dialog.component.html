@@ -16,6 +16,8 @@
               <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['maxlength'] as error">
                 Поле должно быть не более {{ error.requiredLength }} символов
               </mat-error>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['serverErrors'] as error">{{ error.messages }}</mat-error>
             </mat-form-field>
           </div>
 
@@ -57,7 +59,11 @@
               <mat-form-field class="full-width">
                 <input matInput id="formula" placeholder="Формула" formControlName="formula">
 
-                <mat-error>Обязательное поле</mat-error>
+                <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">Обязательное поле</mat-error>
+
+                <mat-error *ngIf="sensorForm.controls.basic.controls.formula.errors?.['serverErrors'] as error">
+                  {{ error.messages }}
+                </mat-error>
               </mat-form-field>
             </div>
 
@@ -87,7 +93,11 @@
                 <mat-option [value]="validator.id" *ngFor="let validator of this.data.sensors">{{ validator.name }}</mat-option>
               </mat-select>
 
-              <mat-error>Обязательное поле</mat-error>
+              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">Обязательное поле</mat-error>
+
+              <mat-error *ngIf="sensorForm.controls.basic.controls.validator.errors?.['serverErrors'] as error">
+                {{ error.messages }}
+              </mat-error>
             </mat-form-field>
           </div>
 
