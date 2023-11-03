@@ -10,7 +10,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'tech',
+        redirectTo: 'messages',
         pathMatch: 'full'
       },
       {
@@ -20,6 +20,10 @@ export const routes: Routes = [
       {
         path: 'tech',
         loadComponent: () => import('./tech/tech.component')
+      },
+      {
+        path: 'messages',
+        loadComponent: () => import('./messages/messages.component')
       },
       {
         path: 'directory',
