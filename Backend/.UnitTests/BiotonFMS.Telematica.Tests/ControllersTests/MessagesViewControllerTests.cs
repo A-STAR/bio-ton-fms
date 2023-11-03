@@ -166,10 +166,12 @@ public class MessagesViewControllerTests
         ICollection<Tracker>? trackers = null)
     {
         var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MessagesViewMappingProfile())));
-        var logger = new Mock<ILogger<MessagesViewController>>().Object;
+        //var logger = new Mock<ILogger<MessagesViewController>>().Object;
         var vehicleRepository = VehicleRepositoryMock.GetStub(vehicles);
+        var commandRepository = new TrackerCommandRepositoryMock();
+        var messageRepository = TrackerMessageRepositoryMock.GetStub();
 
-        return new MessagesViewController(mapper, logger, vehicleRepository);
+        return new MessagesViewController(mapper, vehicleRepository, commandRepository, messageRepository);
     }
 
     private static IList<Vehicle> MonitoringVehicles => new List<Vehicle>
