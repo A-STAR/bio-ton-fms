@@ -1,5 +1,6 @@
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
@@ -54,11 +55,13 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return query.ToList();
     }
 
-    public IList<TrackerMessage> GetTrackerMessagesForDate(int[] trackerExternalIds, DateOnly date, bool forUpdate = false)
+    public IList<TrackerMessage> GetTrackerMessagesForDate(int[] trackerExternalIds, DateOnly date,
+        bool forUpdate = false)
     {
         var query = forUpdate ? HydratedQuery : HydratedQuery.AsNoTracking();
         query = query
-            .Where(m => trackerExternalIds.Contains(m.ExternalTrackerId) && DateOnly.FromDateTime(m.ServerDateTime) == date)
+            .Where(m => trackerExternalIds.Contains(m.ExternalTrackerId) &&
+                        DateOnly.FromDateTime(m.ServerDateTime) == date)
             .OrderBy(m => m.ExternalTrackerId)
             .ThenBy(m => m.Id);
         return query.ToList();
@@ -267,7 +270,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
         return result;
     }
-    
+
     public IDictionary<int, (double Lat, double Long)> GetLocations(int[] externalIds)
     {
         var result = QueryableProvider.Linq()
@@ -280,5 +283,42 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .ToDictionary(x => x.ExternalTrackerId, x => (x.Latitude!.Value, x.Longitude!.Value));
 
         return result;
+    }
+
+    public ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end)
+    {
+        var messages = HydratedQuery.AsNoTracking()
+            .Where(x => x.ExternalTrackerId == externalId &&
+                        x.ServerDateTime >= start &&
+                        x.ServerDateTime <= end);
+
+        var l = messages.ToList();
+
+        var firstMileage = (int?)messages.OrderBy(x => x.ServerDateTime)
+            .SelectMany(x => x.Tags)
+            .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
+            ?.GetValue() ?? 0;
+        
+        var lastMileage = (int?)messages.OrderByDescending(x => x.ServerDateTime)
+            .SelectMany(x => x.Tags)
+            .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
+            ?.GetValue() ?? 0;
+
+        return new ViewMessageStatisticsDto
+        {
+            NumberOfMessages = messages.Count(),
+            MaxSpeed = messages.Where(x => x.Speed != null)
+                .Select(x => x.Speed!.Value)
+                .DefaultIfEmpty()
+                .Max(),
+            AverageSpeed = messages.Where(x => x.Speed != null && x.Speed != 0)
+                .Select(x => x.Speed!.Value)
+                .DefaultIfEmpty()
+                .Average(),
+            Distance = (lastMileage - firstMileage) * 5,
+            Mileage = lastMileage * 5,
+            TotalTime = (messages.Select(x => x.ServerDateTime).DefaultIfEmpty().Max() -
+                         messages.Select(x => x.ServerDateTime).DefaultIfEmpty().Min()).Seconds
+        };
     }
 }
