@@ -291,18 +291,16 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .Where(x => x.ExternalTrackerId == externalId &&
                         x.ServerDateTime >= start &&
                         x.ServerDateTime <= end);
-
-        var l = messages.ToList();
-
-        var firstMileage = (int?)messages.OrderBy(x => x.ServerDateTime)
+        //Пробег берем из тега can_b0 - значение нужно умножить на 5
+        var firstMileage = ((int?)messages.OrderBy(x => x.ServerDateTime)
             .SelectMany(x => x.Tags)
             .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
-            ?.GetValue() ?? 0;
+            ?.GetValue() ?? 0) * 5;
         
-        var lastMileage = (int?)messages.OrderByDescending(x => x.ServerDateTime)
+        var lastMileage = ((int?)messages.OrderByDescending(x => x.ServerDateTime)
             .SelectMany(x => x.Tags)
             .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
-            ?.GetValue() ?? 0;
+            ?.GetValue() ?? 0) * 5;
 
         return new ViewMessageStatisticsDto
         {
@@ -315,8 +313,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 .Select(x => x.Speed!.Value)
                 .DefaultIfEmpty()
                 .Average(),
-            Distance = (lastMileage - firstMileage) * 5,
-            Mileage = lastMileage * 5,
+            Distance = (lastMileage - firstMileage),
+            Mileage = lastMileage,
             TotalTime = (messages.Select(x => x.ServerDateTime).DefaultIfEmpty().Max() -
                          messages.Select(x => x.ServerDateTime).DefaultIfEmpty().Min()).Seconds
         };
