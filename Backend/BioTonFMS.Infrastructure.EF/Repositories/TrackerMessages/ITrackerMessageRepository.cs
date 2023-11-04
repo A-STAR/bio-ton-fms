@@ -1,3 +1,4 @@
+using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
@@ -35,4 +36,6 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     /// <param name="externalIds">Внешние id трекеров</param>
     /// <returns>Локации трекеров в формате Longitude, Latitude</returns>
     IDictionary<int, (double Lat, double Long)> GetLocations(int[] externalIds);
+
+    ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end);
 }
