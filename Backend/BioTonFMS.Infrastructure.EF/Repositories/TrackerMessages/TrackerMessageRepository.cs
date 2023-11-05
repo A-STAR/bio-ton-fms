@@ -238,9 +238,12 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     /// <summary>
     /// Информация о перемещении трекеров за сутки
     /// </summary>
+    /// <param name="trackStartTime">Начало периода</param>
+    /// <param name="trackEndTime">Конец периода</param>
     /// <param name="externalIds">Внешние id трекеров</param>
     /// <returns>Данные трека для машин за последние сутки</returns>
-    public IDictionary<int, TrackPointInfo[]> GetTracks(DateTime trackStartTime, int[] externalIds)
+    public IDictionary<int, TrackPointInfo[]> GetTracks(DateTime trackStartTime,
+        DateTime trackEndTime, params int[] externalIds)
     {
         if (externalIds.Length == 0)
         {
@@ -248,11 +251,13 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         }
 
         var trackStartTimeUtc = trackStartTime.ToUniversalTime();
+        var trackEndTimeUtc = trackEndTime.ToUniversalTime();
 
         var filteredMessages = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
                         x.Latitude != null && x.Longitude != null &&
-                        x.ServerDateTime > trackStartTimeUtc)
+                        x.ServerDateTime >= trackStartTimeUtc &&
+                        x.ServerDateTime <= trackEndTimeUtc)
             .OrderBy(x => x.TrackerDateTime);
 
         var result = filteredMessages
@@ -271,7 +276,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return result;
     }
 
-    public IDictionary<int, (double Lat, double Long)> GetLocations(int[] externalIds)
+    public IDictionary<int, (double Lat, double Long)> GetLocations(params int[] externalIds)
     {
         var result = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&

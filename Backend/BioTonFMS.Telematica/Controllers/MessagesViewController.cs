@@ -1,14 +1,17 @@
 using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.MessageStatistics;
+using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
+using BioTonFMS.Telematica.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace BioTonFMS.Telematica.Controllers;
 
@@ -22,16 +25,20 @@ namespace BioTonFMS.Telematica.Controllers;
 [Produces("application/json")]
 public class MessagesViewController : ControllerBase
 {
+    private readonly ILogger<MessagesViewController> _logger;
     private readonly IMapper _mapper;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly ITrackerCommandRepository _commandRepository;
     private readonly ITrackerMessageRepository _messageRepository;
-
-    public MessagesViewController(IMapper mapper,
+    
+    public MessagesViewController(
+        ILogger<MessagesViewController> logger,
+        IMapper mapper,
         IVehicleRepository vehicleRepository,
         ITrackerCommandRepository commandRepository,
         ITrackerMessageRepository messageRepository)
     {
+        _logger = logger;
         _mapper = mapper;
         _vehicleRepository = vehicleRepository;
         _commandRepository = commandRepository;
@@ -71,5 +78,33 @@ public class MessagesViewController : ControllerBase
             vehicles.Select(v => _mapper.Map<MessagesViewVehicleDto>(v)).ToArray();
 
         return Ok(messagesViewVehicleDtos);
+    }
+    
+    /// <summary>
+    /// Возвращает точки для трека для выбранной машины и периода
+    /// </summary>
+    [HttpGet("track")]
+    [ProducesResponseType(typeof(MessagesViewTrackResponse), StatusCodes.Status200OK)]
+    public IActionResult GetMessagesViewTrack([FromQuery] int vehicleId,
+        [FromQuery] DateTime periodStart, [FromQuery] DateTime periodEnd)
+    {
+        if (!_vehicleRepository.GetExternalIds(vehicleId).TryGetValue(vehicleId, out var externalId))
+        {
+            return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
+        }
+        
+        if (!_messageRepository.GetTracks(periodStart, periodEnd, externalId)
+            .TryGetValue(externalId, out var points))
+        {
+            return Ok(new MessagesViewTrackResponse());
+        }
+
+        ViewBounds? viewBounds = TelematicaHelpers.CalculateViewBounds(points);
+
+        return Ok(new MessagesViewTrackResponse
+        {
+            ViewBounds = viewBounds,
+            Track = points
+        });
     }
 }

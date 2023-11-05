@@ -361,10 +361,10 @@ public class MonitoringControllerTests
         response.Should().NotBeNull();
         response!.Tracks.Should().HaveCount(1);
         response.ViewBounds.Should().NotBeNull();
-        response.ViewBounds!.UpperLeftLatitude.Should().Be(lastMessage.Latitude + MonitoringController.DefaultDifLat);
-        response.ViewBounds!.UpperLeftLongitude.Should().Be(lastMessage.Longitude - MonitoringController.DefaultDifLon);
-        response.ViewBounds!.BottomRightLatitude.Should().Be(lastMessage.Latitude - MonitoringController.DefaultDifLat);
-        response.ViewBounds!.BottomRightLongitude.Should().Be(lastMessage.Longitude + MonitoringController.DefaultDifLon);
+        response.ViewBounds!.UpperLeftLatitude.Should().Be(lastMessage.Latitude + TelematicaHelpers.DefaultDifLat);
+        response.ViewBounds!.UpperLeftLongitude.Should().Be(lastMessage.Longitude - TelematicaHelpers.DefaultDifLon);
+        response.ViewBounds!.BottomRightLatitude.Should().Be(lastMessage.Latitude - TelematicaHelpers.DefaultDifLat);
+        response.ViewBounds!.BottomRightLongitude.Should().Be(lastMessage.Longitude + TelematicaHelpers.DefaultDifLon);
     }
 
     [Fact]
@@ -412,13 +412,13 @@ public class MonitoringControllerTests
         };
         var difLat = (lats.Max() - lats.Min()) / 20;
         var difLon = (lons.Max() - lons.Min()) / 20;
-        if (difLat < MonitoringController.DefaultDifLat)
+        if (difLat < TelematicaHelpers.DefaultDifLat)
         {
-            difLat = MonitoringController.DefaultDifLat;
+            difLat = TelematicaHelpers.DefaultDifLat;
         }
-        if (difLon < MonitoringController.DefaultDifLon)
+        if (difLon < TelematicaHelpers.DefaultDifLon)
         {
-            difLon = MonitoringController.DefaultDifLon;
+            difLon = TelematicaHelpers.DefaultDifLon;
         }
         var expectedViewBounds = new ViewBounds
         {
@@ -547,13 +547,13 @@ public class MonitoringControllerTests
 
         var difLat = (lats.Max() - lats.Min()) / 20;
         var difLon = (lons.Max() - lons.Min()) / 20;
-        if (difLat < MonitoringController.DefaultDifLat)
+        if (difLat < TelematicaHelpers.DefaultDifLat)
         {
-            difLat = MonitoringController.DefaultDifLat;
+            difLat = TelematicaHelpers.DefaultDifLat;
         }
-        if (difLon < MonitoringController.DefaultDifLon)
+        if (difLon < TelematicaHelpers.DefaultDifLon)
         {
-            difLon = MonitoringController.DefaultDifLon;
+            difLon = TelematicaHelpers.DefaultDifLon;
         }
         var expectedViewBounds = new ViewBounds
         {

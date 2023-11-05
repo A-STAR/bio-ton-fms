@@ -672,7 +672,8 @@ public class TrackerMessageRepositoryTests
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
 
-        var results = TrackerMessageRepositoryMock.GetStub().GetTracks(today.ToUniversalTime(), externalIds);
+        var results = TrackerMessageRepositoryMock.GetStub().GetTracks(today.ToUniversalTime(),
+            DateTime.MaxValue, externalIds);
 
         Assert.Equal(expected.Count, results.Count);
 
