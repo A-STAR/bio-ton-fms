@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using BioTonFMS.Common.Settings;
+using AutoMapper;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Domain.Monitoring;
-using BioTonFMS.Domain.TrackerMessages;
-using BioTonFMS.Infrastructure.Controllers;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
-using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
-using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
@@ -15,33 +12,54 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace BioTonFMS.Telematica.Controllers;
 
 /// <summary>
-/// API cервиса просмотра сообщений
+/// API cервиса для работы со статистикой
 /// </summary>
 [Authorize]
 [ApiController]
 [Route("/api/telematica/messagesview")]
 [Consumes("application/json")]
 [Produces("application/json")]
-public class MessagesViewController : ValidationControllerBase
+public class MessagesViewController : ControllerBase
 {
-    private readonly IVehicleRepository _vehicleRepository;
+    private readonly ILogger<MessagesViewController> _logger;
     private readonly IMapper _mapper;
+    private readonly IVehicleRepository _vehicleRepository;
+    private readonly ITrackerCommandRepository _commandRepository;
     private readonly ITrackerMessageRepository _messageRepository;
-
+    
     public MessagesViewController(
-        IMapper mapper,
         ILogger<MessagesViewController> logger,
+        IMapper mapper,
         IVehicleRepository vehicleRepository,
+        ITrackerCommandRepository commandRepository,
         ITrackerMessageRepository messageRepository)
     {
-        _vehicleRepository = vehicleRepository;
-        _messageRepository = messageRepository;
+        _logger = logger;
         _mapper = mapper;
+        _vehicleRepository = vehicleRepository;
+        _commandRepository = commandRepository;
+        _messageRepository = messageRepository;
+    }
+
+    /// <summary>
+    /// Просмотр сообщений. Получение статистики.
+    /// </summary>
+    [HttpGet("statistics")]
+    [ProducesResponseType(typeof(ViewMessageStatisticsDto), StatusCodes.Status200OK)]
+    public IActionResult GetMessagesViewStatistics([FromQuery] MessagesViewStatisticsRequest request)
+    {
+        if (_vehicleRepository.GetExternalIds(request.VehicleId).TryGetValue(request.VehicleId, out var externalId))
+        {
+            return NotFound("Трекер машины с таким id не существует");
+        }
+
+        return Ok(request.ViewMessageType == ViewMessageTypeEnum.DataMessage
+            ? _messageRepository.GetStatistics(externalId, request.PeriodStart, request.PeriodEnd)
+            : _commandRepository.GetStatistics(externalId, request.PeriodStart, request.PeriodEnd));
     }
 
     /// <summary>
@@ -56,7 +74,8 @@ public class MessagesViewController : ValidationControllerBase
     {
         Vehicle[] vehicles = _vehicleRepository.FindVehicles(findCriterion);
 
-        MessagesViewVehicleDto[] messagesViewVehicleDtos = vehicles.Select(v => _mapper.Map<MessagesViewVehicleDto>(v)).ToArray();
+        MessagesViewVehicleDto[] messagesViewVehicleDtos =
+            vehicles.Select(v => _mapper.Map<MessagesViewVehicleDto>(v)).ToArray();
 
         return Ok(messagesViewVehicleDtos);
     }
@@ -80,7 +99,7 @@ public class MessagesViewController : ValidationControllerBase
             return Ok(new MessagesViewTrackResponse());
         }
 
-        ViewBounds? viewBounds = CalculateViewBounds(points);
+        ViewBounds? viewBounds = TelematicaHelpers.CalculateViewBounds(points);
 
         return Ok(new MessagesViewTrackResponse
         {
@@ -88,40 +107,4 @@ public class MessagesViewController : ValidationControllerBase
             Track = points
         });
     }
-
-    #region Private
-
-    private static ViewBounds? CalculateViewBounds(ICollection<TrackPointInfo> points)
-    {
-        if (points.Count == 0)
-        {
-            return null;
-        }
-        
-        List<double> lons = points.Select(x => x.Longitude).ToList();
-        List<double> lats = points.Select(x => x.Latitude).ToList();
-
-        var difLat = (lats.Max() - lats.Min()) / 20;
-        var difLon = (lons.Max() - lons.Min()) / 20;
-
-        if (difLat < MonitoringController.DefaultDifLat)
-        {
-            difLat = MonitoringController.DefaultDifLat;
-        }
-        if (difLon < MonitoringController.DefaultDifLon)
-        {
-            difLon = MonitoringController.DefaultDifLon;
-        }
-
-        var viewBounds = new ViewBounds
-        {
-            UpperLeftLatitude = lats.Max() + difLat,
-            UpperLeftLongitude = lons.Min() - difLon,
-            BottomRightLatitude = lats.Min() - difLat,
-            BottomRightLongitude = lons.Max() + difLon
-        };
-        return viewBounds;
-    }
-
-    #endregion
 }

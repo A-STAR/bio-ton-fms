@@ -1,4 +1,5 @@
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,25 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
 
     public TrackerCommand? GetWithoutCaching(int key)
     {
-        TrackerCommand? trackerCommand = QueryableProvider.Linq().AsNoTracking().Where(t => t.Id == key).SingleOrDefault();
+        TrackerCommand? trackerCommand = QueryableProvider.Linq()
+            .AsNoTracking().SingleOrDefault(t => t.Id == key);
         return trackerCommand;
+    }
+
+    public ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end)
+    {
+        IQueryable<TrackerCommand> commands = QueryableProvider.Linq()
+            .AsNoTracking()
+            .Where(x => x.Tracker != null &&
+                        x.Tracker.ExternalId == externalId &&
+                        x.SentDateTime >= start &&
+                        x.SentDateTime <= end);
+
+        return new ViewMessageStatisticsDto
+        {
+            NumberOfMessages = commands.Count(),
+            TotalTime = (commands.Select(x => x.SentDateTime).DefaultIfEmpty().Max() -
+                         commands.Select(x => x.SentDateTime).DefaultIfEmpty().Min()).Seconds
+        };
     }
 }

@@ -34,9 +34,6 @@ public class MonitoringController : ValidationControllerBase
     private readonly ITrackerTagRepository _tagsRepository;
     private readonly ITrackerRepository _trackerRepository;
 
-    public const double DefaultDifLon = 0.08;
-    public const double DefaultDifLat = 0.05;
-
     public MonitoringController(
         IMapper mapper,
         ILogger<MonitoringController> logger,
@@ -126,7 +123,7 @@ public class MonitoringController : ValidationControllerBase
 
         List<LocationAndTrack> locationsAndTracks = GetLocationsAndTracks(requests, externalIds, names, locations, tracks);
 
-        ViewBounds? viewBounds = CalculateViewBounds(locationsAndTracks);
+        ViewBounds? viewBounds = TelematicaHelpers.CalculateViewBounds(locationsAndTracks);
 
         return Ok(new LocationsAndTracksResponse
         {
@@ -237,40 +234,6 @@ public class MonitoringController : ValidationControllerBase
         }
 
         return locationsAndTracks;
-    }
-
-    private static ViewBounds? CalculateViewBounds(List<LocationAndTrack> locationsAndTracks)
-    {
-        if (locationsAndTracks.Count == 0)
-        {
-            return null;
-        }
-        List<double> lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
-        lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
-
-        List<double> lats = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Latitude).ToList();
-        lats.AddRange(locationsAndTracks.Select(x => x.Latitude));
-
-        var difLat = (lats.Max() - lats.Min()) / 20;
-        var difLon = (lons.Max() - lons.Min()) / 20;
-
-        if (difLat < DefaultDifLat)
-        {
-            difLat = DefaultDifLat;
-        }
-        if (difLon < DefaultDifLon)
-        {
-            difLon = DefaultDifLon;
-        }
-
-        var viewBounds = new ViewBounds
-        {
-            UpperLeftLatitude = lats.Max() + difLat,
-            UpperLeftLongitude = lons.Min() - difLon,
-            BottomRightLatitude = lats.Min() - difLat,
-            BottomRightLongitude = lons.Max() + difLon
-        };
-        return viewBounds;
     }
 
     private MonitoringVehicleInfoDto GetVehicleInfo(TrackerMessage lastMessage,

@@ -1,5 +1,6 @@
 using BioTonFMS.Common.Settings;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.Persistence.Specifications;
 using BioTonFMS.Infrastructure.Services;
@@ -105,6 +106,11 @@ public class TrackerCommandRepositoryMock : ITrackerCommandRepository
     public TrackerCommand? GetWithoutCaching(int key)
     {
         return _mockList.FirstOrDefault(x => x.Id == key);
+    }
+
+    public ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end)
+    {
+        throw new NotImplementedException();
     }
 
     public int Count => _mockList.Count;
