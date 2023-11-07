@@ -128,7 +128,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
 
         public Vehicle[] FindVehicles(string? findCriterion)
         {
-            // На странице мониторинга показываем только машины с привязанными трекерами
+            // Показываем только машины с привязанными трекерами
             var vehicleQuery = QueryableProvider.Fetch(x => x.Tracker).Linq().Where(x => x.Tracker != null).OrderBy(x => x.Name);
             return (string.IsNullOrEmpty(findCriterion)
                 ? vehicleQuery
