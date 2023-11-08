@@ -1,6 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatInputHarness } from '@angular/material/input/testing';
+import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
 
 import { Observable, of } from 'rxjs';
 
@@ -16,6 +21,7 @@ import { testMonitoringVehicles } from '../tech/tech.service.spec';
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
   let fixture: ComponentFixture<MessagesComponent>;
+  let loader: HarnessLoader;
 
   let vehiclesSpy: jasmine.Spy<() => Observable<MonitoringVehicle[]>>;
 
@@ -23,6 +29,7 @@ describe('MessagesComponent', () => {
     await TestBed
       .configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           HttpClientTestingModule,
           MessagesComponent
         ]
@@ -30,6 +37,7 @@ describe('MessagesComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(MessagesComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
 
     const messageService = TestBed.inject(MessageService);
 
@@ -47,6 +55,29 @@ describe('MessagesComponent', () => {
     expect(component)
       .toBeTruthy();
   });
+
+  it('should render selection form', fakeAsync(async () => {
+    const selectionFormDe = fixture.debugElement.query(
+      By.css('form#selection-form')
+    );
+
+    expect(selectionFormDe)
+      .withContext('render selection form element')
+      .not.toBeNull();
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#selection-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    await loader.getAllHarnesses(
+      MatAutocompleteHarness.with({
+        ancestor: 'form#selection-form'
+      })
+    );
+  }));
 
   it('should get vehicles', () => {
     expect(vehiclesSpy)

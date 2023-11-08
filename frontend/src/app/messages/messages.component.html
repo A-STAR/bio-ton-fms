@@ -1,5 +1,17 @@
 <aside>
-  <ng-container *ngIf="tech$ | async"></ng-container>
+  <form id="selection-form" [formGroup]="selectionForm">
+    <div>
+      <label for="tech">Объект</label>
+
+      <mat-form-field>
+        <input matInput id="tech" placeholder="Поиск" formControlName="tech" [matAutocomplete]="auto">
+
+        <mat-autocomplete #auto="matAutocomplete" autoActiveFirstOption [displayWith]="displayFn">
+          <mat-option [value]="tech" *ngFor="let tech of tech$ | async; trackBy: techTrackBy">{{ tech.name }}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+  </form>
 </aside>
 
 <bio-map></bio-map>
