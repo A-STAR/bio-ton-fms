@@ -4,6 +4,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
 
@@ -77,6 +78,38 @@ describe('MessagesComponent', () => {
         ancestor: 'form#selection-form'
       })
     );
+  }));
+
+  it('should validate required tech selection', fakeAsync(async () => {
+    const techInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#selection-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    await techInput.setValue(testMonitoringVehicles[0].name);
+    await techInput.blur();
+
+    const techFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    const errors = await techFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single tech error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render selection required error')
+      .toBeResolvedTo('Объект должен быть выбран из списка');
   }));
 
   it('should get vehicles', () => {

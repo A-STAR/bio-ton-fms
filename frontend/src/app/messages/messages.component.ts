@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -55,12 +55,25 @@ export default class MessagesComponent implements OnInit {
     return id;
   }
 
+  #selectionRequiredValidator({ value }: AbstractControl): ValidationErrors | null {
+    if (value && typeof value !== 'object') {
+      return {
+        selectionRequired: true
+      };
+    }
+
+    return null;
+  }
+
   /**
    * Initialize Selection form.
    */
   #initSelectionForm() {
     this.selectionForm = this.fb.group({
-      tech: this.fb.nonNullable.control<MonitoringTech | string | undefined>(undefined)
+      tech: this.fb.nonNullable.control<MonitoringTech | string | undefined>(undefined, [
+        Validators.required,
+        this.#selectionRequiredValidator
+      ])
     });
   }
 

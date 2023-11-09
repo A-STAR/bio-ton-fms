@@ -6,6 +6,10 @@
       <mat-form-field>
         <input matInput id="tech" placeholder="Поиск" formControlName="tech" [matAutocomplete]="auto">
 
+        <mat-error *ngIf="selectionForm.controls.tech.errors?.['required']">Обязательное поле</mat-error>
+
+        <mat-error *ngIf="selectionForm.controls.tech.errors?.['selectionRequired']">Объект должен быть выбран из списка</mat-error>
+
         <mat-autocomplete #auto="matAutocomplete" autoActiveFirstOption [displayWith]="displayFn">
           <mat-option [value]="tech" *ngFor="let tech of tech$ | async; trackBy: techTrackBy">{{ tech.name }}</mat-option>
         </mat-autocomplete>
