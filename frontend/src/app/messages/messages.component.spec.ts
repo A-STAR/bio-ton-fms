@@ -15,7 +15,7 @@ import { MessageService } from './message.service';
 import MessagesComponent from './messages.component';
 import { MapComponent } from '../shared/map/map.component';
 
-import { MonitoringVehicle } from '../tech/tech.service';
+import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
 import { testMonitoringVehicles } from '../tech/tech.service.spec';
 
@@ -24,7 +24,7 @@ describe('MessagesComponent', () => {
   let fixture: ComponentFixture<MessagesComponent>;
   let loader: HarnessLoader;
 
-  let vehiclesSpy: jasmine.Spy<() => Observable<MonitoringVehicle[]>>;
+  let vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>;
 
   beforeEach(async () => {
     await TestBed
