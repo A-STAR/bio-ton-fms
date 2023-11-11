@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -17,7 +17,8 @@ import { MapComponent } from '../shared/map/map.component';
 
 import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
-import { testMonitoringVehicles } from '../tech/tech.service.spec';
+import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
+import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -110,6 +111,8 @@ describe('MessagesComponent', () => {
     )
       .withContext('render selection required error')
       .toBeResolvedTo('Объект должен быть выбран из списка');
+
+    discardPeriodicTasks();
   }));
 
   it('should get vehicles', () => {
@@ -126,4 +129,94 @@ describe('MessagesComponent', () => {
       .withContext('render `bio-map` component')
       .not.toBeNull();
   });
+
+  it('should search tech', fakeAsync(async () => {
+    // skip initial vehicles call
+    vehiclesSpy.calls.reset();
+
+    const techInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#selection-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // enter empty value
+    await techInput.setValue('123');
+    await techInput.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .not.toHaveBeenCalled();
+
+    const spaceChar = ' ';
+
+    // enter insufficient search query
+    const testInsufficientSearchQuery = `${spaceChar}${testFindCriterion.substring(0, SEARCH_MIN_LENGTH - 1)}${spaceChar.repeat(20)}`;
+
+    await techInput.setValue(testInsufficientSearchQuery);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .not.toHaveBeenCalledTimes(2);
+
+    // enter satisfying search query
+    let testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles();
+    let vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    await techInput.setValue(`${testFindCriterion}${spaceChar.repeat(2)}`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith({
+        findCriterion: testFindCriterion.toLocaleLowerCase()
+      });
+
+    // clean search field
+    vehicles$ = of(testMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    await techInput.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledTimes(2);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith();
+
+    // enter insufficient search query
+    vehiclesSpy.calls.reset();
+
+    await techInput.setValue(testInsufficientSearchQuery);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .not.toHaveBeenCalled();
+
+    // enter invalid search query
+    const testInvalidIDSearchQuery = '123';
+
+    testFoundMonitoringVehicles = mockTestFoundMonitoringVehicles(testInvalidIDSearchQuery);
+    vehicles$ = of(testFoundMonitoringVehicles);
+
+    vehiclesSpy.and.returnValue(vehicles$);
+
+    await techInput.setValue(testInvalidIDSearchQuery);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    expect(vehiclesSpy)
+      .toHaveBeenCalledWith({
+        findCriterion: testInvalidIDSearchQuery.toLocaleLowerCase()
+      });
+  }));
 });

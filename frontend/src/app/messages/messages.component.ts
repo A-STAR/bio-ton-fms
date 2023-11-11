@@ -5,13 +5,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
-import { Observable } from 'rxjs';
+import { Observable, debounceTime, defer, distinctUntilChanged, filter, map, skipWhile, startWith, switchMap } from 'rxjs';
 
 import { MessageService } from './message.service';
 
 import { MapComponent } from '../shared/map/map.component';
 
-import { MonitoringTech } from '../tech/tech.component';
+import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 
 @Component({
   selector: 'bio-messages',
@@ -29,6 +29,29 @@ import { MonitoringTech } from '../tech/tech.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export default class MessagesComponent implements OnInit {
+  /**
+   * Get search stream.
+   *
+   * @returns An `Observable` of search stream.
+   */
+  get #search$() {
+    return this.selectionForm
+      .get('tech')!
+      .valueChanges.pipe(
+        filter(value => typeof value !== 'object'),
+        map(value => value as string | undefined),
+        debounceTime(DEBOUNCE_DUE_TIME),
+        map(searchValue => searchValue
+          ?.trim()
+          ?.toLocaleLowerCase()
+        ),
+        distinctUntilChanged(),
+        skipWhile(searchValue => searchValue ? searchValue.length < SEARCH_MIN_LENGTH : true),
+        map(searchValue => searchValue !== undefined && searchValue.length < SEARCH_MIN_LENGTH ? undefined : searchValue),
+        distinctUntilChanged()
+      );
+  }
+
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
 
@@ -81,7 +104,16 @@ export default class MessagesComponent implements OnInit {
    * Set tech.
    */
   #setTech() {
-    this.tech$ = this.messageService.getVehicles();
+    const tech$ = defer(
+      () => this.messageService.getVehicles()
+    );
+
+    const searchTech = (findCriterion: string) => this.messageService.getVehicles({ findCriterion });
+
+    this.tech$ = this.#search$.pipe(
+      startWith(undefined),
+      switchMap(searchQuery => searchQuery ? searchTech(searchQuery) : tech$)
+    );
   }
 
   constructor(private fb: FormBuilder, private messageService: MessageService) { }
