@@ -19,6 +19,7 @@ import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.servi
 
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
+import { MatButtonHarness } from '@angular/material/button/testing';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -77,6 +78,24 @@ describe('MessagesComponent', () => {
     await loader.getAllHarnesses(
       MatAutocompleteHarness.with({
         ancestor: 'form#selection-form'
+      })
+    );
+
+    await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[type="reset"]',
+        text: 'Очистить',
+        variant: 'stroked'
+      })
+    );
+
+    await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[type="submit"]',
+        text: 'Выполнить',
+        variant: 'flat'
       })
     );
   }));
