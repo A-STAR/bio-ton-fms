@@ -56,9 +56,19 @@ form > mat-error
 bio-tech,
 bio-messages
 
+  aside
+    display: flex
+    flex-direction: column
+    flex-basis: 400px
+    height: 100vh
+    background-color: $white
+
   bio-map.maplibregl-map
     flex: 1
     height: unset
+
+label
+  color: $darker-gray
 
 .maplibregl-popup-content
   @extend %info-layout

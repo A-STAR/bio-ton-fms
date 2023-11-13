@@ -1,1 +1,25 @@
+<aside>
+  <form id="selection-form" [formGroup]="selectionForm">
+    <div>
+      <label for="tech">Объект</label>
+
+      <mat-form-field>
+        <input matInput id="tech" placeholder="Поиск" formControlName="tech" [matAutocomplete]="auto">
+
+        <mat-error *ngIf="selectionForm.controls.tech.errors?.['required']">Обязательное поле</mat-error>
+
+        <mat-error *ngIf="selectionForm.controls.tech.errors?.['selectionRequired']">Объект должен быть выбран из списка</mat-error>
+
+        <mat-autocomplete #auto="matAutocomplete" autoActiveFirstOption [displayWith]="displayFn">
+          <mat-option [value]="tech" *ngFor="let tech of tech$ | async; trackBy: techTrackBy">{{ tech.name }}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <button mat-stroked-button type="reset" color="accent">Очистить</button>
+
+    <button mat-flat-button type="submit" color="accent">Выполнить</button>
+  </form>
+</aside>
+
 <bio-map></bio-map>
