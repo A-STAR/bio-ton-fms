@@ -1,12 +1,15 @@
+import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
+import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
 import { Observable, of } from 'rxjs';
 
@@ -35,6 +38,20 @@ describe('MessagesComponent', () => {
           NoopAnimationsModule,
           HttpClientTestingModule,
           MessagesComponent
+        ],
+        providers: [
+          {
+            provide: LOCALE_ID,
+            useValue: 'ru-RU'
+          },
+          {
+            provide: DateAdapter,
+            useClass: LuxonDateAdapter
+          },
+          {
+            provide: MAT_DATE_FORMATS,
+            useValue: MAT_LUXON_DATE_FORMATS
+          },
         ]
       })
       .compileComponents();
