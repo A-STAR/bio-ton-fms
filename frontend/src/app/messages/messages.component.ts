@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModu
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 
 import { Observable, debounceTime, defer, distinctUntilChanged, filter, map, skipWhile, startWith, switchMap } from 'rxjs';
@@ -23,6 +24,7 @@ import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/te
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
+    MatDatepickerModule,
     MatButtonModule,
     MapComponent
   ],
@@ -98,7 +100,15 @@ export default class MessagesComponent implements OnInit {
       tech: this.fb.nonNullable.control<MonitoringTech | string | undefined>(undefined, [
         Validators.required,
         this.#selectionRequiredValidator
-      ])
+      ]),
+      range: this.fb.group({
+        start: this.fb.group({
+          date: this.fb.nonNullable.control<string | undefined>(undefined)
+        }),
+        end: this.fb.group({
+          date: this.fb.nonNullable.control<string | undefined>(undefined)
+        })
+      })
     });
   }
 
@@ -129,4 +139,12 @@ export default class MessagesComponent implements OnInit {
 
 type MessageSelectionForm = FormGroup<{
   tech: FormControl<MonitoringTech | string | undefined>;
+  range: FormGroup<{
+    start: FormGroup<{
+      date: FormControl<string | undefined>;
+    }>;
+    end: FormGroup<{
+      date: FormControl<string | undefined>;
+    }>;
+  }>;
 }>;

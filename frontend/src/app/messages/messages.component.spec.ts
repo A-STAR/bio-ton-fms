@@ -9,6 +9,8 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
+import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/material/datepicker/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
 import { Observable, of } from 'rxjs';
@@ -22,7 +24,6 @@ import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.servi
 
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
-import { MatButtonHarness } from '@angular/material/button/testing';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -95,6 +96,34 @@ describe('MessagesComponent', () => {
     await loader.getAllHarnesses(
       MatAutocompleteHarness.with({
         ancestor: 'form#selection-form'
+      })
+    );
+
+    await loader.getHarness(
+      MatDatepickerInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        selector: '#start',
+        placeholder: 'Дата начала'
+      })
+    );
+
+    await loader.getHarness(
+      MatDatepickerToggleHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]'
+      })
+    );
+
+    await loader.getHarness(
+      MatDatepickerInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        selector: '#end',
+        placeholder: 'Дата конца'
+      })
+    );
+
+    await loader.getHarness(
+      MatDatepickerToggleHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]'
       })
     );
 
