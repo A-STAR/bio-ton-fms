@@ -82,6 +82,12 @@
   span.mat-mdc-button-persistent-ripple::before
     transition-property: background-color, opacity
 
+  &.cdk-program-focused,
+  &.cdk-keyboard-focused
+
+    .mat-mdc-button-persistent-ripple::before
+      opacity: 0.06
+
   @at-root .mat-column-action > #{&}:hover span.mat-mdc-button-persistent-ripple::before
     opacity: 0
 
