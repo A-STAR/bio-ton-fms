@@ -82,6 +82,14 @@ export default class MessagesComponent implements OnInit {
     return id;
   }
 
+  /**
+   * Validator that requires the control have a tech `object` value from selection.
+   *
+   * @param control A tech `AbstractControl`.
+   *
+   * @returns An error map with the `selectionRequired` property
+   * if the validation check fails, otherwise `null`.
+   */
   #selectionRequiredValidator({ value }: AbstractControl): ValidationErrors | null {
     if (value && typeof value !== 'object') {
       return {
@@ -103,10 +111,12 @@ export default class MessagesComponent implements OnInit {
       ]),
       range: this.fb.group({
         start: this.fb.group({
-          date: this.fb.nonNullable.control<string | undefined>(undefined)
+          date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+          time: this.fb.nonNullable.control<string | undefined>(undefined)
         }),
         end: this.fb.group({
-          date: this.fb.nonNullable.control<string | undefined>(undefined)
+          date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
+          time: this.fb.nonNullable.control<string | undefined>(undefined)
         })
       })
     });
@@ -142,9 +152,11 @@ type MessageSelectionForm = FormGroup<{
   range: FormGroup<{
     start: FormGroup<{
       date: FormControl<string | undefined>;
+      time: FormControl<string | undefined>;
     }>;
     end: FormGroup<{
       date: FormControl<string | undefined>;
+      time: FormControl<string | undefined>;
     }>;
   }>;
 }>;

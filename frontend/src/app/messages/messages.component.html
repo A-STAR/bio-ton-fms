@@ -21,13 +21,31 @@
         <label for="start">От</label>
 
         <mat-form-field>
-          <input id="start" matInput formControlName="date" placeholder="Дата начала" [matDatepicker]="startPicker">
+          <input id="start" matInput formControlName="date" placeholder="Дата начала" [matDatepicker]="startPicker"
+            [max]="selectionForm.controls.range.controls.end.controls.date.value">
 
           <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
 
           <mat-hint><em>01.01.2023</em></mat-hint>
 
+          <mat-error *ngIf="!selectionForm.controls.range.controls.start.controls.date.errors?.['matDatepickerParse']
+            && selectionForm.controls.range.controls.start.controls.date.errors?.['required']">Обязательное поле</mat-error>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.start.controls.date.errors?.['matDatepickerParse']">
+            Неверная дата
+          </mat-error>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.start.controls.date.errors?.['matDatepickerMax'] as error">
+            Дата позднее {{ error.max | date:'dd.MM.YYYY' }}
+          </mat-error>
+
           <mat-datepicker #startPicker color="accent"></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput placeholder="Время начала" formControlName="time">
+
+          <mat-hint><em>00:00</em></mat-hint>
         </mat-form-field>
       </fieldset>
 
@@ -35,13 +53,31 @@
         <label for="end">До</label>
 
         <mat-form-field>
-          <input id="end" matInput formControlName="date" placeholder="Дата конца" [matDatepicker]="endPicker">
+          <input id="end" matInput formControlName="date" placeholder="Дата конца" [matDatepicker]="endPicker"
+            [min]="selectionForm.controls.range.controls.start.controls.date.value">
 
           <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
 
           <mat-hint><em>31.12.2023</em></mat-hint>
 
+          <mat-error *ngIf="!selectionForm.controls.range.controls.end.controls.date.errors?.['matDatepickerParse']
+            && selectionForm.controls.range.controls.end.controls.date.errors?.['required']">Обязательное поле</mat-error>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.end.controls.date.errors?.['matDatepickerParse']">
+            Неверная дата
+          </mat-error>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.end.controls.date.errors?.['matDatepickerMin'] as error">
+            Дата ранее {{ error.min | date:'dd.MM.YYYY' }}
+          </mat-error>
+
           <mat-datepicker #endPicker color="accent"></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput placeholder="Время конца" formControlName="time">
+
+          <mat-hint><em>23:59</em></mat-hint>
         </mat-form-field>
       </fieldset>
     </fieldset>

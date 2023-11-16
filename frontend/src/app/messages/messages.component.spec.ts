@@ -114,6 +114,13 @@ describe('MessagesComponent', () => {
     );
 
     await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        placeholder: 'Время начала'
+      })
+    );
+
+    await loader.getAllHarnesses(
       MatDatepickerInputHarness.with({
         ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
         selector: '#end',
@@ -124,6 +131,13 @@ describe('MessagesComponent', () => {
     await loader.getHarness(
       MatDatepickerToggleHarness.with({
         ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]'
+      })
+    );
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        placeholder: 'Время конца'
       })
     );
 
