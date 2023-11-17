@@ -1,16 +1,10 @@
 ﻿using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
-using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
-using BioTonFMS.Infrastructure.Persistence.Providers;
-using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Xunit.Abstractions;
-using BioTonFMS.Infrastructure.EF;
-using BiotonFMS.Telematica.Tests.Mocks.Repositories;
-using BioTonFMS.Common.Testable;
 
 namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
@@ -175,7 +169,7 @@ public class VehicleRepositoryTests
             new object[]
             {
                 "",
-                VehicleRepositoryMock.SampleVehicles.ToArray()
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.TrackerId != null).ToArray()
             },
             new object[]
             {
@@ -185,7 +179,7 @@ public class VehicleRepositoryTests
             new object[]
             {
                 null!,
-                VehicleRepositoryMock.SampleVehicles.ToArray()
+                VehicleRepositoryMock.SampleVehicles.Where(x => x.TrackerId != null).ToArray()
             }
         };
 

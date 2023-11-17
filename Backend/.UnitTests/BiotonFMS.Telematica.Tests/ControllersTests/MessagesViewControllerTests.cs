@@ -1,18 +1,20 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AutoMapper;
-using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
 using BioTonFMS.Telematica.Mapping;
+using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Collections;
 using Xunit.Abstractions;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
@@ -23,6 +25,11 @@ namespace BiotonFMS.Telematica.Tests.ControllersTests;
 public class MessagesViewControllerTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
+
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 
     public MessagesViewControllerTests(ITestOutputHelper testOutputHelper)
     {
@@ -36,7 +43,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 "красн",
-                new []
+                new[]
                 {
                     new MessagesViewVehicleDto
                     {
@@ -49,7 +56,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 "ая",
-                new []
+                new[]
                 {
                     new MessagesViewVehicleDto
                     {
@@ -66,7 +73,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 "64128256",
-                new []
+                new[]
                 {
                     new MessagesViewVehicleDto
                     {
@@ -83,7 +90,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 "15",
-                new []
+                new[]
                 {
                     new MessagesViewVehicleDto
                     {
@@ -95,7 +102,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 "",
-                new []
+                new[]
                 {
                     new MessagesViewVehicleDto
                     {
@@ -127,7 +134,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 null!,
-                new []
+                new[]
                 {
                     new MessagesViewVehicleDto { Id = 1, Name = "Красная машина" },
                     new MessagesViewVehicleDto { Id = 3, Name = "Желтая машина" },
@@ -144,7 +151,7 @@ public class MessagesViewControllerTests
         var today = DateTime.Today;
         SystemTime.Set(today.AddHours(14));
 
-        var result = GetController(MonitoringVehicles).FindVehicles(criterion);
+        var result = GetController().FindVehicles(criterion);
 
         var actual = result.As<OkObjectResult>().Value.As<MessagesViewVehicleDto[]>();
 
@@ -159,133 +166,183 @@ public class MessagesViewControllerTests
         }
     }
 
+    public static IEnumerable<object[]> StatisticsData =>
+        new List<object[]>
+        {
+            new object[]
+            {
+                new MessagesViewStatisticsRequest
+                {
+                    VehicleId = 1,
+                    ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                    PeriodStart = DateTime.UtcNow.AddHours(-100),
+                    PeriodEnd = DateTime.UtcNow.AddHours(100)
+                },
+                new OkObjectResult(new ViewMessageStatisticsDto
+                {
+                    NumberOfMessages = 2,
+                    TotalTime = 10,
+                    AverageSpeed = 12.1,
+                    MaxSpeed = 12.1
+                })
+            },
+            new object[]
+            {
+                new MessagesViewStatisticsRequest
+                {
+                    VehicleId = 1,
+                    ViewMessageType = ViewMessageTypeEnum.CommandMessage,
+                    PeriodStart = DateTime.UnixEpoch.AddHours(-100),
+                    PeriodEnd = DateTime.UnixEpoch.AddHours(100)
+                },
+                new OkObjectResult(new ViewMessageStatisticsDto
+                {
+                    NumberOfMessages = 3,
+                    TotalTime = 20
+                })
+            },
+            new object[]
+            {
+                new MessagesViewStatisticsRequest
+                {
+                    VehicleId = -91001,
+                    ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                    PeriodStart = DateTime.UtcNow,
+                    PeriodEnd = DateTime.UtcNow
+                },
+                new NotFoundObjectResult("Трекер машины с таким id не существует")
+            },
+            new object[]
+            {
+                new MessagesViewStatisticsRequest
+                {
+                    VehicleId = 5,
+                    ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                    PeriodStart = DateTime.UtcNow,
+                    PeriodEnd = DateTime.UtcNow
+                },
+                new NotFoundObjectResult("Трекер машины с таким id не существует")
+            },
+            new object[]
+            {
+                new MessagesViewStatisticsRequest
+                {
+                    VehicleId = 2,
+                    ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                    PeriodStart = DateTime.UtcNow,
+                    PeriodEnd = DateTime.UtcNow
+                },
+                new OkObjectResult(new ViewMessageStatisticsDto())
+            }
+        };
+
+    [Theory, MemberData(nameof(StatisticsData))]
+    public void GetMessagesViewStatistics(MessagesViewStatisticsRequest request,
+        ObjectResult expected)
+    {
+        _testOutputHelper.WriteLine("Request:\n" + JsonSerializer.Serialize(request, _jsonOptions));
+
+        var result = GetController().GetMessagesViewStatistics(request);
+
+        expected.StatusCode.Should().Be(expected.StatusCode);
+
+        expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
+    }
+
+    public static IEnumerable<object[]> TrackData =>
+        new List<object[]>
+        {
+            new object[]
+            {
+                1, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new OkObjectResult(new MessagesViewTrackResponse
+                {
+                    ViewBounds = new ViewBounds
+                    {
+                        UpperLeftLatitude = 49.782023,
+                        UpperLeftLongitude = 52.456860999999996,
+                        BottomRightLatitude = 42.082023,
+                        BottomRightLongitude = 54.656861
+                    },
+                    Track = new List<TrackPointInfo>
+                    {
+                        new()
+                        {
+                            MessageId = 1,
+                            Latitude = 49.432023,
+                            Longitude = 52.556861,
+                            Speed = null,
+                            NumberOfSatellites = 12
+                        },
+                        new()
+                        {
+                            MessageId = 2,
+                            Latitude = 42.432023,
+                            Longitude = 54.556861,
+                            Speed = 12.1,
+                            NumberOfSatellites = 14
+                        }
+                    }
+                })
+            },
+            new object[]
+            {
+                -13432, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+            },
+            new object[]
+            {
+                5, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+            },
+            new object[]
+            {
+                2, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new OkObjectResult(new MessagesViewTrackResponse())
+            }
+        };
+
+    [Theory, MemberData(nameof(TrackData))]
+    public void GetMessagesViewTrack(int vehicleId,
+        DateTime periodStart, DateTime periodEnd, ObjectResult expected)
+    {
+        _testOutputHelper.WriteLine($"id: {vehicleId}; dates: {periodStart} - {periodEnd}");
+
+        var result = GetController().GetMessagesViewTrack(vehicleId, periodStart, periodEnd);
+        
+        expected.StatusCode.Should().Be(result.As<ObjectResult>().StatusCode);
+        
+        if (expected.StatusCode == 200)
+        {
+            var actual = result.As<OkObjectResult>().Value.As<MessagesViewTrackResponse>();
+            
+            expected.Value.As<MessagesViewTrackResponse>().Track
+                .Should().Equal(actual.Track, (x, y) =>
+                    x.Longitude.Equals(y.Longitude) &&
+                    x.Latitude.Equals(y.Latitude) &&
+                    x.MessageId.Equals(y.MessageId) &&
+                    x.NumberOfSatellites.Equals(y.NumberOfSatellites) &&
+                    x.Speed.Equals(y.Speed));
+            
+            expected.Value.As<MessagesViewTrackResponse>().ViewBounds
+                .Should().BeEquivalentTo(actual.ViewBounds);
+        }
+        else
+        {
+            expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
+        }
+    }
 
     private static MessagesViewController GetController(
         ICollection<Vehicle>? vehicles = null,
-        ICollection<TrackerMessage>? messages = null,
-        ICollection<Tracker>? trackers = null)
+        ICollection<TrackerMessage>? messages = null)
     {
         var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MessagesViewMappingProfile())));
         var logger = new Mock<ILogger<MessagesViewController>>().Object;
         var vehicleRepository = VehicleRepositoryMock.GetStub(vehicles);
-        var commandRepository = new TrackerCommandRepositoryMock();
-        var messageRepository = TrackerMessageRepositoryMock.GetStub();
+        var commandRepository = TrackerCommandRepositoryMock.GetStub();
+        var messageRepository = TrackerMessageRepositoryMock.GetStub(messages);
 
         return new MessagesViewController(logger, mapper, vehicleRepository, commandRepository, messageRepository);
     }
-
-    private static IList<Vehicle> MonitoringVehicles => new List<Vehicle>
-    {
-        new()
-        {
-            Id = 1,
-            Name = "Красная машина",
-            Type = VehicleTypeEnum.Transport,
-            VehicleSubType = VehicleSubTypeEnum.Car,
-            FuelType = new FuelType { Id = 1, Name = "Бензин" },
-            FuelTypeId = 1,
-            Description = "Описание 1",
-            Make = "Ford",
-            Model = "Focus",
-            ManufacturingYear = 2020,
-            RegistrationNumber = "В167АР 199",
-            InventoryNumber = "1234",
-            TrackerId = 1,
-            Tracker = new Tracker
-            {
-                Id = 1,
-                Imei = "123",
-                ExternalId = 2552
-            }
-        },
-        new()
-        {
-            Id = 2,
-            Name = "Синяя машина",
-            Type = VehicleTypeEnum.Agro,
-            VehicleSubType = VehicleSubTypeEnum.Car,
-            FuelType = new FuelType { Id = 1, Name = "Бензин" },
-            FuelTypeId = 1,
-            VehicleGroup = new VehicleGroup { Id = 1, Name = "Группа 1" },
-            VehicleGroupId = 1,
-            Description = "Описание 2",
-            Make = "Ford",
-            Model = "Focus",
-            ManufacturingYear = 2015,
-            RegistrationNumber = "В167АР 172",
-            InventoryNumber = "1235",
-            TrackerId = 2,
-            Tracker = new Tracker
-            {
-                Id = 2,
-                Imei = "128128",
-                ExternalId = 15
-            }
-        },
-        new()
-        {
-            Id = 3,
-            Name = "Желтая машина",
-            Type = VehicleTypeEnum.Transport,
-            VehicleSubType = VehicleSubTypeEnum.Sprayer,
-            FuelType = new FuelType { Id = 2, Name = "Дизель" },
-            FuelTypeId = 2,
-            VehicleGroup = new VehicleGroup { Id = 2, Name = "Группа 2" },
-            VehicleGroupId = 2,
-            Description = "Описание 3",
-            Make = "Mazda",
-            Model = "CX5",
-            ManufacturingYear = 2010,
-            RegistrationNumber = "В167АР 174",
-            InventoryNumber = "1236",
-            TrackerId = 3,
-            Tracker = new Tracker
-            {
-                Id = 3,
-                Imei = "64128256",
-                ExternalId = 128
-            }
-        },
-        new()
-        {
-            Id = 4,
-            Name = "Чёрный трактор",
-            Type = VehicleTypeEnum.Transport,
-            VehicleSubType = VehicleSubTypeEnum.Sprayer,
-            FuelType = new FuelType { Id = 2, Name = "Дизель" },
-            FuelTypeId = 2,
-            VehicleGroup = new VehicleGroup { Id = 2, Name = "Группа 2" },
-            VehicleGroupId = 2,
-            Description = "Описание 4",
-            Make = "Mazda",
-            Model = "CX6",
-            ManufacturingYear = 2012,
-            RegistrationNumber = "В187АР 163",
-            InventoryNumber = "12367",
-            TrackerId = 4,
-            Tracker = new Tracker
-            {
-                Id = 4,
-                Imei = "6412825699",
-                ExternalId = 1555
-            }
-        },
-        new()
-        {
-            Id = 5,
-            Name = "Красная машина без трекера",
-            Type = VehicleTypeEnum.Transport,
-            VehicleSubType = VehicleSubTypeEnum.Car,
-            FuelType = new FuelType { Id = 1, Name = "Бензин" },
-            FuelTypeId = 1,
-            Description = "Описание 1",
-            Make = "Ford",
-            Model = "Focus",
-            ManufacturingYear = 2020,
-            RegistrationNumber = "В167АР 189",
-            InventoryNumber = "1234"
-        },
-    };
-
-
 }
