@@ -244,7 +244,7 @@ public class MessagesViewControllerTests
 
         var result = GetController().GetMessagesViewStatistics(request);
 
-        expected.StatusCode.Should().Be(expected.StatusCode);
+        expected.StatusCode.Should().Be(result.As<ObjectResult>().StatusCode);
 
         expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
     }
