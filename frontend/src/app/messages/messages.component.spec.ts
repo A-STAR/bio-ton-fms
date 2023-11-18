@@ -160,6 +160,11 @@ describe('MessagesComponent', () => {
     );
   }));
 
+  it('should get vehicles', () => {
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+  });
+
   it('should validate required tech selection', fakeAsync(async () => {
     const techInput = await loader.getHarness(
       MatInputHarness.with({
@@ -182,7 +187,7 @@ describe('MessagesComponent', () => {
     const errors = await techFormField.getErrors();
 
     expect(errors.length)
-      .withContext('render a single tech error')
+      .withContext('render a single tech form field error')
       .toBe(1);
 
     await expectAsync(
@@ -194,10 +199,156 @@ describe('MessagesComponent', () => {
     discardPeriodicTasks();
   }));
 
-  it('should get vehicles', () => {
-    expect(vehiclesSpy)
-      .toHaveBeenCalled();
-  });
+  it('should validate range time', fakeAsync(async () => {
+    const startDateInput = await loader.getHarness(
+      MatDatepickerInputHarness.with({
+        placeholder: 'Дата начала'
+      })
+    );
+
+    const endDateInput = await loader.getHarness(
+      MatDatepickerInputHarness.with({
+        placeholder: 'Дата конца'
+      })
+    );
+
+    const date = '17.11.2023';
+
+    // set the same day
+    await startDateInput.setValue(date);
+    await endDateInput.setValue(date);
+
+    const startTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время начала'
+      })
+    );
+
+    const endTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время конца'
+      })
+    );
+
+    const START_TIME = '00:02';
+    const END_TIME = '00:03';
+
+    // set the end time earlier than the start time
+    await startTimeInput.setValue(END_TIME);
+    await startTimeInput.blur();
+
+    await endTimeInput.setValue(START_TIME);
+    await endTimeInput.blur();
+
+    let startTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    let errors = await startTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single start time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time max error')
+      .toBeResolvedTo(`Время должно быть ранее ${START_TIME}`);
+
+    let endTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    errors = await endTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single end time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time min error')
+      .toBeResolvedTo(`Время должно быть позже ${END_TIME}`);
+
+    // set correct start and end time
+    await startTimeInput.setValue(START_TIME);
+    await startTimeInput.blur();
+
+    await endTimeInput.setValue(END_TIME);
+    await endTimeInput.blur();
+
+    startTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        isValid: true,
+        hasErrors: false
+      })
+    );
+
+    endTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        isValid: true,
+        hasErrors: false
+      })
+    );
+
+    // set the end time the same as the start time
+    await endTimeInput.setValue(START_TIME);
+    await endTimeInput.blur();
+
+    startTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    errors = await startTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single start time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time max error')
+      .toBeResolvedTo(`Время должно быть ранее ${START_TIME}`);
+
+    endTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    errors = await endTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single end time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time min error')
+      .toBeResolvedTo(`Время должно быть позже ${START_TIME}`);
+
+    discardPeriodicTasks();
+  }));
 
   it('should render map', () => {
     const mapDe = fixture.debugElement.query(

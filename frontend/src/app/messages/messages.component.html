@@ -46,6 +46,18 @@
           <input matInput placeholder="Время начала" formControlName="time">
 
           <mat-hint><em>00:00</em></mat-hint>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.start.controls.time?.errors?.['required']">Обязательное поле</mat-error>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.start.controls.time.errors?.['pattern']">
+            Время введено некорректно
+          </mat-error>
+
+          <mat-error *ngIf="!selectionForm.controls.range.controls.start.controls.time?.errors?.['required']
+            && !selectionForm.controls.range.controls.start.controls.time.errors?.['pattern']
+            && selectionForm.controls.range.controls.start.controls.time.errors?.['rangeTimeMax'] as error">
+            Время должно быть ранее {{ error.max }}
+          </mat-error>
         </mat-form-field>
       </fieldset>
 
@@ -78,6 +90,18 @@
           <input matInput placeholder="Время конца" formControlName="time">
 
           <mat-hint><em>23:59</em></mat-hint>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.end.controls.time.errors?.['required']">Обязательное поле</mat-error>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.end.controls.time.errors?.['pattern']">
+            Время введено некорректно
+          </mat-error>
+
+          <mat-error *ngIf="!selectionForm.controls.range.controls.end.controls.time.errors?.['required']
+            && !selectionForm.controls.range.controls.end.controls.time.errors?.['pattern']
+            && selectionForm.controls.range.controls.end.controls.time.errors?.['rangeTimeMin'] as error">
+            Время должно быть позже {{ error.min }}
+          </mat-error>
         </mat-form-field>
       </fieldset>
     </fieldset>
