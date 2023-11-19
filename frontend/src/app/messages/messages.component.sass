@@ -9,7 +9,13 @@ form
   margin-bottom: 10px
   padding: 10px
 
-  $field-column-gap: 10px
+  $field-column-gap: 20px
+
+  > div,
+  > fieldset fieldset,
+  > fieldset:last-of-type
+    display: flex
+    column-gap: $field-column-gap
 
   > div,
   > fieldset
@@ -19,26 +25,27 @@ form
   > fieldset fieldset
 
     &:nth-child(-n + 3)
-      display: flex
       align-items: baseline
-      column-gap: $field-column-gap
+
+      mat-form-field
+        $label-flex-basis: 41px
+        $field-count: 2
+
+        display: inline-block
+        flex-basis: calc((100% - $label-flex-basis - 2 * $field-column-gap) / $field-count)
 
       label
         margin-bottom: unset
         margin-right: auto
 
-    &:last-of-type
-      margin-bottom: 8px
-
   > div mat-form-field
     flex: 1
 
-  fieldset mat-form-field
-    $label-flex-basis: 41px
-    $field-count: 2
+  > fieldset:last-of-type
+    margin-bottom: 8px
 
-    display: inline-block
-    flex-basis: calc((100% - $label-flex-basis - 2 * $field-column-gap) / $field-count)
+    > div
+      flex: 1
 
   button
     width: 160px

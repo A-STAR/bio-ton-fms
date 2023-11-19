@@ -106,6 +106,36 @@
       </fieldset>
     </fieldset>
 
+    <fieldset formGroupName="message">
+      <div>
+        <label for="type">Тип сообщений</label>
+
+        <mat-form-field>
+          <mat-select id="type" placeholder="Тип сообщений" formControlName="type">
+            <mat-option>Тип сообщений</mat-option>
+
+            <mat-option [value]="MessageType.DataMessage">Сообщения с данными</mat-option>
+
+            <mat-option [value]="MessageType.CommandMessage">Отправленные команды</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <label for="parameters">Параметры</label>
+
+        <mat-form-field>
+          <mat-select id="parameters" placeholder="Параметры" formControlName="parameters">
+            <mat-option>Параметры</mat-option>
+
+            <mat-option [value]="DataMessageParameter.TrackerData">Исходные данные</mat-option>
+
+            <mat-option [value]="DataMessageParameter.SensorData">Значения датчиков</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </fieldset>
+
     <button mat-stroked-button type="reset" color="accent">Очистить</button>
 
     <button mat-flat-button type="submit" color="accent">Выполнить</button>

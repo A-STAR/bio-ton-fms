@@ -10,6 +10,7 @@ import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
 import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/material/datepicker/testing';
+import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
@@ -138,6 +139,20 @@ describe('MessagesComponent', () => {
       MatInputHarness.with({
         ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
         placeholder: 'Время конца'
+      })
+    );
+
+    await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Тип сообщений"]'
+      })
+    );
+
+    await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Параметры"]'
       })
     );
 
