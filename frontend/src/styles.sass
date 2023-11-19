@@ -13,7 +13,7 @@ strong
   font-weight: 700
 
 label
-  color: $light-dark
+  color: $darker-gray
   font-size: 12px
   line-height: 20px
 
@@ -30,7 +30,7 @@ bio-root
 bio-sidebar ~ router-outlet + *
     margin-left: $bio-sidebar-width
 
-fieldset:not(:last-child)
+fieldset:has(legend):not(:last-child)
   margin-bottom: 25px
 
 legend
@@ -66,9 +66,6 @@ bio-messages
   bio-map.maplibregl-map
     flex: 1
     height: unset
-
-label
-  color: $darker-gray
 
 .maplibregl-popup-content
   @extend %info-layout

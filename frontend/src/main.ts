@@ -5,9 +5,11 @@ import { DATE_PIPE_DEFAULT_OPTIONS, registerLocaleData } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import localeRu from '@angular/common/locales/ru';
 import { provideRouter } from '@angular/router';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatSnackBarConfig, MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldDefaultOptions, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
 import { ErrorHandler as ErrorHandlerClass } from './app/error.handler';
 import { AuthInterceptor } from './app/auth.interceptor';
@@ -60,6 +62,14 @@ const appConfig: ApplicationConfig = {
       useValue: {
         dateFormat: 'd MMMM y, H:mm'
       }
+    },
+    {
+      provide: DateAdapter,
+      useClass: LuxonDateAdapter
+    },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: MAT_LUXON_DATE_FORMATS
     },
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
