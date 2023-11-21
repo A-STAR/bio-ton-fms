@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
 import { Observable, debounceTime, defer, distinctUntilChanged, filter, map, skipWhile, startWith, switchMap } from 'rxjs';
@@ -27,6 +28,7 @@ import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/te
     MatInputModule,
     MatAutocompleteModule,
     MatDatepickerModule,
+    MatSelectModule,
     MatButtonModule,
     MapComponent
   ],
@@ -60,6 +62,8 @@ export default class MessagesComponent implements OnInit {
 
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
+  protected MessageType = MessageType;
+  protected DataMessageParameter = DataMessageParameter;
 
   /**
    * Map a tech option's control value to its name display value in the trigger.
@@ -82,6 +86,18 @@ export default class MessagesComponent implements OnInit {
    */
   protected techTrackBy(index: number, { id }: MonitoringTech) {
     return id;
+  }
+
+  /**
+   * Toggle `message` `parameters` control disabled state
+   * on `message` `type` selection change conditionally.
+   *
+   * @param event `MatSelectionChange` event.
+   */
+  protected onMessageTypeSelectionChange({ value }: MatSelectChange) {
+    const parametersControl = this.selectionForm.get('message.parameters');
+
+    value === MessageType.DataMessage ? parametersControl?.enable() : parametersControl?.disable();
   }
 
   /**
@@ -213,6 +229,13 @@ export default class MessagesComponent implements OnInit {
         })
       }, {
         validators: this.#rangeTimeValidator
+      }),
+      message: this.fb.group({
+        type: this.fb.nonNullable.control<MessageType | undefined>(undefined, Validators.required),
+        parameters: this.fb.nonNullable.control<DataMessageParameter | undefined>({
+          value: undefined,
+          disabled: true
+        }, Validators.required)
       })
     });
   }
@@ -254,6 +277,20 @@ type MessageSelectionForm = FormGroup<{
       time: FormControl<string | undefined>;
     }>;
   }>;
+  message: FormGroup<{
+    type: FormControl<MessageType | undefined>;
+    parameters: FormControl<DataMessageParameter | undefined>;
+  }>;
 }>;
+
+export enum MessageType {
+  DataMessage = 'dataMessage',
+  CommandMessage = 'commandMessage'
+}
+
+export enum DataMessageParameter {
+  TrackerData = 'trackerData',
+  SensorData = 'sensorData'
+}
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;

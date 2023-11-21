@@ -30,6 +30,10 @@ bio-root
 bio-sidebar ~ router-outlet + *
     margin-left: $bio-sidebar-width
 
+fieldset div[hidden]
+  display: unset
+  visibility: hidden
+
 fieldset:has(legend):not(:last-child)
   margin-bottom: 25px
 

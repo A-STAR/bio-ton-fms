@@ -10,6 +10,7 @@ import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
 import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/material/datepicker/testing';
+import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
@@ -142,6 +143,20 @@ describe('MessagesComponent', () => {
     );
 
     await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Тип сообщений"]'
+      })
+    );
+
+    await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await loader.getHarness(
       MatButtonHarness.with({
         ancestor: 'form#selection-form',
         selector: '[type="reset"]',
@@ -163,6 +178,16 @@ describe('MessagesComponent', () => {
   it('should get vehicles', () => {
     expect(vehiclesSpy)
       .toHaveBeenCalled();
+  });
+
+  it('should render map', () => {
+    const mapDe = fixture.debugElement.query(
+      By.directive(MapComponent)
+    );
+
+    expect(mapDe)
+      .withContext('render `bio-map` component')
+      .not.toBeNull();
   });
 
   it('should validate required tech selection', fakeAsync(async () => {
@@ -350,15 +375,66 @@ describe('MessagesComponent', () => {
     discardPeriodicTasks();
   }));
 
-  it('should render map', () => {
-    const mapDe = fixture.debugElement.query(
-      By.directive(MapComponent)
+  it('should toggle parameters control visible/disabled state', fakeAsync(async () => {
+    // initially render `parameters` control hidden and disabled
+    let parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
+        selector: '[placeholder="Параметры"]'
+      })
     );
 
-    expect(mapDe)
-      .withContext('render `bio-map` component')
-      .not.toBeNull();
-  });
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control disabled')
+      .toBeResolvedTo(true);
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Тип сообщений"]'
+      })
+    );
+
+    // render `parameters` control visible and enabled for `message` data `type`
+    typeSelect.clickOptions({
+      text: 'Сообщения с данными'
+    });
+
+    parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] :not([hidden])',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control enabled')
+      .toBeResolvedTo(false);
+
+    // render `parameters` control hidden and enabled for `message` command `type`
+    typeSelect.clickOptions({
+      text: 'Отправленные команды'
+    });
+
+    parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control disabled')
+      .toBeResolvedTo(true);
+
+    discardPeriodicTasks();
+  }));
 
   it('should search tech', fakeAsync(async () => {
     // skip initial vehicles call
