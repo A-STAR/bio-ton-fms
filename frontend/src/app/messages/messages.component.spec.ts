@@ -180,6 +180,16 @@ describe('MessagesComponent', () => {
       .toHaveBeenCalled();
   });
 
+  it('should render map', () => {
+    const mapDe = fixture.debugElement.query(
+      By.directive(MapComponent)
+    );
+
+    expect(mapDe)
+      .withContext('render `bio-map` component')
+      .not.toBeNull();
+  });
+
   it('should validate required tech selection', fakeAsync(async () => {
     const techInput = await loader.getHarness(
       MatInputHarness.with({
@@ -365,15 +375,66 @@ describe('MessagesComponent', () => {
     discardPeriodicTasks();
   }));
 
-  it('should render map', () => {
-    const mapDe = fixture.debugElement.query(
-      By.directive(MapComponent)
+  it('should toggle parameters control visible/disabled state', fakeAsync(async () => {
+    // initially render `parameters` control hidden and disabled
+    let parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
+        selector: '[placeholder="Параметры"]'
+      })
     );
 
-    expect(mapDe)
-      .withContext('render `bio-map` component')
-      .not.toBeNull();
-  });
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control disabled')
+      .toBeResolvedTo(true);
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Тип сообщений"]'
+      })
+    );
+
+    // render `parameters` control visible and enabled for `message` data `type`
+    typeSelect.clickOptions({
+      text: 'Сообщения с данными'
+    });
+
+    parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] :not([hidden])',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control enabled')
+      .toBeResolvedTo(false);
+
+    // render `parameters` control hidden and enabled for `message` command `type`
+    typeSelect.clickOptions({
+      text: 'Отправленные команды'
+    });
+
+    parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control disabled')
+      .toBeResolvedTo(true);
+
+    discardPeriodicTasks();
+  }));
 
   it('should search tech', fakeAsync(async () => {
     // skip initial vehicles call

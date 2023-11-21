@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
 import { Observable, debounceTime, defer, distinctUntilChanged, filter, map, skipWhile, startWith, switchMap } from 'rxjs';
@@ -86,6 +86,18 @@ export default class MessagesComponent implements OnInit {
    */
   protected techTrackBy(index: number, { id }: MonitoringTech) {
     return id;
+  }
+
+  /**
+   * Toggle `message` `parameters` control disabled state
+   * on `message` `type` selection change conditionally.
+   *
+   * @param event `MatSelectionChange` event.
+   */
+  protected onMessageTypeSelectionChange({ value }: MatSelectChange) {
+    const parametersControl = this.selectionForm.get('message.parameters');
+
+    value === MessageType.DataMessage ? parametersControl?.enable() : parametersControl?.disable();
   }
 
   /**
@@ -219,8 +231,11 @@ export default class MessagesComponent implements OnInit {
         validators: this.#rangeTimeValidator
       }),
       message: this.fb.group({
-        type: this.fb.nonNullable.control<MessageType | undefined>(undefined),
-        parameters: this.fb.nonNullable.control<DataMessageParameter | undefined>(undefined)
+        type: this.fb.nonNullable.control<MessageType | undefined>(undefined, Validators.required),
+        parameters: this.fb.nonNullable.control<DataMessageParameter | undefined>({
+          value: undefined,
+          disabled: true
+        }, Validators.required)
       })
     });
   }

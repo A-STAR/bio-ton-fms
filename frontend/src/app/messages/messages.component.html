@@ -111,17 +111,19 @@
         <label for="type">Тип сообщений</label>
 
         <mat-form-field>
-          <mat-select id="type" placeholder="Тип сообщений" formControlName="type">
+          <mat-select id="type" placeholder="Тип сообщений" formControlName="type" (selectionChange)="onMessageTypeSelectionChange($event)">
             <mat-option>Тип сообщений</mat-option>
 
             <mat-option [value]="MessageType.DataMessage">Сообщения с данными</mat-option>
 
             <mat-option [value]="MessageType.CommandMessage">Отправленные команды</mat-option>
           </mat-select>
+
+          <mat-error>Обязательное поле</mat-error>
         </mat-form-field>
       </div>
 
-      <div>
+      <div [hidden]="selectionForm.controls.message.controls.type.value !== MessageType.DataMessage">
         <label for="parameters">Параметры</label>
 
         <mat-form-field>
@@ -132,6 +134,8 @@
 
             <mat-option [value]="DataMessageParameter.SensorData">Значения датчиков</mat-option>
           </mat-select>
+
+          <mat-error>Обязательное поле</mat-error>
         </mat-form-field>
       </div>
     </fieldset>
