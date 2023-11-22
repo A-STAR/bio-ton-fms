@@ -1,7 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { MessageService } from './message.service';
+import { MessageService, MessageStatistics, MessageStatisticsOptions } from './message.service';
+
+import { DataMessageParameter, MessageType } from './messages.component';
 
 import { MonitoringVehiclesOptions } from '../tech/tech.service';
 
@@ -105,5 +107,45 @@ describe('MessageService', () => {
     );
 
     vehiclesRequest.flush(testFoundMonitoringVehicles);
+  });
+
+  it('should get message statistics', (done: DoneFn) => {
+    const testMessageStatisticsOptions: MessageStatisticsOptions = {
+      vehicleId: testMonitoringVehicles[0].id,
+      periodStart: '2023-05-01T20:00:00.000Z',
+      periodEnd: '2023-05-17T19:59:59.999Z',
+      viewMessageType: MessageType.DataMessage,
+      parameterType: DataMessageParameter.TrackerData
+    };
+
+    const testMessageStatistics: MessageStatistics = {
+      numberOfMessages: 13,
+      totalTime: 40,
+      distance: 245,
+      mileage: 8895,
+      averageSpeed: 25.0,
+      maxSpeed: 90.0
+    };
+
+    service
+      .getStatistics(testMessageStatisticsOptions)
+      .subscribe(statistics => {
+        expect(statistics)
+          .withContext('get statistics')
+          .toEqual(testMessageStatistics);
+
+        done();
+      });
+
+    const statisticsRequest = httpTestingController.expectOne(
+      `/api/telematica/messagesview/statistics?vehicleId=${testMessageStatisticsOptions.vehicleId}&periodStart=${
+        testMessageStatisticsOptions.periodStart
+      }&periodEnd=${testMessageStatisticsOptions.periodEnd}&viewMessageType=${testMessageStatisticsOptions.viewMessageType}&parameterType=${
+        testMessageStatisticsOptions.parameterType!
+      }`,
+      'statistics request'
+    );
+
+    statisticsRequest.flush(testMessageStatistics);
   });
 });
