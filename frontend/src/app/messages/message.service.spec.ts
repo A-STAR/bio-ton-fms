@@ -118,15 +118,6 @@ describe('MessageService', () => {
       parameterType: DataMessageParameter.TrackerData
     };
 
-    const testMessageStatistics: MessageStatistics = {
-      numberOfMessages: 13,
-      totalTime: 40,
-      distance: 245,
-      mileage: 8895,
-      averageSpeed: 25.0,
-      maxSpeed: 90.0
-    };
-
     service
       .getStatistics(testMessageStatisticsOptions)
       .subscribe(statistics => {
@@ -149,3 +140,12 @@ describe('MessageService', () => {
     statisticsRequest.flush(testMessageStatistics);
   });
 });
+
+export const testMessageStatistics: MessageStatistics = {
+  numberOfMessages: 13,
+  totalTime: 40,
+  distance: 245,
+  mileage: 8895,
+  averageSpeed: 25.0,
+  maxSpeed: 90.0
+};

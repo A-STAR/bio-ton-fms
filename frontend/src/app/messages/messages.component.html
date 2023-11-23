@@ -1,5 +1,5 @@
 <aside>
-  <form id="selection-form" [formGroup]="selectionForm">
+  <form id="selection-form" [formGroup]="selectionForm" (ngSubmit)="submitSelectionForm()">
     <div>
       <label for="tech">Объект</label>
 
