@@ -1,5 +1,5 @@
 <aside>
-  <form id="selection-form" [formGroup]="selectionForm">
+  <form id="selection-form" [formGroup]="selectionForm" (ngSubmit)="submitSelectionForm()">
     <div>
       <label for="tech">Объект</label>
 
@@ -144,6 +144,38 @@
 
     <button mat-flat-button type="submit" color="accent">Выполнить</button>
   </form>
+
+  <ng-container *ngIf="statistics">
+    <h1>Статистика</h1>
+
+    <dl class="statistics">
+      <dt>Всего сообщений:</dt>
+      <dd>{{ statistics.numberOfMessages }}</dd>
+
+      <dt>Общее время:</dt>
+      <dd>{{ statistics.totalTime }} ч</dd>
+
+      <dt>Расстояние:</dt>
+      <dd>
+        <ng-container *ngIf="statistics.distance !== undefined; else default">{{ statistics.distance | number:'1.0-0' }} км</ng-container>
+      </dd>
+
+      <dt>Пробег:</dt>
+      <dd>{{ statistics.mileage | number:'1.0-0' }} км</dd>
+
+      <dt>Средняя скорость:</dt>
+      <dd>{{ statistics.averageSpeed | number:'1.1-1':'en-US' }} км/ч</dd>
+
+      <dt>Максимальная скорость:</dt>
+      <dd>
+        <ng-container *ngIf="statistics.maxSpeed !== undefined; else default">
+          {{ statistics.maxSpeed | number:'1.1-1':'en-US' }} км/ч
+        </ng-container>
+      </dd>
+    </dl>
+
+    <ng-template #default>-</ng-template>
+  </ng-container>
 </aside>
 
 <bio-map></bio-map>

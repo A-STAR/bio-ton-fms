@@ -2,7 +2,9 @@ import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { formatNumber, registerLocaleData } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import localeRu from '@angular/common/locales/ru';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
@@ -16,20 +18,23 @@ import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxo
 
 import { Observable, of } from 'rxjs';
 
-import { MessageService } from './message.service';
+import { MessageService, MessageStatisticsOptions } from './message.service';
 
-import MessagesComponent from './messages.component';
+import MessagesComponent, { DataMessageParameter, MessageType, parseTime } from './messages.component';
 import { MapComponent } from '../shared/map/map.component';
 
 import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
+import { localeID } from '../tech/shared/relative-time.pipe';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
+import { testMessageStatistics } from './message.service.spec';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
   let fixture: ComponentFixture<MessagesComponent>;
   let loader: HarnessLoader;
+  let messageService: MessageService;
 
   let vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>;
 
@@ -53,15 +58,17 @@ describe('MessagesComponent', () => {
           {
             provide: MAT_DATE_FORMATS,
             useValue: MAT_LUXON_DATE_FORMATS
-          },
+          }
         ]
       })
       .compileComponents();
 
+    registerLocaleData(localeRu, localeID);
+
     fixture = TestBed.createComponent(MessagesComponent);
     loader = TestbedHarnessEnvironment.loader(fixture);
 
-    const messageService = TestBed.inject(MessageService);
+    messageService = TestBed.inject(MessageService);
 
     component = fixture.componentInstance;
 
@@ -94,7 +101,7 @@ describe('MessagesComponent', () => {
       })
     );
 
-    await loader.getAllHarnesses(
+    await loader.getHarness(
       MatAutocompleteHarness.with({
         ancestor: 'form#selection-form'
       })
@@ -237,11 +244,11 @@ describe('MessagesComponent', () => {
       })
     );
 
-    const date = '17.11.2023';
+    const testDate = '17.11.2023';
 
     // set the same day
-    await startDateInput.setValue(date);
-    await endDateInput.setValue(date);
+    await startDateInput.setValue(testDate);
+    await endDateInput.setValue(testDate);
 
     const startTimeInput = await loader.getHarness(
       MatInputHarness.with({
@@ -255,14 +262,14 @@ describe('MessagesComponent', () => {
       })
     );
 
-    const START_TIME = '00:02';
-    const END_TIME = '00:03';
+    const testStartTime = '00:02';
+    const testEndTime = '00:03';
 
     // set the end time earlier than the start time
-    await startTimeInput.setValue(END_TIME);
+    await startTimeInput.setValue(testEndTime);
     await startTimeInput.blur();
 
-    await endTimeInput.setValue(START_TIME);
+    await endTimeInput.setValue(testStartTime);
     await endTimeInput.blur();
 
     let startTimeFormField = await loader.getHarness(
@@ -283,7 +290,7 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time max error')
-      .toBeResolvedTo(`Время должно быть ранее ${START_TIME}`);
+      .toBeResolvedTo(`Время должно быть ранее ${testStartTime}`);
 
     let endTimeFormField = await loader.getHarness(
       MatFormFieldHarness.with({
@@ -303,13 +310,13 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time min error')
-      .toBeResolvedTo(`Время должно быть позже ${END_TIME}`);
+      .toBeResolvedTo(`Время должно быть позже ${testEndTime}`);
 
     // set correct start and end time
-    await startTimeInput.setValue(START_TIME);
+    await startTimeInput.setValue(testStartTime);
     await startTimeInput.blur();
 
-    await endTimeInput.setValue(END_TIME);
+    await endTimeInput.setValue(testEndTime);
     await endTimeInput.blur();
 
     startTimeFormField = await loader.getHarness(
@@ -329,7 +336,7 @@ describe('MessagesComponent', () => {
     );
 
     // set the end time the same as the start time
-    await endTimeInput.setValue(START_TIME);
+    await endTimeInput.setValue(testStartTime);
     await endTimeInput.blur();
 
     startTimeFormField = await loader.getHarness(
@@ -350,7 +357,7 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time max error')
-      .toBeResolvedTo(`Время должно быть ранее ${START_TIME}`);
+      .toBeResolvedTo(`Время должно быть ранее ${testStartTime}`);
 
     endTimeFormField = await loader.getHarness(
       MatFormFieldHarness.with({
@@ -370,7 +377,7 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time min error')
-      .toBeResolvedTo(`Время должно быть позже ${START_TIME}`);
+      .toBeResolvedTo(`Время должно быть позже ${testStartTime}`);
 
     discardPeriodicTasks();
   }));
@@ -525,4 +532,197 @@ describe('MessagesComponent', () => {
         findCriterion: testInvalidIDSearchQuery.toLocaleLowerCase()
       });
   }));
+
+  it('should submit invalid selection form', fakeAsync(async () => {
+    spyOn(messageService, 'getStatistics')
+      .and.callThrough();
+
+    const executeButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[type="submit"]',
+        text: 'Выполнить',
+        variant: 'flat'
+      })
+    );
+
+    await executeButton.click();
+
+    expect(messageService.getStatistics)
+      .not.toHaveBeenCalled();
+  }));
+
+  it('should submit selection form', fakeAsync(async () => {
+    /* Autocomplete doesn't properly set an actual control `object` value in tests
+       rather than its display value. */
+    component['selectionForm'].controls.tech.setValue(testMonitoringVehicles[0]);
+
+    const [startDateInput, endDateInput] = await loader.getAllHarnesses(
+      MatDatepickerInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"]'
+      })
+    );
+
+    const testDate = '17.11.2023';
+
+    await startDateInput.setValue(testDate);
+    await endDateInput.setValue(testDate);
+
+    const startTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время начала'
+      })
+    );
+
+    const endTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время конца'
+      })
+    );
+
+    const testStartTime = '00:00';
+    const testEndTime = '23:59';
+
+    await startTimeInput.setValue(testStartTime);
+    await endTimeInput.setValue(testEndTime);
+
+    const [typeSelect, parametersSelect] = await loader.getAllHarnesses(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form'
+      })
+    );
+
+    await typeSelect.clickOptions({
+      text: 'Сообщения с данными'
+    });
+
+    await parametersSelect.clickOptions({
+      text: 'Исходные данные'
+    });
+
+    const [day, month, year] = testDate
+      .split('.')
+      .map(Number);
+
+    const monthIndex = month - 1;
+
+    const [startHours, startMinutes] = parseTime(testStartTime);
+    const [endHours, endMinutes] = parseTime(testEndTime);
+
+    const startDate = new Date(year, monthIndex, day, startHours, startMinutes);
+    const endDate = new Date(year, monthIndex, day, endHours, endMinutes);
+
+    const testStatisticsOptions: MessageStatisticsOptions = {
+      vehicleId: testMonitoringVehicles[0].id,
+      periodStart: startDate.toISOString(),
+      periodEnd: endDate.toISOString(),
+      viewMessageType: MessageType.DataMessage,
+      parameterType: DataMessageParameter.TrackerData
+    };
+
+    spyOn(messageService, 'getStatistics')
+      .and.callFake(() => of(testMessageStatistics));
+
+    const executeButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[type="submit"]',
+        text: 'Выполнить',
+        variant: 'flat'
+      })
+    );
+
+    await executeButton.click();
+
+    expect(messageService.getStatistics)
+      .toHaveBeenCalledWith(testStatisticsOptions);
+  }));
+
+  it('should render statistics', () => {
+    let headingDe = fixture.debugElement.query(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render no heading element')
+      .toBeNull();
+
+    let descriptionListDe = fixture.debugElement.query(
+      By.css('dl')
+    );
+
+    expect(descriptionListDe)
+      .withContext('render no description list element')
+      .toBeNull();
+
+    // set data message statistics
+    component['statistics'] = testMessageStatistics;
+
+    fixture.detectChanges();
+
+    headingDe = fixture.debugElement.query(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render heading element')
+      .not.toBeNull();
+
+    expect(headingDe.nativeElement.textContent)
+      .withContext('render heading text')
+      .toBe('Статистика');
+
+    descriptionListDe = fixture.debugElement.query(
+      By.css('dl.statistics')
+    );
+
+    const descriptionTermDes = descriptionListDe.queryAll(
+      By.css('dt')
+    );
+
+    const descriptionDetailsDes = descriptionListDe.queryAll(
+      By.css('dd')
+    );
+
+    const { numberOfMessages, totalTime, distance, mileage, averageSpeed, maxSpeed } = testMessageStatistics;
+
+    const DESCRIPTION_TEXTS = [
+      {
+        term: 'Всего сообщений',
+        details: numberOfMessages.toString()
+      },
+      {
+        term: 'Общее время',
+        details: `${totalTime} ч`
+      },
+      {
+        term: 'Расстояние',
+        details: `${formatNumber(distance!, localeID, '1.0-0')} км`
+      },
+      {
+        term: 'Пробег',
+        details: `${formatNumber(mileage, localeID, '1.0-0')} км`
+      },
+      {
+        term: 'Средняя скорость',
+        details: `${formatNumber(averageSpeed, 'en-US', '1.1-1')} км/ч`
+      },
+      {
+        term: 'Максимальная скорость',
+        details: `${formatNumber(maxSpeed!, 'en-US', '1.1-1')} км/ч`
+      }
+    ];
+
+    descriptionTermDes.forEach((descriptionTermDe, index) => {
+      expect(descriptionTermDe.nativeElement.textContent)
+        .withContext('render description term text')
+        .toBe(`${DESCRIPTION_TEXTS[index].term}:`);
+
+      expect(
+        descriptionDetailsDes[index].nativeElement.textContent.trim()
+      )
+        .withContext('render description details text')
+        .toBe(DESCRIPTION_TEXTS[index].details);
+    });
+  });
 });

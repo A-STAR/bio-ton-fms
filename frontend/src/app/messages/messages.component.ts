@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
@@ -10,9 +10,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
-import { Observable, debounceTime, defer, distinctUntilChanged, filter, map, skipWhile, startWith, switchMap } from 'rxjs';
+import { Observable, Subscription, debounceTime, defer, distinctUntilChanged, filter, map, skipWhile, startWith, switchMap } from 'rxjs';
 
-import { MessageService } from './message.service';
+import { MessageService, MessageStatistics, MessageStatisticsOptions } from './message.service';
 
 import { MapComponent } from '../shared/map/map.component';
 
@@ -36,7 +36,7 @@ import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/te
   styleUrls: ['./messages.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class MessagesComponent implements OnInit {
+export default class MessagesComponent implements OnInit, OnDestroy {
   /**
    * Get search stream.
    *
@@ -62,6 +62,7 @@ export default class MessagesComponent implements OnInit {
 
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
+  protected statistics?: MessageStatistics;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
 
@@ -99,6 +100,58 @@ export default class MessagesComponent implements OnInit {
 
     value === MessageType.DataMessage ? parametersControl?.enable() : parametersControl?.disable();
   }
+
+  /**
+   * Submit selection form, checking validation state.
+   *
+   * Get message statistics.
+   */
+  protected submitSelectionForm() {
+    this.#subscription?.unsubscribe();
+
+    const { invalid, value } = this.selectionForm;
+
+    if (invalid) {
+      return;
+    }
+
+    const { tech, range, message } = value;
+
+    const { start, end } = range!;
+    const { type, parameters } = message!;
+
+    const startDate = new Date(start!.date!);
+    const endDate = new Date(end!.date!);
+
+    const [startHours, startMinutes] = parseTime(start!.time!);
+
+    startDate.setHours(startHours);
+    startDate.setMinutes(startMinutes);
+
+    const [endHours, endMinutes] = parseTime(end!.time!);
+
+    endDate.setHours(endHours);
+    endDate.setMinutes(endMinutes);
+
+    const messageStatisticsOptions: MessageStatisticsOptions = {
+      vehicleId: (tech as MonitoringTech).id,
+      periodStart: startDate.toISOString(),
+      periodEnd: endDate.toISOString(),
+      viewMessageType: type!
+    };
+
+    if (parameters) {
+      messageStatisticsOptions.parameterType = parameters;
+    }
+
+    this.#subscription = this.messageService
+      .getStatistics(messageStatisticsOptions)
+      .subscribe(statistics => {
+        this.statistics = statistics;
+      });
+  }
+
+  #subscription: Subscription | undefined;
 
   /**
    * Validator that requires the control have a tech `object` value from selection.
@@ -148,19 +201,15 @@ export default class MessagesComponent implements OnInit {
         endDate = new Date(endDateControl.value);
       }
 
-      const parseTime = (value: string) => value
-        .split(':')
-        .map(Number);
-
       const [startHours, startMinutes] = parseTime(startTimeControl.value);
 
-      startDate.setUTCHours(startHours);
-      startDate.setUTCMinutes(startMinutes);
+      startDate.setHours(startHours);
+      startDate.setMinutes(startMinutes);
 
       const [endHours, endMinutes] = parseTime(endTimeControl.value);
 
-      endDate.setUTCHours(endHours);
-      endDate.setUTCMinutes(endMinutes);
+      endDate.setHours(endHours);
+      endDate.setMinutes(endMinutes);
 
       const start = startDate.getTime();
       const end = endDate.getTime();
@@ -263,6 +312,11 @@ export default class MessagesComponent implements OnInit {
     this.#initSelectionForm();
     this.#setTech();
   }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  ngOnDestroy() {
+    this.#subscription?.unsubscribe();
+  }
 }
 
 type MessageSelectionForm = FormGroup<{
@@ -294,3 +348,14 @@ export enum DataMessageParameter {
 }
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
+
+/**
+ * Parsing time from user input.
+ *
+ * @param value Time user input (00:00, 23:59 etc.).
+ *
+ * @returns Array of hours and minutes.
+ */
+export const parseTime = (value: string) => value
+  .split(':')
+  .map(Number);
