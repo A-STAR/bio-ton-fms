@@ -56,8 +56,8 @@ public class MessagesViewController : ControllerBase
         }
 
         return Ok(request.ViewMessageType == ViewMessageTypeEnum.DataMessage
-            ? _messageRepository.GetStatistics(externalId, request.PeriodStart, request.PeriodEnd)
-            : _commandRepository.GetStatistics(externalId, request.PeriodStart, request.PeriodEnd));
+            ? _messageRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(), request.PeriodEnd.ToUniversalTime())
+            : _commandRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(), request.PeriodEnd.ToUniversalTime()));
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public class MessagesViewController : ControllerBase
             return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
         }
         
-        if (!_messageRepository.GetTracks(periodStart, periodEnd, externalId)
+        if (!_messageRepository.GetTracks(periodStart.ToUniversalTime(), periodEnd.ToUniversalTime(), externalId)
             .TryGetValue(externalId, out var points))
         {
             return Ok(new MessagesViewTrackResponse());
