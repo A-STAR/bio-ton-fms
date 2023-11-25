@@ -24,12 +24,14 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
 
     public ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end)
     {
+        var startUtc = start.ToUniversalTime();
+        var endUtc = end.ToUniversalTime();
         IQueryable<TrackerCommand> commands = QueryableProvider.Linq()
             .AsNoTracking()
             .Where(x => x.Tracker != null &&
                         x.Tracker.ExternalId == externalId &&
-                        x.SentDateTime >= start &&
-                        x.SentDateTime <= end);
+                        x.SentDateTime >= startUtc &&
+                        x.SentDateTime <= endUtc);
 
         return new ViewMessageStatisticsDto
         {
