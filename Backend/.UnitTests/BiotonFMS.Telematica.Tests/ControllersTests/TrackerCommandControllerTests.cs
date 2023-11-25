@@ -1,15 +1,12 @@
 using BioTonFMS.Common.Settings;
 using BioTonFMS.Domain;
-using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
-using BioTonFMS.Infrastructure.Persistence.Specifications;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Controllers;
 using BioTonFMS.Telematica.Dtos.TrackerCommand;
 using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using BioTonFMS.TrackerProtocolSpecific.Senders;
 using FluentAssertions;
-using LinqSpecs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -87,53 +84,5 @@ public class TrackerCommandControllerTests
         );
 
         return controller;
-    }
-}
-
-public class TrackerCommandRepositoryMock : ITrackerCommandRepository
-{
-    private int _idSeq;
-    private readonly List<TrackerCommand> _mockList;
-
-    public TrackerCommandRepositoryMock()
-    {
-        _mockList = new List<TrackerCommand>();
-        _idSeq = 0;
-    }
-
-    public TrackerCommand? this[int key] => _mockList.FirstOrDefault(x => x.Id == key);
-
-    public TrackerCommand? GetWithoutCaching(int key)
-    {
-        return _mockList.FirstOrDefault(x => x.Id == key);
-    }
-
-    public ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end)
-    {
-        throw new NotImplementedException();
-    }
-
-    public int Count => _mockList.Count;
-
-    public void Remove(TrackerCommand entity)
-    {
-        _mockList.Remove(entity);
-    }
-
-    public void Add(TrackerCommand entity)
-    {
-        _idSeq++;
-        entity.Id = _idSeq;
-        _mockList.Add(entity);
-    }
-
-    public void Update(TrackerCommand entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IBeginSpecification<TrackerCommand> BeginSpecification(Specification<TrackerCommand> specification)
-    {
-        throw new NotImplementedException();
     }
 }
