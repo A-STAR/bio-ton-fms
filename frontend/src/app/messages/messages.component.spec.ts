@@ -1,12 +1,18 @@
+import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
+import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/material/datepicker/testing';
+import { MatSelectHarness } from '@angular/material/select/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
+import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
 import { Observable, of } from 'rxjs';
 
@@ -19,7 +25,6 @@ import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.servi
 
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
-import { MatButtonHarness } from '@angular/material/button/testing';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -35,6 +40,20 @@ describe('MessagesComponent', () => {
           NoopAnimationsModule,
           HttpClientTestingModule,
           MessagesComponent
+        ],
+        providers: [
+          {
+            provide: LOCALE_ID,
+            useValue: 'ru-RU'
+          },
+          {
+            provide: DateAdapter,
+            useClass: LuxonDateAdapter
+          },
+          {
+            provide: MAT_DATE_FORMATS,
+            useValue: MAT_LUXON_DATE_FORMATS
+          },
         ]
       })
       .compileComponents();
@@ -82,6 +101,62 @@ describe('MessagesComponent', () => {
     );
 
     await loader.getHarness(
+      MatDatepickerInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        selector: '#start',
+        placeholder: 'Дата начала'
+      })
+    );
+
+    await loader.getHarness(
+      MatDatepickerToggleHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]'
+      })
+    );
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        placeholder: 'Время начала'
+      })
+    );
+
+    await loader.getAllHarnesses(
+      MatDatepickerInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        selector: '#end',
+        placeholder: 'Дата конца'
+      })
+    );
+
+    await loader.getHarness(
+      MatDatepickerToggleHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]'
+      })
+    );
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        placeholder: 'Время конца'
+      })
+    );
+
+    await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Тип сообщений"]'
+      })
+    );
+
+    await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await loader.getHarness(
       MatButtonHarness.with({
         ancestor: 'form#selection-form',
         selector: '[type="reset"]',
@@ -99,6 +174,21 @@ describe('MessagesComponent', () => {
       })
     );
   }));
+
+  it('should get vehicles', () => {
+    expect(vehiclesSpy)
+      .toHaveBeenCalled();
+  });
+
+  it('should render map', () => {
+    const mapDe = fixture.debugElement.query(
+      By.directive(MapComponent)
+    );
+
+    expect(mapDe)
+      .withContext('render `bio-map` component')
+      .not.toBeNull();
+  });
 
   it('should validate required tech selection', fakeAsync(async () => {
     const techInput = await loader.getHarness(
@@ -122,7 +212,7 @@ describe('MessagesComponent', () => {
     const errors = await techFormField.getErrors();
 
     expect(errors.length)
-      .withContext('render a single tech error')
+      .withContext('render a single tech form field error')
       .toBe(1);
 
     await expectAsync(
@@ -134,20 +224,217 @@ describe('MessagesComponent', () => {
     discardPeriodicTasks();
   }));
 
-  it('should get vehicles', () => {
-    expect(vehiclesSpy)
-      .toHaveBeenCalled();
-  });
-
-  it('should render map', () => {
-    const mapDe = fixture.debugElement.query(
-      By.directive(MapComponent)
+  it('should validate range time', fakeAsync(async () => {
+    const startDateInput = await loader.getHarness(
+      MatDatepickerInputHarness.with({
+        placeholder: 'Дата начала'
+      })
     );
 
-    expect(mapDe)
-      .withContext('render `bio-map` component')
-      .not.toBeNull();
-  });
+    const endDateInput = await loader.getHarness(
+      MatDatepickerInputHarness.with({
+        placeholder: 'Дата конца'
+      })
+    );
+
+    const date = '17.11.2023';
+
+    // set the same day
+    await startDateInput.setValue(date);
+    await endDateInput.setValue(date);
+
+    const startTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время начала'
+      })
+    );
+
+    const endTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время конца'
+      })
+    );
+
+    const START_TIME = '00:02';
+    const END_TIME = '00:03';
+
+    // set the end time earlier than the start time
+    await startTimeInput.setValue(END_TIME);
+    await startTimeInput.blur();
+
+    await endTimeInput.setValue(START_TIME);
+    await endTimeInput.blur();
+
+    let startTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    let errors = await startTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single start time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time max error')
+      .toBeResolvedTo(`Время должно быть ранее ${START_TIME}`);
+
+    let endTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    errors = await endTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single end time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time min error')
+      .toBeResolvedTo(`Время должно быть позже ${END_TIME}`);
+
+    // set correct start and end time
+    await startTimeInput.setValue(START_TIME);
+    await startTimeInput.blur();
+
+    await endTimeInput.setValue(END_TIME);
+    await endTimeInput.blur();
+
+    startTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        isValid: true,
+        hasErrors: false
+      })
+    );
+
+    endTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        isValid: true,
+        hasErrors: false
+      })
+    );
+
+    // set the end time the same as the start time
+    await endTimeInput.setValue(START_TIME);
+    await endTimeInput.blur();
+
+    startTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    errors = await startTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single start time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time max error')
+      .toBeResolvedTo(`Время должно быть ранее ${START_TIME}`);
+
+    endTimeFormField = await loader.getHarness(
+      MatFormFieldHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        isValid: false,
+        hasErrors: true
+      })
+    );
+
+    errors = await endTimeFormField.getErrors();
+
+    expect(errors.length)
+      .withContext('render a single end time form field error')
+      .toBe(1);
+
+    await expectAsync(
+      errors[0].getText()
+    )
+      .withContext('render range time min error')
+      .toBeResolvedTo(`Время должно быть позже ${START_TIME}`);
+
+    discardPeriodicTasks();
+  }));
+
+  it('should toggle parameters control visible/disabled state', fakeAsync(async () => {
+    // initially render `parameters` control hidden and disabled
+    let parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control disabled')
+      .toBeResolvedTo(true);
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[placeholder="Тип сообщений"]'
+      })
+    );
+
+    // render `parameters` control visible and enabled for `message` data `type`
+    typeSelect.clickOptions({
+      text: 'Сообщения с данными'
+    });
+
+    parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] :not([hidden])',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control enabled')
+      .toBeResolvedTo(false);
+
+    // render `parameters` control hidden and enabled for `message` command `type`
+    typeSelect.clickOptions({
+      text: 'Отправленные команды'
+    });
+
+    parametersSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
+        selector: '[placeholder="Параметры"]'
+      })
+    );
+
+    await expectAsync(
+      parametersSelect.isDisabled()
+    )
+      .withContext('render parameters control disabled')
+      .toBeResolvedTo(true);
+
+    discardPeriodicTasks();
+  }));
 
   it('should search tech', fakeAsync(async () => {
     // skip initial vehicles call
