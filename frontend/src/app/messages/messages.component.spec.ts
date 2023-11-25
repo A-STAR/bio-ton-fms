@@ -2,7 +2,7 @@ import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { registerLocaleData } from '@angular/common';
+import { formatNumber, registerLocaleData } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import localeRu from '@angular/common/locales/ru';
 import { HarnessLoader } from '@angular/cdk/testing';
@@ -637,4 +637,92 @@ describe('MessagesComponent', () => {
     expect(messageService.getStatistics)
       .toHaveBeenCalledWith(testStatisticsOptions);
   }));
+
+  it('should render statistics', () => {
+    let headingDe = fixture.debugElement.query(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render no heading element')
+      .toBeNull();
+
+    let descriptionListDe = fixture.debugElement.query(
+      By.css('dl')
+    );
+
+    expect(descriptionListDe)
+      .withContext('render no description list element')
+      .toBeNull();
+
+    // set data message statistics
+    component['statistics'] = testMessageStatistics;
+
+    fixture.detectChanges();
+
+    headingDe = fixture.debugElement.query(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render heading element')
+      .not.toBeNull();
+
+    expect(headingDe.nativeElement.textContent)
+      .withContext('render heading text')
+      .toBe('Статистика');
+
+    descriptionListDe = fixture.debugElement.query(
+      By.css('dl.statistics')
+    );
+
+    const descriptionTermDes = descriptionListDe.queryAll(
+      By.css('dt')
+    );
+
+    const descriptionDetailsDes = descriptionListDe.queryAll(
+      By.css('dd')
+    );
+
+    const { numberOfMessages, totalTime, distance, mileage, averageSpeed, maxSpeed } = testMessageStatistics;
+
+    const DESCRIPTION_TEXTS = [
+      {
+        term: 'Всего сообщений',
+        details: numberOfMessages.toString()
+      },
+      {
+        term: 'Общее время',
+        details: `${totalTime} ч`
+      },
+      {
+        term: 'Расстояние',
+        details: `${formatNumber(distance!, localeID, '1.0-0')} км`
+      },
+      {
+        term: 'Пробег',
+        details: `${formatNumber(mileage, localeID, '1.0-0')} км`
+      },
+      {
+        term: 'Средняя скорость',
+        details: `${formatNumber(averageSpeed, 'en-US', '1.1-1')} км/ч`
+      },
+      {
+        term: 'Максимальная скорость',
+        details: `${formatNumber(maxSpeed!, 'en-US', '1.1-1')} км/ч`
+      }
+    ];
+
+    descriptionTermDes.forEach((descriptionTermDe, index) => {
+      expect(descriptionTermDe.nativeElement.textContent)
+        .withContext('render description term text')
+        .toBe(`${DESCRIPTION_TEXTS[index].term}:`);
+
+      expect(
+        descriptionDetailsDes[index].nativeElement.textContent.trim()
+      )
+        .withContext('render description details text')
+        .toBe(DESCRIPTION_TEXTS[index].details);
+    });
+  });
 });
