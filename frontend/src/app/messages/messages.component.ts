@@ -10,7 +10,19 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
-import { Observable, Subscription, debounceTime, defer, distinctUntilChanged, filter, map, skipWhile, startWith, switchMap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  Subscription,
+  debounceTime,
+  defer,
+  distinctUntilChanged,
+  filter,
+  map,
+  skipWhile,
+  startWith,
+  switchMap
+} from 'rxjs';
 
 import { MessageService, MessageStatistics, MessageStatisticsOptions } from './message.service';
 
@@ -62,7 +74,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
-  protected statistics?: MessageStatistics;
+  protected statistics = new Subject<MessageStatistics>();
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
 
@@ -147,7 +159,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     this.#subscription = this.messageService
       .getStatistics(messageStatisticsOptions)
       .subscribe(statistics => {
-        this.statistics = statistics;
+        this.statistics.next(statistics);
       });
   }
 

@@ -145,7 +145,7 @@
     <button mat-flat-button type="submit" color="accent">Выполнить</button>
   </form>
 
-  <ng-container *ngIf="statistics">
+  <ng-container *ngIf="statistics | async as statistics">
     <h1>Статистика</h1>
 
     <dl class="statistics">

@@ -648,7 +648,7 @@ describe('MessagesComponent', () => {
       .toBeNull();
 
     let descriptionListDe = fixture.debugElement.query(
-      By.css('dl')
+      By.css('dl.statistics')
     );
 
     expect(descriptionListDe)
@@ -656,7 +656,7 @@ describe('MessagesComponent', () => {
       .toBeNull();
 
     // set data message statistics
-    component['statistics'] = testMessageStatistics;
+    component['statistics'].next(testMessageStatistics);
 
     fixture.detectChanges();
 
