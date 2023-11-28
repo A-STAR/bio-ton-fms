@@ -50,6 +50,29 @@ import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/te
 })
 export default class MessagesComponent implements OnInit, OnDestroy {
   /**
+   * Get today's date.
+   *
+   * @returns Max start date.
+   */
+  get maxStartDate() {
+    return new Date();
+  }
+
+  /**
+   * Calculate tomorrow's max date.
+   *
+   * @returns Max end date.
+   */
+  get maxEndDate() {
+    const date = new Date();
+    const tomorrowDay = date.getDate() + 1;
+
+    date.setDate(tomorrowDay);
+
+    return date;
+  }
+
+  /**
    * Get search stream.
    *
    * @returns An `Observable` of search stream.

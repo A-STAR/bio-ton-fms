@@ -22,7 +22,7 @@
 
         <mat-form-field>
           <input id="start" matInput formControlName="date" placeholder="Дата начала" [matDatepicker]="startPicker"
-            [max]="selectionForm.controls.range.controls.end.controls.date.value">
+            [max]="selectionForm.controls.range.controls.end.controls.date.value ?? maxStartDate">
 
           <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
 
@@ -66,7 +66,7 @@
 
         <mat-form-field>
           <input id="end" matInput formControlName="date" placeholder="Дата конца" [matDatepicker]="endPicker"
-            [min]="selectionForm.controls.range.controls.start.controls.date.value">
+            [min]="selectionForm.controls.range.controls.start.controls.date.value" [max]="maxEndDate">
 
           <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
 
@@ -81,6 +81,10 @@
 
           <mat-error *ngIf="selectionForm.controls.range.controls.end.controls.date.errors?.['matDatepickerMin'] as error">
             Дата ранее {{ error.min | date:'dd.MM.YYYY' }}
+          </mat-error>
+
+          <mat-error *ngIf="selectionForm.controls.range.controls.end.controls.date.errors?.['matDatepickerMax'] as error">
+            Дата позднее {{ error.max | date:'dd.MM.YYYY' }}
           </mat-error>
 
           <mat-datepicker #endPicker color="accent"></mat-datepicker>
