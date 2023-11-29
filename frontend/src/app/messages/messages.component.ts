@@ -299,14 +299,14 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       range: this.fb.group({
         start: this.fb.group({
           date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-          time: this.fb.nonNullable.control<string | undefined>(undefined, [
+          time: this.fb.nonNullable.control<string | undefined>('00:00', [
             Validators.required,
             Validators.pattern(TIME_PATTERN)
           ])
         }),
         end: this.fb.group({
           date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-          time: this.fb.nonNullable.control<string | undefined>(undefined, [
+          time: this.fb.nonNullable.control<string | undefined>('00:00', [
             Validators.required,
             Validators.pattern(TIME_PATTERN)
           ])
