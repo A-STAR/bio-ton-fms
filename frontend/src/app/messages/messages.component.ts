@@ -27,6 +27,7 @@ import {
 import { MessageService, MessageStatistics, MessageStatisticsOptions } from './message.service';
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
+import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-input.directive';
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
@@ -44,6 +45,7 @@ import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/te
     MatSelectModule,
     MatButtonModule,
     DateCharsInputDirective,
+    TimeCharsInputDirective,
     MapComponent
   ],
   templateUrl: './messages.component.html',

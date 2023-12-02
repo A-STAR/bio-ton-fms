@@ -124,6 +124,7 @@ describe('MessagesComponent', () => {
     await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="start"]',
+        selector: '[bioTimeCharsInput]',
         placeholder: 'Время начала',
         value: '00:00'
       })
@@ -146,6 +147,7 @@ describe('MessagesComponent', () => {
     await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#selection-form [formGroupName="range"] [formGroupName="end"]',
+        selector: '[bioTimeCharsInput]',
         placeholder: 'Время конца',
         value: '00:00'
       })
