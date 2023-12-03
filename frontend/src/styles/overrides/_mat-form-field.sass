@@ -68,6 +68,14 @@ div.mat-mdc-text-field-wrapper
     &__trailing
       border-width: 1px
 
+.mdc-notched-outline
+
+  &--notched div#{&}__notch
+    border-top: 1px solid $lighter-gray
+
+  .mat-mdc-form-field-type-mat-select & .mdc-floating-label
+    display: none
+
 .mat-mdc-form-field-text-prefix,
 .mat-mdc-form-field-text-suffix
   white-space: nowrap
