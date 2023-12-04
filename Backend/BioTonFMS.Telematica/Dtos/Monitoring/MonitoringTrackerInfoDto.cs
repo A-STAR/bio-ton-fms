@@ -1,5 +1,6 @@
 using BioTonFMS.Domain.TrackerMessages;
 using System.ComponentModel.DataAnnotations;
+using BioTonFMS.Domain.MessagesView;
 
 namespace BioTonFMS.Telematica.Dtos.Monitoring;
 

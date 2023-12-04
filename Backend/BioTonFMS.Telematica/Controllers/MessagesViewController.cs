@@ -1,9 +1,11 @@
 using AutoMapper;
 using BioTonFMS.Domain;
-using BioTonFMS.Domain.MessageStatistics;
+using BioTonFMS.Domain.MessagesView;
+using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
+using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
 using Microsoft.AspNetCore.Authorization;
@@ -67,7 +69,7 @@ public class MessagesViewController : ControllerBase
     /// <response code="200">Список машин успешно возвращен</response>
     /// <response code="400">Невозможно вернуть список машин</response>
     [HttpGet("vehicles")]
-    [ProducesResponseType(typeof(MonitoringVehicleDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessagesViewVehicleDto[]), StatusCodes.Status200OK)]
     public IActionResult FindVehicles([FromQuery] string? findCriterion)
     {
         Vehicle[] vehicles = _vehicleRepository.FindVehicles(findCriterion);
@@ -104,5 +106,15 @@ public class MessagesViewController : ControllerBase
             ViewBounds = viewBounds,
             Track = points
         });
+    }
+
+    /// <summary>
+    /// Возвращает точки для трека для выбранной машины и периода
+    /// </summary>
+    [HttpGet("list")]
+    [ProducesResponseType(typeof(ViewMessageMessagesDto), StatusCodes.Status200OK)]
+    public IActionResult GetMessagesViewMessages([FromQuery] MessagesViewMessagesRequest request)
+    {
+        return Ok();
     }
 }

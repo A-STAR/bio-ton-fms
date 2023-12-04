@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BioTonFMS.Common.Settings;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Controllers;

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System.Collections;
+using BioTonFMS.Domain.MessagesView;
 using Xunit.Abstractions;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
