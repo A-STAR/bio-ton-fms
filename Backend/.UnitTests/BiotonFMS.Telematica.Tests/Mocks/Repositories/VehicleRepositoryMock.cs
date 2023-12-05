@@ -1,9 +1,7 @@
 using BioTonFMS.Domain;
 using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF;
-using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
-using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 
@@ -118,6 +116,21 @@ public static class VehicleRepositoryMock
                 Imei = "6412825699",
                 ExternalId = 1555
             }
+        },
+        new()
+        {
+            Id = 5,
+            Name = "Красная машина без трекера",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 1",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В167АР 189",
+            InventoryNumber = "1234"
         }
     };
 }

@@ -292,10 +292,13 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
     public ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end)
     {
+        var startUtc = start.ToUniversalTime();
+        var endUtc = end.ToUniversalTime();
+
         var messages = HydratedQuery.AsNoTracking()
             .Where(x => x.ExternalTrackerId == externalId &&
-                        x.ServerDateTime >= start &&
-                        x.ServerDateTime <= end);
+                        x.ServerDateTime >= startUtc &&
+                        x.ServerDateTime <= endUtc);
         //Пробег берем из тега can_b0 - значение нужно умножить на 5
         var firstMileage = ((int?)messages.OrderBy(x => x.ServerDateTime)
             .SelectMany(x => x.Tags)

@@ -26,9 +26,9 @@
           <label for="type">Тип устройства</label>
 
           <mat-form-field>
-            <mat-select id="type" placeholder="Тип устройства" formControlName="type">
-              <mat-option>Тип устройства</mat-option>
+            <mat-label>Тип устройства</mat-label>
 
+            <mat-select id="type" placeholder="Тип устройства" formControlName="type">
               <mat-option [value]="type.key" *ngFor="let type of trackerType">{{ type.value }}</mat-option>
             </mat-select>
 

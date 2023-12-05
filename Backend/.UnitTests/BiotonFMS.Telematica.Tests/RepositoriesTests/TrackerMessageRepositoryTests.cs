@@ -1,5 +1,7 @@
 using System.Collections;
+using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
+using BioTonFMS.Domain.MessageStatistics;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
@@ -8,7 +10,6 @@ using BioTonFMS.Infrastructure.Paging;
 using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Xunit.Abstractions;
-using BioTonFMS.Common.Testable;
 
 namespace BiotonFMS.Telematica.Tests.RepositoriesTests;
 
@@ -687,4 +688,53 @@ public class TrackerMessageRepositoryTests
 
     #endregion
 
+    #region GetStatistics
+
+    public static IEnumerable<object[]> StatisticsData =>
+        new List<object[]>
+        {
+            new object[]
+            {
+                2552,
+                DateTime.UtcNow.AddHours(-100),
+                DateTime.UtcNow.AddHours(100),
+                new ViewMessageStatisticsDto
+                {
+                    NumberOfMessages = 2,
+                    TotalTime = 10,
+                    AverageSpeed = 12.1,
+                    MaxSpeed = 12.1
+                }
+            },
+            new object[]
+            {
+                1555,
+                DateTime.UtcNow.AddHours(-100),
+                DateTime.UtcNow.AddHours(100),
+                new ViewMessageStatisticsDto
+                {
+                    NumberOfMessages = 1
+                }
+            },
+            new object[]
+            {
+                -12938,
+                DateTime.UtcNow.AddHours(-100),
+                DateTime.UtcNow.AddHours(100),
+                new ViewMessageStatisticsDto()
+            },
+        };
+    
+    [Theory, MemberData(nameof(StatisticsData))]
+    public void GetStatistics(int externalId, DateTime start, DateTime end,
+        ViewMessageStatisticsDto expected)
+    {
+        _testOutputHelper.WriteLine($"id: {externalId}; dates: {start} - {end}");
+
+        var result = TrackerMessageRepositoryMock.GetStub().GetStatistics(externalId, start, end);
+
+        expected.Should().BeEquivalentTo(result);
+    }
+
+    #endregion
 }

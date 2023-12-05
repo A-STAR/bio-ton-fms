@@ -9,7 +9,13 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatSnackBarConfig, MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatDialogConfig, MAT_DIALOG_DEFAULT_OPTIONS, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldDefaultOptions, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
-import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
+
+import {
+  LuxonDateAdapter,
+  MAT_LUXON_DATE_ADAPTER_OPTIONS,
+  MAT_LUXON_DATE_FORMATS,
+  MatLuxonDateAdapterOptions
+} from '@angular/material-luxon-adapter';
 
 import { ErrorHandler as ErrorHandlerClass } from './app/error.handler';
 import { AuthInterceptor } from './app/auth.interceptor';
@@ -18,6 +24,11 @@ import { APIInterceptor } from './app/api.interceptor';
 import { AppComponent } from './app/app.component';
 
 import { routes } from './app/app.routes';
+
+const luxonDateAdapterOptions: MatLuxonDateAdapterOptions = {
+  useUtc: false,
+  firstDayOfWeek: 1
+};
 
 const snackBarOptions: MatSnackBarConfig = {
   duration: 4000
@@ -70,6 +81,10 @@ const appConfig: ApplicationConfig = {
     {
       provide: MAT_DATE_FORMATS,
       useValue: MAT_LUXON_DATE_FORMATS
+    },
+    {
+      provide: MAT_LUXON_DATE_ADAPTER_OPTIONS,
+      useValue: luxonDateAdapterOptions
     },
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,

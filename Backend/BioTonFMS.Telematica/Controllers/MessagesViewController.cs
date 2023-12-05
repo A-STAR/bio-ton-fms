@@ -1,13 +1,11 @@
 using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.MessageStatistics;
-using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
-using BioTonFMS.Telematica.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,14 +50,14 @@ public class MessagesViewController : ControllerBase
     [ProducesResponseType(typeof(ViewMessageStatisticsDto), StatusCodes.Status200OK)]
     public IActionResult GetMessagesViewStatistics([FromQuery] MessagesViewStatisticsRequest request)
     {
-        if (_vehicleRepository.GetExternalIds(request.VehicleId).TryGetValue(request.VehicleId, out var externalId))
+        if (!_vehicleRepository.GetExternalIds(request.VehicleId).TryGetValue(request.VehicleId, out var externalId))
         {
             return NotFound("Трекер машины с таким id не существует");
         }
 
         return Ok(request.ViewMessageType == ViewMessageTypeEnum.DataMessage
-            ? _messageRepository.GetStatistics(externalId, request.PeriodStart, request.PeriodEnd)
-            : _commandRepository.GetStatistics(externalId, request.PeriodStart, request.PeriodEnd));
+            ? _messageRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(), request.PeriodEnd.ToUniversalTime())
+            : _commandRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(), request.PeriodEnd.ToUniversalTime()));
     }
 
     /// <summary>
@@ -93,7 +91,7 @@ public class MessagesViewController : ControllerBase
             return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
         }
         
-        if (!_messageRepository.GetTracks(periodStart, periodEnd, externalId)
+        if (!_messageRepository.GetTracks(periodStart.ToUniversalTime(), periodEnd.ToUniversalTime(), externalId)
             .TryGetValue(externalId, out var points))
         {
             return Ok(new MessagesViewTrackResponse());

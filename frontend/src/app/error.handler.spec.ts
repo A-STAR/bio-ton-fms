@@ -64,7 +64,24 @@ describe('ErrorHandler', () => {
   });
 
   it('should handle error response with multiple errors', () => {
-    const testErrorResponse = new HttpErrorResponse({
+    let testErrorResponse = new HttpErrorResponse({
+      error: 'Трекер машины с таким id не существует',
+      status: 404,
+      statusText: 'Not Found',
+      // eslint-disable-next-line max-len
+      url: 'https://bioton-fms.ru/api/telematica/messagesview/statistics?vehicleId=-3&periodStart=2023-11-14T21:00:00.000Z&periodEnd=2023-11-15T20:59:00.000Z&viewMessageType=dataMessage&parameterType=trackerData'
+    });
+
+    handler.handleError(testErrorResponse);
+
+    expect(snackBarSpy.open)
+      .toHaveBeenCalledWith(testErrorResponse.error, ERROR_ACTION, snackBarConfig);
+
+    // eslint-disable-next-line no-console
+    expect(console.error)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    testErrorResponse = new HttpErrorResponse({
       error: {
         message: 'Http failure response for https://bioton-fms.ru: 504 Gateway Timeout'
       },

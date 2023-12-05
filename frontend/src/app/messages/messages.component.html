@@ -1,5 +1,5 @@
 <aside>
-  <form id="selection-form" [formGroup]="selectionForm">
+  <form id="selection-form" [formGroup]="selectionForm" (ngSubmit)="submitSelectionForm()">
     <div>
       <label for="tech">Объект</label>
 
@@ -22,7 +22,7 @@
 
         <mat-form-field>
           <input id="start" matInput formControlName="date" placeholder="Дата начала" [matDatepicker]="startPicker"
-            [max]="selectionForm.controls.range.controls.end.controls.date.value">
+            [max]="selectionForm.controls.range.controls.end.controls.date.value ?? maxStartDate">
 
           <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
 
@@ -43,7 +43,7 @@
         </mat-form-field>
 
         <mat-form-field>
-          <input matInput placeholder="Время начала" formControlName="time">
+          <input matInput bioTimeCharsInput placeholder="Время начала" formControlName="time">
 
           <mat-hint><em>00:00</em></mat-hint>
 
@@ -66,7 +66,7 @@
 
         <mat-form-field>
           <input id="end" matInput formControlName="date" placeholder="Дата конца" [matDatepicker]="endPicker"
-            [min]="selectionForm.controls.range.controls.start.controls.date.value">
+            [min]="selectionForm.controls.range.controls.start.controls.date.value" [max]="maxEndDate">
 
           <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
 
@@ -83,11 +83,15 @@
             Дата ранее {{ error.min | date:'dd.MM.YYYY' }}
           </mat-error>
 
+          <mat-error *ngIf="selectionForm.controls.range.controls.end.controls.date.errors?.['matDatepickerMax'] as error">
+            Дата позднее {{ error.max | date:'dd.MM.YYYY' }}
+          </mat-error>
+
           <mat-datepicker #endPicker color="accent"></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field>
-          <input matInput placeholder="Время конца" formControlName="time">
+          <input matInput bioTimeCharsInput placeholder="Время конца" formControlName="time">
 
           <mat-hint><em>23:59</em></mat-hint>
 
@@ -111,9 +115,9 @@
         <label for="type">Тип сообщений</label>
 
         <mat-form-field>
-          <mat-select id="type" placeholder="Тип сообщений" formControlName="type" (selectionChange)="onMessageTypeSelectionChange($event)">
-            <mat-option>Тип сообщений</mat-option>
+          <mat-label>Тип сообщений</mat-label>
 
+          <mat-select id="type" placeholder="Тип сообщений" formControlName="type" (selectionChange)="onMessageTypeSelectionChange($event)">
             <mat-option [value]="MessageType.DataMessage">Сообщения с данными</mat-option>
 
             <mat-option [value]="MessageType.CommandMessage">Отправленные команды</mat-option>
@@ -127,9 +131,9 @@
         <label for="parameters">Параметры</label>
 
         <mat-form-field>
-          <mat-select id="parameters" placeholder="Параметры" formControlName="parameters">
-            <mat-option>Параметры</mat-option>
+          <mat-label>Параметры</mat-label>
 
+          <mat-select id="parameters" placeholder="Параметры" formControlName="parameters">
             <mat-option [value]="DataMessageParameter.TrackerData">Исходные данные</mat-option>
 
             <mat-option [value]="DataMessageParameter.SensorData">Значения датчиков</mat-option>
@@ -144,6 +148,38 @@
 
     <button mat-flat-button type="submit" color="accent">Выполнить</button>
   </form>
+
+  <ng-container *ngIf="statistics | async as statistics">
+    <h1>Статистика</h1>
+
+    <dl class="statistics">
+      <dt>Всего сообщений:</dt>
+      <dd>{{ statistics.numberOfMessages }}</dd>
+
+      <dt>Общее время:</dt>
+      <dd>{{ statistics.totalTime }} ч</dd>
+
+      <dt>Расстояние:</dt>
+      <dd>
+        <ng-container *ngIf="statistics.distance !== undefined; else default">{{ statistics.distance | number:'1.0-0' }} км</ng-container>
+      </dd>
+
+      <dt>Пробег:</dt>
+      <dd>{{ statistics.mileage | number:'1.0-0' }} км</dd>
+
+      <dt>Средняя скорость:</dt>
+      <dd>{{ statistics.averageSpeed | number:'1.1-1':'en-US' }} км/ч</dd>
+
+      <dt>Максимальная скорость:</dt>
+      <dd>
+        <ng-container *ngIf="statistics.maxSpeed !== undefined; else default">
+          {{ statistics.maxSpeed | number:'1.1-1':'en-US' }} км/ч
+        </ng-container>
+      </dd>
+    </dl>
+
+    <ng-template #default>-</ng-template>
+  </ng-container>
 </aside>
 
 <bio-map></bio-map>
