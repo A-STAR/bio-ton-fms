@@ -19,7 +19,8 @@ public class TrackerCommandControllerTests
     [Fact]
     public async Task SendCommand_TrackerExists_ShouldAddCommandToDb()
     {
-        var repository = new TrackerCommandRepositoryMock();
+        var commandList = new List<TrackerCommand>();
+        var repository = TrackerCommandRepositoryMock.GetStub(commandList);
         var controller = GetController(repository);
         const string command = "test cmd";
 
@@ -30,9 +31,9 @@ public class TrackerCommandControllerTests
                 Transport = TrackerCommandTransportEnum.TCP
             });
 
-        repository.Count.Should().Be(1);
-        repository[1]?.Should().NotBeNull();
-        repository[1]!.CommandText.Should().Be(command);
+        commandList.Count.Should().Be(1);
+        repository[0]?.Should().NotBeNull();
+        repository[0]!.CommandText.Should().Be(command);
     }
 
     [Fact]
@@ -55,7 +56,8 @@ public class TrackerCommandControllerTests
     [Fact]
     public async Task SendCommand_WithoutResponse_ShouldReturnError()
     {
-        var repository = new TrackerCommandRepositoryMock();
+        var commandList = new List<TrackerCommand>();
+        var repository = TrackerCommandRepositoryMock.GetStub(commandList);
         var controller = GetController(repository);
         const string command = "test cmd";
 
@@ -77,7 +79,7 @@ public class TrackerCommandControllerTests
         Func<TrackerTypeEnum, TrackerCommandTransportEnum, ITrackerCommandSender> senderResolver =
             (_, _) => Mock.Of<ITrackerCommandSender>();
         var options = new TrackerOptions { CommandTimeoutSec = 1 };
-        var commandRepo = repo ?? new TrackerCommandRepositoryMock();
+        var commandRepo = repo ?? TrackerCommandRepositoryMock.GetStub(Array.Empty<TrackerCommand>());
 
         var controller = new TrackerCommandController(
             logger, trackerRepo, senderResolver, commandRepo, Options.Create(options)

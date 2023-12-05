@@ -169,14 +169,15 @@ public class MessagesViewControllerTests
     public static IEnumerable<object[]> StatisticsData =>
         new List<object[]>
         {
+            //Запрос статистики по сообщениям, общий случай
             new object[]
             {
                 new MessagesViewStatisticsRequest
                 {
                     VehicleId = 1,
                     ViewMessageType = ViewMessageTypeEnum.DataMessage,
-                    PeriodStart = DateTime.UtcNow.AddHours(-100),
-                    PeriodEnd = DateTime.UtcNow.AddHours(100)
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
                 },
                 new OkObjectResult(new ViewMessageStatisticsDto
                 {
@@ -186,14 +187,15 @@ public class MessagesViewControllerTests
                     MaxSpeed = 12.1
                 })
             },
+            //Запрос статистики по командам, общий случай
             new object[]
             {
                 new MessagesViewStatisticsRequest
                 {
                     VehicleId = 1,
                     ViewMessageType = ViewMessageTypeEnum.CommandMessage,
-                    PeriodStart = DateTime.UnixEpoch.AddHours(-100),
-                    PeriodEnd = DateTime.UnixEpoch.AddHours(100)
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
                 },
                 new OkObjectResult(new ViewMessageStatisticsDto
                 {
@@ -201,36 +203,39 @@ public class MessagesViewControllerTests
                     TotalTime = 20
                 })
             },
+            //Несуществующая машина в запросе
             new object[]
             {
                 new MessagesViewStatisticsRequest
                 {
                     VehicleId = -91001,
                     ViewMessageType = ViewMessageTypeEnum.DataMessage,
-                    PeriodStart = DateTime.UtcNow,
-                    PeriodEnd = DateTime.UtcNow
+                    PeriodStart = SystemTime.UtcNow,
+                    PeriodEnd = SystemTime.UtcNow
                 },
                 new NotFoundObjectResult("Трекер машины с таким id не существует")
             },
+            //Машина без трекера в запросе
             new object[]
             {
                 new MessagesViewStatisticsRequest
                 {
                     VehicleId = 5,
                     ViewMessageType = ViewMessageTypeEnum.DataMessage,
-                    PeriodStart = DateTime.UtcNow,
-                    PeriodEnd = DateTime.UtcNow
+                    PeriodStart = SystemTime.UtcNow,
+                    PeriodEnd = SystemTime.UtcNow
                 },
                 new NotFoundObjectResult("Трекер машины с таким id не существует")
             },
+            //Нет сообщений в периоде
             new object[]
             {
                 new MessagesViewStatisticsRequest
                 {
                     VehicleId = 2,
                     ViewMessageType = ViewMessageTypeEnum.DataMessage,
-                    PeriodStart = DateTime.UtcNow,
-                    PeriodEnd = DateTime.UtcNow
+                    PeriodStart = SystemTime.UtcNow,
+                    PeriodEnd = SystemTime.UtcNow
                 },
                 new OkObjectResult(new ViewMessageStatisticsDto())
             }
@@ -240,6 +245,7 @@ public class MessagesViewControllerTests
     public void GetMessagesViewStatistics(MessagesViewStatisticsRequest request,
         ObjectResult expected)
     {
+        SystemTime.Set(DateTime.UtcNow);
         _testOutputHelper.WriteLine("Request:\n" + JsonSerializer.Serialize(request, _jsonOptions));
 
         var result = GetController().GetMessagesViewStatistics(request);
@@ -252,9 +258,15 @@ public class MessagesViewControllerTests
     public static IEnumerable<object[]> TrackData =>
         new List<object[]>
         {
+            //Общий случай
             new object[]
             {
-                1, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new MessagesViewTrackRequest
+                {
+                    VehicleId = 1, 
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
+                },
                 new OkObjectResult(new MessagesViewTrackResponse
                 {
                     ViewBounds = new ViewBounds
@@ -285,30 +297,47 @@ public class MessagesViewControllerTests
                     }
                 })
             },
+            //Несуществующая машина
             new object[]
             {
-                -13432, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new MessagesViewTrackRequest
+                { 
+                    VehicleId = -13432,
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
+                },
                 new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
             },
+            //Машина без трекера
             new object[]
             {
-                5, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new MessagesViewTrackRequest
+                { 
+                    VehicleId = 5,
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
+                },
                 new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
             },
+            //Машина с трекером без сообщений
             new object[]
             {
-                2, DateTime.UtcNow.AddHours(-100), DateTime.UtcNow.AddHours(100),
+                new MessagesViewTrackRequest
+                {
+                    VehicleId = 2,
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
+                },
                 new OkObjectResult(new MessagesViewTrackResponse())
             }
         };
 
     [Theory, MemberData(nameof(TrackData))]
-    public void GetMessagesViewTrack(int vehicleId,
-        DateTime periodStart, DateTime periodEnd, ObjectResult expected)
+    public void GetMessagesViewTrack(MessagesViewTrackRequest request, ObjectResult expected)
     {
-        _testOutputHelper.WriteLine($"id: {vehicleId}; dates: {periodStart} - {periodEnd}");
+        _testOutputHelper.WriteLine($"id: {request.VehicleId}; dates: {request.PeriodStart} - {request.PeriodEnd}");
 
-        var result = GetController().GetMessagesViewTrack(vehicleId, periodStart, periodEnd);
+        var result = GetController().GetMessagesViewTrack(request);
         
         expected.StatusCode.Should().Be(result.As<ObjectResult>().StatusCode);
         

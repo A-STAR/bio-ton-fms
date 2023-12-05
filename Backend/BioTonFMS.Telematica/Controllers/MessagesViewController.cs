@@ -83,15 +83,15 @@ public class MessagesViewController : ControllerBase
     /// </summary>
     [HttpGet("track")]
     [ProducesResponseType(typeof(MessagesViewTrackResponse), StatusCodes.Status200OK)]
-    public IActionResult GetMessagesViewTrack([FromQuery] int vehicleId,
-        [FromQuery] DateTime periodStart, [FromQuery] DateTime periodEnd)
+    public IActionResult GetMessagesViewTrack([FromQuery] MessagesViewTrackRequest request)
     {
-        if (!_vehicleRepository.GetExternalIds(vehicleId).TryGetValue(vehicleId, out var externalId))
+        if (!_vehicleRepository.GetExternalIds(request.VehicleId).TryGetValue(request.VehicleId, out var externalId))
         {
             return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
         }
         
-        if (!_messageRepository.GetTracks(periodStart.ToUniversalTime(), periodEnd.ToUniversalTime(), externalId)
+        if (!_messageRepository.GetTracks(request.PeriodStart.ToUniversalTime(),
+                    request.PeriodEnd.ToUniversalTime(), externalId)
             .TryGetValue(externalId, out var points))
         {
             return Ok(new MessagesViewTrackResponse());
