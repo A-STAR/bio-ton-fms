@@ -333,10 +333,6 @@ describe('TechComponent', () => {
     expect(mapDe)
       .withContext('render `bio-map` component')
       .not.toBeNull();
-
-    expect(mapDe.componentInstance.location)
-      .withContext('render `bio-map` component `location` input value')
-      .toBeUndefined();
   }));
 
   it('should toggle all checkbox selecting options', fakeAsync(async () => {

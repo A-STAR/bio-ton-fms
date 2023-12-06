@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 
-import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
+import { LocationAndTrackResponse, MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
 import { DataMessageParameter, MessageType } from './messages.component';
 
@@ -39,6 +39,21 @@ export class MessageService {
     return this.httpClient.get<MessageStatistics>('/api/telematica/messagesview/statistics', { params });
   }
 
+  /**
+   * Get messages location and track.
+   *
+   * @param fromObject Message track params options.
+   *
+   * @returns An `Observable` of the `LocationAndTrackResponse` stream.
+   */
+  getTrack(fromObject: MessageTrackOptions) {
+    const paramsOptions: HttpParamsOptions = { fromObject };
+
+    const params = new HttpParams(paramsOptions);
+
+    return this.httpClient.get<LocationAndTrackResponse>('/api/telematica/messagesview/track', { params });
+  }
+
   constructor(private httpClient: HttpClient) { }
 }
 
@@ -49,6 +64,8 @@ export type MessageStatisticsOptions = {
   viewMessageType: MessageType;
   parameterType?: DataMessageParameter;
 };
+
+export type MessageTrackOptions = Pick<MessageStatisticsOptions, 'vehicleId' | 'periodStart' | 'periodEnd'>;
 
 export type MessageStatistics = {
   numberOfMessages: number;
