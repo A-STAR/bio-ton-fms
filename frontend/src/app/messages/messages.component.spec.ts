@@ -18,7 +18,7 @@ import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxo
 
 import { Observable, of } from 'rxjs';
 
-import { MessageService, MessageStatisticsOptions } from './message.service';
+import { MessageService, MessageStatisticsOptions, MessageTrackOptions } from './message.service';
 
 import MessagesComponent, { DataMessageParameter, MessageType, parseTime } from './messages.component';
 import { MapComponent } from '../shared/map/map.component';
@@ -28,7 +28,7 @@ import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.servi
 import { localeID } from '../tech/shared/relative-time.pipe';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
-import { testMessageStatistics } from './message.service.spec';
+import { testMessageLocationAndTrack, testMessageStatistics } from './message.service.spec';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -199,6 +199,10 @@ describe('MessagesComponent', () => {
     expect(mapDe)
       .withContext('render `bio-map` component')
       .not.toBeNull();
+
+    expect(mapDe.componentInstance.location)
+      .withContext('render `bio-map` component `location` input value')
+      .toBeUndefined();
   });
 
   it('should validate required tech selection', fakeAsync(async () => {
@@ -624,8 +628,17 @@ describe('MessagesComponent', () => {
       parameterType: DataMessageParameter.TrackerData
     };
 
+    const testTrackOptions: MessageTrackOptions = {
+      vehicleId: testMonitoringVehicles[0].id,
+      periodStart: startDate.toISOString(),
+      periodEnd: endDate.toISOString()
+    };
+
     spyOn(messageService, 'getStatistics')
       .and.callFake(() => of(testMessageStatistics));
+
+    spyOn(messageService, 'getTrack')
+      .and.callFake(() => of(testMessageLocationAndTrack));
 
     const executeButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -640,6 +653,9 @@ describe('MessagesComponent', () => {
 
     expect(messageService.getStatistics)
       .toHaveBeenCalledWith(testStatisticsOptions);
+
+    expect(messageService.getTrack)
+      .toHaveBeenCalledWith(testTrackOptions);
   }));
 
   it('should render statistics', () => {
@@ -660,7 +676,7 @@ describe('MessagesComponent', () => {
       .toBeNull();
 
     // set data message statistics
-    component['statistics'].next(testMessageStatistics);
+    component['statistics$'] = of(testMessageStatistics);
 
     fixture.detectChanges();
 
@@ -747,7 +763,8 @@ describe('MessagesComponent', () => {
       .withContext('render no description list element')
       .toBeNull();
 
-    component['statistics'].next(testMessageStatistics);
+    // set data message statistics
+    component['statistics$'] = of(testMessageStatistics);
 
     fixture.detectChanges();
 
