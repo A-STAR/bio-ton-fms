@@ -5,11 +5,15 @@
   display: flex
 
 aside
+  overflow-y: scroll
   padding: 10px
+
+  > :last-child
+    margin-bottom: 20px
 
 form,
 dl:not(:last-of-type)
-  margin-bottom: 30px
+  margin-bottom: 40px
 
 form
   display: flex
@@ -64,15 +68,19 @@ h1
   margin-bottom: 20px
   font-size: 15px
 
-dl.statistics
+dl
   display: flex
-  flex-wrap: wrap
   row-gap: 10px
+
+$flex-spacing-horizontal: 10px
+
+dl.statistics
+  flex-wrap: wrap
 
   dt,
   dd
-    padding-left: 10px
-    padding-right: 10px
+    padding-left: $flex-spacing-horizontal
+    padding-right: $flex-spacing-horizontal
     color: $light-dark
 
   dt
@@ -84,3 +92,24 @@ dl.statistics
     flex-basis: 55%
     font-size: 12px
     font-weight: 500
+
+dl.legend
+  flex-direction: column
+
+  dd
+    display: flex
+    align-items: center
+    flex-basis: 100%
+    padding-right: 10px
+    font-size: 11px
+
+    &::before
+      $marker-size: 16px
+
+      content: ''
+      width: $marker-size
+      height: $marker-size
+      margin-left: $flex-spacing-horizontal
+      margin-right: 2 * $flex-spacing-horizontal
+      background-color: var(--marker-background-color)
+      border-radius: 4px

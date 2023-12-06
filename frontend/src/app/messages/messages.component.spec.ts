@@ -729,4 +729,75 @@ describe('MessagesComponent', () => {
         .toBe(DESCRIPTION_TEXTS[index].details);
     });
   });
+
+  it('should render legend', () => {
+    let [, headingDe] = fixture.debugElement.queryAll(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render no heading element')
+      .toBeUndefined();
+
+    let descriptionListDe = fixture.debugElement.query(
+      By.css('dl.legend')
+    );
+
+    expect(descriptionListDe)
+      .withContext('render no description list element')
+      .toBeNull();
+
+    component['statistics'].next(testMessageStatistics);
+
+    fixture.detectChanges();
+
+    [, headingDe] = fixture.debugElement.queryAll(
+      By.css('h1')
+    );
+
+    expect(headingDe)
+      .withContext('render heading element')
+      .toBeDefined();
+
+    expect(headingDe.nativeElement.textContent)
+      .withContext('render heading text')
+      .toBe('Легенда');
+
+    descriptionListDe = fixture.debugElement.query(
+      By.css('dl.legend')
+    );
+
+    const descriptionDetailsDes = descriptionListDe.queryAll(
+      By.css('dd')
+    );
+
+    const DESCRIPTION_TEXTS = [
+      {
+        color: '#699575',
+        details: 'Сообщения из «черного ящика» (от 2 до 10 минут)'
+      },
+      {
+        color: '#8FAB93',
+        details: 'Сообщения из «черного ящика» (от 10 до 30 минут)'
+      },
+      {
+        color: '#CAD8CE',
+        details: 'Сообщения из «черного ящика» (позже 30 минут)'
+      }
+    ];
+
+    descriptionDetailsDes.forEach((descriptionDetailsDe, index) => {
+      const styleAttribute = descriptionDetailsDe.nativeElement.getAttribute('style');
+
+      expect(styleAttribute)
+        .withContext('render description marker background color variable attribute')
+        .toBe(`--marker-background-color: ${DESCRIPTION_TEXTS[index].color};`);
+
+      expect(
+        descriptionDetailsDe.nativeElement.textContent.trim()
+      )
+        .withContext('render description details text')
+        .toBe(DESCRIPTION_TEXTS[index].details);
+    });
+  });
 });
