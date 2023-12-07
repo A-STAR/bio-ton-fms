@@ -1,13 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { MessageService, MessageStatistics, MessageStatisticsOptions } from './message.service';
+import { MessageService, MessageStatistics, MessageStatisticsOptions, MessageTrackOptions } from './message.service';
 
 import { DataMessageParameter, MessageType } from './messages.component';
 
-import { MonitoringVehiclesOptions } from '../tech/tech.service';
+import { LocationAndTrackResponse, MonitoringVehiclesOptions } from '../tech/tech.service';
 
-import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
+import {
+  mockTestFoundMonitoringVehicles,
+  testFindCriterion,
+  testLocationAndTrackResponse,
+  testMonitoringVehicles
+} from '../tech/tech.service.spec';
 
 describe('MessageService', () => {
   let httpTestingController: HttpTestingController;
@@ -139,6 +144,32 @@ describe('MessageService', () => {
 
     statisticsRequest.flush(testMessageStatistics);
   });
+
+  it('should get message track', (done: DoneFn) => {
+    const testMessageTrackOptions: MessageTrackOptions = {
+      vehicleId: testMonitoringVehicles[0].id,
+      periodStart: '2023-05-01T20:00:00.000Z',
+      periodEnd: '2023-05-17T19:59:59.999Z'
+    };
+
+    service
+      .getTrack(testMessageTrackOptions)
+      .subscribe(track => {
+        expect(track)
+          .withContext('get track')
+          .toEqual(testMessageLocationAndTrack);
+
+        done();
+      });
+
+    const statisticsRequest = httpTestingController.expectOne(
+      `/api/telematica/messagesview/track?vehicleId=${testMessageTrackOptions.vehicleId}&periodStart=${testMessageTrackOptions.periodStart
+      }&periodEnd=${testMessageTrackOptions.periodEnd}`,
+      'track request'
+    );
+
+    statisticsRequest.flush(testMessageLocationAndTrack);
+  });
 });
 
 export const testMessageStatistics: MessageStatistics = {
@@ -148,4 +179,9 @@ export const testMessageStatistics: MessageStatistics = {
   mileage: 8895,
   averageSpeed: 25.0,
   maxSpeed: 90.0
+};
+
+export const testMessageLocationAndTrack: LocationAndTrackResponse = {
+  ...testLocationAndTrackResponse,
+  tracks: [testLocationAndTrackResponse.tracks[0]]
 };

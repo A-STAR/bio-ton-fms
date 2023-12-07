@@ -18,19 +18,21 @@ import {
   defer,
   distinctUntilChanged,
   filter,
+  forkJoin,
   map,
   skipWhile,
   startWith,
   switchMap
 } from 'rxjs';
 
-import { MessageService, MessageStatistics, MessageStatisticsOptions } from './message.service';
+import { MessageService, MessageStatistics, MessageStatisticsOptions, MessageTrackOptions } from './message.service';
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
 import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-input.directive';
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
+import { LocationAndTrackResponse } from '../tech/tech.service';
 
 @Component({
   selector: 'bio-messages',
@@ -101,7 +103,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
-  protected statistics = new Subject<MessageStatistics>();
+  protected statistics$!: Observable<MessageStatistics>;
+  protected location$!: Observable<LocationAndTrackResponse>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
 
@@ -183,13 +186,24 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       messageStatisticsOptions.parameterType = parameters;
     }
 
-    this.#subscription = this.messageService
-      .getStatistics(messageStatisticsOptions)
-      .subscribe(statistics => {
-        this.statistics.next(statistics);
+    const messageTrackOptions: MessageTrackOptions = {
+      vehicleId: (tech as MonitoringTech).id,
+      periodStart: startDate.toISOString(),
+      periodEnd: endDate.toISOString()
+    };
+
+    this.#subscription = forkJoin([
+      this.messageService.getStatistics(messageStatisticsOptions),
+      this.messageService.getTrack(messageTrackOptions)
+    ])
+      .subscribe(([statistics, location]) => {
+        this.#statistics$.next(statistics);
+        this.#location$.next(location);
       });
   }
 
+  #location$ = new Subject<LocationAndTrackResponse>();
+  #statistics$ = new Subject<MessageStatistics>();
   #subscription: Subscription | undefined;
 
   /**
@@ -344,7 +358,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     );
   }
 
-  constructor(private fb: FormBuilder, private messageService: MessageService) { }
+  constructor(private fb: FormBuilder, private messageService: MessageService) {
+    this.statistics$ = this.#statistics$.asObservable();
+    this.location$ = this.#location$.asObservable();
+  }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
