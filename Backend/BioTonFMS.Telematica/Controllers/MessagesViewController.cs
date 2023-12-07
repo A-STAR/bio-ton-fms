@@ -115,6 +115,87 @@ public class MessagesViewController : ControllerBase
     [ProducesResponseType(typeof(ViewMessageMessagesDto), StatusCodes.Status200OK)]
     public IActionResult GetMessagesViewMessages([FromQuery] MessagesViewMessagesRequest request)
     {
-        return Ok();
+        return Ok(new ViewMessageMessagesDto
+        {
+            Pagination = new Pagination{ Total = 10, PageIndex = 1},
+            CommandMessages = new[]
+            {
+                new CommandMessageDto
+                {
+                    Channel = "channel",
+                    Num = 1,
+                    CommandText = "text 1",
+                    ExecutionTime = 123,
+                    CommandDateTime = DateTime.UtcNow,
+                    CommandResponseText = "response 1"
+                },
+                new CommandMessageDto
+                {
+                    Channel = "channel",
+                    Num = 2,
+                    CommandText = "text 2",
+                    ExecutionTime = 542,
+                    CommandDateTime = DateTime.UtcNow,
+                    CommandResponseText = "response 2"
+                }
+            },
+            SensorDataMessages = new[]
+            {
+                new SensorDataMessageDto
+                {
+                    Id = 1,
+                    Longitude = 13.13,
+                    Latitude = 23.1,
+                    ServerDateTime = DateTime.Now,
+                    TrackerDateTime = DateTime.Now,
+                    Num = 1,
+                    Altitude = 23.1,
+                    SatNumber = 123,
+                    Speed = 44,
+                    Sensors = new []
+                    {
+                        new TrackerSensorDto
+                        {
+                            Value = "val",
+                            Name = "name",
+                            Unit = "unit"
+                        }
+                    }
+                }
+            },
+            TrackerDataMessages = new[]
+            {
+                new TrackerDataMessageDto
+                {
+                    Id = 1,
+                    Longitude = 12.13,
+                    Latitude = 42.152,
+                    ServerDateTime = DateTime.Now,
+                    TrackerDateTime = DateTime.Now,
+                    Num = 178,
+                    Altitude = 23.1,
+                    SatNumber = 2,
+                    Speed = 66,
+                    Parameters = new []
+                    {
+                        new TrackerParameter
+                        {
+                            ParamName = "param0",
+                            LastValueDateTime = DateTime.MaxValue
+                        },
+                        new TrackerParameter
+                        {
+                            ParamName = "param1",
+                            LastValueDecimal = 34.66
+                        },
+                        new TrackerParameter
+                        {
+                            ParamName = "param2",
+                            LastValueString = "val"
+                        },
+                    }
+                }
+            }
+        });
     }
 }
