@@ -82,7 +82,7 @@ public class MessagesViewController : ControllerBase
     /// Возвращает точки для трека для выбранной машины и периода
     /// </summary>
     [HttpGet("track")]
-    [ProducesResponseType(typeof(MessagesViewTrackResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
     public IActionResult GetMessagesViewTrack([FromQuery] MessagesViewTrackRequest request)
     {
         if (!_vehicleRepository.GetExternalIds(request.VehicleId).TryGetValue(request.VehicleId, out var externalId))
@@ -94,15 +94,28 @@ public class MessagesViewController : ControllerBase
                     request.PeriodEnd.ToUniversalTime(), externalId)
             .TryGetValue(externalId, out var points))
         {
-            return Ok(new MessagesViewTrackResponse());
+            return Ok(new LocationsAndTracksResponse());
         }
 
         ViewBounds? viewBounds = TelematicaHelpers.CalculateViewBounds(points);
+        string name = _vehicleRepository.GetNames(request.VehicleId)[request.VehicleId];
+        (double Lat, double Long) location =
+            _messageRepository.GetLocations(externalId)[externalId];
 
-        return Ok(new MessagesViewTrackResponse
+        return Ok(new LocationsAndTracksResponse
         {
             ViewBounds = viewBounds,
-            Track = points
+            Tracks = new List<LocationAndTrack>
+            {
+                new ()
+                {
+                    Longitude = location.Long,
+                    Latitude = location.Lat,
+                    VehicleId = request.VehicleId,
+                    VehicleName = name,
+                    Track = points
+                }
+            }
         });
     }
 }

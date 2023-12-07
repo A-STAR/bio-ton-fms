@@ -263,11 +263,11 @@ public class MessagesViewControllerTests
             {
                 new MessagesViewTrackRequest
                 {
-                    VehicleId = 1, 
+                    VehicleId = 1,
                     PeriodStart = SystemTime.UtcNow.AddHours(-100),
                     PeriodEnd = SystemTime.UtcNow.AddHours(100)
                 },
-                new OkObjectResult(new MessagesViewTrackResponse
+                new OkObjectResult(new LocationsAndTracksResponse
                 {
                     ViewBounds = new ViewBounds
                     {
@@ -276,23 +276,35 @@ public class MessagesViewControllerTests
                         BottomRightLatitude = 42.082023,
                         BottomRightLongitude = 54.656861
                     },
-                    Track = new List<TrackPointInfo>
+                    Tracks = new List<LocationAndTrack>
                     {
                         new()
                         {
-                            MessageId = 1,
-                            Latitude = 49.432023,
-                            Longitude = 52.556861,
-                            Speed = null,
-                            NumberOfSatellites = 12
-                        },
-                        new()
-                        {
-                            MessageId = 2,
-                            Latitude = 42.432023,
-                            Longitude = 54.556861,
-                            Speed = 12.1,
-                            NumberOfSatellites = 14
+                            VehicleId = 1,
+                            Latitude = 42.432023000000001,
+                            Longitude = 54.556860999999998,
+                            VehicleName = "Красная машина",
+                            Track = new TrackPointInfo[]
+                            {
+                                new()
+                                {
+                                    MessageId = 1,
+                                    Latitude = 49.432023,
+                                    Longitude = 52.556861,
+                                    Speed = null,
+                                    NumberOfSatellites = 12,
+                                    Time = SystemTime.WithNegativeDelta(TimeSpan.FromSeconds(40))
+                                },
+                                new()
+                                {
+                                    MessageId = 2,
+                                    Latitude = 42.432023,
+                                    Longitude = 54.556861,
+                                    Speed = 12.1,
+                                    NumberOfSatellites = 14,
+                                    Time = SystemTime.WithNegativeDelta(TimeSpan.FromSeconds(30))
+                                }
+                            }
                         }
                     }
                 })
@@ -301,7 +313,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 new MessagesViewTrackRequest
-                { 
+                {
                     VehicleId = -13432,
                     PeriodStart = SystemTime.UtcNow.AddHours(-100),
                     PeriodEnd = SystemTime.UtcNow.AddHours(100)
@@ -312,7 +324,7 @@ public class MessagesViewControllerTests
             new object[]
             {
                 new MessagesViewTrackRequest
-                { 
+                {
                     VehicleId = 5,
                     PeriodStart = SystemTime.UtcNow.AddHours(-100),
                     PeriodEnd = SystemTime.UtcNow.AddHours(100)
@@ -328,7 +340,7 @@ public class MessagesViewControllerTests
                     PeriodStart = SystemTime.UtcNow.AddHours(-100),
                     PeriodEnd = SystemTime.UtcNow.AddHours(100)
                 },
-                new OkObjectResult(new MessagesViewTrackResponse())
+                new OkObjectResult(new LocationsAndTracksResponse())
             }
         };
 
@@ -338,23 +350,14 @@ public class MessagesViewControllerTests
         _testOutputHelper.WriteLine($"id: {request.VehicleId}; dates: {request.PeriodStart} - {request.PeriodEnd}");
 
         var result = GetController().GetMessagesViewTrack(request);
-        
+
         expected.StatusCode.Should().Be(result.As<ObjectResult>().StatusCode);
-        
+
         if (expected.StatusCode == 200)
         {
-            var actual = result.As<OkObjectResult>().Value.As<MessagesViewTrackResponse>();
-            
-            expected.Value.As<MessagesViewTrackResponse>().Track
-                .Should().Equal(actual.Track, (x, y) =>
-                    x.Longitude.Equals(y.Longitude) &&
-                    x.Latitude.Equals(y.Latitude) &&
-                    x.MessageId.Equals(y.MessageId) &&
-                    x.NumberOfSatellites.Equals(y.NumberOfSatellites) &&
-                    x.Speed.Equals(y.Speed));
-            
-            expected.Value.As<MessagesViewTrackResponse>().ViewBounds
-                .Should().BeEquivalentTo(actual.ViewBounds);
+            var actual = result.As<OkObjectResult>().Value.As<LocationsAndTracksResponse>();
+
+            actual.Should().BeEquivalentTo(expected.Value);
         }
         else
         {
