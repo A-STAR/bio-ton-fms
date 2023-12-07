@@ -1,5 +1,5 @@
 using BioTonFMS.Domain;
-using BioTonFMS.Domain.MessageStatistics;
+using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Infrastructure;
 using BioTonFMS.Infrastructure.EF;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;

@@ -1,5 +1,5 @@
 using BioTonFMS.Domain;
-using BioTonFMS.Domain.MessageStatistics;
+using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Infrastructure.Persistence;
 using BioTonFMS.Infrastructure.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
