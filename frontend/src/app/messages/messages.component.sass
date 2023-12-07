@@ -3,6 +3,7 @@
 
 \:host
   display: flex
+  flex-wrap: wrap
 
 aside
   overflow-y: scroll
@@ -113,3 +114,15 @@ dl.legend
       margin-right: 2 * $flex-spacing-horizontal
       background-color: var(--marker-background-color)
       border-radius: 4px
+
+$messages-height: 50vh
+
+bio-map
+  margin-bottom: $messages-height
+
+#messages
+  flex-basis: 100%
+  height: $messages-height
+  margin-top: - $messages-height
+  margin-left: $map-aside-width
+  background-color: $white
