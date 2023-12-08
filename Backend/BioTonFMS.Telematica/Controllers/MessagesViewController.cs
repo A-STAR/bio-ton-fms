@@ -1,6 +1,7 @@
 using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.MessagesView;
+using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
@@ -94,13 +95,13 @@ public class MessagesViewController : ControllerBase
         
         if (!_messageRepository.GetTracks(request.PeriodStart.ToUniversalTime(),
                     request.PeriodEnd.ToUniversalTime(), externalId)
-            .TryGetValue(externalId, out var points))
+            .TryGetValue(externalId, out TrackPointInfo[]? points))
         {
             return Ok(new LocationsAndTracksResponse());
         }
 
         ViewBounds? viewBounds = TelematicaHelpers.CalculateViewBounds(points);
-        string name = _vehicleRepository.GetNames(request.VehicleId)[request.VehicleId];
+        string name = _vehicleRepository.GetNamesWhereTrackerNotEmpty(request.VehicleId)[request.VehicleId];
         (double Lat, double Long) location =
             _messageRepository.GetLocations(externalId)[externalId];
 
