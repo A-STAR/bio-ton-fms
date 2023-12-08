@@ -14,6 +14,7 @@ import {
   Observable,
   Subject,
   Subscription,
+  asapScheduler,
   debounceTime,
   defer,
   distinctUntilChanged,
@@ -141,6 +142,21 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     const parametersControl = this.selectionForm.get('message.parameters');
 
     value === MessageType.DataMessage ? parametersControl?.enable() : parametersControl?.disable();
+  }
+
+  /**
+   * Reset selection form default values.
+   */
+  protected onResetSelectionForm() {
+    asapScheduler.schedule(() => {
+      this.selectionForm
+        .get('range.start.time')
+        ?.setValue('00:00');
+
+      this.selectionForm
+        .get('range.end.time')
+        ?.setValue('00:00');
+    }, 1);
   }
 
   /**
