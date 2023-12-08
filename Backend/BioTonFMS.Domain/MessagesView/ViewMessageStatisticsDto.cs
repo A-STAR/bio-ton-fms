@@ -1,4 +1,4 @@
-namespace BioTonFMS.Domain.MessageStatistics;
+namespace BioTonFMS.Domain.MessagesView;
 
 public class ViewMessageStatisticsDto
 {

@@ -1,7 +1,7 @@
 using System.Collections;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
-using BioTonFMS.Domain.MessageStatistics;
+using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;

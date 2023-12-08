@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using AutoMapper;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
-using BioTonFMS.Domain.MessageStatistics;
+using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Telematica.Controllers;

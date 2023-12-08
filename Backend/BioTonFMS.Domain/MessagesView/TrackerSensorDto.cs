@@ -1,4 +1,4 @@
-namespace BioTonFMS.Telematica.Dtos.Monitoring;
+namespace BioTonFMS.Domain.MessagesView;
 
 public class TrackerSensorDto
 {
