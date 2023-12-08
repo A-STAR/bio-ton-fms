@@ -108,7 +108,7 @@ public class MonitoringController : ValidationControllerBase
         IDictionary<int, int> externalIds = _vehicleRepository.GetExternalIds(
             requests.Select(x => x.VehicleId).ToArray());
 
-        IDictionary<int, string> names = _vehicleRepository.GetNames(
+        IDictionary<int, string> names = _vehicleRepository.GetNamesWhereTrackerNotEmpty(
             requests.Select(x => x.VehicleId).ToArray());
 
         IDictionary<int, (double Lat, double Long)> locations = _messageRepository.GetLocations(externalIds.Values.ToArray());

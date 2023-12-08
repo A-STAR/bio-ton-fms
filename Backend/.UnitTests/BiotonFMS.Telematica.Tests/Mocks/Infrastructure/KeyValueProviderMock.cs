@@ -7,10 +7,12 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
         where TEntity : class, IEntity<TKey> 
     {
         private readonly ICollection<TEntity> _collection;
+        private int _seq;
 
         public KeyValueProviderMock(ICollection<TEntity> collection)
         {
             _collection = collection ?? throw new ArgumentNullException(nameof(collection));
+            _seq = 0;
         }
 
         /// <inheritdoc />
@@ -38,6 +40,13 @@ namespace BiotonFMS.Telematica.Tests.Mocks.Infrastructure
             {
                 throw new ArgumentNullException(nameof(entity));
             }
+
+            var idProp = typeof(TEntity).GetProperty("Id");
+            if (idProp?.PropertyType == typeof(int))
+            {
+                idProp.SetValue(entity, _seq++);
+            }
+            
             if (!_collection.Contains(entity))
             {
                 _collection.Add(entity);

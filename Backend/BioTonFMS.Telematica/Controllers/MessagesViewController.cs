@@ -1,6 +1,7 @@
 using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.MessagesView;
+using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
@@ -84,27 +85,40 @@ public class MessagesViewController : ControllerBase
     /// Возвращает точки для трека для выбранной машины и периода
     /// </summary>
     [HttpGet("track")]
-    [ProducesResponseType(typeof(MessagesViewTrackResponse), StatusCodes.Status200OK)]
-    public IActionResult GetMessagesViewTrack([FromQuery] int vehicleId,
-        [FromQuery] DateTime periodStart, [FromQuery] DateTime periodEnd)
+    [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
+    public IActionResult GetMessagesViewTrack([FromQuery] MessagesViewTrackRequest request)
     {
-        if (!_vehicleRepository.GetExternalIds(vehicleId).TryGetValue(vehicleId, out var externalId))
+        if (!_vehicleRepository.GetExternalIds(request.VehicleId).TryGetValue(request.VehicleId, out var externalId))
         {
             return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
         }
         
-        if (!_messageRepository.GetTracks(periodStart.ToUniversalTime(), periodEnd.ToUniversalTime(), externalId)
-            .TryGetValue(externalId, out var points))
+        if (!_messageRepository.GetTracks(request.PeriodStart.ToUniversalTime(),
+                    request.PeriodEnd.ToUniversalTime(), externalId)
+            .TryGetValue(externalId, out TrackPointInfo[]? points))
         {
-            return Ok(new MessagesViewTrackResponse());
+            return Ok(new LocationsAndTracksResponse());
         }
 
         ViewBounds? viewBounds = TelematicaHelpers.CalculateViewBounds(points);
+        string name = _vehicleRepository.GetNamesWhereTrackerNotEmpty(request.VehicleId)[request.VehicleId];
+        (double Lat, double Long) location =
+            _messageRepository.GetLocations(externalId)[externalId];
 
-        return Ok(new MessagesViewTrackResponse
+        return Ok(new LocationsAndTracksResponse
         {
             ViewBounds = viewBounds,
-            Track = points
+            Tracks = new List<LocationAndTrack>
+            {
+                new ()
+                {
+                    Longitude = location.Long,
+                    Latitude = location.Lat,
+                    VehicleId = request.VehicleId,
+                    VehicleName = name,
+                    Track = points
+                }
+            }
         });
     }
 

@@ -1,3 +1,4 @@
+using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain.MessagesView;
 using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
@@ -22,8 +23,8 @@ public class TrackerCommandRepositoryTests
             new object[]
             {
                 2552,
-                DateTime.UnixEpoch.AddHours(-100),
-                DateTime.UnixEpoch.AddHours(100),
+                SystemTime.UtcNow.AddHours(-100),
+                SystemTime.UtcNow.AddHours(100),
                 new ViewMessageStatisticsDto
                 {
                     NumberOfMessages = 3,
@@ -33,8 +34,8 @@ public class TrackerCommandRepositoryTests
             new object[]
             {
                 1555,
-                DateTime.UnixEpoch.AddHours(-100),
-                DateTime.UnixEpoch.AddHours(100),
+                SystemTime.UtcNow.AddHours(-100),
+                SystemTime.UtcNow.AddHours(100),
                 new ViewMessageStatisticsDto
                 {
                     NumberOfMessages = 0
@@ -43,8 +44,8 @@ public class TrackerCommandRepositoryTests
             new object[]
             {
                 -12938,
-                DateTime.UnixEpoch.AddHours(-100),
-                DateTime.UnixEpoch.AddHours(100),
+                SystemTime.UtcNow.AddHours(-100),
+                SystemTime.UtcNow.AddHours(100),
                 new ViewMessageStatisticsDto()
             },
         };

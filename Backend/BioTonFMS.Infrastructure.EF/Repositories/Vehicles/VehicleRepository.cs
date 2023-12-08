@@ -145,7 +145,7 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.Vehicles
                 .Where(x => vehicleIds.Contains(x.Id) && x.Tracker != null)
                 .ToDictionary(x => x.Id, x => x.Tracker!.ExternalId);
 
-        public IDictionary<int, string> GetNames(int[] vehicleIds) =>
+        public IDictionary<int, string> GetNamesWhereTrackerNotEmpty(params int[] vehicleIds) =>
             QueryableProvider.Fetch(x => x.Tracker)
                 .Linq()
                 .Where(x => vehicleIds.Contains(x.Id) && x.Tracker != null)
