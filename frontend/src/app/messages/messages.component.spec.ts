@@ -541,6 +541,48 @@ describe('MessagesComponent', () => {
       });
   }));
 
+  it('should reset selection form range time', fakeAsync(async () => {
+    const startTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время начала'
+      })
+    );
+
+    const endTimeInput = await loader.getHarness(
+      MatInputHarness.with({
+        placeholder: 'Время конца'
+      })
+    );
+
+    startTimeInput.setValue('');
+    endTimeInput.setValue('23:59');
+
+    const resetButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[type="reset"]',
+        text: 'Очистить',
+        variant: 'stroked'
+      })
+    );
+
+    await resetButton.click();
+
+    tick(1);
+
+    await expectAsync(
+      startTimeInput.getValue()
+    )
+      .withContext('reset start time default value')
+      .toBeResolvedTo('00:00');
+
+    await expectAsync(
+      endTimeInput.getValue()
+    )
+      .withContext('reset end time default value')
+      .toBeResolvedTo('00:00');
+  }));
+
   it('should submit invalid selection form', fakeAsync(async () => {
     spyOn(messageService, 'getStatistics')
       .and.callThrough();
