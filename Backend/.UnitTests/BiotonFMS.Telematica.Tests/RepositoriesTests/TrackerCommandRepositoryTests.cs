@@ -1,3 +1,4 @@
+using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain.MessagesView;
 using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
