@@ -11,6 +11,7 @@ import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
 import {
+  BehaviorSubject,
   Observable,
   Subject,
   Subscription,
@@ -19,14 +20,20 @@ import {
   defer,
   distinctUntilChanged,
   filter,
-  forkJoin,
   map,
   skipWhile,
   startWith,
   switchMap
 } from 'rxjs';
 
-import { MessageService, MessageStatistics, MessageStatisticsOptions, MessageTrackOptions } from './message.service';
+import {
+  MessageService,
+  MessageStatistics,
+  MessageStatisticsOptions,
+  MessageTrackOptions,
+  Messages,
+  MessagesOptions
+} from './message.service';
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
 import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-input.directive';
@@ -104,8 +111,9 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
-  protected statistics$!: Observable<MessageStatistics>;
-  protected location$!: Observable<LocationAndTrackResponse>;
+  protected messages$?: Observable<Messages>;
+  protected location$?: Observable<LocationAndTrackResponse>;
+  protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
 
@@ -164,7 +172,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    *
    * Get message statistics.
    */
-  protected submitSelectionForm() {
+  protected async submitSelectionForm() {
     this.#subscription?.unsubscribe();
 
     const { invalid, value } = this.selectionForm;
@@ -191,7 +199,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     endDate.setHours(endHours);
     endDate.setMinutes(endMinutes);
 
-    const messageStatisticsOptions: MessageStatisticsOptions = {
+    const messagesOptions: MessagesOptions = {
       vehicleId: (tech as MonitoringTech).id,
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString(),
@@ -199,8 +207,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     };
 
     if (parameters) {
-      messageStatisticsOptions.parameterType = parameters;
+      messagesOptions.parameterType = parameters;
     }
+
+    const messageStatisticsOptions: MessageStatisticsOptions = { ...messagesOptions };
 
     const messageTrackOptions: MessageTrackOptions = {
       vehicleId: (tech as MonitoringTech).id,
@@ -208,16 +218,26 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       periodEnd: endDate.toISOString()
     };
 
-    this.#subscription = forkJoin([
-      this.messageService.getStatistics(messageStatisticsOptions),
-      this.messageService.getTrack(messageTrackOptions)
-    ])
-      .subscribe(([statistics, location]) => {
-        this.#statistics$.next(statistics);
+    this.#messages$.next(messagesOptions);
+
+    let subscription = this.messageService
+      .getTrack(messageTrackOptions)
+      .subscribe(location => {
         this.#location$.next(location);
       });
+
+    this.#subscription?.add(subscription);
+
+    subscription = this.messageService
+      .getStatistics(messageStatisticsOptions)
+      .subscribe(statistics => {
+        this.#statistics$.next(statistics);
+      });
+
+    this.#subscription?.add(subscription);
   }
 
+  #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
   #location$ = new Subject<LocationAndTrackResponse>();
   #statistics$ = new Subject<MessageStatistics>();
   #subscription: Subscription | undefined;
@@ -374,15 +394,26 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Set messages.
+   */
+  #setMessages() {
+    this.messages$ = this.#messages$.pipe(
+      filter((value): value is MessagesOptions => value !== undefined),
+      switchMap(messagesOptions => this.messageService.getMessages(messagesOptions))
+    );
+  }
+
   constructor(private fb: FormBuilder, private messageService: MessageService) {
-    this.statistics$ = this.#statistics$.asObservable();
     this.location$ = this.#location$.asObservable();
+    this.statistics$ = this.#statistics$.asObservable();
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#initSelectionForm();
     this.#setTech();
+    this.#setMessages();
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering

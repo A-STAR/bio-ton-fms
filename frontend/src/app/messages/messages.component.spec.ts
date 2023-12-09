@@ -18,7 +18,7 @@ import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxo
 
 import { Observable, of } from 'rxjs';
 
-import { MessageService, MessageStatisticsOptions, MessageTrackOptions } from './message.service';
+import { MessageService, MessageStatisticsOptions, MessageTrackOptions, MessagesOptions } from './message.service';
 
 import MessagesComponent, { DataMessageParameter, MessageType, parseTime } from './messages.component';
 import { MapComponent } from '../shared/map/map.component';
@@ -28,7 +28,7 @@ import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.servi
 import { localeID } from '../tech/shared/relative-time.pipe';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
-import { testMessageLocationAndTrack, testMessageStatistics } from './message.service.spec';
+import { testMessageLocationAndTrack, testMessageStatistics, testTrackerMessages } from './message.service.spec';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -662,12 +662,16 @@ describe('MessagesComponent', () => {
     const startDate = new Date(year, monthIndex, day, startHours, startMinutes);
     const endDate = new Date(year, monthIndex, day, endHours, endMinutes);
 
-    const testStatisticsOptions: MessageStatisticsOptions = {
+    const testMessagesOptions: MessagesOptions = {
       vehicleId: testMonitoringVehicles[0].id,
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString(),
       viewMessageType: MessageType.DataMessage,
       parameterType: DataMessageParameter.TrackerData
+    };
+
+    const testStatisticsOptions: MessageStatisticsOptions = {
+      ...testMessagesOptions
     };
 
     const testTrackOptions: MessageTrackOptions = {
@@ -676,11 +680,14 @@ describe('MessagesComponent', () => {
       periodEnd: endDate.toISOString()
     };
 
-    spyOn(messageService, 'getStatistics')
-      .and.callFake(() => of(testMessageStatistics));
+    spyOn(messageService, 'getMessages')
+      .and.callFake(() => of(testTrackerMessages));
 
     spyOn(messageService, 'getTrack')
       .and.callFake(() => of(testMessageLocationAndTrack));
+
+    spyOn(messageService, 'getStatistics')
+      .and.callFake(() => of(testMessageStatistics));
 
     const executeButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -693,11 +700,14 @@ describe('MessagesComponent', () => {
 
     await executeButton.click();
 
-    expect(messageService.getStatistics)
-      .toHaveBeenCalledWith(testStatisticsOptions);
+    expect(messageService.getMessages)
+      .toHaveBeenCalledWith(testMessagesOptions);
 
     expect(messageService.getTrack)
       .toHaveBeenCalledWith(testTrackOptions);
+
+    expect(messageService.getStatistics)
+      .toHaveBeenCalledWith(testStatisticsOptions);
   }));
 
   it('should render statistics', () => {
