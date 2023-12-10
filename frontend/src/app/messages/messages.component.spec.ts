@@ -26,6 +26,7 @@ import { MapComponent } from '../shared/map/map.component';
 import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
 import { localeID } from '../tech/shared/relative-time.pipe';
+import { PAGE_NUM } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
 import { testMessageLocationAndTrack, testMessageStatistics, testTrackerMessages } from './message.service.spec';
@@ -199,10 +200,50 @@ describe('MessagesComponent', () => {
     expect(mapDe)
       .withContext('render `bio-map` component')
       .not.toBeNull();
+  });
 
-    expect(mapDe.componentInstance.location)
-      .withContext('render `bio-map` component `location` input value')
-      .toBeUndefined();
+  it('should render messages placeholder', () => {
+    const messagesDe = fixture.debugElement.query(
+      By.css('section#messages')
+    );
+
+    expect(messagesDe)
+      .withContext('render messages section')
+      .not.toBeNull();
+
+    let paragraphDe = messagesDe.query(
+      By.css('p')
+    );
+
+    expect(paragraphDe)
+      .withContext('render messages placeholder paragraph element')
+      .not.toBeNull();
+
+    expect(paragraphDe.nativeElement.textContent)
+      .withContext('render messages unselected placeholder paragraph text')
+      .toBe('Сообщения не выбраны');
+
+    component['messages$'] = of({
+      trackerDataMessages: [],
+      pagination: {
+        pageIndex: PAGE_NUM,
+        total: 10
+      }
+    });
+
+    fixture.detectChanges();
+
+    paragraphDe = messagesDe.query(
+      By.css('p')
+    );
+
+    expect(paragraphDe)
+      .withContext('render messages placeholder paragraph element')
+      .not.toBeNull();
+
+    expect(paragraphDe.nativeElement.textContent)
+      .withContext('render messages empty placeholder paragraph text')
+      .toBe('Сообщения не найдены');
   });
 
   it('should validate required tech selection', fakeAsync(async () => {

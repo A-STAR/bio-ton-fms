@@ -121,8 +121,21 @@ bio-map
   margin-bottom: $messages-height
 
 #messages
+  position: relative
   flex-basis: 100%
   height: $messages-height
   margin-top: - $messages-height
   margin-left: $map-aside-width
   background-color: $white
+
+  p
+    position: absolute
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 100%
+    height: 100%
+    background-color: $light
+    color: $green
+    font-size: 14px
+    text-align: center

@@ -193,5 +193,16 @@
 <bio-map [location]="location$ | async"></bio-map>
 
 <section id="messages">
-  <ng-container *ngIf="messages$ | async"></ng-container>
+  <ng-container *ngIf="messages$ | async as messages; else unselected">
+    <ng-container *ngIf="(messages.trackerDataMessages || messages.sensorDataMessages
+      || messages.commandMessages)?.length; else empty"></ng-container>
+
+    <ng-template #empty>
+      <p>Сообщения не найдены</p>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #unselected>
+    <p>Сообщения не выбраны</p>
+  </ng-template>
 </section>
