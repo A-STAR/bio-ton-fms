@@ -236,7 +236,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     }
 
     /// <summary>
-    /// Информация о перемещении трекеров за сутки
+    /// Информация о перемещении трекеров за выбранный период
     /// </summary>
     /// <param name="trackStartTime">Начало периода</param>
     /// <param name="trackEndTime">Конец периода</param>
