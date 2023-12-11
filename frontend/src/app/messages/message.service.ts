@@ -93,7 +93,7 @@ export type MessageStatisticsOptions = Exclude<MessagesOptions, 'pageNum' | 'pag
 
 export type MessageTrackOptions = Pick<MessagesOptions, 'vehicleId' | 'periodStart' | 'periodEnd'>;
 
-type DataMessage = {
+export type DataMessage = {
   id: number;
   num: number;
   serverDateTime: string;
@@ -105,11 +105,11 @@ type DataMessage = {
   altitude?: number;
 };
 
-type TrackerMessage = DataMessage & {
+export type TrackerMessage = DataMessage & {
   parameters: TrackerParameter[];
 };
 
-type SensorMessage = DataMessage & {
+export type SensorMessage = DataMessage & {
   sensors: Sensor[];
 };
 

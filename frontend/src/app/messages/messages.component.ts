@@ -23,16 +23,19 @@ import {
   map,
   skipWhile,
   startWith,
-  switchMap
+  switchMap,
+  tap
 } from 'rxjs';
 
 import {
+  DataMessage,
   MessageService,
   MessageStatistics,
   MessageStatisticsOptions,
   MessageTrackOptions,
   Messages,
-  MessagesOptions
+  MessagesOptions,
+  TrackerMessage
 } from './message.service';
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
@@ -40,6 +43,7 @@ import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-i
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
+import { TableDataSource } from '../directory-tech/shared/table/table.data-source';
 import { LocationAndTrackResponse } from '../tech/tech.service';
 
 @Component({
@@ -109,9 +113,19 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       );
   }
 
+  /**
+   * Get message options.
+   *
+   * @returns `MessagesOptions` value.
+   */
+  get #options() {
+    return Object.freeze(this.#messages$.value);
+  }
+
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
   protected messages$?: Observable<Messages>;
+  protected messagesDataSource?: TableDataSource<TrackerMessageDataSource>;
   protected location$?: Observable<LocationAndTrackResponse>;
   protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
@@ -395,12 +409,72 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Map messages data source.
+   *
+   * @param messages Messages with pagination.
+   *
+   * @returns Mapped `TrackerMessageDataSource`.
+   */
+  #mapTrackerMessagesDataSource({ trackerDataMessages }: Messages) {
+    return Object
+      .freeze(trackerDataMessages!)
+      .map(({
+        id,
+        num: position,
+        serverDateTime: registration,
+        trackerDateTime: time,
+        speed,
+        latitude,
+        longitude,
+        altitude,
+        satNumber: satellites,
+        parameters
+      }): TrackerMessageDataSource => ({
+        id,
+        position,
+        time,
+        registration,
+        speed,
+        location: { latitude, longitude, satellites },
+        altitude,
+        parameters
+      }));
+  }
+
+  /**
+   * Initialize `TableDataSource` and set messages data source.
+   *
+   * @param messages Messages.
+   */
+  #setMessagesDataSource(messages: Messages) {
+    let messagesDataSource: TrackerMessageDataSource[] | undefined;
+
+    switch (this.#options?.viewMessageType) {
+      case MessageType.DataMessage:
+
+        switch (this.#options.parameterType) {
+          case DataMessageParameter.TrackerData:
+            messagesDataSource = this.#mapTrackerMessagesDataSource(messages);
+        }
+    }
+
+    if (this.messagesDataSource) {
+      this.messagesDataSource.setDataSource(messagesDataSource!);
+    } else {
+      this.messagesDataSource = new TableDataSource(messagesDataSource!);
+    }
+  }
+
+  /**
    * Set messages.
    */
   #setMessages() {
     this.messages$ = this.#messages$.pipe(
       filter((value): value is MessagesOptions => value !== undefined),
-      switchMap(messagesOptions => this.messageService.getMessages(messagesOptions))
+      switchMap(messagesOptions => this.messageService.getMessages(messagesOptions)),
+      tap(messages => {
+        this.#setMessagesDataSource(messages);
+      })
     );
   }
 
@@ -422,6 +496,16 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 }
 
+export enum MessageType {
+  DataMessage = 'dataMessage',
+  CommandMessage = 'commandMessage'
+}
+
+export enum DataMessageParameter {
+  TrackerData = 'trackerData',
+  SensorData = 'sensorData'
+}
+
 type MessageSelectionForm = FormGroup<{
   tech: FormControl<MonitoringTech | string | undefined>;
   range: FormGroup<{
@@ -440,14 +524,15 @@ type MessageSelectionForm = FormGroup<{
   }>;
 }>;
 
-export enum MessageType {
-  DataMessage = 'dataMessage',
-  CommandMessage = 'commandMessage'
-}
-
-export enum DataMessageParameter {
-  TrackerData = 'trackerData',
-  SensorData = 'sensorData'
+interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Pick<TrackerMessage, 'parameters'> {
+  position: DataMessage['num'];
+  time?: DataMessage['trackerDateTime'];
+  registration: DataMessage['serverDateTime'];
+  location?: {
+    latitude: DataMessage['latitude'];
+    longitude: DataMessage['longitude'];
+    satellites: DataMessage['satNumber'];
+  };
 }
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;

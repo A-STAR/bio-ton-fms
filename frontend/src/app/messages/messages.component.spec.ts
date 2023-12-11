@@ -749,6 +749,10 @@ describe('MessagesComponent', () => {
 
     expect(messageService.getStatistics)
       .toHaveBeenCalledWith(testStatisticsOptions);
+
+    /* Coverage for updating messages data source */
+
+    await executeButton.click();
   }));
 
   it('should render statistics', () => {

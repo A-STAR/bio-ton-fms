@@ -167,7 +167,7 @@ describe('TrackerParametersHistoryDialogComponent', () => {
     cellTexts.forEach((rowCellTexts, index) => {
       const { time, latitude, longitude, altitude, speed } = testParametersHistory.parameters[index];
 
-      const hash = index + 1;
+      const position = index + 1;
 
       const formattedTime = formatDate(time, dateFormat, localeID);
 
@@ -175,7 +175,7 @@ describe('TrackerParametersHistoryDialogComponent', () => {
       let formattedLongitude: string | undefined;
       let formattedAltitude: string | undefined;
       let formattedSpeed: string | undefined;
-      let coordinates: string | undefined;
+      let location: string | undefined;
 
       if (latitude) {
         formattedLatitude = formatNumber(latitude, 'en-US', '1.6-6');
@@ -185,8 +185,8 @@ describe('TrackerParametersHistoryDialogComponent', () => {
         formattedLongitude = formatNumber(longitude, 'en-US', '1.6-6');
       }
 
-      if (latitude && longitude) {
-        coordinates = `${formattedLatitude} ${formattedLongitude}`;
+      if (formattedLatitude && formattedLongitude) {
+        location = `${formattedLatitude} ${formattedLongitude}`;
       }
 
       if (altitude) {
@@ -197,7 +197,7 @@ describe('TrackerParametersHistoryDialogComponent', () => {
         formattedSpeed = formatNumber(speed, 'en-US', '1.1-1');
       }
 
-      const parametersHistoryTexts = [hash, formattedTime, formattedSpeed, coordinates, formattedAltitude].map(
+      const parametersHistoryTexts = [position, formattedTime, formattedSpeed, location, formattedAltitude].map(
         value => value?.toString() ?? ''
       );
 
