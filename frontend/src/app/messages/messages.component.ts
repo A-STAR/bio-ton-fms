@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 
@@ -130,6 +130,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
+  protected columns?: KeyValue<MessageColumn, string>[];
+  protected columnKeys?: string[];
 
   /**
    * Map a tech option's control value to its name display value in the trigger.
@@ -409,6 +411,23 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Set columns, column keys.
+   */
+  #setColumns() {
+    switch (this.#options?.viewMessageType) {
+      case MessageType.DataMessage:
+        this.columns = dataMessageColumns;
+
+        switch (this.#options.parameterType) {
+          case DataMessageParameter.TrackerData:
+            this.columns = this.columns.concat(trackerMessageColumns);
+        }
+    }
+
+    this.columnKeys = this.columns?.map(({ key }) => key);
+  }
+
+  /**
    * Map messages data source.
    *
    * @param messages Messages with pagination.
@@ -466,13 +485,14 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Set messages.
+   * Set messages, message type.
    */
   #setMessages() {
     this.messages$ = this.#messages$.pipe(
       filter((value): value is MessagesOptions => value !== undefined),
       switchMap(messagesOptions => this.messageService.getMessages(messagesOptions)),
       tap(messages => {
+        this.#setColumns();
         this.#setMessagesDataSource(messages);
       })
     );
@@ -506,6 +526,16 @@ export enum DataMessageParameter {
   SensorData = 'sensorData'
 }
 
+enum MessageColumn {
+  Position = 'position',
+  Time = 'time',
+  Registration = 'registration',
+  Speed = 'speed',
+  Location = 'location',
+  Altitude = 'altitude',
+  Parameters = 'parameters'
+}
+
 type MessageSelectionForm = FormGroup<{
   tech: FormControl<MonitoringTech | string | undefined>;
   range: FormGroup<{
@@ -536,6 +566,40 @@ interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'a
 }
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
+
+const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
+  {
+    key: MessageColumn.Position,
+    value: '#'
+  },
+  {
+    key: MessageColumn.Time,
+    value: 'Время устройства'
+  },
+  {
+    key: MessageColumn.Registration,
+    value: 'Время системы'
+  },
+  {
+    key: MessageColumn.Speed,
+    value: 'Скорость, км/ч'
+  },
+  {
+    key: MessageColumn.Location,
+    value: 'Координаты'
+  },
+  {
+    key: MessageColumn.Altitude,
+    value: 'Высота, м'
+  }
+];
+
+const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
+  {
+    key: MessageColumn.Parameters,
+    value: 'Параметры'
+  }
+];
 
 /**
  * Parsing time from user input.

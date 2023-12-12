@@ -99,7 +99,7 @@ export enum ParameterHistoryColumn {
   Speed = 'speed',
   Location = 'location',
   Altitude = 'altitude',
-  Parameters = 'parameters',
+  Parameters = 'parameters'
 }
 
 interface ParameterHistoryDataSource extends Pick<TrackerParameterHistory, 'time' | 'speed' | 'altitude' | 'parameters'> {
