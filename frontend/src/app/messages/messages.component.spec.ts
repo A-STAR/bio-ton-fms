@@ -2,10 +2,10 @@ import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { formatNumber, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, formatNumber, registerLocaleData } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import localeRu from '@angular/common/locales/ru';
-import { HarnessLoader } from '@angular/cdk/testing';
+import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
@@ -14,13 +14,22 @@ import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
 import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/material/datepicker/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatTableHarness } from '@angular/material/table/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
 import { Observable, of } from 'rxjs';
 
-import { MessageService, MessageStatisticsOptions, MessageTrackOptions, MessagesOptions } from './message.service';
+import { MessageService, MessageStatisticsOptions, MessageTrackOptions, Messages, MessagesOptions } from './message.service';
 
-import MessagesComponent, { DataMessageParameter, MessageType, parseTime } from './messages.component';
+import MessagesComponent, {
+  DataMessageParameter,
+  MessageColumn,
+  MessageType,
+  dataMessageColumns,
+  parseTime,
+  trackerMessageColumns
+} from './messages.component';
+
 import { MapComponent } from '../shared/map/map.component';
 
 import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
@@ -30,6 +39,8 @@ import { PAGE_NUM } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
 import { testMessageLocationAndTrack, testMessageStatistics, testTrackerMessages } from './message.service.spec';
+import { dateFormat } from '../directory-tech/trackers/trackers.component.spec';
+import { MatChipSetHarness } from '@angular/material/chips/testing';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -51,6 +62,12 @@ describe('MessagesComponent', () => {
           {
             provide: LOCALE_ID,
             useValue: 'ru-RU'
+          },
+          {
+            provide: DATE_PIPE_DEFAULT_OPTIONS,
+            useValue: {
+              dateFormat: 'd MMMM y, H:mm'
+            }
           },
           {
             provide: DateAdapter,
@@ -755,7 +772,7 @@ describe('MessagesComponent', () => {
     await executeButton.click();
   }));
 
-  it('should render statistics', () => {
+  it('should render statistics', fakeAsync(async () => {
     let headingDe = fixture.debugElement.query(
       By.css('h1')
     );
@@ -773,7 +790,7 @@ describe('MessagesComponent', () => {
       .toBeNull();
 
     // set data message statistics
-    component['statistics$'] = of(testMessageStatistics);
+    await mockTestMessages(component, loader, messageService);
 
     fixture.detectChanges();
 
@@ -841,9 +858,9 @@ describe('MessagesComponent', () => {
         .withContext('render description details text')
         .toBe(DESCRIPTION_TEXTS[index].details);
     });
-  });
+  }));
 
-  it('should render legend', () => {
+  it('should render legend', fakeAsync(async () => {
     let [, headingDe] = fixture.debugElement.queryAll(
       By.css('h1')
     );
@@ -860,8 +877,8 @@ describe('MessagesComponent', () => {
       .withContext('render no description list element')
       .toBeNull();
 
-    // set data message statistics
-    component['statistics$'] = of(testMessageStatistics);
+    // set message statistics
+    await mockTestMessages(component, loader, messageService);
 
     fixture.detectChanges();
 
@@ -913,5 +930,289 @@ describe('MessagesComponent', () => {
         .withContext('render description details text')
         .toBe(DESCRIPTION_TEXTS[index].details);
     });
-  });
+  }));
+
+  it('should render tracker message table', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const tables = await loader.getHarnessOrNull(MatTableHarness);
+
+    expect(tables)
+      .withContext('render a table')
+      .not.toBeNull();
+  }));
+
+  it('should render tracker message table rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    fixture.detectChanges();
+
+    const table = await loader.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+    const rows = await table.getRows();
+
+    expect(headerRows.length)
+      .withContext('render a header row')
+      .toBe(1);
+
+    expect(rows.length)
+      .withContext('render rows')
+      .toBe(testTrackerMessages.trackerDataMessages!.length);
+  }));
+
+  it('should render tracker message table header cells', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const table = await loader.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+
+    const [headerCells] = await parallel(() => headerRows.map(
+      row => row.getCells()
+    ));
+
+    expect(headerCells.length)
+      .withContext('render header cells')
+      .toBe(dataMessageColumns.length + trackerMessageColumns.length);
+
+    const headerCellTexts = await parallel(
+      () => headerCells.map(cell => cell.getText())
+    );
+
+    const columnLabels = dataMessageColumns
+      .concat(trackerMessageColumns)
+      .map(({ value }) => value);
+
+    expect(headerCellTexts)
+      .withContext('render column labels')
+      .toEqual(columnLabels);
+  }));
+
+  it('should render data message table cells', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const table = await loader.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells()
+    ));
+
+    cells.forEach(({ length }) => {
+      expect(length)
+        .withContext('render cells')
+        .toBe(dataMessageColumns.length + trackerMessageColumns.length);
+    });
+
+    const cellTexts = await parallel(() => cells.map(
+      rowCells => parallel(
+        () => rowCells
+          .slice(0, -1)
+          .map(cell => cell.getText())
+      )
+    ));
+
+    cellTexts.forEach((rowCellTexts, index) => {
+      const {
+        num: hash,
+        serverDateTime: time,
+        trackerDateTime: registration,
+        speed,
+        latitude,
+        longitude,
+        satNumber: satellites,
+        altitude
+      } = testTrackerMessages.trackerDataMessages![index];
+
+      let formattedTime: string | undefined;
+      let formattedRegistration: string | undefined;
+      let formattedSpeed: string | undefined;
+      let formattedLatitude: string | undefined;
+      let formattedLongitude: string | undefined;
+      let location: string | undefined;
+      let formattedAltitude: string | undefined;
+
+      if (time) {
+        formattedTime = formatDate(time, dateFormat, 'ru-RU');
+      }
+
+      if (registration) {
+        formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
+      }
+
+      if (speed) {
+        formattedSpeed = formatNumber(speed, 'en-US', '1.1-1');
+      }
+
+      if (latitude) {
+        formattedLatitude = formatNumber(latitude, 'en-US', '1.6-6');
+      }
+
+      if (longitude) {
+        formattedLongitude = formatNumber(longitude, 'en-US', '1.6-6');
+      }
+
+      if (formattedLatitude && formattedLongitude && satellites) {
+        location = `${formattedLatitude} ${formattedLongitude} (${satellites})`;
+      }
+
+      if (altitude) {
+        formattedAltitude = formatNumber(altitude, 'en-US', '1.1-1');
+      }
+
+      const messageTexts = [hash, formattedTime, formattedRegistration, formattedSpeed, location, formattedAltitude].map(
+        value => value?.toString() ?? ''
+      );
+
+      expect(rowCellTexts)
+        .withContext('render cells text')
+        .toEqual(messageTexts);
+    });
+  }));
+
+  it('should render parameters cells chips', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const table = await loader.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells({
+        columnName: MessageColumn.Parameters
+      })
+    ));
+
+    const parametersChipSets = await parallel(() => cells.map(
+      ([parametersCell]) => parametersCell.getHarness(MatChipSetHarness))
+    );
+
+    parametersChipSets.forEach(parametersChipSet => {
+      expect(parametersChipSet)
+        .withContext('render chip set')
+        .not.toBeNull();
+    });
+
+    parametersChipSets.forEach(async (parametersChipSet, index) => {
+      const chips = await parametersChipSet.getChips();
+
+      const chipTexts = await parallel(() => chips.map(
+        chip => chip.getText()
+      ));
+
+      const parameters = testTrackerMessages.trackerDataMessages![index].parameters;
+
+      chipTexts.forEach((chipText, index) => {
+        const {
+          paramName: name,
+          lastValueDateTime,
+          lastValueDecimal,
+          lastValueString
+        } = parameters[index];
+
+        const value = lastValueString ?? lastValueDecimal ?? lastValueDateTime;
+
+        expect(chipText)
+          .withContext('render parameter text')
+          .toBe(`${name}=${value}`);
+      });
+
+      const chipHosts = await parallel(() => chips.map(
+        chip => chip.host()
+      ));
+
+      const chipDisableRippleAttributes = await parallel(() => chipHosts.map(
+        host => host.getAttribute('ng-reflect-disable-ripple')
+      ));
+
+      chipDisableRippleAttributes.forEach(async value => {
+        expect(value)
+          .withContext('render disable ripple attribute')
+          .not.toBeNull();
+      });
+    });
+  }));
 });
+
+/**
+ * Mock messages, track, statistics submitting selection form.
+ *
+ * @param component `MessagesComponent` test component.
+ * @param loader `HarnessLoader` instance.
+ * @param messageService `MessageService` instance.
+ * @param options Message type options.
+ * @param testMessages Test `Messages`.
+ */
+async function mockTestMessages(
+  component: MessagesComponent,
+  loader: HarnessLoader,
+  messageService: MessageService,
+  { type, parameter }: {
+    type: MessageType;
+    parameter?: DataMessageParameter;
+  } = {
+    type: MessageType.DataMessage,
+    parameter: DataMessageParameter.TrackerData
+  },
+  testMessages: Messages = testTrackerMessages
+) {
+  /* Autocomplete doesn't properly set an actual control `object` value in tests
+       rather than its display value. */
+  component['selectionForm'].controls.tech.setValue(testMonitoringVehicles[0]);
+
+  const [startDateInput, endDateInput] = await loader.getAllHarnesses(
+    MatDatepickerInputHarness.with({
+      ancestor: 'form#selection-form [formGroupName="range"]'
+    })
+  );
+
+  await startDateInput.setValue('17.11.2023');
+  await endDateInput.setValue('18.11.2023');
+
+  const [typeSelect, parametersSelect] = await loader.getAllHarnesses(
+    MatSelectHarness.with({
+      ancestor: 'form#selection-form'
+    })
+  );
+
+  let typeText: string | undefined;
+  let parameterText: string | undefined;
+
+  switch (type) {
+    case MessageType.DataMessage:
+      typeText = 'Сообщения с данными';
+
+      switch (parameter) {
+        case DataMessageParameter.TrackerData:
+          parameterText = 'Исходные данные';
+      }
+  }
+
+  await typeSelect.clickOptions({
+    text: typeText
+  });
+
+  if (parameter) {
+    await parametersSelect.clickOptions({
+      text: parameterText
+    });
+  }
+
+  spyOn(messageService, 'getMessages')
+    .and.callFake(() => of(testMessages));
+
+  spyOn(messageService, 'getTrack')
+    .and.callFake(() => of(testMessageLocationAndTrack));
+
+  spyOn(messageService, 'getStatistics')
+    .and.callFake(() => of(testMessageStatistics));
+
+  const executeButton = await loader.getHarness(
+    MatButtonHarness.with({
+      ancestor: 'form#selection-form',
+      selector: '[type="submit"]',
+      text: 'Выполнить',
+      variant: 'flat'
+    })
+  );
+
+  await executeButton.click();
+}

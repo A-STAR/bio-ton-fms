@@ -9,6 +9,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatChipsModule } from '@angular/material/chips';
 
 import {
   BehaviorSubject,
@@ -45,6 +47,7 @@ import { MapComponent } from '../shared/map/map.component';
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { TableDataSource } from '../directory-tech/shared/table/table.data-source';
 import { LocationAndTrackResponse } from '../tech/tech.service';
+import { TrackerParameter } from '../directory-tech/tracker.service';
 
 @Component({
   selector: 'bio-messages',
@@ -58,6 +61,8 @@ import { LocationAndTrackResponse } from '../tech/tech.service';
     MatDatepickerModule,
     MatSelectModule,
     MatButtonModule,
+    MatTableModule,
+    MatChipsModule,
     DateCharsInputDirective,
     TimeCharsInputDirective,
     MapComponent
@@ -132,6 +137,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected DataMessageParameter = DataMessageParameter;
   protected columns?: KeyValue<MessageColumn, string>[];
   protected columnKeys?: string[];
+  protected MessageColumn = MessageColumn;
 
   /**
    * Map a tech option's control value to its name display value in the trigger.
@@ -251,6 +257,18 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       });
 
     this.#subscription?.add(subscription);
+  }
+
+  /**
+   * `TrackByFunction` to compute the identity of parameter.
+   *
+   * @param index The index of the item within the iterable.
+   * @param tech The `TrackerParameter` in the iterable.
+   *
+   * @returns `TrackerParameter` name.
+   */
+  protected parameterTrackBy(index: number, { paramName }: TrackerParameter) {
+    return paramName;
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
@@ -526,7 +544,7 @@ export enum DataMessageParameter {
   SensorData = 'sensorData'
 }
 
-enum MessageColumn {
+export enum MessageColumn {
   Position = 'position',
   Time = 'time',
   Registration = 'registration',
@@ -567,7 +585,7 @@ interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'a
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
 
-const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
+export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Position,
     value: '#'
@@ -594,7 +612,7 @@ const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
   }
 ];
 
-const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
+export const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Parameters,
     value: 'Параметры'

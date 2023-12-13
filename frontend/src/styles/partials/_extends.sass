@@ -86,7 +86,7 @@
 
 %striped-table
 
-  mat-table:not(mat-card *):not(mat-dialog-container *)
+  mat-table:not(section *):not(mat-card *):not(mat-dialog-container *)
     box-shadow: $box-shadow
 
   mat-header-row
@@ -111,7 +111,9 @@
   .mat-mdc-row
     min-height: 40px
 
+  section .mdc-data-table__table,
   mat-card .mdc-data-table__table,
+  mat-dialog-content .mdc-data-table__table,
   mat-header-cell,
   mat-cell,
   :last-child .mdc-data-table__cell,
@@ -125,7 +127,7 @@
     justify-content: center
     text-align: center
 
-    &:not(mat-card *):not(mat-dialog-container *)
+    &:not(section *):not(mat-card *):not(mat-dialog-container *)
 
       &:first-of-type
         border-left-color: transparent
@@ -137,7 +139,7 @@
     font-size: 10px
     font-weight: 500
 
-    &:not(mat-card *):not(mat-dialog-container *)
+    &:not(section *):not(mat-card *):not(mat-dialog-container *)
       border-top-color: transparent
 
   mat-cell
@@ -147,7 +149,7 @@
   .mdc-data-table__cell
     padding: 0 math.div(16px, 2)
 
-  .mdc-data-table__row:last-child:not(mat-card *):not(mat-dialog-container *)
+  .mdc-data-table__row:last-child:not(section *):not(mat-card *):not(mat-dialog-container *)
 
     .mdc-data-table__cell,
     .actions
