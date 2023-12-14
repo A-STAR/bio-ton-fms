@@ -4,6 +4,7 @@ using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using BioTonFMS.Common.Testable;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 
 namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
@@ -218,6 +219,102 @@ public class TrackerMessageRepositoryMock
                     Value = 2134,
                     TrackerTagId = 24,
                     TagType = TagDataTypeEnum.Integer
+                }
+            }
+        },
+        new()
+        {
+            Id = 6,
+            ExternalTrackerId = 89989,
+            Imei = "12389989",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            Latitude = 49.432023,
+            Longitude = 52.556861,
+            SatNumber = 12,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 92.0,
+            Direction = 2.8,
+            FuelLevel = 81,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("F28AC4A2-5DD0-49DC-B1B5-3B161C39549A")
+        },
+        new()
+        {
+            Id = 7,
+            ExternalTrackerId = 89989,
+            Imei = "12389989",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            Latitude = 42.432023,
+            Longitude = 54.556861,
+            SatNumber = 14,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 90.0,
+            Speed = 50.1,
+            Direction = 2.7,
+            FuelLevel = 80,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("829D3996-DB42-4777-A4D5-BB6D8A9E1B79")
+        },
+        new()
+        {
+            Id = 8,
+            ExternalTrackerId = 89910,
+            Imei = "123899897",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            Latitude = 49.432023,
+            Longitude = 52.556861,
+            SatNumber = 12,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 92.0,
+            Direction = 2.8,
+            FuelLevel = 81,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("C21AC4A2-5DA0-49DC-B1B5-3B161C30549A"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 14980,
+                    TrackerTagId = TagsSeed.CanB0Id,
+                    TagType = TagDataTypeEnum.Integer,
+                    Id = 1,
+                    TrackerMessageId = 9
+                }
+            }
+        },
+        new()
+        {
+            Id = 9,
+            ExternalTrackerId = 89910,
+            Imei = "123899897",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            Latitude = 42.432023,
+            Longitude = 54.556861,
+            SatNumber = 14,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 90.0,
+            Speed = 50.1,
+            Direction = 2.7,
+            FuelLevel = 80,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("819D3996-DB42-4777-A4D5-BB6D8A0E1B79"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 14981,
+                    TrackerTagId = TagsSeed.CanB0Id,
+                    TagType = TagDataTypeEnum.Integer,
+                    Id = 1,
+                    TrackerMessageId = 9
                 }
             }
         }

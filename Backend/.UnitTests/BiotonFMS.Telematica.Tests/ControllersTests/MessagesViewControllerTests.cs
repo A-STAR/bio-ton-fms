@@ -14,6 +14,7 @@ using BiotonFMS.Telematica.Tests.Mocks.Repositories;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 using Xunit.Abstractions;
 
@@ -104,26 +105,12 @@ public class MessagesViewControllerTests
                 "",
                 new[]
                 {
-                    new MessagesViewVehicleDto
-                    {
-                        Id = 1,
-                        Name = "Красная машина",
-                    },
-                    new MessagesViewVehicleDto
-                    {
-                        Id = 3,
-                        Name = "Желтая машина",
-                    },
-                    new MessagesViewVehicleDto
-                    {
-                        Id = 2,
-                        Name = "Синяя машина",
-                    },
-                    new MessagesViewVehicleDto
-                    {
-                        Id = 4,
-                        Name = "Чёрный трактор",
-                    }
+                    new MessagesViewVehicleDto { Id = 1, Name = "Красная машина" },
+                    new MessagesViewVehicleDto { Id = 3, Name = "Желтая машина" },
+                    new MessagesViewVehicleDto { Id = 2, Name = "Синяя машина" },
+                    new MessagesViewVehicleDto { Id = 4, Name = "Чёрный трактор" },
+                    new MessagesViewVehicleDto { Id = 6, Name = "Фиолетовый трактор" },
+                    new MessagesViewVehicleDto { Id = 7, Name = "Фиолетовый трактор 2" }
                 }
             },
             new object[]
@@ -139,7 +126,9 @@ public class MessagesViewControllerTests
                     new MessagesViewVehicleDto { Id = 1, Name = "Красная машина" },
                     new MessagesViewVehicleDto { Id = 3, Name = "Желтая машина" },
                     new MessagesViewVehicleDto { Id = 2, Name = "Синяя машина" },
-                    new MessagesViewVehicleDto { Id = 4, Name = "Чёрный трактор" }
+                    new MessagesViewVehicleDto { Id = 4, Name = "Чёрный трактор" },
+                    new MessagesViewVehicleDto { Id = 6, Name = "Фиолетовый трактор" },
+                    new MessagesViewVehicleDto { Id = 7, Name = "Фиолетовый трактор 2" }
                 }
             }
         };
@@ -169,7 +158,7 @@ public class MessagesViewControllerTests
     public static IEnumerable<object[]> StatisticsData =>
         new List<object[]>
         {
-            //Запрос статистики по сообщениям, общий случай
+            //Запрос статистики по сообщениям, есть сообщения в периоде
             new object[]
             {
                 new MessagesViewStatisticsRequest
@@ -187,7 +176,7 @@ public class MessagesViewControllerTests
                     MaxSpeed = 12.1
                 })
             },
-            //Запрос статистики по командам, общий случай
+            //Запрос статистики по командам, есть команды в периоде
             new object[]
             {
                 new MessagesViewStatisticsRequest
@@ -238,6 +227,44 @@ public class MessagesViewControllerTests
                     PeriodEnd = SystemTime.UtcNow
                 },
                 new OkObjectResult(new ViewMessageStatisticsDto())
+            },
+            //Сообщения без тегов
+            new object[]
+            {
+                new MessagesViewStatisticsRequest
+                {
+                    VehicleId = 6,
+                    ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
+                },
+                new OkObjectResult(new ViewMessageStatisticsDto
+                {
+                    NumberOfMessages = 2,
+                    TotalTime = 10,
+                    AverageSpeed = 50.1,
+                    MaxSpeed = 50.1
+                })
+            },
+            //Сообщения c тегами
+            new object[]
+            {
+                new MessagesViewStatisticsRequest
+                {
+                    VehicleId = 7,
+                    ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                    PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                    PeriodEnd = SystemTime.UtcNow.AddHours(100)
+                },
+                new OkObjectResult(new ViewMessageStatisticsDto
+                {
+                    NumberOfMessages = 2,
+                    TotalTime = 10,
+                    AverageSpeed = 50.1,
+                    MaxSpeed = 50.1,
+                    Distance = 5,
+                    Mileage = 74905
+                })
             }
         };
 
@@ -258,7 +285,7 @@ public class MessagesViewControllerTests
     public static IEnumerable<object[]> TrackData =>
         new List<object[]>
         {
-            //Общий случай
+            //Машина с трекером и с сообщениями
             new object[]
             {
                 new MessagesViewTrackRequest
@@ -340,7 +367,7 @@ public class MessagesViewControllerTests
                     PeriodStart = SystemTime.UtcNow.AddHours(-100),
                     PeriodEnd = SystemTime.UtcNow.AddHours(100)
                 },
-                new OkObjectResult(new LocationsAndTracksResponse())
+                new OkObjectResult(new LocationsAndTracksResponse{Tracks = new List<LocationAndTrack>()})
             }
         };
 
@@ -358,6 +385,15 @@ public class MessagesViewControllerTests
             var actual = result.As<OkObjectResult>().Value.As<LocationsAndTracksResponse>();
 
             actual.Should().BeEquivalentTo(expected.Value);
+
+            if (actual.Tracks.IsNullOrEmpty()) return;
+            
+            actual.Tracks.Should().ContainSingle();
+            var track = actual.Tracks.Single();
+
+            var lastPoint = track.Track.OrderBy(x => x.Time).Last();
+            lastPoint.Longitude.Should().Be(track.Longitude);
+            lastPoint.Latitude.Should().Be(track.Latitude);
         }
         else
         {

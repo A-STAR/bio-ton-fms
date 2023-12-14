@@ -28,10 +28,10 @@ public class TelematicaHelpers
             return null;
         }
         List<double> lons = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Longitude).ToList();
-        lons.AddRange(locationsAndTracks.Select(x => x.Longitude));
+        lons.AddRange(locationsAndTracks.Where(x => x.Longitude != null).Select(x => x.Longitude!.Value));
 
         List<double> lats = locationsAndTracks.SelectMany(x => x.Track).Select(x => x.Latitude).ToList();
-        lats.AddRange(locationsAndTracks.Select(x => x.Latitude));
+        lats.AddRange(locationsAndTracks.Where(x => x.Latitude != null).Select(x => x.Latitude!.Value));
 
         return CalculateViewBounds(lons, lats);
     }

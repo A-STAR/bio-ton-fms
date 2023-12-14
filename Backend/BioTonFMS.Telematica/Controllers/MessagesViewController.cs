@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BioTonFMS.Telematica.Controllers;
 
@@ -31,7 +32,7 @@ public class MessagesViewController : ControllerBase
     private readonly IVehicleRepository _vehicleRepository;
     private readonly ITrackerCommandRepository _commandRepository;
     private readonly ITrackerMessageRepository _messageRepository;
-    
+
     public MessagesViewController(
         ILogger<MessagesViewController> logger,
         IMapper mapper,
@@ -59,8 +60,10 @@ public class MessagesViewController : ControllerBase
         }
 
         return Ok(request.ViewMessageType == ViewMessageTypeEnum.DataMessage
-            ? _messageRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(), request.PeriodEnd.ToUniversalTime())
-            : _commandRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(), request.PeriodEnd.ToUniversalTime()));
+            ? _messageRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(),
+                request.PeriodEnd.ToUniversalTime())
+            : _commandRepository.GetStatistics(externalId, request.PeriodStart.ToUniversalTime(),
+                request.PeriodEnd.ToUniversalTime()));
     }
 
     /// <summary>
@@ -80,7 +83,7 @@ public class MessagesViewController : ControllerBase
 
         return Ok(messagesViewVehicleDtos);
     }
-    
+
     /// <summary>
     /// Возвращает точки для трека для выбранной машины и периода
     /// </summary>
@@ -92,28 +95,27 @@ public class MessagesViewController : ControllerBase
         {
             return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
         }
-        
+
         if (!_messageRepository.GetTracks(request.PeriodStart.ToUniversalTime(),
                     request.PeriodEnd.ToUniversalTime(), externalId)
-            .TryGetValue(externalId, out TrackPointInfo[]? points))
+                .TryGetValue(externalId, out TrackPointInfo[]? points) || points.IsNullOrEmpty())
         {
-            return Ok(new LocationsAndTracksResponse());
+            return Ok(new LocationsAndTracksResponse { Tracks = ArraySegment<LocationAndTrack>.Empty });
         }
 
         ViewBounds? viewBounds = TelematicaHelpers.CalculateViewBounds(points);
         string name = _vehicleRepository.GetNamesWhereTrackerNotEmpty(request.VehicleId)[request.VehicleId];
-        (double Lat, double Long) location =
-            _messageRepository.GetLocations(externalId)[externalId];
+        TrackPointInfo lastPoint = points.Last();
 
         return Ok(new LocationsAndTracksResponse
         {
             ViewBounds = viewBounds,
             Tracks = new List<LocationAndTrack>
             {
-                new ()
+                new()
                 {
-                    Longitude = location.Long,
-                    Latitude = location.Lat,
+                    Longitude = lastPoint.Longitude,
+                    Latitude = lastPoint.Latitude,
                     VehicleId = request.VehicleId,
                     VehicleName = name,
                     Track = points
@@ -131,7 +133,7 @@ public class MessagesViewController : ControllerBase
     {
         return Ok(new ViewMessageMessagesDto
         {
-            Pagination = new Pagination{ Total = 10, PageIndex = 1},
+            Pagination = new Pagination { Total = 10, PageIndex = 1 },
             CommandMessages = new[]
             {
                 new CommandMessageDto
@@ -166,7 +168,7 @@ public class MessagesViewController : ControllerBase
                     Altitude = 23.1,
                     SatNumber = 123,
                     Speed = 44,
-                    Sensors = new []
+                    Sensors = new[]
                     {
                         new TrackerSensorDto
                         {
@@ -190,7 +192,7 @@ public class MessagesViewController : ControllerBase
                     Altitude = 23.1,
                     SatNumber = 2,
                     Speed = 66,
-                    Parameters = new []
+                    Parameters = new[]
                     {
                         new TrackerParameter
                         {
