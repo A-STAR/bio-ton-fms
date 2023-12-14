@@ -131,6 +131,50 @@ public static class VehicleRepositoryMock
             ManufacturingYear = 2020,
             RegistrationNumber = "В167АР 189",
             InventoryNumber = "1234"
+        },
+        new()
+        {
+            Id = 6,
+            Name = "Фиолетовый трактор",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 6",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В117АР 189",
+            InventoryNumber = "21434",
+            TrackerId = 6,
+            Tracker = new Tracker
+            {
+                Id = 6,
+                Imei = "12389989",
+                ExternalId = 89989
+            }
+        },
+        new()
+        {
+            Id = 7,
+            Name = "Фиолетовый трактор 2",
+            Type = VehicleTypeEnum.Transport,
+            VehicleSubType = VehicleSubTypeEnum.Car,
+            FuelType = new FuelType { Id = 1, Name = "Бензин" },
+            FuelTypeId = 1,
+            Description = "Описание 6",
+            Make = "Ford",
+            Model = "Focus",
+            ManufacturingYear = 2020,
+            RegistrationNumber = "В117АР 189",
+            InventoryNumber = "21434",
+            TrackerId = 6,
+            Tracker = new Tracker
+            {
+                Id = 7,
+                Imei = "123899897",
+                ExternalId = 89910
+            }
         }
     };
 }

@@ -693,6 +693,7 @@ public class TrackerMessageRepositoryTests
     public static IEnumerable<object[]> StatisticsData =>
         new List<object[]>
         {
+            //Несколько сообщений в периоде
             new object[]
             {
                 2552,
@@ -706,6 +707,7 @@ public class TrackerMessageRepositoryTests
                     MaxSpeed = 12.1
                 }
             },
+            //Только одно сообщение в периоде
             new object[]
             {
                 1555,
@@ -716,6 +718,7 @@ public class TrackerMessageRepositoryTests
                     NumberOfMessages = 1
                 }
             },
+            //Не существующий externalId
             new object[]
             {
                 -12938,

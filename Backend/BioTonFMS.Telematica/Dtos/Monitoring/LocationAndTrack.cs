@@ -17,12 +17,12 @@ public class LocationAndTrack
     /// <summary>
     /// Широта положения машины из последнего сообщения, полученного от её трекера
     /// </summary>
-    public double Latitude { get; set; }
+    public double? Latitude { get; set; }
 
     /// <summary>
     /// Долгота положения машины из последнего сообщения, полученного от её трекера
     /// </summary>
-    public double Longitude { get; set; }
+    public double? Longitude { get; set; }
 
     /// <summary>
     /// Содержит данные трека для машины за последние сутки, если для этой машины был запрошен трек.
