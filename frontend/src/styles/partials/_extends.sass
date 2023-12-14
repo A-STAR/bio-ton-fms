@@ -155,10 +155,19 @@
     .actions
       border-bottom-color: transparent
 
+  .mat-column-action,
+  .mat-column-position,
+  .mat-column-speed,
+  .mat-column-altitude
+    flex: unset
+
+  .mat-column-speed,
+  .mat-column-altitude
+    flex-basis: 70px
+
   .mat-column-action
     $column-spacing-horizontal: 10px
 
-    flex: unset
     flex-basis: 2 * $column-spacing-horizontal + map.get($mat-icon-button, size)
 
     button.deferred-hover + .actions,
@@ -179,6 +188,15 @@
       padding: 0 $actions-padding-right 0 $column-spacing-horizontal
       background: linear-gradient(to left, transparent, $white $actions-padding-right)
       border-right: unset
+
+  .mat-column-position
+    flex-basis: 45px
+
+  .mat-column-parameters
+    flex: 2
+
+    @at-root .mat-mdc-row mat-cell.mat-mdc-cell#{&}
+      justify-content: flex-start
 
 %heading-with-border
   padding-bottom: 10px
