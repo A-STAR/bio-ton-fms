@@ -230,7 +230,7 @@
         </mat-cell>
       </ng-container>
 
-      <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
+      <mat-header-row *matHeaderRowDef="columnKeys; sticky: true"></mat-header-row>
 
       <mat-row *matRowDef="let row; columns: columnKeys"></mat-row>
     </mat-table>

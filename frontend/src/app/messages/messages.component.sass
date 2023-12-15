@@ -124,11 +124,19 @@ bio-map
 
 #messages
   position: relative
+  flex-direction: column
   flex-basis: 100%
   height: $messages-height
   margin-top: - $messages-height
   margin-left: $map-aside-width
   background-color: $white
+
+  &,
+  p
+    display: flex
+
+  mat-table
+    overflow: auto
 
   p
     position: absolute
