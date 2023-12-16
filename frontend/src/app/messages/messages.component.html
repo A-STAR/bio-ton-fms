@@ -196,7 +196,13 @@
   <ng-container *ngIf="messages$ | async as messages; else unselected">
     <mat-table [dataSource]="messagesDataSource!"
       *ngIf="(messages.trackerDataMessages || messages.sensorDataMessages || messages.commandMessages)?.length; else empty">
-      <ng-container [matColumnDef]="column.key" *ngFor="let column of columns">
+      <ng-container sticky [matColumnDef]="column.key" *ngFor="let column of columns | slice:0:1">
+        <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+
+        <mat-cell *matCellDef="let element">{{ element[column.key] }}</mat-cell>
+      </ng-container>
+
+      <ng-container [matColumnDef]="column.key" *ngFor="let column of columns | slice:1">
         <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
 
         <mat-cell [ngSwitch]="column.key" *matCellDef="let element">

@@ -121,8 +121,7 @@
     border: math.div(1px, 2) solid $light-gray
 
   mat-header-cell,
-  mat-cell,
-  :last-child .mdc-data-table__cell,
+  mat-cell:not(.mat-column-parameters),
   .actions
     justify-content: center
     text-align: center
@@ -157,18 +156,24 @@
 
   .mat-column-action,
   .mat-column-position,
+  .mat-column-time,
+  .mat-column-location,
   .mat-column-speed,
   .mat-column-altitude
     flex: unset
 
+  .mat-column-time,
+  .mat-column-location
+    width: 175px
+
   .mat-column-speed,
   .mat-column-altitude
-    flex-basis: 70px
+    width: 70px
 
   .mat-column-action
     $column-spacing-horizontal: 10px
 
-    flex-basis: 2 * $column-spacing-horizontal + map.get($mat-icon-button, size)
+    width: 2 * $column-spacing-horizontal + map.get($mat-icon-button, size)
 
     button.deferred-hover + .actions,
     .actions:hover
@@ -190,10 +195,7 @@
       border-right: unset
 
   .mat-column-position
-    flex-basis: 65px
-
-  .mat-column-parameters
-    flex: 2
+    width: 65px
 
     @at-root .mat-mdc-row mat-cell.mat-mdc-cell#{&}
       justify-content: flex-start
