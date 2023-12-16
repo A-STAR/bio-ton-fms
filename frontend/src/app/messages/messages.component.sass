@@ -2,6 +2,8 @@
 @use 'variables' as *
 
 \:host
+  @extend %striped-table
+
   display: flex
   flex-wrap: wrap
 
@@ -121,8 +123,49 @@ bio-map
   margin-bottom: $messages-height
 
 #messages
+  overflow-y: auto
+  position: relative
+  flex-direction: column
   flex-basis: 100%
   height: $messages-height
   margin-top: - $messages-height
   margin-left: $map-aside-width
   background-color: $white
+
+  &,
+  p
+    display: flex
+
+  mat-table
+    overflow: auto
+
+  mat-header-cell,
+  mat-cell
+
+    &.mat-column-speed,
+    &.mat-column-altitude
+      min-width: 70px
+
+    &.mat-column-position
+      min-width: 65px
+
+    &.mat-column-location
+      min-width: 200px
+
+    &.mat-column-parameters
+      min-width: 475px
+
+    &:not(.mat-column-position, .mat-column-speed, .mat-column-location, .mat-column-altitude, .mat-column-parameters)
+      min-width: 175px
+
+  p
+    position: absolute
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 100%
+    height: 100%
+    background-color: $light
+    color: $green
+    font-size: 14px
+    text-align: center

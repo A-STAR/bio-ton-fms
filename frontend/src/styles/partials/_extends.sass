@@ -86,7 +86,7 @@
 
 %striped-table
 
-  mat-table:not(mat-card *):not(mat-dialog-container *)
+  mat-table:not(section *):not(mat-card *):not(mat-dialog-container *)
     box-shadow: $box-shadow
 
   mat-header-row
@@ -111,7 +111,9 @@
   .mat-mdc-row
     min-height: 40px
 
+  section .mdc-data-table__table,
   mat-card .mdc-data-table__table,
+  mat-dialog-content .mdc-data-table__table,
   mat-header-cell,
   mat-cell,
   :last-child .mdc-data-table__cell,
@@ -119,13 +121,12 @@
     border: math.div(1px, 2) solid $light-gray
 
   mat-header-cell,
-  mat-cell,
-  :last-child .mdc-data-table__cell,
+  mat-cell:not(.mat-column-parameters),
   .actions
     justify-content: center
     text-align: center
 
-    &:not(mat-card *):not(mat-dialog-container *)
+    &:not(section *):not(mat-card *):not(mat-dialog-container *)
 
       &:first-of-type
         border-left-color: transparent
@@ -137,7 +138,7 @@
     font-size: 10px
     font-weight: 500
 
-    &:not(mat-card *):not(mat-dialog-container *)
+    &:not(section *):not(mat-card *):not(mat-dialog-container *)
       border-top-color: transparent
 
   mat-cell
@@ -147,17 +148,32 @@
   .mdc-data-table__cell
     padding: 0 math.div(16px, 2)
 
-  .mdc-data-table__row:last-child:not(mat-card *):not(mat-dialog-container *)
+  .mdc-data-table__row:last-child:not(section *):not(mat-card *):not(mat-dialog-container *)
 
     .mdc-data-table__cell,
     .actions
       border-bottom-color: transparent
 
+  .mat-column-action,
+  .mat-column-position,
+  .mat-column-time,
+  .mat-column-location,
+  .mat-column-speed,
+  .mat-column-altitude
+    flex: unset
+
+  .mat-column-time,
+  .mat-column-location
+    width: 175px
+
+  .mat-column-speed,
+  .mat-column-altitude
+    width: 70px
+
   .mat-column-action
     $column-spacing-horizontal: 10px
 
-    flex: unset
-    flex-basis: 2 * $column-spacing-horizontal + map.get($mat-icon-button, size)
+    width: 2 * $column-spacing-horizontal + map.get($mat-icon-button, size)
 
     button.deferred-hover + .actions,
     .actions:hover
@@ -177,6 +193,12 @@
       padding: 0 $actions-padding-right 0 $column-spacing-horizontal
       background: linear-gradient(to left, transparent, $white $actions-padding-right)
       border-right: unset
+
+  .mat-column-position
+    width: 65px
+
+    @at-root .mat-mdc-row mat-cell.mat-mdc-cell#{&}
+      justify-content: flex-start
 
 %heading-with-border
   padding-bottom: 10px

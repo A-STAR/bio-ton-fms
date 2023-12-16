@@ -241,7 +241,11 @@ export default class TrackersComponent implements OnInit, OnDestroy {
   #setTrackersDataSource(trackers: Trackers) {
     const trackersDataSource = this.#mapTrackersDataSource(trackers);
 
-    this.trackersDataSource = new TableDataSource<TrackerDataSource>(trackersDataSource);
+    if (this.trackersDataSource) {
+      this.trackersDataSource.setDataSource(trackersDataSource);
+    } else {
+      this.trackersDataSource = new TableDataSource<TrackerDataSource>(trackersDataSource);
+    }
   }
 
   /**

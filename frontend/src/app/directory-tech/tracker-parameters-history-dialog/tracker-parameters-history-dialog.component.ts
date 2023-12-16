@@ -45,7 +45,7 @@ export class TrackerParametersHistoryDialogComponent implements OnInit {
       .map(({ time, speed, latitude, longitude, altitude, parameters }): ParameterHistoryDataSource => ({
         time,
         speed,
-        coordinates: { latitude, longitude },
+        location: { latitude, longitude },
         altitude,
         parameters
       }));
@@ -94,16 +94,16 @@ export class TrackerParametersHistoryDialogComponent implements OnInit {
 }
 
 export enum ParameterHistoryColumn {
-  Hash = 'hash',
+  Position = 'position',
   Time = 'time',
   Speed = 'speed',
-  Coordinates = 'coordinates',
+  Location = 'location',
   Altitude = 'altitude',
-  Parameters = 'parameters',
+  Parameters = 'parameters'
 }
 
 interface ParameterHistoryDataSource extends Pick<TrackerParameterHistory, 'time' | 'speed' | 'altitude' | 'parameters'> {
-  coordinates: {
+  location: {
     latitude: TrackerParameterHistory['latitude'];
     longitude: TrackerParameterHistory['longitude'];
   };
@@ -111,7 +111,7 @@ interface ParameterHistoryDataSource extends Pick<TrackerParameterHistory, 'time
 
 export const trackerParameterHistoryColumns: KeyValue<ParameterHistoryColumn, string>[] = [
   {
-    key: ParameterHistoryColumn.Hash,
+    key: ParameterHistoryColumn.Position,
     value: '#'
   },
   {
@@ -123,7 +123,7 @@ export const trackerParameterHistoryColumns: KeyValue<ParameterHistoryColumn, st
     value: 'Скорость, км/ч'
   },
   {
-    key: ParameterHistoryColumn.Coordinates,
+    key: ParameterHistoryColumn.Location,
     value: 'Координаты'
   },
   {

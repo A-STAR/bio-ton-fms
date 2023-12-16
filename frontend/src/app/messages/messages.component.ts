@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 
@@ -9,8 +9,11 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatChipsModule } from '@angular/material/chips';
 
 import {
+  BehaviorSubject,
   Observable,
   Subject,
   Subscription,
@@ -19,21 +22,32 @@ import {
   defer,
   distinctUntilChanged,
   filter,
-  forkJoin,
   map,
   skipWhile,
   startWith,
-  switchMap
+  switchMap,
+  tap
 } from 'rxjs';
 
-import { MessageService, MessageStatistics, MessageStatisticsOptions, MessageTrackOptions } from './message.service';
+import {
+  DataMessage,
+  MessageService,
+  MessageStatistics,
+  MessageStatisticsOptions,
+  MessageTrackOptions,
+  Messages,
+  MessagesOptions,
+  TrackerMessage
+} from './message.service';
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
 import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-input.directive';
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
+import { TableDataSource } from '../directory-tech/shared/table/table.data-source';
 import { LocationAndTrackResponse } from '../tech/tech.service';
+import { TrackerParameter } from '../directory-tech/tracker.service';
 
 @Component({
   selector: 'bio-messages',
@@ -47,6 +61,8 @@ import { LocationAndTrackResponse } from '../tech/tech.service';
     MatDatepickerModule,
     MatSelectModule,
     MatButtonModule,
+    MatTableModule,
+    MatChipsModule,
     DateCharsInputDirective,
     TimeCharsInputDirective,
     MapComponent
@@ -102,12 +118,26 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       );
   }
 
+  /**
+   * Get message options.
+   *
+   * @returns `MessagesOptions` value.
+   */
+  get #options() {
+    return Object.freeze(this.#messages$.value);
+  }
+
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
-  protected statistics$!: Observable<MessageStatistics>;
-  protected location$!: Observable<LocationAndTrackResponse>;
+  protected messages$?: Observable<Messages>;
+  protected messagesDataSource?: TableDataSource<TrackerMessageDataSource>;
+  protected location$?: Observable<LocationAndTrackResponse>;
+  protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
+  protected columns?: KeyValue<MessageColumn, string>[];
+  protected columnKeys?: string[];
+  protected MessageColumn = MessageColumn;
 
   /**
    * Map a tech option's control value to its name display value in the trigger.
@@ -164,7 +194,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    *
    * Get message statistics.
    */
-  protected submitSelectionForm() {
+  protected async submitSelectionForm() {
     this.#subscription?.unsubscribe();
 
     const { invalid, value } = this.selectionForm;
@@ -191,7 +221,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     endDate.setHours(endHours);
     endDate.setMinutes(endMinutes);
 
-    const messageStatisticsOptions: MessageStatisticsOptions = {
+    const messagesOptions: MessagesOptions = {
       vehicleId: (tech as MonitoringTech).id,
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString(),
@@ -199,8 +229,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     };
 
     if (parameters) {
-      messageStatisticsOptions.parameterType = parameters;
+      messagesOptions.parameterType = parameters;
     }
+
+    const messageStatisticsOptions: MessageStatisticsOptions = { ...messagesOptions };
 
     const messageTrackOptions: MessageTrackOptions = {
       vehicleId: (tech as MonitoringTech).id,
@@ -208,16 +240,38 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       periodEnd: endDate.toISOString()
     };
 
-    this.#subscription = forkJoin([
-      this.messageService.getStatistics(messageStatisticsOptions),
-      this.messageService.getTrack(messageTrackOptions)
-    ])
-      .subscribe(([statistics, location]) => {
-        this.#statistics$.next(statistics);
+    this.#messages$.next(messagesOptions);
+
+    let subscription = this.messageService
+      .getTrack(messageTrackOptions)
+      .subscribe(location => {
         this.#location$.next(location);
       });
+
+    this.#subscription?.add(subscription);
+
+    subscription = this.messageService
+      .getStatistics(messageStatisticsOptions)
+      .subscribe(statistics => {
+        this.#statistics$.next(statistics);
+      });
+
+    this.#subscription?.add(subscription);
   }
 
+  /**
+   * `TrackByFunction` to compute the identity of parameter.
+   *
+   * @param index The index of the item within the iterable.
+   * @param tech The `TrackerParameter` in the iterable.
+   *
+   * @returns `TrackerParameter` name.
+   */
+  protected parameterTrackBy(index: number, { paramName }: TrackerParameter) {
+    return paramName;
+  }
+
+  #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
   #location$ = new Subject<LocationAndTrackResponse>();
   #statistics$ = new Subject<MessageStatistics>();
   #subscription: Subscription | undefined;
@@ -374,21 +428,130 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Set columns, column keys.
+   */
+  #setColumns() {
+    switch (this.#options?.viewMessageType) {
+      case MessageType.DataMessage:
+        this.columns = dataMessageColumns;
+
+        switch (this.#options.parameterType) {
+          case DataMessageParameter.TrackerData:
+            this.columns = this.columns.concat(trackerMessageColumns);
+        }
+    }
+
+    this.columnKeys = this.columns?.map(({ key }) => key);
+  }
+
+  /**
+   * Map messages data source.
+   *
+   * @param messages Messages with pagination.
+   *
+   * @returns Mapped `TrackerMessageDataSource`.
+   */
+  #mapTrackerMessagesDataSource({ trackerDataMessages }: Messages) {
+    return Object
+      .freeze(trackerDataMessages!)
+      .map(({
+        id,
+        num: position,
+        serverDateTime: registration,
+        trackerDateTime: time,
+        speed,
+        latitude,
+        longitude,
+        altitude,
+        satNumber: satellites,
+        parameters
+      }): TrackerMessageDataSource => ({
+        id,
+        position,
+        time,
+        registration,
+        speed,
+        location: { latitude, longitude, satellites },
+        altitude,
+        parameters
+      }));
+  }
+
+  /**
+   * Initialize `TableDataSource` and set messages data source.
+   *
+   * @param messages Messages.
+   */
+  #setMessagesDataSource(messages: Messages) {
+    let messagesDataSource: TrackerMessageDataSource[] | undefined;
+
+    switch (this.#options?.viewMessageType) {
+      case MessageType.DataMessage:
+
+        switch (this.#options.parameterType) {
+          case DataMessageParameter.TrackerData:
+            messagesDataSource = this.#mapTrackerMessagesDataSource(messages);
+        }
+    }
+
+    if (this.messagesDataSource) {
+      this.messagesDataSource.setDataSource(messagesDataSource!);
+    } else {
+      this.messagesDataSource = new TableDataSource(messagesDataSource!);
+    }
+  }
+
+  /**
+   * Set messages, message type.
+   */
+  #setMessages() {
+    this.messages$ = this.#messages$.pipe(
+      filter((value): value is MessagesOptions => value !== undefined),
+      switchMap(messagesOptions => this.messageService.getMessages(messagesOptions)),
+      tap(messages => {
+        this.#setColumns();
+        this.#setMessagesDataSource(messages);
+      })
+    );
+  }
+
   constructor(private fb: FormBuilder, private messageService: MessageService) {
-    this.statistics$ = this.#statistics$.asObservable();
     this.location$ = this.#location$.asObservable();
+    this.statistics$ = this.#statistics$.asObservable();
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnInit() {
     this.#initSelectionForm();
     this.#setTech();
+    this.#setMessages();
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   ngOnDestroy() {
     this.#subscription?.unsubscribe();
   }
+}
+
+export enum MessageType {
+  DataMessage = 'dataMessage',
+  CommandMessage = 'commandMessage'
+}
+
+export enum DataMessageParameter {
+  TrackerData = 'trackerData',
+  SensorData = 'sensorData'
+}
+
+export enum MessageColumn {
+  Position = 'position',
+  Time = 'time',
+  Registration = 'registration',
+  Speed = 'speed',
+  Location = 'location',
+  Altitude = 'altitude',
+  Parameters = 'parameters'
 }
 
 type MessageSelectionForm = FormGroup<{
@@ -409,17 +572,52 @@ type MessageSelectionForm = FormGroup<{
   }>;
 }>;
 
-export enum MessageType {
-  DataMessage = 'dataMessage',
-  CommandMessage = 'commandMessage'
-}
-
-export enum DataMessageParameter {
-  TrackerData = 'trackerData',
-  SensorData = 'sensorData'
+interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Pick<TrackerMessage, 'parameters'> {
+  position: DataMessage['num'];
+  time?: DataMessage['trackerDateTime'];
+  registration: DataMessage['serverDateTime'];
+  location?: {
+    latitude: DataMessage['latitude'];
+    longitude: DataMessage['longitude'];
+    satellites: DataMessage['satNumber'];
+  };
 }
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
+
+export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
+  {
+    key: MessageColumn.Position,
+    value: '#'
+  },
+  {
+    key: MessageColumn.Time,
+    value: 'Время устройства'
+  },
+  {
+    key: MessageColumn.Registration,
+    value: 'Время системы'
+  },
+  {
+    key: MessageColumn.Speed,
+    value: 'Скорость, км/ч'
+  },
+  {
+    key: MessageColumn.Location,
+    value: 'Координаты'
+  },
+  {
+    key: MessageColumn.Altitude,
+    value: 'Высота, м'
+  }
+];
+
+export const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
+  {
+    key: MessageColumn.Parameters,
+    value: 'Параметры'
+  }
+];
 
 /**
  * Parsing time from user input.
