@@ -18,4 +18,5 @@ RUN dotnet publish -c Release -o out Backend/TrackerMessages/BioTonFMS.TrackerTc
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 COPY --from=publish /app/out .
+EXPOSE 6000
 ENTRYPOINT ["dotnet", "BioTonFMS.TrackerTcpServer.dll"]

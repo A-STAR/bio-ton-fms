@@ -70,14 +70,17 @@ IHost host = Host.CreateDefaultBuilder(args)
                     x => x.MigrationsAssembly("BioTonFMS.MessagesMigrations"))
                 .UseSnakeCaseNamingConvention()
                 .EnableSensitiveDataLogging(hostContext.HostingEnvironment.IsDevelopment()));
-        
+
+        Console.WriteLine("AddDbContext<MessagesDBContext>");
+
         services.AddDbContext<BioTonDBContext>(
             options => options
                 .UseNpgsql(hostContext.Configuration.GetConnectionString("DefaultConnection")!,
                     x => x.MigrationsAssembly("BioTonFMS.Migrations"))
                 .UseSnakeCaseNamingConvention()
                 .EnableSensitiveDataLogging(hostContext.HostingEnvironment.IsDevelopment()));
-        
+        Console.WriteLine("AddDbContext<BioTonDBContext>");
+
         services.RegisterInfrastructureComponents()
             .RegisterDataAccess()
             .RegisterMessagesDataAccess();
@@ -95,6 +98,7 @@ await host.RunAsync();
 
 async Task Migrate(IHost h)
 {
+    Console.WriteLine("Migrate starts");
     using var scope = h.Services.CreateScope();
     var services = scope.ServiceProvider;
 
