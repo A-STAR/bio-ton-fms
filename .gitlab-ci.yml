@@ -2,11 +2,13 @@ variables:
   GIT_FETCH_EXTRA_FLAGS: --tags
   DOCKER_TAG: $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
   TrueVar: "true"
+  CiEnv: "yes"
 
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
-
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  
 .node-job:
   before_script:
   - cd frontend 
@@ -167,7 +169,7 @@ Deploy-frontend-production.bioton-fms.ru:
 Build-backend:
   stage: build
   script:
-    - echo $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA        
+    - echo $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
     - mkdir dir
     - cd dir
     - git clone git@git.bioton-fms.ru:BioTon/fms.git .
@@ -204,6 +206,25 @@ Test-backend:
       when: always
     - changes:
       - Backend/**/*
+    - if: $TrueVar == "true"
+      when: manual
+      allow_failure: true
+
+Integration-test-backend:  
+  stage: test
+  needs: 
+    - Build-TrackerTcpServer
+  script:
+    - mkdir dir
+    - cd dir
+    - git clone git@git.bioton-fms.ru:BioTon/fms.git .
+    - git checkout ${CI_COMMIT_BRANCH}
+    - dotnet build -c release Backend/.tools/BioTonFMS.Version
+    - cd Backend/.IntegrationTests/BiotonFMS.TcpServerIntegrationTests
+    - echo $CiEnv
+    - echo $DOCKER_TAG
+    - dotnet test --logger:trx 
+  rules:
     - if: $TrueVar == "true"
       when: manual
       allow_failure: true

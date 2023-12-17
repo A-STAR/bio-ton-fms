@@ -1,6 +1,5 @@
 ﻿using BioTonFMS.Common.Settings;
 using BioTonFMS.Infrastructure.MessageBus;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
@@ -101,6 +100,18 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
             }
         }
 
+        public void PurgeQueue()
+        {
+            CheckIfInitialized();
+            _channel?.QueuePurge(_queueName);
+        }
+
+        public uint? GetMessageCount()
+        {
+            CheckIfInitialized();
+            return _channel?.MessageCount(_queueName);
+        }
+
         private void CheckIfInitialized()
         {
             if (!_initialized)
@@ -124,13 +135,13 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
 
             var connection = factory.CreateConnection();
             _channel = CreateChannel(connection);
-
             try
             {
                 CreateQueue(_channel, _isDurable, _needDeadMessageQueue);
             }
-            catch (OperationInterruptedException)
+            catch (OperationInterruptedException ex)
             {
+                _logger.LogDebug("CreateQueue exception {Message}", ex.Message);
                 // Очередь уже существует, но с другими параметрами. Удаляем её и пересоздаём.
                 _channel = CreateChannel(connection);
                 _channel.QueueDelete(queue: _queueName, ifUnused: false, ifEmpty: false);
@@ -185,10 +196,12 @@ namespace BioTonFMS.Infrastructure.RabbitMQ
                 // Количество попыток передоставки
                 args["x-delivery-limit"] = _deliveryLimit;
             }
+            _logger.LogDebug("About to QueueDeclare {QueueName} {IsDurable} {Args}", _queueName, isDurable, args);
             channel.QueueDeclare(queue: _queueName, durable: isDurable, exclusive: false,
                                     autoDelete: false, arguments: args);
             if (needDeadMessageQueue)
             {
+                _logger.LogDebug("About to DeadMessageQueue Declare {QueueName} {IsDurable}", _queueName, isDurable);
                 channel.QueueDeclare(queue: $"err_{_queueName}", durable: isDurable, exclusive: false,
                                         autoDelete: false, arguments: null);
             }

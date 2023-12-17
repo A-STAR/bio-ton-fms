@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TcpServerIntegrationTests": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ci-env": "yes"
+      }
+    }
+  }
+}

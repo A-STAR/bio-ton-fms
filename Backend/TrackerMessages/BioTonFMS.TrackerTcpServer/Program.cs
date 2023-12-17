@@ -40,10 +40,12 @@ builder.Services.AddTransient<Func<TrackerTypeEnum, IProtocolMessageHandler>>(pr
 
 builder.ConfigureSerilog();
 
+Console.WriteLine("test output1");
 builder.WebHost.UseKestrel(so =>
 {
     so.Listen(new IPEndPoint(IPAddress.Parse(serverSettings.IpAddress), serverSettings.GalileoskyPort),
         epo => epo.UseConnectionHandler<GalileoTrackerConnectionHandler>());
+    Console.WriteLine("test output2");
 });
 
 var app = builder.Build();
@@ -54,8 +56,9 @@ app.Lifetime.ApplicationStarted.Register(() =>
     
     if (server is not null)
     {
-        var addresses = server.Features.Get<IServerAddressesFeature>()!.Addresses;
-        Console.WriteLine(String.Join(Environment.NewLine, addresses));
+        Console.WriteLine("test output2");
+        ICollection<string>? addresses = server.Features.Get<IServerAddressesFeature>()?.Addresses;
+        Console.WriteLine(String.Join(Environment.NewLine, addresses??new List<string>()));
     }
 });
 app.Run();
@@ -90,3 +93,5 @@ IMessageBus GetRawTrackerMessageBus(IServiceProvider serviceProvider, RabbitMQOp
 
     return new MessageBusMux(primaryBus, secondary, Policy.Handle<Exception>().WaitAndRetry(timeouts));
 }
+
+public partial class Program { }
