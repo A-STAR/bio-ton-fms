@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http';
 
-import { LocationAndTrackResponse, MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
+import { LocationAndTrackResponse, MonitoringSensor, MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
 import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from '../directory-tech/shared/pagination';
 import { TrackerCommand, TrackerCommandResponse, TrackerCommandTransport, TrackerParameter } from '../directory-tech/tracker.service';
-
-import { Sensor } from '../directory-tech/sensor.service';
 
 import { DataMessageParameter, MessageType } from './messages.component';
 
@@ -109,8 +107,8 @@ export type TrackerMessage = DataMessage & {
   parameters: TrackerParameter[];
 };
 
-export type SensorMessage = DataMessage & {
-  sensors: Sensor[];
+type SensorMessage = DataMessage & {
+  sensors: MonitoringSensor[];
 };
 
 type CommandMessage = {

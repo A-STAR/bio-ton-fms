@@ -45,6 +45,7 @@ import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-i
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
+
 import { TableDataSource } from '../directory-tech/shared/table/table.data-source';
 import { LocationAndTrackResponse } from '../tech/tech.service';
 import { TrackerParameter } from '../directory-tech/tracker.service';
@@ -130,7 +131,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
   protected messages$?: Observable<Messages>;
-  protected messagesDataSource?: TableDataSource<TrackerMessageDataSource>;
+  protected messagesDataSource?: TableDataSource<TrackerMessageDataSource | SensorMessageDataSource>;
   protected location$?: Observable<LocationAndTrackResponse>;
   protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
@@ -446,7 +447,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Map messages data source.
+   * Map tracker messages data source.
    *
    * @param messages Messages with pagination.
    *
@@ -479,12 +480,62 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Map sensor messages data source, sensors.
+   *
+   * @param messages Messages with pagination.
+   *
+   * @returns Mapped `SensorMessageDataSource`.
+   */
+  #mapSensorMessagesDataSource({ sensorDataMessages }: Messages) {
+    return Object
+      .freeze(sensorDataMessages!)
+      .map(({
+        id,
+        num: position,
+        serverDateTime: registration,
+        trackerDateTime: time,
+        speed,
+        latitude,
+        longitude,
+        altitude,
+        satNumber: satellites,
+        sensors
+      }): SensorMessageDataSource => {
+        const sensorMap: {
+          [key: string]: string;
+        } = {};
+
+        sensors.forEach(({ value, unit }, index) => {
+          let key = 'sensor';
+
+          if (index) {
+            // start numbering from the 2nd sensor
+            key += `-${index + 1}`;
+          }
+
+          sensorMap[key] = `${value} ${unit}`;
+        });
+
+        return {
+          id,
+          position,
+          time,
+          registration,
+          speed,
+          location: { latitude, longitude, satellites },
+          altitude,
+          ...sensorMap
+        };
+      });
+  }
+
+  /**
    * Initialize `TableDataSource` and set messages data source.
    *
    * @param messages Messages.
    */
   #setMessagesDataSource(messages: Messages) {
-    let messagesDataSource: TrackerMessageDataSource[] | undefined;
+    let messagesDataSource: (TrackerMessageDataSource | SensorMessageDataSource)[] | undefined;
 
     switch (this.#options?.viewMessageType) {
       case MessageType.DataMessage:
@@ -492,6 +543,11 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         switch (this.#options.parameterType) {
           case DataMessageParameter.TrackerData:
             messagesDataSource = this.#mapTrackerMessagesDataSource(messages);
+
+            break;
+
+          case DataMessageParameter.SensorData:
+            messagesDataSource = this.#mapSensorMessagesDataSource(messages);
         }
     }
 
@@ -573,6 +629,19 @@ type MessageSelectionForm = FormGroup<{
 }>;
 
 interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Pick<TrackerMessage, 'parameters'> {
+  position: DataMessage['num'];
+  time?: DataMessage['trackerDateTime'];
+  registration: DataMessage['serverDateTime'];
+  location?: {
+    latitude: DataMessage['latitude'];
+    longitude: DataMessage['longitude'];
+    satellites: DataMessage['satNumber'];
+  };
+}
+
+interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Partial<{
+  [key: string]: unknown;
+}> {
   position: DataMessage['num'];
   time?: DataMessage['trackerDateTime'];
   registration: DataMessage['serverDateTime'];
