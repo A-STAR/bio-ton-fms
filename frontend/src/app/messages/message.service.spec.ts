@@ -14,14 +14,17 @@ import { DataMessageParameter, MessageType } from './messages.component';
 
 import { LocationAndTrackResponse, MonitoringVehiclesOptions } from '../tech/tech.service';
 
-import { PAGE_NUM, PAGE_SIZE } from '../directory-tech/shared/pagination';
+import { PAGE_NUM, PAGE_SIZE, Pagination } from '../directory-tech/shared/pagination';
 
 import {
   mockTestFoundMonitoringVehicles,
   testFindCriterion,
   testLocationAndTrackResponse,
-  testMonitoringVehicles
+  testMonitoringVehicles,
+  testVehicleMonitoringInfo
 } from '../tech/tech.service.spec';
+
+import { testParameters } from '../directory-tech/tracker.service.spec';
 
 describe('MessageService', () => {
   let httpTestingController: HttpTestingController;
@@ -210,6 +213,13 @@ const testMessageOptions: MessagesOptions | MessageStatisticsOptions = {
   parameterType: DataMessageParameter.TrackerData
 };
 
+const pagination: Pagination = {
+  pagination: {
+    pageIndex: PAGE_NUM,
+    total: 10
+  }
+};
+
 export const testTrackerMessages: Messages = {
   trackerDataMessages: [
     {
@@ -222,26 +232,28 @@ export const testTrackerMessages: Messages = {
       longitude: 12.13,
       satNumber: 2,
       altitude: 23.1,
-      parameters: [
-        {
-          paramName: 'param0',
-          lastValueDateTime: '9999-12-31T23:59:59.9999999'
-        },
-        {
-          paramName: 'param1',
-          lastValueDecimal: 34.66
-        },
-        {
-          paramName: 'param2',
-          lastValueString: 'val'
-        }
-      ]
+      parameters: testParameters
     }
   ],
-  pagination: {
-    pageIndex: PAGE_NUM,
-    total: 10
-  }
+  ...pagination
+};
+
+export const testSensorMessages: Messages = {
+  sensorDataMessages: [
+    {
+      id: 1,
+      num: 1,
+      serverDateTime: '2023-12-08T21:52:00.273523+00:00',
+      trackerDateTime: '2023-12-08T21:52:00.2735232+00:00',
+      speed: 66.0,
+      latitude: 42.152,
+      longitude: 12.13,
+      satNumber: 2,
+      altitude: 23.1,
+      sensors: testVehicleMonitoringInfo.trackerInfo.sensors!
+    }
+  ],
+  ...pagination
 };
 
 export const testMessageLocationAndTrack: LocationAndTrackResponse = {

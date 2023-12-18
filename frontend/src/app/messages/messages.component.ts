@@ -47,7 +47,7 @@ import { MapComponent } from '../shared/map/map.component';
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 
 import { TableDataSource } from '../directory-tech/shared/table/table.data-source';
-import { LocationAndTrackResponse } from '../tech/tech.service';
+import { LocationAndTrackResponse, MonitoringSensor } from '../tech/tech.service';
 import { TrackerParameter } from '../directory-tech/tracker.service';
 
 @Component({
@@ -136,7 +136,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
-  protected columns?: KeyValue<MessageColumn, string>[];
+  protected columns?: KeyValue<MessageColumn | string, string>[];
   protected columnKeys?: string[];
   protected MessageColumn = MessageColumn;
 
@@ -431,8 +431,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
   /**
    * Set columns, column keys.
+   *
+   * @param messages Messages.
    */
-  #setColumns() {
+  #setColumns({ sensorDataMessages }: Messages) {
     switch (this.#options?.viewMessageType) {
       case MessageType.DataMessage:
         this.columns = dataMessageColumns;
@@ -440,6 +442,26 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         switch (this.#options.parameterType) {
           case DataMessageParameter.TrackerData:
             this.columns = this.columns.concat(trackerMessageColumns);
+
+            break;
+
+          case DataMessageParameter.SensorData: {
+            const sensorColumns: KeyValue<string, MonitoringSensor['name']>[] = sensorDataMessages![0].sensors.map(({ name }, index) => {
+              let key = 'sensor';
+
+              if (index) {
+                // start numbering from the 2nd sensor
+                key += `-${index + 1}`;
+              }
+
+              return {
+                key,
+                value: name
+              };
+            });
+
+            this.columns = this.columns.concat(sensorColumns);
+          }
         }
     }
 
@@ -506,14 +528,16 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         } = {};
 
         sensors.forEach(({ value, unit }, index) => {
-          let key = 'sensor';
+          if (value) {
+            let key = 'sensor';
 
-          if (index) {
-            // start numbering from the 2nd sensor
-            key += `-${index + 1}`;
+            if (index) {
+              // start numbering from the 2nd sensor
+              key += `-${index + 1}`;
+            }
+
+            sensorMap[key] = `${value} ${unit}`;
           }
-
-          sensorMap[key] = `${value} ${unit}`;
         });
 
         return {
@@ -566,7 +590,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       filter((value): value is MessagesOptions => value !== undefined),
       switchMap(messagesOptions => this.messageService.getMessages(messagesOptions)),
       tap(messages => {
-        this.#setColumns();
+        this.#setColumns(messages);
         this.#setMessagesDataSource(messages);
       })
     );
