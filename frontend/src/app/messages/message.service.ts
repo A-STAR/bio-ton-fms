@@ -111,12 +111,12 @@ type SensorMessage = DataMessage & {
   sensors: MonitoringSensor[];
 };
 
-type CommandMessage = {
+export type CommandMessage = {
   num: number;
   commandDateTime: string;
-  channel: TrackerCommandTransport;
   commandText?: TrackerCommand['commandText'];
-  executionTime?: number;
+  executionTime?: string;
+  channel: TrackerCommandTransport;
   commandResponseText?: TrackerCommandResponse['commandResponse'];
 };
 
