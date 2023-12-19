@@ -464,6 +464,11 @@ export default class MessagesComponent implements OnInit, OnDestroy {
             this.columns = this.columns.concat(sensorColumns);
           }
         }
+
+        break;
+
+      case MessageType.CommandMessage:
+        this.columns = commandMessageColumns;
     }
 
     this.columnKeys = this.columns?.map(({ key }) => key);
@@ -657,7 +662,11 @@ export enum MessageColumn {
   Speed = 'speed',
   Location = 'location',
   Altitude = 'altitude',
-  Parameters = 'parameters'
+  Parameters = 'parameters',
+  Command = 'command',
+  Channel = 'channel',
+  Execution = 'execution',
+  Response = 'response'
 }
 
 type MessageSelectionForm = FormGroup<{
@@ -712,11 +721,15 @@ interface CommandMessageDataSource extends Pick<CommandMessage, 'channel'> {
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
 
-export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
+const messageColumns: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Position,
     value: '#'
-  },
+  }
+];
+
+export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
+  ...messageColumns,
   {
     key: MessageColumn.Time,
     value: 'Время устройства'
@@ -743,6 +756,30 @@ export const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Parameters,
     value: 'Параметры'
+  }
+];
+
+export const commandMessageColumns: KeyValue<MessageColumn, string>[] = [
+  ...messageColumns,
+  {
+    key: MessageColumn.Time,
+    value: 'Время'
+  },
+  {
+    key: MessageColumn.Command,
+    value: 'Текст сообщения'
+  },
+  {
+    key: MessageColumn.Execution,
+    value: 'Время выполнения'
+  },
+  {
+    key: MessageColumn.Channel,
+    value: 'Канал'
+  },
+  {
+    key: MessageColumn.Response,
+    value: 'Ответ на команду'
   }
 ];
 
