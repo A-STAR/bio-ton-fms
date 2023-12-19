@@ -15,6 +15,7 @@ import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
+import { MatChipSetHarness } from '@angular/material/chips/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
 import { Observable, of } from 'rxjs';
@@ -38,9 +39,8 @@ import { localeID } from '../tech/shared/relative-time.pipe';
 import { PAGE_NUM } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
-import { testMessageLocationAndTrack, testMessageStatistics, testTrackerMessages } from './message.service.spec';
+import { testMessageLocationAndTrack, testMessageStatistics, testSensorMessages, testTrackerMessages } from './message.service.spec';
 import { dateFormat } from '../directory-tech/trackers/trackers.component.spec';
-import { MatChipSetHarness } from '@angular/material/chips/testing';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -942,6 +942,19 @@ describe('MessagesComponent', () => {
       .not.toBeNull();
   }));
 
+  it('should render sensor message table', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.DataMessage,
+      parameter: DataMessageParameter.SensorData
+    }, testSensorMessages);
+
+    const tables = await loader.getHarnessOrNull(MatTableHarness);
+
+    expect(tables)
+      .withContext('render a table')
+      .not.toBeNull();
+  }));
+
   it('should render tracker message table rows', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
@@ -958,6 +971,27 @@ describe('MessagesComponent', () => {
     expect(rows.length)
       .withContext('render rows')
       .toBe(testTrackerMessages.trackerDataMessages!.length);
+  }));
+
+  it('should render sensor message table rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.DataMessage,
+      parameter: DataMessageParameter.SensorData
+    }, testSensorMessages);
+
+    fixture.detectChanges();
+
+    const table = await loader.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+    const rows = await table.getRows();
+
+    expect(headerRows.length)
+      .withContext('render a header row')
+      .toBe(1);
+
+    expect(rows.length)
+      .withContext('render rows')
+      .toBe(testSensorMessages.sensorDataMessages!.length);
   }));
 
   it('should render tracker message table header cells', fakeAsync(async () => {
@@ -987,6 +1021,38 @@ describe('MessagesComponent', () => {
       .toEqual(columnLabels);
   }));
 
+  it('should render sensor message table header cells', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.DataMessage,
+      parameter: DataMessageParameter.SensorData
+    }, testSensorMessages);
+
+    const table = await loader.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+
+    const [headerCells] = await parallel(() => headerRows.map(
+      row => row.getCells()
+    ));
+
+    expect(headerCells.length)
+      .withContext('render header cells')
+      .toBe(dataMessageColumns.length + testSensorMessages.sensorDataMessages![0].sensors.length);
+
+    const sensorNames = testSensorMessages.sensorDataMessages![0].sensors.map(({ name }) => name);
+
+    const headerCellTexts = await parallel(
+      () => headerCells.map(cell => cell.getText())
+    );
+
+    const columnLabels = dataMessageColumns
+      .map(({ value }) => value)
+      .concat(sensorNames);
+
+    expect(headerCellTexts)
+      .withContext('render column labels')
+      .toEqual(columnLabels);
+  }));
+
   it('should render data message table cells', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
@@ -1006,14 +1072,14 @@ describe('MessagesComponent', () => {
     const cellTexts = await parallel(() => cells.map(
       rowCells => parallel(
         () => rowCells
-          .slice(0, -1)
+          .slice(0, 6)
           .map(cell => cell.getText())
       )
     ));
 
     cellTexts.forEach((rowCellTexts, index) => {
       const {
-        num: hash,
+        num: position,
         serverDateTime: time,
         trackerDateTime: registration,
         speed,
@@ -1059,7 +1125,7 @@ describe('MessagesComponent', () => {
         formattedAltitude = formatNumber(altitude, 'en-US', '1.1-1');
       }
 
-      const messageTexts = [hash, formattedTime, formattedRegistration, formattedSpeed, location, formattedAltitude].map(
+      const messageTexts = [position, formattedTime, formattedRegistration, formattedSpeed, location, formattedAltitude].map(
         value => value?.toString() ?? ''
       );
 
@@ -1130,6 +1196,104 @@ describe('MessagesComponent', () => {
       });
     });
   }));
+
+  it('should render sensor message table cells', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.DataMessage,
+      parameter: DataMessageParameter.SensorData
+    }, testSensorMessages);
+
+    const table = await loader.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells()
+    ));
+
+    cells.forEach(({ length }) => {
+      expect(length)
+        .withContext('render cells')
+        .toBe(dataMessageColumns.length + testSensorMessages.sensorDataMessages![0].sensors.length);
+    });
+
+    const cellTexts = await parallel(() => cells.map(
+      rowCells => parallel(
+        () => rowCells.map(cell => cell.getText())
+      )
+    ));
+
+    cellTexts.forEach((rowCellTexts, index) => {
+      const {
+        num: position,
+        serverDateTime: time,
+        trackerDateTime: registration,
+        speed,
+        latitude,
+        longitude,
+        satNumber: satellites,
+        altitude,
+        sensors
+      } = testSensorMessages.sensorDataMessages![index];
+
+      let formattedTime: string | undefined;
+      let formattedRegistration: string | undefined;
+      let formattedSpeed: string | undefined;
+      let formattedLatitude: string | undefined;
+      let formattedLongitude: string | undefined;
+      let location: string | undefined;
+      let formattedAltitude: string | undefined;
+
+      if (time) {
+        formattedTime = formatDate(time, dateFormat, 'ru-RU');
+      }
+
+      if (registration) {
+        formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
+      }
+
+      if (speed) {
+        formattedSpeed = formatNumber(speed, 'en-US', '1.1-1');
+      }
+
+      if (latitude) {
+        formattedLatitude = formatNumber(latitude, 'en-US', '1.6-6');
+      }
+
+      if (longitude) {
+        formattedLongitude = formatNumber(longitude, 'en-US', '1.6-6');
+      }
+
+      if (formattedLatitude && formattedLongitude && satellites) {
+        location = `${formattedLatitude} ${formattedLongitude} (${satellites})`;
+      }
+
+      if (altitude) {
+        formattedAltitude = formatNumber(altitude, 'en-US', '1.1-1');
+      }
+
+      const sensorValues: string[] = [];
+
+      sensors.forEach(({ value, unit }) => {
+        const sensorValue = value ? `${value} ${unit}` : '';
+
+        sensorValues.push(sensorValue);
+      });
+
+      const messageTexts = [
+        position,
+        formattedTime,
+        formattedRegistration,
+        formattedSpeed,
+        location,
+        formattedAltitude,
+        ...sensorValues
+      ].map(value => value?.toString() ?? '');
+
+      expect(rowCellTexts)
+        .withContext('render cells text')
+        .toEqual(messageTexts);
+    });
+  }));
 });
 
 /**
@@ -1183,6 +1347,11 @@ async function mockTestMessages(
       switch (parameter) {
         case DataMessageParameter.TrackerData:
           parameterText = 'Исходные данные';
+
+          break;
+
+        case DataMessageParameter.SensorData:
+          parameterText = 'Значения датчиков';
       }
   }
 
