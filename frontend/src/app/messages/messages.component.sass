@@ -155,7 +155,10 @@ bio-map
     &.mat-column-parameters
       min-width: 475px
 
-    &:not(.mat-column-position, .mat-column-speed, .mat-column-location, .mat-column-altitude, .mat-column-parameters)
+    [class*="mat-column-sensor"]
+      min-width: 100px
+
+    &:not(.mat-column-position, .mat-column-speed, .mat-column-location, .mat-column-altitude, .mat-column-parameters, [class*="mat-column-sensor"])
       min-width: 175px
 
   p
