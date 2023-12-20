@@ -879,7 +879,7 @@ describe('MessagesComponent', () => {
       .toBeUndefined();
 
     let descriptionListDe = fixture.debugElement.query(
-      By.css('dl.legend')
+      By.css('dl#legend')
     );
 
     expect(descriptionListDe)
@@ -904,7 +904,7 @@ describe('MessagesComponent', () => {
       .toBe('Легенда');
 
     descriptionListDe = fixture.debugElement.query(
-      By.css('dl.legend')
+      By.css('dl#legend')
     );
 
     const descriptionDetailsDes = descriptionListDe.queryAll(

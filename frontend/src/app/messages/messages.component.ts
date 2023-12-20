@@ -744,7 +744,7 @@ export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
   },
   {
     key: MessageColumn.Location,
-    value: 'Координаты'
+    value: 'Координаты (Спутники)'
   },
   {
     key: MessageColumn.Altitude,

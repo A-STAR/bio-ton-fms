@@ -182,7 +182,7 @@
 
     <h1>Легенда</h1>
 
-    <dl class="legend">
+    <dl id="legend">
       <dd [style.--marker-background-color]="'#699575'">Сообщения из «черного ящика» (от 2 до 10 минут)</dd>
       <dd [style.--marker-background-color]="'#8FAB93'">Сообщения из «черного ящика» (от 10 до 30 минут)</dd>
       <dd [style.--marker-background-color]="'#CAD8CE'">Сообщения из «черного ящика» (позже 30 минут)</dd>
@@ -194,54 +194,56 @@
 
 <section id="messages">
   <ng-container *ngIf="messages$ | async as messages; else unselected">
-    <mat-table [dataSource]="messagesDataSource!"
+    <figure role="region" aria-labelledby="legend"
       *ngIf="(messages.trackerDataMessages || messages.sensorDataMessages || messages.commandMessages)?.length; else empty">
-      <ng-container sticky [matColumnDef]="column.key" *ngFor="let column of columns | slice:0:1">
-        <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+      <mat-table [dataSource]="messagesDataSource!">
+        <ng-container sticky [matColumnDef]="column.key" *ngFor="let column of columns | slice:0:1">
+          <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
 
-        <mat-cell *matCellDef="let element">{{ element[column.key] }}</mat-cell>
-      </ng-container>
+          <mat-cell *matCellDef="let element">{{ element[column.key] }}</mat-cell>
+        </ng-container>
 
-      <ng-container [matColumnDef]="column.key" *ngFor="let column of columns | slice:1">
-        <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+        <ng-container [matColumnDef]="column.key" *ngFor="let column of columns | slice:1">
+          <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
 
-        <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
-          <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Time"></ng-container>
+          <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+            <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Time"></ng-container>
 
-          <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Registration"></ng-container>
+            <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Registration"></ng-container>
 
-          <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Execution"></ng-container>
+            <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Execution"></ng-container>
 
-          <ng-container [ngTemplateOutlet]="telemetry" *ngSwitchCase="MessageColumn.Speed"></ng-container>
+            <ng-container [ngTemplateOutlet]="telemetry" *ngSwitchCase="MessageColumn.Speed"></ng-container>
 
-          <ng-container *ngSwitchCase="MessageColumn.Location">
-            {{ element[column.key].latitude | number: '1.6-6':'en-US' }}
-            {{ element[column.key].longitude | number: '1.6-6':'en-US' }}
-            ({{ element[column.key].satellites }})
-          </ng-container>
+            <ng-container *ngSwitchCase="MessageColumn.Location">
+              {{ element[column.key].latitude | number: '1.6-6':'en-US' }}
+              {{ element[column.key].longitude | number: '1.6-6':'en-US' }}
+              ({{ element[column.key].satellites }})
+            </ng-container>
 
-          <ng-container [ngTemplateOutlet]="telemetry" *ngSwitchCase="MessageColumn.Altitude"></ng-container>
+            <ng-container [ngTemplateOutlet]="telemetry" *ngSwitchCase="MessageColumn.Altitude"></ng-container>
 
-          <ng-container *ngSwitchCase="MessageColumn.Parameters">
-            <mat-chip-set>
-              <mat-chip disableRipple *ngFor="let parameter of element[column.key]; trackBy: parameterTrackBy">
-                {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
-              </mat-chip>
-            </mat-chip-set>
-          </ng-container>
+            <ng-container *ngSwitchCase="MessageColumn.Parameters">
+              <mat-chip-set>
+                <mat-chip disableRipple *ngFor="let parameter of element[column.key]; trackBy: parameterTrackBy">
+                  {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
+                </mat-chip>
+              </mat-chip-set>
+            </ng-container>
 
-          <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+            <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
 
-          <ng-template #date>{{ element[column.key] | date }}</ng-template>
+            <ng-template #date>{{ element[column.key] | date }}</ng-template>
 
-          <ng-template #telemetry>{{ element[column.key] | number: '1.1-1':'en-US' }}</ng-template>
-        </mat-cell>
-      </ng-container>
+            <ng-template #telemetry>{{ element[column.key] | number: '1.1-1':'en-US' }}</ng-template>
+          </mat-cell>
+        </ng-container>
 
-      <mat-header-row *matHeaderRowDef="columnKeys; sticky: true"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="columnKeys; sticky: true"></mat-header-row>
 
-      <mat-row *matRowDef="let row; columns: columnKeys"></mat-row>
-    </mat-table>
+        <mat-row *matRowDef="let row; columns: columnKeys"></mat-row>
+      </mat-table>
+    </figure>
 
     <ng-template #empty>
       <p>Сообщения не найдены</p>
