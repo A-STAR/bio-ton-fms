@@ -210,6 +210,8 @@
 
           <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Registration"></ng-container>
 
+          <ng-container [ngTemplateOutlet]="date" *ngSwitchCase="MessageColumn.Execution"></ng-container>
+
           <ng-container [ngTemplateOutlet]="telemetry" *ngSwitchCase="MessageColumn.Speed"></ng-container>
 
           <ng-container *ngSwitchCase="MessageColumn.Location">

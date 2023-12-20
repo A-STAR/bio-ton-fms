@@ -26,6 +26,7 @@ import MessagesComponent, {
   DataMessageParameter,
   MessageColumn,
   MessageType,
+  commandMessageColumns,
   dataMessageColumns,
   parseTime,
   trackerMessageColumns
@@ -39,7 +40,15 @@ import { localeID } from '../tech/shared/relative-time.pipe';
 import { PAGE_NUM } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
-import { testMessageLocationAndTrack, testMessageStatistics, testSensorMessages, testTrackerMessages } from './message.service.spec';
+
+import {
+  testCommandMessages,
+  testMessageLocationAndTrack,
+  testMessageStatistics,
+  testSensorMessages,
+  testTrackerMessages
+} from './message.service.spec';
+
 import { dateFormat } from '../directory-tech/trackers/trackers.component.spec';
 
 describe('MessagesComponent', () => {
@@ -955,6 +964,18 @@ describe('MessagesComponent', () => {
       .not.toBeNull();
   }));
 
+  it('should render command message table', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    const tables = await loader.getHarnessOrNull(MatTableHarness);
+
+    expect(tables)
+      .withContext('render a table')
+      .not.toBeNull();
+  }));
+
   it('should render tracker message table rows', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
@@ -992,6 +1013,26 @@ describe('MessagesComponent', () => {
     expect(rows.length)
       .withContext('render rows')
       .toBe(testSensorMessages.sensorDataMessages!.length);
+  }));
+
+  it('should render command message table rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    fixture.detectChanges();
+
+    const table = await loader.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+    const rows = await table.getRows();
+
+    expect(headerRows.length)
+      .withContext('render a header row')
+      .toBe(1);
+
+    expect(rows.length)
+      .withContext('render rows')
+      .toBe(testCommandMessages.commandMessages!.length);
   }));
 
   it('should render tracker message table header cells', fakeAsync(async () => {
@@ -1053,6 +1094,33 @@ describe('MessagesComponent', () => {
       .toEqual(columnLabels);
   }));
 
+  it('should render command message table header cells', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    const table = await loader.getHarness(MatTableHarness);
+    const headerRows = await table.getHeaderRows();
+
+    const [headerCells] = await parallel(() => headerRows.map(
+      row => row.getCells()
+    ));
+
+    expect(headerCells.length)
+      .withContext('render header cells')
+      .toBe(commandMessageColumns.length);
+
+    const headerCellTexts = await parallel(
+      () => headerCells.map(cell => cell.getText())
+    );
+
+    const columnLabels = commandMessageColumns.map(({ value }) => value);
+
+    expect(headerCellTexts)
+      .withContext('render column labels')
+      .toEqual(columnLabels);
+  }));
+
   it('should render data message table cells', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
@@ -1089,17 +1157,14 @@ describe('MessagesComponent', () => {
         altitude
       } = testTrackerMessages.trackerDataMessages![index];
 
-      let formattedTime: string | undefined;
+      const formattedTime = formatDate(time, dateFormat, 'ru-RU');
+
       let formattedRegistration: string | undefined;
       let formattedSpeed: string | undefined;
       let formattedLatitude: string | undefined;
       let formattedLongitude: string | undefined;
       let location: string | undefined;
       let formattedAltitude: string | undefined;
-
-      if (time) {
-        formattedTime = formatDate(time, dateFormat, 'ru-RU');
-      }
 
       if (registration) {
         formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
@@ -1235,17 +1300,14 @@ describe('MessagesComponent', () => {
         sensors
       } = testSensorMessages.sensorDataMessages![index];
 
-      let formattedTime: string | undefined;
+      const formattedTime = formatDate(time, dateFormat, 'ru-RU');
+
       let formattedRegistration: string | undefined;
       let formattedSpeed: string | undefined;
       let formattedLatitude: string | undefined;
       let formattedLongitude: string | undefined;
       let location: string | undefined;
       let formattedAltitude: string | undefined;
-
-      if (time) {
-        formattedTime = formatDate(time, dateFormat, 'ru-RU');
-      }
 
       if (registration) {
         formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
@@ -1288,6 +1350,58 @@ describe('MessagesComponent', () => {
         formattedAltitude,
         ...sensorValues
       ].map(value => value?.toString() ?? '');
+
+      expect(rowCellTexts)
+        .withContext('render cells text')
+        .toEqual(messageTexts);
+    });
+  }));
+
+  it('should render command message table cells', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    const table = await loader.getHarness(MatTableHarness);
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells()
+    ));
+
+    cells.forEach(({ length }) => {
+      expect(length)
+        .withContext('render cells')
+        .toBe(commandMessageColumns.length);
+    });
+
+    const cellTexts = await parallel(() => cells.map(
+      rowCells => parallel(
+        () => rowCells.map(cell => cell.getText())
+      )
+    ));
+
+    cellTexts.forEach((rowCellTexts, index) => {
+      const {
+        num: position,
+        commandDateTime: time,
+        commandText: command,
+        executionTime: execution,
+        channel,
+        commandResponseText: response
+      } = testCommandMessages.commandMessages![index];
+
+      const formattedTime = formatDate(time, dateFormat, 'ru-RU');
+
+      let formattedExecution: string | undefined;
+
+      if (execution) {
+        formattedExecution = formatDate(time, dateFormat, 'ru-RU');
+      }
+
+      const messageTexts = [position, formattedTime, command, formattedExecution, channel, response].map(
+        value => value?.toString() ?? ''
+      );
 
       expect(rowCellTexts)
         .withContext('render cells text')
@@ -1337,7 +1451,7 @@ async function mockTestMessages(
     })
   );
 
-  let typeText: string | undefined;
+  let typeText: string;
   let parameterText: string | undefined;
 
   switch (type) {
@@ -1353,6 +1467,11 @@ async function mockTestMessages(
         case DataMessageParameter.SensorData:
           parameterText = 'Значения датчиков';
       }
+
+      break;
+
+    case MessageType.CommandMessage:
+      typeText = 'Отправленные команды';
   }
 
   await typeSelect.clickOptions({

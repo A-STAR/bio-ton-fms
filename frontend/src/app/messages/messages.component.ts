@@ -30,6 +30,7 @@ import {
 } from 'rxjs';
 
 import {
+  CommandMessage,
   DataMessage,
   MessageService,
   MessageStatistics,
@@ -131,7 +132,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
   protected messages$?: Observable<Messages>;
-  protected messagesDataSource?: TableDataSource<TrackerMessageDataSource | SensorMessageDataSource>;
+  protected messagesDataSource?: TableDataSource<TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource>;
   protected location$?: Observable<LocationAndTrackResponse>;
   protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
@@ -463,6 +464,11 @@ export default class MessagesComponent implements OnInit, OnDestroy {
             this.columns = this.columns.concat(sensorColumns);
           }
         }
+
+        break;
+
+      case MessageType.CommandMessage:
+        this.columns = commandMessageColumns;
     }
 
     this.columnKeys = this.columns?.map(({ key }) => key);
@@ -554,12 +560,32 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Map command messages data source.
+   *
+   * @param messages Messages with pagination.
+   *
+   * @returns Mapped `CommandMessageDataSource`.
+   */
+  #mapCommandMessagesDataSource({ commandMessages }: Messages) {
+    return Object
+      .freeze(commandMessages!)
+      .map(({
+        num: position,
+        commandDateTime: time,
+        commandText: command,
+        executionTime: execution,
+        channel,
+        commandResponseText: response
+      }): CommandMessageDataSource => ({ position, time, channel, command, execution, response }));
+  }
+
+  /**
    * Initialize `TableDataSource` and set messages data source.
    *
    * @param messages Messages.
    */
   #setMessagesDataSource(messages: Messages) {
-    let messagesDataSource: (TrackerMessageDataSource | SensorMessageDataSource)[] | undefined;
+    let messagesDataSource: (TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource)[] | undefined;
 
     switch (this.#options?.viewMessageType) {
       case MessageType.DataMessage:
@@ -573,6 +599,11 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           case DataMessageParameter.SensorData:
             messagesDataSource = this.#mapSensorMessagesDataSource(messages);
         }
+
+        break;
+
+      case MessageType.CommandMessage:
+        messagesDataSource = this.#mapCommandMessagesDataSource(messages);
     }
 
     if (this.messagesDataSource) {
@@ -631,7 +662,11 @@ export enum MessageColumn {
   Speed = 'speed',
   Location = 'location',
   Altitude = 'altitude',
-  Parameters = 'parameters'
+  Parameters = 'parameters',
+  Command = 'command',
+  Channel = 'channel',
+  Execution = 'execution',
+  Response = 'response'
 }
 
 type MessageSelectionForm = FormGroup<{
@@ -676,13 +711,25 @@ interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'al
   };
 }
 
+interface CommandMessageDataSource extends Pick<CommandMessage, 'channel'> {
+  position: CommandMessage['num'];
+  time: CommandMessage['commandDateTime'];
+  command: CommandMessage['commandText'];
+  execution: CommandMessage['executionTime'];
+  response: CommandMessage['commandResponseText'];
+}
+
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
 
-export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
+const messageColumns: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Position,
     value: '#'
-  },
+  }
+];
+
+export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
+  ...messageColumns,
   {
     key: MessageColumn.Time,
     value: 'Время устройства'
@@ -709,6 +756,30 @@ export const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Parameters,
     value: 'Параметры'
+  }
+];
+
+export const commandMessageColumns: KeyValue<MessageColumn, string>[] = [
+  ...messageColumns,
+  {
+    key: MessageColumn.Time,
+    value: 'Время'
+  },
+  {
+    key: MessageColumn.Command,
+    value: 'Текст сообщения'
+  },
+  {
+    key: MessageColumn.Execution,
+    value: 'Время выполнения'
+  },
+  {
+    key: MessageColumn.Channel,
+    value: 'Канал'
+  },
+  {
+    key: MessageColumn.Response,
+    value: 'Ответ на команду'
   }
 ];
 

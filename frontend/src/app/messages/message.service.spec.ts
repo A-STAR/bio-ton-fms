@@ -24,6 +24,8 @@ import {
   testVehicleMonitoringInfo
 } from '../tech/tech.service.spec';
 
+import { TrackerCommandTransport } from '../directory-tech/tracker.service';
+
 import { testParameters } from '../directory-tech/tracker.service.spec';
 
 describe('MessageService', () => {
@@ -226,7 +228,7 @@ export const testTrackerMessages: Messages = {
       id: 1,
       num: 178,
       serverDateTime: '2023-12-08T21:52:00.273523+00:00',
-      trackerDateTime: '2023-12-08T21:52:00.2735232+00:00',
+      trackerDateTime: '2023-12-08T21:52:00.273523+00:00',
       speed: 66.0,
       latitude: 42.152,
       longitude: 12.13,
@@ -244,13 +246,35 @@ export const testSensorMessages: Messages = {
       id: 1,
       num: 1,
       serverDateTime: '2023-12-08T21:52:00.273523+00:00',
-      trackerDateTime: '2023-12-08T21:52:00.2735232+00:00',
+      trackerDateTime: '2023-12-08T21:52:00.273523+00:00',
       speed: 66.0,
       latitude: 42.152,
       longitude: 12.13,
       satNumber: 2,
       altitude: 23.1,
       sensors: testVehicleMonitoringInfo.trackerInfo.sensors!
+    }
+  ],
+  ...pagination
+};
+
+export const testCommandMessages: Messages = {
+  commandMessages:[
+    {
+      num: 1,
+      commandDateTime: '2023-12-17T03:09:22.9649951Z',
+      commandText: 'text 1',
+      executionTime: '2023-12-17T03:09:22.9649951Z',
+      channel: TrackerCommandTransport.SMS,
+      commandResponseText: 'response 1'
+    },
+    {
+      num: 2,
+      commandDateTime: '2023-12-17T03:09:22.964995Z',
+      commandText: 'text 2',
+      executionTime: '2023-12-17T03:09:22.964995Z',
+      channel: TrackerCommandTransport.TCP,
+      commandResponseText: 'response 2'
     }
   ],
   ...pagination

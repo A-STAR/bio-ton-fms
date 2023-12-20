@@ -143,6 +143,11 @@ bio-map
   mat-cell
 
     &.mat-column-speed,
+    &.mat-column-execution,
+    &.mat-column-channel
+      flex: unset
+
+    &.mat-column-speed,
     &.mat-column-altitude
       min-width: 70px
 
@@ -158,7 +163,10 @@ bio-map
     [class*="mat-column-sensor"]
       min-width: 100px
 
-    &:not(.mat-column-position, .mat-column-speed, .mat-column-location, .mat-column-altitude, .mat-column-parameters, [class*="mat-column-sensor"])
+    &.mat-column-channel
+      min-width: 80px
+
+    &:not(.mat-column-position, .mat-column-speed, .mat-column-location, .mat-column-altitude, .mat-column-parameters, [class*="mat-column-sensor"], .mat-column-channel)
       min-width: 175px
 
   p
