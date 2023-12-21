@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using Xunit.Abstractions;
+using BioTonFMS.Telematica.Validation;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
@@ -410,7 +411,8 @@ public class MessagesViewControllerTests
         var vehicleRepository = VehicleRepositoryMock.GetStub(vehicles);
         var commandRepository = TrackerCommandRepositoryMock.GetStub();
         var messageRepository = TrackerMessageRepositoryMock.GetStub(messages);
+        var messagesViewMessagesRequestValidator = new MessagesViewMessagesRequestValidator();
 
-        return new MessagesViewController(logger, mapper, vehicleRepository, commandRepository, messageRepository);
+        return new MessagesViewController(logger, mapper, messagesViewMessagesRequestValidator, vehicleRepository, commandRepository, messageRepository);
     }
 }

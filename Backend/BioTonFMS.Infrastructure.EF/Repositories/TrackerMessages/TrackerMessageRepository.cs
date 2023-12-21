@@ -327,4 +327,94 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                          messages.Select(x => x.ServerDateTime).DefaultIfEmpty().Min()).Seconds
         };
     }
+
+    /// <summary>
+    /// Возвращает массив событий с данными от трекера для зададанного трекера и временного диапазода  
+    /// </summary>
+    /// <param name="externalId"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public PagedResult<TrackerDataMessageDto> GeTrackertDataMessages(int externalId, DateTime start, DateTime end,
+        int pageNum, int pageSize)
+    {
+        PagedResult<TrackerMessage> messages = QueryableProvider
+            .Fetch(m => m.Tags.Where(x => x.SensorId == null))
+            .Linq()
+            .Where(m => m.ExternalTrackerId == externalId &&
+                        m.ServerDateTime >= start &&
+                        m.ServerDateTime <= end)
+            .OrderBy(x => x.ServerDateTime)
+            .AsNoTracking()
+            .GetPagedQueryable(pageNum, pageSize);
+
+        Dictionary<int, TrackerTag> trackerTags = _tagsRepository.GetTags().ToDictionary(x => x.Id);
+
+        return new PagedResult<TrackerDataMessageDto>
+        {
+            Results = messages.Results.Select((m, idx) => new TrackerDataMessageDto
+            {
+                Id = m.Id,
+                Num = (messages.CurrentPage - 1) * messages.PageSize + idx,
+                ServerDateTime = m.ServerDateTime,
+                TrackerDateTime = m.TrackerDateTime,
+                Latitude = m.Latitude,
+                Longitude = m.Longitude,
+                Altitude = m.Altitude,
+                SatNumber = m.SatNumber,
+                Speed = m.Speed,
+                Parameters = GetParametersForMessage(m, trackerTags)
+            }).ToList(),
+            CurrentPage = messages.CurrentPage,
+            PageSize = messages.PageSize,
+            TolalRowCount = messages.TolalRowCount,
+            TotalPageCount = messages.TotalPageCount
+        };
+    }
+
+    private TrackerParameter[] GetParametersForMessage(TrackerMessage message, Dictionary<int, TrackerTag> trackerTags)
+    {
+        IList<MessageTag>? tags = message.Tags;
+
+        if (tags is null || !tags.Any())
+        {
+            return new TrackerParameter[] { };
+        }
+        
+        var result = new List<TrackerParameter>();
+        foreach (var tag in tags)
+        {
+            var parameter = new TrackerParameter();
+            if (tag.TrackerTagId.HasValue)
+            {
+                parameter.ParamName = trackerTags[tag.TrackerTagId.Value].Name;
+            }
+
+            switch (tag.TagType)
+            {
+                case TagDataTypeEnum.Integer:
+                    parameter.LastValueDecimal = ((MessageTagInteger)tag).Value;
+                    break;
+                case TagDataTypeEnum.Bits or TagDataTypeEnum.Boolean or TagDataTypeEnum.String:
+                    parameter.LastValueString = tag.ValueString;
+                    break;
+                case TagDataTypeEnum.Byte:
+                    parameter.LastValueDecimal = ((MessageTagByte)tag).Value;
+                    break;
+                case TagDataTypeEnum.Double:
+                    parameter.LastValueDecimal = ((MessageTagDouble)tag).Value;
+                    break;
+                case TagDataTypeEnum.DateTime:
+                    parameter.LastValueDateTime = ((MessageTagDateTime)tag).Value;
+                    break;
+            }
+
+            result.Add(parameter);
+        }
+
+        return result.ToArray();
+    }
+
+
+
 }
