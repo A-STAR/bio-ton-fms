@@ -24,22 +24,24 @@ public static class TrackerCommandRepositoryMock
         return new TrackerCommandRepository(keyValueProviderMock, commandQueryProviderMock, unitOfWorkFactoryMock);
     }
     
+    private static DateTime Now = SystemTime.UtcNow;
+
     public static List<TrackerCommand> SampleCommands => new()
     {
         new TrackerCommand
         {
             Tracker = new Tracker{ExternalId = 2552},
-            SentDateTime = SystemTime.UtcNow
+            SentDateTime = Now
         },
         new TrackerCommand
         {
             Tracker = new Tracker{ExternalId = 2552},
-            SentDateTime = SystemTime.UtcNow.AddSeconds(-10)
+            SentDateTime = Now.AddSeconds(-10)
         },
         new TrackerCommand
         {
             Tracker = new Tracker{ExternalId = 2552},
-            SentDateTime = SystemTime.UtcNow.AddSeconds(-20)
+            SentDateTime = Now.AddSeconds(-20)
         }
     };
 }

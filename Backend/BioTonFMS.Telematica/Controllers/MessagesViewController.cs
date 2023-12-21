@@ -2,13 +2,15 @@ using AutoMapper;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Domain.Monitoring;
-using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
 using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
+using BioTonFMS.Telematica.Validation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +27,11 @@ namespace BioTonFMS.Telematica.Controllers;
 [Route("/api/telematica/messagesview")]
 [Consumes("application/json")]
 [Produces("application/json")]
-public class MessagesViewController : ControllerBase
+public class MessagesViewController :  ValidationControllerBase
 {
     private readonly ILogger<MessagesViewController> _logger;
     private readonly IMapper _mapper;
+    private readonly MessagesViewMessagesRequestValidator _messagesViewMessagesRequestValidator;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly ITrackerCommandRepository _commandRepository;
     private readonly ITrackerMessageRepository _messageRepository;
@@ -36,12 +39,14 @@ public class MessagesViewController : ControllerBase
     public MessagesViewController(
         ILogger<MessagesViewController> logger,
         IMapper mapper,
+        MessagesViewMessagesRequestValidator messagesViewMessagesRequestValidator,
         IVehicleRepository vehicleRepository,
         ITrackerCommandRepository commandRepository,
         ITrackerMessageRepository messageRepository)
     {
         _logger = logger;
         _mapper = mapper;
+        _messagesViewMessagesRequestValidator = messagesViewMessagesRequestValidator;
         _vehicleRepository = vehicleRepository;
         _commandRepository = commandRepository;
         _messageRepository = messageRepository;
@@ -125,93 +130,56 @@ public class MessagesViewController : ControllerBase
     }
 
     /// <summary>
-    /// Возвращает точки для трека для выбранной машины и периода
+    /// Возвращает сообщения для выбранной машины и периода
     /// </summary>
     [HttpGet("list")]
     [ProducesResponseType(typeof(ViewMessageMessagesDto), StatusCodes.Status200OK)]
     public IActionResult GetMessagesViewMessages([FromQuery] MessagesViewMessagesRequest request)
     {
-        return Ok(new ViewMessageMessagesDto
+        ValidationResult validationResult = _messagesViewMessagesRequestValidator
+            .Validate(request);
+        if (!validationResult.IsValid)
         {
-            Pagination = new Pagination { Total = 10, PageIndex = 1 },
-            CommandMessages = new[]
+            return ReturnValidationErrors(validationResult);
+        }
+
+        if (!_vehicleRepository.GetExternalIds(request.VehicleId)
+                .TryGetValue(request.VehicleId, out var externalId))
+        {
+            return NotFound("Машина с таким id не существует, либо к ней не привязан трекер");
+        }
+
+        if (request is
             {
-                new CommandMessageDto
-                {
-                    Channel = "channel",
-                    Num = 1,
-                    CommandText = "text 1",
-                    ExecutionTime = 123,
-                    CommandDateTime = DateTime.UtcNow,
-                    CommandResponseText = "response 1"
-                },
-                new CommandMessageDto
-                {
-                    Channel = "channel",
-                    Num = 2,
-                    CommandText = "text 2",
-                    ExecutionTime = 542,
-                    CommandDateTime = DateTime.UtcNow,
-                    CommandResponseText = "response 2"
-                }
-            },
-            SensorDataMessages = new[]
+                ViewMessageType: ViewMessageTypeEnum.DataMessage,
+                ParameterType: ParameterTypeEnum.TrackerData
+            })
+        {
+            var pagedDataMessages = _messageRepository.GeTrackertDataMessages(externalId, request.PeriodStart.ToUniversalTime(), 
+                request.PeriodEnd.ToUniversalTime(), request.PageNum, request.PageSize);
+            return Ok(new ViewMessageMessagesDto
             {
-                new SensorDataMessageDto
+                TrackerDataMessages = pagedDataMessages.Results.ToArray(),
+                Pagination = new Pagination
                 {
-                    Id = 1,
-                    Longitude = 13.13,
-                    Latitude = 23.1,
-                    ServerDateTime = DateTime.Now,
-                    TrackerDateTime = DateTime.Now,
-                    Num = 1,
-                    Altitude = 23.1,
-                    SatNumber = 123,
-                    Speed = 44,
-                    Sensors = new[]
-                    {
-                        new TrackerSensorDto
-                        {
-                            Value = "val",
-                            Name = "name",
-                            Unit = "unit"
-                        }
-                    }
+                    PageIndex = pagedDataMessages.CurrentPage,
+                    Total = pagedDataMessages.TotalPageCount
                 }
-            },
-            TrackerDataMessages = new[]
+            });
+        }
+
+        if (request is
             {
-                new TrackerDataMessageDto
-                {
-                    Id = 1,
-                    Longitude = 12.13,
-                    Latitude = 42.152,
-                    ServerDateTime = DateTime.Now,
-                    TrackerDateTime = DateTime.Now,
-                    Num = 178,
-                    Altitude = 23.1,
-                    SatNumber = 2,
-                    Speed = 66,
-                    Parameters = new[]
-                    {
-                        new TrackerParameter
-                        {
-                            ParamName = "param0",
-                            LastValueDateTime = DateTime.MaxValue
-                        },
-                        new TrackerParameter
-                        {
-                            ParamName = "param1",
-                            LastValueDecimal = 34.66
-                        },
-                        new TrackerParameter
-                        {
-                            ParamName = "param2",
-                            LastValueString = "val"
-                        },
-                    }
-                }
-            }
-        });
+                ViewMessageType: ViewMessageTypeEnum.DataMessage,
+                ParameterType: ParameterTypeEnum.SensorData
+            })
+        {
+        }
+
+        if (request.ViewMessageType == ViewMessageTypeEnum.CommandMessage)
+        {
+        }
+
+        return Ok();
     }
 }

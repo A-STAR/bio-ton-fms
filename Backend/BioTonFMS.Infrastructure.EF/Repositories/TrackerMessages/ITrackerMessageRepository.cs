@@ -39,4 +39,5 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     IDictionary<int, (double Lat, double Long)> GetLocations(params int[] externalIds);
 
     ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end);
+    PagedResult<TrackerDataMessageDto> GeTrackertDataMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
 }
