@@ -56,7 +56,7 @@
           <mat-error *ngIf="!selectionForm.controls.range.controls.start.controls.time?.errors?.['required']
             && !selectionForm.controls.range.controls.start.controls.time.errors?.['pattern']
             && selectionForm.controls.range.controls.start.controls.time.errors?.['rangeTimeMax'] as error">
-            Время должно быть ранее {{ error.max }}
+            Время позднее {{ error.max }}
           </mat-error>
         </mat-form-field>
       </fieldset>
@@ -104,7 +104,7 @@
           <mat-error *ngIf="!selectionForm.controls.range.controls.end.controls.time.errors?.['required']
             && !selectionForm.controls.range.controls.end.controls.time.errors?.['pattern']
             && selectionForm.controls.range.controls.end.controls.time.errors?.['rangeTimeMin'] as error">
-            Время должно быть позже {{ error.min }}
+            Время ранее {{ error.min }}
           </mat-error>
         </mat-form-field>
       </fieldset>

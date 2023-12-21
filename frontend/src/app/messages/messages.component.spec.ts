@@ -365,7 +365,7 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time max error')
-      .toBeResolvedTo(`Время должно быть ранее ${testStartTime}`);
+      .toBeResolvedTo(`Время позднее ${testStartTime}`);
 
     let endTimeFormField = await loader.getHarness(
       MatFormFieldHarness.with({
@@ -385,7 +385,7 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time min error')
-      .toBeResolvedTo(`Время должно быть позже ${testEndTime}`);
+      .toBeResolvedTo(`Время ранее ${testEndTime}`);
 
     // set correct start and end time
     await startTimeInput.setValue(testStartTime);
@@ -432,7 +432,7 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time max error')
-      .toBeResolvedTo(`Время должно быть ранее ${testStartTime}`);
+      .toBeResolvedTo(`Время позднее ${testStartTime}`);
 
     endTimeFormField = await loader.getHarness(
       MatFormFieldHarness.with({
@@ -452,7 +452,7 @@ describe('MessagesComponent', () => {
       errors[0].getText()
     )
       .withContext('render range time min error')
-      .toBeResolvedTo(`Время должно быть позже ${testStartTime}`);
+      .toBeResolvedTo(`Время ранее ${testStartTime}`);
 
     discardPeriodicTasks();
   }));
