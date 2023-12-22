@@ -335,7 +335,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public PagedResult<TrackerDataMessageDto> GeTrackertDataMessages(int externalId, DateTime start, DateTime end,
+    public PagedResult<TrackerDataMessageDto> GetTrackertDataMessages(int externalId, DateTime start, DateTime end,
         int pageNum, int pageSize)
     {
         PagedResult<TrackerMessage> messages = QueryableProvider
@@ -355,7 +355,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             Results = messages.Results.Select((m, idx) => new TrackerDataMessageDto
             {
                 Id = m.Id,
-                Num = (messages.CurrentPage - 1) * messages.PageSize + idx,
+                Num = (messages.CurrentPage - 1) * messages.PageSize + idx + 1,
                 ServerDateTime = m.ServerDateTime,
                 TrackerDateTime = m.TrackerDateTime,
                 Latitude = m.Latitude,
@@ -370,6 +370,24 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             TolalRowCount = messages.TolalRowCount,
             TotalPageCount = messages.TotalPageCount
         };
+    }
+
+    /// <summary>
+    /// Удаляет сообщения из списка
+    /// </summary>
+    /// <param name="messageIds">список идентификаторов для удаления</param>
+    public void DeleteMessages(long[] messageIds)
+    {
+        var existingFromList = QueryableProvider.Linq().Where(m => messageIds.Contains(m.Id)).ToList();
+        if (messageIds.Length > existingFromList.Count())
+        {
+            throw new ArgumentException($"Для некоторых идентификаторов из списка не найдены сообщения");
+        }
+
+        foreach (var message in existingFromList)
+        {
+            base.Remove(message);
+        }
     }
 
     private TrackerParameter[] GetParametersForMessage(TrackerMessage message, Dictionary<int, TrackerTag> trackerTags)
@@ -414,7 +432,4 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
         return result.ToArray();
     }
-
-
-
 }
