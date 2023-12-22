@@ -6,6 +6,7 @@ using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
+using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.MessagesView;
 using BioTonFMS.Telematica.Dtos.Monitoring;
@@ -27,7 +28,7 @@ namespace BioTonFMS.Telematica.Controllers;
 [Route("/api/telematica/messagesview")]
 [Consumes("application/json")]
 [Produces("application/json")]
-public class MessagesViewController :  ValidationControllerBase
+public class MessagesViewController : ValidationControllerBase
 {
     private readonly ILogger<MessagesViewController> _logger;
     private readonly IMapper _mapper;
@@ -92,8 +93,12 @@ public class MessagesViewController :  ValidationControllerBase
     /// <summary>
     /// Возвращает точки для трека для выбранной машины и периода
     /// </summary>
+    /// <param name="request">Параметры запроса для получения трека</param>
+    /// <response code="200">Трек успешно возвращён</response>
+    /// <response code="400">Невалидные параметры запроса</response>
     [HttpGet("track")]
     [ProducesResponseType(typeof(LocationsAndTracksResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult GetMessagesViewTrack([FromQuery] MessagesViewTrackRequest request)
     {
         if (!_vehicleRepository.GetExternalIds(request.VehicleId).TryGetValue(request.VehicleId, out var externalId))
@@ -132,8 +137,13 @@ public class MessagesViewController :  ValidationControllerBase
     /// <summary>
     /// Возвращает сообщения для выбранной машины и периода
     /// </summary>
+    /// <param name="request">Параметры запроса для списка сообщений</param>
+    /// <response code="200">Список сообщенний успешно возвращён</response>
+    /// <response code="400">Невалидные параметры запроса</response>
     [HttpGet("list")]
     [ProducesResponseType(typeof(ViewMessageMessagesDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status400BadRequest)]
     public IActionResult GetMessagesViewMessages([FromQuery] MessagesViewMessagesRequest request)
     {
         ValidationResult validationResult = _messagesViewMessagesRequestValidator
@@ -155,7 +165,7 @@ public class MessagesViewController :  ValidationControllerBase
                 ParameterType: ParameterTypeEnum.TrackerData
             })
         {
-            var pagedDataMessages = _messageRepository.GeTrackertDataMessages(externalId, request.PeriodStart.ToUniversalTime(), 
+            var pagedDataMessages = _messageRepository.GetTrackertDataMessages(externalId, request.PeriodStart.ToUniversalTime(),
                 request.PeriodEnd.ToUniversalTime(), request.PageNum, request.PageSize);
             return Ok(new ViewMessageMessagesDto
             {
@@ -181,5 +191,32 @@ public class MessagesViewController :  ValidationControllerBase
         }
 
         return Ok();
+    }
+
+    /// <summary>
+    /// Удаляет список сообщений по идентификаторам
+    /// </summary>
+    /// <param name="messageIds">Список идентификаторов сообщений для удаления</param>
+    /// <response code="200">Список сообщенний успешно возвращён</response>
+    /// <response code="404">В списке есть идентификаторы несуществующих сообщений</response>
+    [HttpDelete("delete-messages")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
+    public IActionResult DeleteMessages([FromBody] long[] messageIds)
+    {
+        try
+        {
+            _messageRepository.DeleteMessages(messageIds);
+            return Ok();
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(new ServiceErrorResult(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении сообщений");
+            throw;
+        }
     }
 }

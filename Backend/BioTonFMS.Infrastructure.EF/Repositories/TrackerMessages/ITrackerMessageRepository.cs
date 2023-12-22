@@ -38,6 +38,23 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     /// <returns>Локации трекеров в формате Longitude, Latitude</returns>
     IDictionary<int, (double Lat, double Long)> GetLocations(params int[] externalIds);
 
+    /// <summary>
+    ///  Получить статистику для трекера за период
+    /// </summary>
+    /// <param name="externalId">Внешний идентификатор трекера</param>
+    /// <param name="start">Начало периода</param>
+    /// <param name="end">Конец периода</param>
+    /// <returns></returns>
     ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end);
-    PagedResult<TrackerDataMessageDto> GeTrackertDataMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
+
+    /// <summary>
+    /// Возвращает массив событий с данными от трекера для зададанного трекера и временного диапазода  
+    /// </summary>
+    PagedResult<TrackerDataMessageDto> GetTrackertDataMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
+
+    /// <summary>
+    /// Удаляет сообщения из списка
+    /// </summary>
+    /// <param name="messageIds">список идентификаторов для удаления</param>
+    void DeleteMessages(long[] messageIds);
 }
