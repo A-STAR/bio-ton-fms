@@ -475,6 +475,50 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Compute message row black box CSS class.
+   *
+   * @param timeDate Message time date.
+   * @param registrationDate Message server registration date.
+   *
+   * @returns Message CSS class.
+   */
+  #getBlackBoxClass(timeDate: DataMessage['trackerDateTime'], registrationDate: DataMessage['serverDateTime']) {
+    let cssClass: string | undefined;
+
+    if (timeDate) {
+      const time = new Date(timeDate)
+        .getTime();
+
+      const registration = new Date(registrationDate)
+        .getTime();
+
+      const period = registration - time;
+      const MINUTE = 60 * 1000;
+
+      switch (true) {
+        case period <= 2 * MINUTE:
+
+          break;
+
+        case period <= 10 * MINUTE:
+          cssClass = 'black-box';
+
+          break;
+
+        case period <= 30 * MINUTE:
+          cssClass = 'black-box-medium';
+
+          break;
+
+        default:
+          cssClass = 'black-box-long';
+      }
+    }
+
+    return cssClass;
+  }
+
+  /**
    * Map tracker messages data source.
    *
    * @param messages Messages with pagination.
@@ -503,7 +547,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         speed,
         location: { latitude, longitude, satellites },
         altitude,
-        parameters
+        parameters,
+        class: this.#getBlackBoxClass(time, registration)
       }));
   }
 
@@ -554,7 +599,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           speed,
           location: { latitude, longitude, satellites },
           altitude,
-          ...sensorMap
+          ...sensorMap,
+          class: this.#getBlackBoxClass(time, registration)
         };
       });
   }
@@ -696,6 +742,7 @@ interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'a
     longitude: DataMessage['longitude'];
     satellites: DataMessage['satNumber'];
   };
+  class?: string;
 }
 
 interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Partial<{
@@ -709,6 +756,7 @@ interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'al
     longitude: DataMessage['longitude'];
     satellites: DataMessage['satNumber'];
   };
+  class?: string;
 }
 
 interface CommandMessageDataSource extends Pick<CommandMessage, 'channel'> {

@@ -94,8 +94,8 @@ export type MessageTrackOptions = Pick<MessagesOptions, 'vehicleId' | 'periodSta
 export type DataMessage = {
   id: number;
   num: number;
-  serverDateTime: string;
   trackerDateTime?: string;
+  serverDateTime: string;
   speed?: number;
   latitude?: number;
   longitude?: number;

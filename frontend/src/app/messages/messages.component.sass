@@ -139,6 +139,34 @@ bio-map
   figure
     overflow: auto
 
+  mat-row
+
+    &.black-box
+      background-color: $lighter-green
+
+    &.black-box-medium,
+    &.black-box-long
+
+      mat-cell
+        color: $white
+
+      mat-chip
+        --mdc-chip-label-text-color: #{$white}
+
+        border-color: $light-gray
+
+    &.black-box-medium
+      background-color: $light-green
+
+      mat-chip
+        --mdc-chip-elevated-container-color: #{$brighter-green}
+
+    &.black-box-long
+      background-color: $brighter-green
+
+      mat-chip
+        --mdc-chip-elevated-container-color: #{$light-green}
+
   mat-header-cell,
   mat-cell
 
