@@ -165,7 +165,7 @@ public class MessagesViewController : ValidationControllerBase
                 ParameterType: ParameterTypeEnum.TrackerData
             })
         {
-            var pagedDataMessages = _messageRepository.GetTrackertDataMessages(externalId, request.PeriodStart.ToUniversalTime(),
+            var pagedDataMessages = _messageRepository.GetParameterDataTrackerMessages(externalId, request.PeriodStart.ToUniversalTime(),
                 request.PeriodEnd.ToUniversalTime(), request.PageNum, request.PageSize);
             return Ok(new ViewMessageMessagesDto
             {
@@ -184,6 +184,17 @@ public class MessagesViewController : ValidationControllerBase
                 ParameterType: ParameterTypeEnum.SensorData
             })
         {
+            var pagedSensorMessages = _messageRepository.GetSensorDataTrackerMessages(externalId, request.PeriodStart.ToUniversalTime(),
+                request.PeriodEnd.ToUniversalTime(), request.PageNum, request.PageSize);
+            return Ok(new ViewMessageMessagesDto
+            {
+                SensorDataMessages = pagedSensorMessages.Results.ToArray(),
+                Pagination = new Pagination
+                {
+                    PageIndex = pagedSensorMessages.CurrentPage,
+                    Total = pagedSensorMessages.TotalPageCount
+                }
+            });
         }
 
         if (request.ViewMessageType == ViewMessageTypeEnum.CommandMessage)

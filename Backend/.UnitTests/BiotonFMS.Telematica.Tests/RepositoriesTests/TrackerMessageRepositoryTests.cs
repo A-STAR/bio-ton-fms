@@ -52,7 +52,7 @@ public class TrackerMessageRepositoryTests
     public void GetParameters_ShouldReturnParameters(int externalId)
     {
         var repo = TrackerMessageRepositoryMock.GetStub();
-        var parameters = repo.GetParameters(externalId);
+        var parameters = repo.GetLastParameters(externalId);
         parameters.Count.Should().Be(3);
         parameters.First(x => x.ParamName == "hdop").LastValueDecimal.Should().Be(6);
         parameters.First(x => x.ParamName == "rec_sn").LastValueDecimal.Should().Be(12345);
@@ -65,7 +65,7 @@ public class TrackerMessageRepositoryTests
     public void GetParameters_NoMessages_ShouldReturnEmptyCollection(int externalId)
     {
         var repo = TrackerMessageRepositoryMock.GetStub();
-        var parameters = repo.GetParameters(externalId);
+        var parameters = repo.GetLastParameters(externalId);
 
         parameters.Should().Equal(Enumerable.Empty<TrackerParameter>());
     }
@@ -122,7 +122,7 @@ public class TrackerMessageRepositoryTests
             }
         };
         var repo = TrackerMessageRepositoryMock.GetStub(messages);
-        var parameters = repo.GetParameters(2552);
+        var parameters = repo.GetLastParameters(2552);
 
         parameters.Count.Should().Be(6);
         parameters.First(x => x.ParamName == "out").LastValueString.Should().Be("11111");

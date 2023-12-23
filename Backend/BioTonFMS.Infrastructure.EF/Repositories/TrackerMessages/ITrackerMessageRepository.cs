@@ -20,7 +20,7 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
 
     TrackerStandardParameters GetStandardParameters(int externalId);
 
-    IList<TrackerParameter> GetParameters(int externalId);
+    IList<TrackerParameter> GetLastParameters(int externalId);
 
     TrackerMessage? GetLastMessageFor(int externalId);
 
@@ -48,9 +48,14 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end);
 
     /// <summary>
-    /// Возвращает массив событий с данными от трекера для зададанного трекера и временного диапазода  
+    /// Возвращает массив событий со значениями параметров трекера для зададанного трекера и временного диапазода  
     /// </summary>
-    PagedResult<TrackerDataMessageDto> GetTrackertDataMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
+    PagedResult<TrackerDataMessageDto> GetParameterDataTrackerMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
+
+    /// <summary>
+    /// Возвращает массив событий со значениями датчиков трекера для зададанного трекера и временного диапазода
+    /// </summary>
+    PagedResult<SensorDataMessageDto> GetSensorDataTrackerMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
 
     /// <summary>
     /// Удаляет сообщения из списка

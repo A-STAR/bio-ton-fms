@@ -148,7 +148,7 @@ public class MonitoringController : ValidationControllerBase
         }
         
         var trackerInfo = _mapper.Map<MonitoringTrackerInfoDto>(tracker);
-        trackerInfo.Parameters = _messageRepository.GetParameters(tracker.ExternalId);
+        trackerInfo.Parameters = _messageRepository.GetLastParameters(tracker.ExternalId);
 
         var lastMessage = _messageRepository.GetLastMessageFor(tracker.ExternalId);
 
