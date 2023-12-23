@@ -201,7 +201,7 @@ public class TrackerDataControllerTests
         var kvp = new KeyValueProviderMock<TrackerMessage, int>(messages);
         var qp = new QueryableProviderMock<TrackerMessage>(messages);
         var uow = new MessagesDBContextUnitOfWorkFactoryMock();
-        var repo = new TrackerMessageRepository(kvp, qp, uow, TrackerTagRepositoryMock.GetStub());
+        var repo = new TrackerMessageRepository(kvp, qp, uow, TrackerTagRepositoryMock.GetStub(), TrackerRepositoryMock.GetStub());
         return repo;
     }
 }

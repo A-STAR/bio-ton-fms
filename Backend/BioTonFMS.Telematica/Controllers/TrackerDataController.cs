@@ -65,7 +65,7 @@ public class TrackerDataController : ValidationControllerBase
 
         if (tracker is null) return NotFound(new ServiceErrorResult($"Трекер с id = {trackerId} не найден"));
 
-        IList<TrackerParameter> parameters = _messageRepository.GetParameters(tracker.ExternalId);
+        IList<TrackerParameter> parameters = _messageRepository.GetLastParameters(tracker.ExternalId);
         return Ok(parameters);
     }
 

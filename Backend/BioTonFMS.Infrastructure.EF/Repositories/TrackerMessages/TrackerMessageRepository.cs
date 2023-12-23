@@ -1,9 +1,11 @@
+using Azure;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Domain.Monitoring;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
 using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Paging.Extensions;
@@ -16,14 +18,17 @@ namespace BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBContext>, ITrackerMessageRepository
 {
     private readonly ITrackerTagRepository _tagsRepository;
+    private readonly ITrackerRepository _trackerRepository;
 
     public TrackerMessageRepository(IKeyValueProvider<TrackerMessage, int> keyValueProvider,
         IQueryableProvider<TrackerMessage> queryableProvider,
         UnitOfWorkFactory<MessagesDBContext> unitOfWorkFactory,
-        ITrackerTagRepository tagsRepository)
+        ITrackerTagRepository tagsRepository,
+        ITrackerRepository trackerRepository)
         : base(keyValueProvider, queryableProvider, unitOfWorkFactory)
     {
         _tagsRepository = tagsRepository;
+        _trackerRepository = trackerRepository;
     }
 
     public TrackerMessage? this[long key] => HydratedQuery.FirstOrDefault(x => x.Id == key);
@@ -106,7 +111,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         return stdParams;
     }
 
-    public IList<TrackerParameter> GetParameters(int externalId)
+    public IList<TrackerParameter> GetLastParameters(int externalId)
     {
         if (externalId == 0)
         {
@@ -329,13 +334,13 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     }
 
     /// <summary>
-    /// Возвращает массив событий с данными от трекера для зададанного трекера и временного диапазода  
+    /// Возвращает массив событий со значениями параметров трекера для зададанного трекера и временного диапазода
     /// </summary>
     /// <param name="externalId"></param>
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public PagedResult<TrackerDataMessageDto> GetTrackertDataMessages(int externalId, DateTime start, DateTime end,
+    public PagedResult<TrackerDataMessageDto> GetParameterDataTrackerMessages(int externalId, DateTime start, DateTime end,
         int pageNum, int pageSize)
     {
         PagedResult<TrackerMessage> messages = QueryableProvider
@@ -364,6 +369,54 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 SatNumber = m.SatNumber,
                 Speed = m.Speed,
                 Parameters = GetParametersForMessage(m, trackerTags)
+            }).ToList(),
+            CurrentPage = messages.CurrentPage,
+            PageSize = messages.PageSize,
+            TolalRowCount = messages.TolalRowCount,
+            TotalPageCount = messages.TotalPageCount
+        };
+    }
+
+    /// <summary>
+    /// Возвращает массив событий со значениями датчиков трекера для зададанного трекера и временного диапазода
+    /// </summary>
+    /// <param name="externalId"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public PagedResult<SensorDataMessageDto> GetSensorDataTrackerMessages(int externalId, DateTime start, DateTime end, 
+        int pageNum, int pageSize)
+    {
+        PagedResult<TrackerMessage> messages = QueryableProvider
+            .Fetch(m => m.Tags.Where(x => x.SensorId == null))
+            .Linq()
+            .Where(m => m.ExternalTrackerId == externalId &&
+                        m.ServerDateTime >= start &&
+                        m.ServerDateTime <= end)
+            .OrderBy(x => x.ServerDateTime)
+            .AsNoTracking()
+            .GetPagedQueryable(pageNum, pageSize);
+
+        var tracker = _trackerRepository.FindTracker(imei: null, externalId: externalId);
+        if (tracker == null)
+        {
+            throw new ArgumentNullException($"{externalId} не привязан к трекеру");
+        }
+
+        return new PagedResult<SensorDataMessageDto>
+        {
+            Results = messages.Results.Select((m, idx) => new SensorDataMessageDto
+            {
+                Id = m.Id,
+                Num = (messages.CurrentPage - 1) * messages.PageSize + idx + 1,
+                ServerDateTime = m.ServerDateTime,
+                TrackerDateTime = m.TrackerDateTime,
+                Latitude = m.Latitude,
+                Longitude = m.Longitude,
+                Altitude = m.Altitude,
+                SatNumber = m.SatNumber,
+                Speed = m.Speed,
+                Sensors = GetSensorsForMessage(m, tracker.Sensors)
             }).ToList(),
             CurrentPage = messages.CurrentPage,
             PageSize = messages.PageSize,
@@ -431,5 +484,28 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         }
 
         return result.ToArray();
+    }
+
+    private TrackerSensorDto[] GetSensorsForMessage(TrackerMessage message, List<Sensor> sensors)
+    {
+        var trackerSensors = sensors
+            .Where(x => x.IsVisible)
+            .ToDictionary(x => x.Id,
+                x => new TrackerSensorDto
+                {
+                    Name = x.Name,
+                    Unit = x.Unit.Name
+                });
+
+        var trackerSensorDtos = new List<TrackerSensorDto>();
+        foreach (MessageTag tag in message.Tags.Where(t => t.SensorId.HasValue))
+        {
+            if (tag.SensorId != null && trackerSensors.TryGetValue(tag.SensorId.Value, out var sensorDto))
+            {
+                sensorDto.Value = tag.ValueString;
+            }
+        }
+
+        return trackerSensors.Values.ToArray();
     }
 }
