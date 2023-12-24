@@ -747,14 +747,14 @@ describe('MessagesComponent', () => {
       periodEnd: endDate.toISOString()
     };
 
-    spyOn(messageService, 'getMessages')
-      .and.callFake(() => of(testTrackerMessages));
-
     spyOn(messageService, 'getTrack')
       .and.callFake(() => of(testMessageLocationAndTrack));
 
     spyOn(messageService, 'getStatistics')
       .and.callFake(() => of(testMessageStatistics));
+
+    spyOn(messageService, 'getMessages')
+      .and.callFake(() => of(testTrackerMessages));
 
     const executeButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -767,14 +767,14 @@ describe('MessagesComponent', () => {
 
     await executeButton.click();
 
-    expect(messageService.getMessages)
-      .toHaveBeenCalledWith(testMessagesOptions);
-
     expect(messageService.getTrack)
       .toHaveBeenCalledWith(testTrackOptions);
 
     expect(messageService.getStatistics)
       .toHaveBeenCalledWith(testStatisticsOptions);
+
+    expect(messageService.getMessages)
+      .toHaveBeenCalledWith(testMessagesOptions);
 
     /* Coverage for updating messages data source */
 
@@ -1552,14 +1552,14 @@ async function mockTestMessages(
     });
   }
 
-  spyOn(messageService, 'getMessages')
-    .and.callFake(() => of(testMessages));
-
   spyOn(messageService, 'getTrack')
     .and.callFake(() => of(testMessageLocationAndTrack));
 
   spyOn(messageService, 'getStatistics')
     .and.callFake(() => of(testMessageStatistics));
+
+  spyOn(messageService, 'getMessages')
+    .and.callFake(() => of(testMessages));
 
   const executeButton = await loader.getHarness(
     MatButtonHarness.with({

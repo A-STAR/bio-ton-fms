@@ -22,6 +22,8 @@ import {
   defer,
   distinctUntilChanged,
   filter,
+  first,
+  forkJoin,
   map,
   skipWhile,
   startWith,
@@ -242,23 +244,19 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       periodEnd: endDate.toISOString()
     };
 
-    this.#messages$.next(messagesOptions);
-
-    let subscription = this.messageService
-      .getTrack(messageTrackOptions)
-      .subscribe(location => {
+    this.#subscription = forkJoin([
+      this.messageService.getTrack(messageTrackOptions),
+      this.messageService.getStatistics(messageStatisticsOptions),
+      this.#messagesSettled$.pipe(
+        first()
+      )
+    ])
+      .subscribe(([location, statistics]) => {
         this.#location$.next(location);
-      });
-
-    this.#subscription?.add(subscription);
-
-    subscription = this.messageService
-      .getStatistics(messageStatisticsOptions)
-      .subscribe(statistics => {
         this.#statistics$.next(statistics);
       });
 
-    this.#subscription?.add(subscription);
+    this.#messages$.next(messagesOptions);
   }
 
   /**
@@ -274,6 +272,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
+  #messagesSettled$ = new Subject();
   #location$ = new Subject<LocationAndTrackResponse>();
   #statistics$ = new Subject<MessageStatistics>();
   #subscription: Subscription | undefined;
@@ -660,7 +659,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Set messages, message type.
+   * Set messages, message columns.
    */
   #setMessages() {
     this.messages$ = this.#messages$.pipe(
@@ -669,6 +668,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       tap(messages => {
         this.#setColumns(messages);
         this.#setMessagesDataSource(messages);
+
+        this.#messagesSettled$.next(undefined);
       })
     );
   }
