@@ -48,12 +48,12 @@ public interface ITrackerMessageRepository : IRepository<TrackerMessage>
     ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end);
 
     /// <summary>
-    /// Возвращает массив событий со значениями параметров трекера для зададанного трекера и временного диапазода  
+    /// Постранично возвращает массив событий со значениями параметров трекера для зададанного трекера и временного диапазона  
     /// </summary>
     PagedResult<TrackerDataMessageDto> GetParameterDataTrackerMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
 
     /// <summary>
-    /// Возвращает массив событий со значениями датчиков трекера для зададанного трекера и временного диапазода
+    /// Постранично возвращает массив событий со значениями датчиков трекера для зададанного трекера и временного диапазона
     /// </summary>
     PagedResult<SensorDataMessageDto> GetSensorDataTrackerMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
 

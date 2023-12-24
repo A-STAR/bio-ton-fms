@@ -25,6 +25,9 @@ namespace BiotonFMS.Telematica.Tests.ControllersTests;
 public class MonitoringControllerTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
+    private static DateTime TestToday = DateTime.Today;
+    private static DateTime TestUtcNow = TestToday.AddHours(14).ToUniversalTime();
+
 
     public MonitoringControllerTests(ITestOutputHelper testOutputHelper)
     {
@@ -75,7 +78,7 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        LastMessageTime = SystemTime.UtcNow,
+                        LastMessageTime = TestUtcNow,
                         NumberOfSatellites = 14
                     },
                     new MonitoringVehicleDto
@@ -157,7 +160,7 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        LastMessageTime = SystemTime.UtcNow,
+                        LastMessageTime = TestUtcNow,
                         NumberOfSatellites = 14
                     },
                     new MonitoringVehicleDto
@@ -200,7 +203,7 @@ public class MonitoringControllerTests
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.NoData,
                         NumberOfSatellites = 1,
-                        LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20)
+                        LastMessageTime = TestUtcNow - TimeSpan.FromSeconds(20)
                     }
                 }
             },
@@ -226,7 +229,7 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Moving,
-                        LastMessageTime = SystemTime.UtcNow,
+                        LastMessageTime = TestUtcNow,
                         NumberOfSatellites = 14
                     },
                     new MonitoringVehicleDto
@@ -269,7 +272,7 @@ public class MonitoringControllerTests
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.NoData,
                         NumberOfSatellites = 1,
-                        LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20)
+                        LastMessageTime = TestUtcNow - TimeSpan.FromSeconds(20)
                     }
                 }
             }
@@ -279,8 +282,6 @@ public class MonitoringControllerTests
     public void FindVehicles(string? criterion, MonitoringVehicleDto[] expected)
     {
         _testOutputHelper.WriteLine("Criterion = \"" + criterion + "\"");
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
 
         var result = GetController(MonitoringVehicles).FindVehicles(criterion);
 
@@ -315,8 +316,6 @@ public class MonitoringControllerTests
     [Fact]
     public void LocationsAndTracks_ShouldReturnLocationFromLastMessage_ForOneVehicle()
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
         var vehicle = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
 
         var request = new LocationAndTrackRequest
@@ -327,7 +326,7 @@ public class MonitoringControllerTests
         var messages = TrackerMessageRepositoryMock.Messages;
         var lastMessage = messages.Where(m => m.ExternalTrackerId == vehicle!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
 
-        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request });
+        var actionResult = GetController(null, messages).LocationsAndTracks(TestToday.ToUniversalTime(), new LocationAndTrackRequest[] { request });
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as LocationsAndTracksResponse;
 
@@ -343,8 +342,6 @@ public class MonitoringControllerTests
     [Fact]
     public void LocationsAndTracks_ShouldReturnCorrectViewBounds_ForOneVehicle()
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
         var vehicle = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
 
         var request = new LocationAndTrackRequest
@@ -355,7 +352,7 @@ public class MonitoringControllerTests
         var messages = TrackerMessageRepositoryMock.Messages;
         var lastMessage = messages.Where(m => m.ExternalTrackerId == vehicle!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
 
-        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request });
+        var actionResult = GetController(null, messages).LocationsAndTracks(TestToday.ToUniversalTime(), new LocationAndTrackRequest[] { request });
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as LocationsAndTracksResponse;
 
@@ -371,8 +368,6 @@ public class MonitoringControllerTests
     [Fact]
     public void LocationsAndTracks_ShouldReturnCorrectViewBounds_For3Vehicles()
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
         var vehicle1 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
         var vehicle2 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 4).Single();
         var vehicle3 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 3).Single();
@@ -429,7 +424,7 @@ public class MonitoringControllerTests
             BottomRightLongitude = lons.Max() + difLon
         };
 
-        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
+        var actionResult = GetController(null, messages).LocationsAndTracks(TestToday.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as LocationsAndTracksResponse;
 
@@ -442,8 +437,6 @@ public class MonitoringControllerTests
     [Fact]
     public void LocationsAndTracks_ShouldReturnCorrectTrack_ForVehicleRequiresTrack()
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
         var vehicle1 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
         var vehicle2 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 4).Single();
         var vehicle3 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 3).Single();
@@ -470,7 +463,7 @@ public class MonitoringControllerTests
             new TrackPointInfo
             {
                 MessageId = 1,
-                Time = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+                Time = TestUtcNow - TimeSpan.FromSeconds(40),
                 Latitude = 49.432023,
                 Longitude = 52.556861,
                 Speed = null,
@@ -479,7 +472,7 @@ public class MonitoringControllerTests
             new TrackPointInfo
             {
                 MessageId = 2,
-                Time = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+                Time = TestUtcNow - TimeSpan.FromSeconds(20),
                 Latitude = 49.432023,
                 Longitude = 52.556861,
                 Speed = 12.1,
@@ -487,7 +480,7 @@ public class MonitoringControllerTests
             }
         };
 
-        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
+        var actionResult = GetController(null, messages).LocationsAndTracks(TestToday.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as LocationsAndTracksResponse;
 
@@ -501,8 +494,6 @@ public class MonitoringControllerTests
     [Fact]
     public void LocationsAndTracks_ShouldReturnCorrectViewBounds_For3VehiclesWithTrack()
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
         var vehicle1 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 1).Single();
         var vehicle2 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 4).Single();
         var vehicle3 = VehicleRepositoryMock.SampleVehicles.Where(v => v.Id == 3).Single();
@@ -528,7 +519,7 @@ public class MonitoringControllerTests
         var lastMessage2 = messages.Where(m => m.ExternalTrackerId == vehicle2!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
         var lastMessage3 = messages.Where(m => m.ExternalTrackerId == vehicle3!.Tracker!.ExternalId).OrderBy(m => m.ServerDateTime).Last();
 
-        var trackMessages = messages.Where(m => m.ExternalTrackerId == vehicle1!.Tracker!.ExternalId && m.ServerDateTime > today.ToUniversalTime()).ToArray();
+        var trackMessages = messages.Where(m => m.ExternalTrackerId == vehicle1!.Tracker!.ExternalId && m.ServerDateTime > TestToday.ToUniversalTime()).ToArray();
 
         List<double> lats = new()
         {
@@ -564,7 +555,7 @@ public class MonitoringControllerTests
             BottomRightLongitude = lons.Max() + difLon
         };
 
-        var actionResult = GetController(null, messages).LocationsAndTracks(today.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
+        var actionResult = GetController(null, messages).LocationsAndTracks(TestToday.ToUniversalTime(), new LocationAndTrackRequest[] { request1, request2, request3 });
         var okResult = actionResult as OkObjectResult;
         var response = okResult!.Value as LocationsAndTracksResponse;
 
@@ -577,9 +568,6 @@ public class MonitoringControllerTests
     [Fact]
     public void GetVehicleInformation_ShouldReturnNotFound_ForVehicleWithoutTracker()
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
-
         var vehicleWithoutTracker = MonitoringVehicles.Where(v => v.Id == 5).Single();
 
         var actionResult = GetController(MonitoringVehicles, MonitoringMessages).GetVehicleInformation(vehicleWithoutTracker.Id);
@@ -592,9 +580,6 @@ public class MonitoringControllerTests
     {
         get
         {
-            var today = DateTime.Today;
-            SystemTime.Set(today.AddHours(14));
-
             return new List<object[]>
             {
                 // Машина с сообщениями и без настроенных датчиков
@@ -605,7 +590,7 @@ public class MonitoringControllerTests
                     {
                         GeneralInfo = new MonitoringGeneralInfoDto
                         {
-                            LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+                            LastMessageTime = TestUtcNow - TimeSpan.FromSeconds(30),
                             Speed = 12.1,
                             Mileage = null,
                             EngineHours = null,
@@ -690,7 +675,7 @@ public class MonitoringControllerTests
                     {
                         GeneralInfo = new MonitoringGeneralInfoDto
                         {
-                            LastMessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+                            LastMessageTime = TestUtcNow - TimeSpan.FromSeconds(10),
                             Speed = 0,
                             Mileage = null,
                             EngineHours = null,
@@ -760,9 +745,6 @@ public class MonitoringControllerTests
     [Theory, MemberData(nameof(VehicleInfoData))]
     public void GetVehicleInformation_ShouldReturnVehicleInformation_ForVehicleWithTrackerAndMessages(int vehicleId, MonitoringVehicleInfoDto expected )
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
-
         var testVehicle = MonitoringGetInfoVehicles.Where(v => v.Id == vehicleId).Single();
 
         var actionResult = GetController(MonitoringGetInfoVehicles, MonitoringMessages).GetVehicleInformation(testVehicle.Id);
@@ -776,9 +758,6 @@ public class MonitoringControllerTests
     [Fact]
     public void GetTrackPointInformation_ShouldReturnNotFound_IfMessageNotExists()
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
-
         var actionResult = GetController(MonitoringVehicles, MonitoringMessages).GetTrackPointInformation(1000);
         var notFoundResult = actionResult as NotFoundResult;
 
@@ -789,9 +768,7 @@ public class MonitoringControllerTests
     {
         get
         {
-            var today = DateTime.Today;
-            SystemTime.Set(today.AddHours(14));
-
+            //SystemTime.Set(TestNow);
             return new List<object[]>
             {
                 // Сообщение без датчиков
@@ -802,7 +779,7 @@ public class MonitoringControllerTests
                     {
                         GeneralInfo = new TrackPointGeneralInfoDto
                         {
-                            MessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+                            MessageTime = TestUtcNow - TimeSpan.FromSeconds(40),
                             Speed = null,
                             NumberOfSatellites = 12,
                             Latitude = 49.432023,
@@ -838,7 +815,7 @@ public class MonitoringControllerTests
                     {
                         GeneralInfo = new TrackPointGeneralInfoDto
                         {
-                            MessageTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+                            MessageTime = TestUtcNow - TimeSpan.FromSeconds(10),
                             Speed = 0,
                             NumberOfSatellites = 19,
                             Latitude = 39.4323,
@@ -887,8 +864,8 @@ public class MonitoringControllerTests
     [Theory, MemberData(nameof(TrackPointInfoData))]
     public void GetTrackPointInformation_ShouldReturnTrackPointInformation_ForMessages(int messageId, MonitoringTrackPointInfoDto expected)
     {
-        var today = DateTime.Today;
-        SystemTime.Set(today.AddHours(14));
+        //SystemTime.Set(TestNow);
+        //_testOutputHelper.WriteLine($"GetTrackPointInformation_ShouldReturnTrackPointInformation_ForMessages UtcNow={SystemTime.UtcNow}");
 
         var actionResult = GetController(MonitoringGetInfoVehicles, MonitoringMessages, GetTrackers()).GetTrackPointInformation(messageId);
         var okResult = actionResult as OkObjectResult;
@@ -1203,226 +1180,227 @@ public class MonitoringControllerTests
         },
     };
 
-    public static TrackerMessage[] MonitoringMessages => new TrackerMessage[]
-    {
-        new()
+    private TrackerMessage[] MonitoringMessages => 
+        new TrackerMessage[]
         {
-            Id = 1,
-            ExternalTrackerId = 2552,
-            Imei = "123",
-            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
-            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
-            Latitude = 49.432023,
-            Longitude = 52.556861,
-            SatNumber = 12,
-            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-            Altitude = 97.0,
-            Direction = 2.8,
-            FuelLevel = 100,
-            CoolantTemperature = 45,
-            EngineSpeed = 901,
-            PackageUID = Guid.Parse("F28AC4A2-5DD0-49DC-B8B5-3B161C39546A"),
-            Tags = new List<MessageTag>
+            new()
             {
-                new MessageTagInteger
+                Id = 1,
+                ExternalTrackerId = 2552,
+                Imei = "123",
+                ServerDateTime = TestUtcNow - TimeSpan.FromSeconds(40),
+                TrackerDateTime = TestUtcNow - TimeSpan.FromSeconds(40),
+                Latitude = 49.432023,
+                Longitude = 52.556861,
+                SatNumber = 12,
+                CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+                Altitude = 97.0,
+                Direction = 2.8,
+                FuelLevel = 100,
+                CoolantTemperature = 45,
+                EngineSpeed = 901,
+                PackageUID = Guid.Parse("F28AC4A2-5DD0-49DC-B8B5-3B161C39546A"),
+                Tags = new List<MessageTag>
                 {
-                    Value = 1234,
-                    TrackerTagId = 5,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagByte
+                    new MessageTagInteger
+                    {
+                        Value = 1234,
+                        TrackerTagId = 5,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagByte
+                    {
+                        Value = 6,
+                        TrackerTagId = 10,
+                        TagType = TagDataTypeEnum.Byte
+                    },
+                    new MessageTagBits
+                    {
+                        Value = new BitArray(new byte[] { 215 }),
+                        TrackerTagId = 15,
+                        TagType = TagDataTypeEnum.Bits
+                    }
+                }
+            },
+            new()
+            {
+                Id = 2,
+                ExternalTrackerId = 2552,
+                Imei = "123",
+                ServerDateTime = TestUtcNow - TimeSpan.FromSeconds(30),
+                TrackerDateTime = TestUtcNow - TimeSpan.FromSeconds(30),
+                Latitude = 42.432023,
+                Longitude = 54.556861,
+                SatNumber = 14,
+                CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+                Altitude = 97.0,
+                Speed = 12.1,
+                Direction = 2.8,
+                FuelLevel = 100,
+                CoolantTemperature = 45,
+                EngineSpeed = 901,
+                PackageUID = Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"),
+                Tags = new List<MessageTag>
                 {
-                    Value = 6,
-                    TrackerTagId = 10,
-                    TagType = TagDataTypeEnum.Byte
-                },
-                new MessageTagBits
+                    new MessageTagInteger
+                    {
+                        Value = 12345,
+                        TrackerTagId = 5,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagByte
+                    {
+                        Value = 6,
+                        TrackerTagId = 10,
+                        TagType = TagDataTypeEnum.Byte
+                    },
+                    new MessageTagInteger
+                    {
+                        Value = 2134,
+                        TrackerTagId = 24,
+                        TagType = TagDataTypeEnum.Integer
+                    }
+                }
+            },
+            new()
+            {
+                Id = 3,
+                ExternalTrackerId = 1024,
+                Imei = "512128256",
+                ServerDateTime = TestUtcNow - TimeSpan.FromSeconds(20),
+                TrackerDateTime = TestUtcNow - TimeSpan.FromSeconds(20),
+                Latitude = 39.4323,
+                Longitude = 12.55861,
+                SatNumber = 1,
+                CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+                Altitude = 92.0,
+                Speed = null,
+                Direction = 2.1,
+                FuelLevel = 90,
+                CoolantTemperature = 40,
+                EngineSpeed = 901,
+                PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+                Tags = new List<MessageTag>
                 {
-                    Value = new BitArray(new byte[] { 215 }),
-                    TrackerTagId = 15,
-                    TagType = TagDataTypeEnum.Bits
+                    new MessageTagInteger
+                    {
+                        Value = 12345,
+                        TrackerTagId = 5,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagByte
+                    {
+                        Value = 6,
+                        TrackerTagId = 10,
+                        TagType = TagDataTypeEnum.Byte
+                    },
+                    new MessageTagInteger
+                    {
+                        Value = 2134,
+                        TrackerTagId = 24,
+                        TagType = TagDataTypeEnum.Integer
+                    }
+                }
+            },
+            new()
+            {
+                Id = 4,
+                ExternalTrackerId = 1555,
+                Imei = "6412825699",
+                ServerDateTime = TestUtcNow - TimeSpan.FromSeconds(20),
+                TrackerDateTime = TestUtcNow - TimeSpan.FromSeconds(20),
+                Latitude = 36.4323,
+                Longitude = 28.55861,
+                SatNumber = 1,
+                CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+                Altitude = 92.0,
+                Speed = null,
+                Direction = 2.1,
+                FuelLevel = 90,
+                CoolantTemperature = 40,
+                EngineSpeed = 901,
+                PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+                Tags = new List<MessageTag>
+                {
+                    new MessageTagInteger
+                    {
+                        Value = 12345,
+                        TrackerTagId = 5,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagByte
+                    {
+                        Value = 6,
+                        TrackerTagId = 10,
+                        TagType = TagDataTypeEnum.Byte
+                    },
+                    new MessageTagInteger
+                    {
+                        Value = 2134,
+                        TrackerTagId = 24,
+                        TagType = TagDataTypeEnum.Integer
+                    }
+                }
+            },
+            new()
+            {
+                Id = 5,
+                ExternalTrackerId = 128,
+                Imei = "64128256",
+                ServerDateTime = TestUtcNow - TimeSpan.FromSeconds(10),
+                TrackerDateTime = TestUtcNow - TimeSpan.FromSeconds(10),
+                Latitude = 39.4323,
+                Longitude = 12.55861,
+                SatNumber = 19,
+                CoordCorrectness = CoordCorrectnessEnum.CorrectGsm,
+                Altitude = 92.0,
+                Speed = 0,
+                Direction = 2.1,
+                FuelLevel = 90,
+                CoolantTemperature = 40,
+                EngineSpeed = 901,
+                PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+                Tags = new List<MessageTag>
+                {
+                    new MessageTagInteger
+                    {
+                        Value = 12345,
+                        TrackerTagId = 5,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagByte
+                    {
+                        Value = 6,
+                        TrackerTagId = 10,
+                        TagType = TagDataTypeEnum.Byte
+                    },
+                    new MessageTagInteger
+                    {
+                        Value = 2134,
+                        TrackerTagId = 24,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagInteger
+                    {
+                        SensorId = 3,
+                        Value = 25,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagInteger
+                    {
+                        SensorId = 4,
+                        Value = 11,
+                        TagType = TagDataTypeEnum.Integer
+                    },
+                    new MessageTagInteger
+                    {
+                        SensorId = 5,
+                        Value = 11,
+                        TagType = TagDataTypeEnum.Integer
+                    }
                 }
             }
-        },
-        new()
-        {
-            Id = 2,
-            ExternalTrackerId = 2552,
-            Imei = "123",
-            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
-            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
-            Latitude = 42.432023,
-            Longitude = 54.556861,
-            SatNumber = 14,
-            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-            Altitude = 97.0,
-            Speed = 12.1,
-            Direction = 2.8,
-            FuelLevel = 100,
-            CoolantTemperature = 45,
-            EngineSpeed = 901,
-            PackageUID = Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"),
-            Tags = new List<MessageTag>
-            {
-                new MessageTagInteger
-                {
-                    Value = 12345,
-                    TrackerTagId = 5,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagByte
-                {
-                    Value = 6,
-                    TrackerTagId = 10,
-                    TagType = TagDataTypeEnum.Byte
-                },
-                new MessageTagInteger
-                {
-                    Value = 2134,
-                    TrackerTagId = 24,
-                    TagType = TagDataTypeEnum.Integer
-                }
-            }
-        },
-        new()
-        {
-            Id = 3,
-            ExternalTrackerId = 1024,
-            Imei = "512128256",
-            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
-            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
-            Latitude = 39.4323,
-            Longitude = 12.55861,
-            SatNumber = 1,
-            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-            Altitude = 92.0,
-            Speed = null,
-            Direction = 2.1,
-            FuelLevel = 90,
-            CoolantTemperature = 40,
-            EngineSpeed = 901,
-            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
-            Tags = new List<MessageTag>
-            {
-                new MessageTagInteger
-                {
-                    Value = 12345,
-                    TrackerTagId = 5,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagByte
-                {
-                    Value = 6,
-                    TrackerTagId = 10,
-                    TagType = TagDataTypeEnum.Byte
-                },
-                new MessageTagInteger
-                {
-                    Value = 2134,
-                    TrackerTagId = 24,
-                    TagType = TagDataTypeEnum.Integer
-                }
-            }
-        },
-        new()
-        {
-            Id = 4,
-            ExternalTrackerId = 1555,
-            Imei = "6412825699",
-            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
-            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
-            Latitude = 36.4323,
-            Longitude = 28.55861,
-            SatNumber = 1,
-            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
-            Altitude = 92.0,
-            Speed = null,
-            Direction = 2.1,
-            FuelLevel = 90,
-            CoolantTemperature = 40,
-            EngineSpeed = 901,
-            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
-            Tags = new List<MessageTag>
-            {
-                new MessageTagInteger
-                {
-                    Value = 12345,
-                    TrackerTagId = 5,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagByte
-                {
-                    Value = 6,
-                    TrackerTagId = 10,
-                    TagType = TagDataTypeEnum.Byte
-                },
-                new MessageTagInteger
-                {
-                    Value = 2134,
-                    TrackerTagId = 24,
-                    TagType = TagDataTypeEnum.Integer
-                }
-            }
-        },
-        new()
-        {
-            Id = 5,
-            ExternalTrackerId = 128,
-            Imei = "64128256",
-            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
-            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
-            Latitude = 39.4323,
-            Longitude = 12.55861,
-            SatNumber = 19,
-            CoordCorrectness = CoordCorrectnessEnum.CorrectGsm,
-            Altitude = 92.0,
-            Speed = 0,
-            Direction = 2.1,
-            FuelLevel = 90,
-            CoolantTemperature = 40,
-            EngineSpeed = 901,
-            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
-            Tags = new List<MessageTag>
-            {
-                new MessageTagInteger
-                {
-                    Value = 12345,
-                    TrackerTagId = 5,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagByte
-                {
-                    Value = 6,
-                    TrackerTagId = 10,
-                    TagType = TagDataTypeEnum.Byte
-                },
-                new MessageTagInteger
-                {
-                    Value = 2134,
-                    TrackerTagId = 24,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagInteger
-                {
-                    SensorId = 3,
-                    Value = 25,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagInteger
-                {
-                    SensorId = 4,
-                    Value = 11,
-                    TagType = TagDataTypeEnum.Integer
-                },
-                new MessageTagInteger
-                {
-                    SensorId = 5,
-                    Value = 11,
-                    TagType = TagDataTypeEnum.Integer
-                }
-            }
-        }
-    };
+        };
 
     public static ICollection<Tracker> GetTrackers()
     {

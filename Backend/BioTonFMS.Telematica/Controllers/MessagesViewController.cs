@@ -6,6 +6,7 @@ using BioTonFMS.Infrastructure.Controllers;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
+using BioTonFMS.Infrastructure.Paging;
 using BioTonFMS.Infrastructure.Services;
 using BioTonFMS.Telematica.Dtos;
 using BioTonFMS.Telematica.Dtos.MessagesView;
@@ -165,7 +166,7 @@ public class MessagesViewController : ValidationControllerBase
                 ParameterType: ParameterTypeEnum.TrackerData
             })
         {
-            var pagedDataMessages = _messageRepository.GetParameterDataTrackerMessages(externalId, request.PeriodStart.ToUniversalTime(),
+            PagedResult<TrackerDataMessageDto> pagedDataMessages = _messageRepository.GetParameterDataTrackerMessages(externalId, request.PeriodStart.ToUniversalTime(),
                 request.PeriodEnd.ToUniversalTime(), request.PageNum, request.PageSize);
             return Ok(new ViewMessageMessagesDto
             {
@@ -184,7 +185,7 @@ public class MessagesViewController : ValidationControllerBase
                 ParameterType: ParameterTypeEnum.SensorData
             })
         {
-            var pagedSensorMessages = _messageRepository.GetSensorDataTrackerMessages(externalId, request.PeriodStart.ToUniversalTime(),
+            PagedResult<SensorDataMessageDto> pagedSensorMessages = _messageRepository.GetSensorDataTrackerMessages(externalId, request.PeriodStart.ToUniversalTime(),
                 request.PeriodEnd.ToUniversalTime(), request.PageNum, request.PageSize);
             return Ok(new ViewMessageMessagesDto
             {
@@ -199,6 +200,17 @@ public class MessagesViewController : ValidationControllerBase
 
         if (request.ViewMessageType == ViewMessageTypeEnum.CommandMessage)
         {
+            PagedResult<CommandMessageDto> pagedCommandMessages = _commandRepository.GetCommandMessages(externalId, request.PeriodStart.ToUniversalTime(),
+                request.PeriodEnd.ToUniversalTime(), request.PageNum, request.PageSize);
+            return Ok(new ViewMessageMessagesDto
+            {
+                CommandMessages = pagedCommandMessages.Results.ToArray(),
+                Pagination = new Pagination
+                {
+                    PageIndex = pagedCommandMessages.CurrentPage,
+                    Total = pagedCommandMessages.TotalPageCount
+                }
+            });
         }
 
         return Ok();
