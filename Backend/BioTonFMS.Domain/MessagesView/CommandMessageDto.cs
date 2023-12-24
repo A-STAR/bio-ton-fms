@@ -23,9 +23,9 @@ public class CommandMessageDto
     public string CommandText { get; set; }
 
     /// <summary>
-    /// Время выполнения команды в секундах
+    /// Дата и время выполнения команды (получения ответа)
     /// </summary>
-    public int? ExecutionTime { get; set; }
+    public DateTime? ExecutionTime { get; set; }
 
     /// <summary>
     /// Ответ, полученный от устройства на отправленную команду

@@ -334,7 +334,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     }
 
     /// <summary>
-    /// Возвращает массив событий со значениями параметров трекера для зададанного трекера и временного диапазода
+    /// Постранично возвращает массив событий со значениями параметров трекера для зададанного трекера и временного диапазона
     /// </summary>
     /// <param name="externalId"></param>
     /// <param name="start"></param>
@@ -343,12 +343,15 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     public PagedResult<TrackerDataMessageDto> GetParameterDataTrackerMessages(int externalId, DateTime start, DateTime end,
         int pageNum, int pageSize)
     {
+        var startUtc = start.ToUniversalTime();
+        var endUtc = end.ToUniversalTime();
+
         PagedResult<TrackerMessage> messages = QueryableProvider
             .Fetch(m => m.Tags.Where(x => x.SensorId == null))
             .Linq()
             .Where(m => m.ExternalTrackerId == externalId &&
-                        m.ServerDateTime >= start &&
-                        m.ServerDateTime <= end)
+                        m.ServerDateTime >= startUtc &&
+                        m.ServerDateTime <= endUtc)
             .OrderBy(x => x.ServerDateTime)
             .AsNoTracking()
             .GetPagedQueryable(pageNum, pageSize);
@@ -378,7 +381,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     }
 
     /// <summary>
-    /// Возвращает массив событий со значениями датчиков трекера для зададанного трекера и временного диапазода
+    /// Постранично возвращает  массив событий со значениями датчиков трекера для зададанного трекера и временного диапазона
     /// </summary>
     /// <param name="externalId"></param>
     /// <param name="start"></param>
@@ -387,12 +390,15 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     public PagedResult<SensorDataMessageDto> GetSensorDataTrackerMessages(int externalId, DateTime start, DateTime end, 
         int pageNum, int pageSize)
     {
+        var startUtc = start.ToUniversalTime();
+        var endUtc = end.ToUniversalTime();
+
         PagedResult<TrackerMessage> messages = QueryableProvider
             .Fetch(m => m.Tags.Where(x => x.SensorId == null))
             .Linq()
             .Where(m => m.ExternalTrackerId == externalId &&
-                        m.ServerDateTime >= start &&
-                        m.ServerDateTime <= end)
+                        m.ServerDateTime >= startUtc &&
+                        m.ServerDateTime <= endUtc)
             .OrderBy(x => x.ServerDateTime)
             .AsNoTracking()
             .GetPagedQueryable(pageNum, pageSize);
