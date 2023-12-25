@@ -198,9 +198,25 @@
       *ngIf="(messages.trackerDataMessages || messages.sensorDataMessages || messages.commandMessages)?.length; else empty">
       <mat-table [dataSource]="messagesDataSource!">
         <ng-container sticky [matColumnDef]="column.key" *ngFor="let column of columns | slice:0:messages.sensorDataMessages ? 1 : 2">
-          <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
+          <mat-header-cell [ngSwitch]="column.key" *matHeaderCellDef>
+            <ng-container *ngSwitchCase="MessageColumn.Selection">
+              <mat-checkbox title="Выбрать все" [checked]="selection.hasValue() && isAllSelected"
+                [indeterminate]="selection.hasValue() && !isAllSelected" (change)="$event ? toggleAllRows() : null">
+              </mat-checkbox>
+            </ng-container>
 
-          <mat-cell *matCellDef="let element">{{ element[column.key] }}</mat-cell>
+            <ng-container *ngSwitchDefault>{{ column.value }}</ng-container>
+          </mat-header-cell>
+
+          <mat-cell [ngSwitch]="column.key" *matCellDef="let element">
+            <ng-container *ngSwitchCase="MessageColumn.Selection">
+              <mat-checkbox bioStopClickPropagation title="Выбрать" [checked]="selection.isSelected(element)"
+                (change)="$event ? selection.toggle(element) : null">
+              </mat-checkbox>
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
+          </mat-cell>
         </ng-container>
 
         <ng-container [matColumnDef]="column.key" *ngFor="let column of columns | slice:messages.sensorDataMessages ? 1 : 2">

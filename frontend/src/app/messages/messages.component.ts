@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { SelectionModel } from '@angular/cdk/collections';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -8,6 +9,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 
 import {
@@ -43,6 +45,7 @@ import {
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
 import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-input.directive';
+import { StopClickPropagationDirective } from '../shared/stop-click-propagation/stop-click-propagation.directive';
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
@@ -64,9 +67,11 @@ import { TrackerParameter } from '../directory-tech/tracker.service';
     MatSelectModule,
     MatButtonModule,
     MatTableModule,
+    MatCheckboxModule,
     MatChipsModule,
     DateCharsInputDirective,
     TimeCharsInputDirective,
+    StopClickPropagationDirective,
     MapComponent
   ],
   templateUrl: './messages.component.html',
@@ -79,7 +84,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    *
    * @returns Max start date.
    */
-  get maxStartDate() {
+  protected get maxStartDate() {
     return new Date();
   }
 
@@ -88,13 +93,22 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    *
    * @returns Max end date.
    */
-  get maxEndDate() {
+  protected get maxEndDate() {
     const date = new Date();
     const tomorrowDay = date.getDate() + 1;
 
     date.setDate(tomorrowDay);
 
     return date;
+  }
+
+  /**
+   * Whether the number of selected messages matches the total number of messages.
+   *
+   * @returns All messages selected value.
+   */
+  protected get isAllSelected() {
+    return this.selection.selected.length === this.messagesDataSource?.data.length;
   }
 
   /**
@@ -139,6 +153,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected DataMessageParameter = DataMessageParameter;
   protected columns?: KeyValue<MessageColumn | string, string | undefined>[];
   protected columnKeys?: string[];
+  protected selection = new SelectionModel<TrackerMessageDataSource | SensorMessageDataSource>(true);
   protected MessageColumn = MessageColumn;
 
   /**
@@ -267,6 +282,19 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    */
   protected parameterTrackBy(index: number, { paramName }: TrackerParameter) {
     return paramName;
+  }
+
+  /**
+   * Selects all messages if they are not all selected, otherwise clears selection.
+   */
+  protected toggleAllRows() {
+    if (this.isAllSelected) {
+      this.selection.clear();
+    } else {
+      const { data } = this.messagesDataSource as TableDataSource<TrackerMessageDataSource | SensorMessageDataSource>;
+
+      this.selection.select(...data);
+    }
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);

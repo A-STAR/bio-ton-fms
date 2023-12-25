@@ -15,6 +15,7 @@ import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
+import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatChipSetHarness } from '@angular/material/chips/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
@@ -1484,6 +1485,107 @@ describe('MessagesComponent', () => {
         .withContext('render cells text')
         .toEqual(messageTexts);
     });
+  }));
+
+  it('should toggle all checkbox selecting messages', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const selectAllCheckbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-header-row',
+        checked: false
+      })
+    );
+
+    await loader.getAllHarnesses(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-row',
+        checked: false
+      })
+    );
+
+    await selectAllCheckbox.check();
+
+    let selectCheckboxes = await loader.getAllHarnesses(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-row',
+        selector: '[bioStopClickPropagation]',
+        checked: true
+      })
+    );
+
+    expect(selectCheckboxes.length)
+      .withContext('render all messages selected')
+      .toBe(testTrackerMessages.trackerDataMessages!.length);
+
+    await selectAllCheckbox.uncheck();
+
+    selectCheckboxes = await loader.getAllHarnesses(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-row',
+        selector: '[bioStopClickPropagation]',
+        checked: false
+      })
+    );
+
+    expect(selectCheckboxes.length)
+      .withContext('render all messages unselected')
+      .toBe(testTrackerMessages.trackerDataMessages!.length);
+  }));
+
+  it('should select messages toggling all checkbox', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const selectAllCheckbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-header-row',
+        checked: false
+      })
+    );
+
+    const selectCheckboxes = await loader.getAllHarnesses(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-row',
+        selector: '[bioStopClickPropagation]',
+        checked: false
+      })
+    );
+
+    selectCheckboxes[0].check();
+
+    await expectAsync(
+      selectAllCheckbox.isIndeterminate()
+    )
+      .withContext('render all checkbox indeterminate')
+      .toBeResolvedTo(true);
+
+    selectCheckboxes.forEach(checkbox => {
+      checkbox.check();
+    });
+
+    await expectAsync(
+      selectAllCheckbox.isChecked()
+    )
+      .withContext('render all checkbox checked')
+      .toBeResolvedTo(true);
+
+    selectCheckboxes[selectCheckboxes.length - 1].uncheck();
+
+    await expectAsync(
+      selectAllCheckbox.isIndeterminate()
+    )
+      .withContext('render all checkbox indeterminate')
+      .toBeResolvedTo(true);
+
+    selectCheckboxes.forEach(checkbox => {
+      checkbox.uncheck();
+    });
+
+    await expectAsync(
+      selectAllCheckbox.isChecked()
+    )
+      .withContext('render all checkbox unchecked')
+      .toBeResolvedTo(false);
   }));
 });
 
