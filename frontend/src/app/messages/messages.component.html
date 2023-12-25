@@ -197,13 +197,13 @@
     <figure role="region" aria-labelledby="legend"
       *ngIf="(messages.trackerDataMessages || messages.sensorDataMessages || messages.commandMessages)?.length; else empty">
       <mat-table [dataSource]="messagesDataSource!">
-        <ng-container sticky [matColumnDef]="column.key" *ngFor="let column of columns | slice:0:1">
+        <ng-container sticky [matColumnDef]="column.key" *ngFor="let column of columns | slice:0:messages.sensorDataMessages ? 1 : 2">
           <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
 
           <mat-cell *matCellDef="let element">{{ element[column.key] }}</mat-cell>
         </ng-container>
 
-        <ng-container [matColumnDef]="column.key" *ngFor="let column of columns | slice:1">
+        <ng-container [matColumnDef]="column.key" *ngFor="let column of columns | slice:messages.sensorDataMessages ? 1 : 2">
           <mat-header-cell *matHeaderCellDef>{{ column.value }}</mat-header-cell>
 
           <mat-cell [ngSwitch]="column.key" *matCellDef="let element">

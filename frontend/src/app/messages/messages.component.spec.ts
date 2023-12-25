@@ -2,7 +2,7 @@ import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, formatNumber, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import localeRu from '@angular/common/locales/ru';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
@@ -1047,14 +1047,16 @@ describe('MessagesComponent', () => {
 
     expect(headerCells.length)
       .withContext('render header cells')
-      .toBe(dataMessageColumns.length + trackerMessageColumns.length);
+      .toBe(trackerMessageColumns.length);
 
     const headerCellTexts = await parallel(
-      () => headerCells.map(cell => cell.getText())
+      () => headerCells
+        .slice(1)
+        .map(cell => cell.getText())
     );
 
-    const columnLabels = dataMessageColumns
-      .concat(trackerMessageColumns)
+    const columnLabels = trackerMessageColumns
+      .filter((column): column is KeyValue<MessageColumn, string> => column.value !== undefined)
       .map(({ value }) => value);
 
     expect(headerCellTexts)
@@ -1086,6 +1088,7 @@ describe('MessagesComponent', () => {
     );
 
     const columnLabels = dataMessageColumns
+      .filter((column): column is KeyValue<MessageColumn, string> => column.value !== undefined)
       .map(({ value }) => value)
       .concat(sensorNames);
 
@@ -1111,17 +1114,21 @@ describe('MessagesComponent', () => {
       .toBe(commandMessageColumns.length);
 
     const headerCellTexts = await parallel(
-      () => headerCells.map(cell => cell.getText())
+      () => headerCells
+        .slice(1)
+        .map(cell => cell.getText())
     );
 
-    const columnLabels = commandMessageColumns.map(({ value }) => value);
+    const columnLabels = commandMessageColumns
+      .filter((column): column is KeyValue<MessageColumn, string> => column.value !== undefined)
+      .map(({ value }) => value);
 
     expect(headerCellTexts)
       .withContext('render column labels')
       .toEqual(columnLabels);
   }));
 
-  it('should render data message table cells', fakeAsync(async () => {
+  it('should render tracker message table cells', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
     const rowDes = fixture.debugElement.queryAll(
@@ -1167,13 +1174,13 @@ describe('MessagesComponent', () => {
     cells.forEach(({ length }) => {
       expect(length)
         .withContext('render cells')
-        .toBe(dataMessageColumns.length + trackerMessageColumns.length);
+        .toBe(trackerMessageColumns.length);
     });
 
     const cellTexts = await parallel(() => cells.map(
       rowCells => parallel(
         () => rowCells
-          .slice(0, 6)
+          .slice(1, 7)
           .map(cell => cell.getText())
       )
     ));
@@ -1234,7 +1241,7 @@ describe('MessagesComponent', () => {
     });
   }));
 
-  it('should render parameters cells chips', fakeAsync(async () => {
+  it('should render tracker message table parameters cells chips', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
     const table = await loader.getHarness(MatTableHarness);
@@ -1445,7 +1452,9 @@ describe('MessagesComponent', () => {
 
     const cellTexts = await parallel(() => cells.map(
       rowCells => parallel(
-        () => rowCells.map(cell => cell.getText())
+        () => rowCells
+          .slice(1)
+          .map(cell => cell.getText())
       )
     ));
 

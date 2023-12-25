@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
-
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -139,7 +137,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
-  protected columns?: KeyValue<MessageColumn | string, string>[];
+  protected columns?: KeyValue<MessageColumn | string, string | undefined>[];
   protected columnKeys?: string[];
   protected MessageColumn = MessageColumn;
 
@@ -437,11 +435,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   #setColumns({ sensorDataMessages }: Messages) {
     switch (this.#options?.viewMessageType) {
       case MessageType.DataMessage:
-        this.columns = dataMessageColumns;
 
         switch (this.#options.parameterType) {
           case DataMessageParameter.TrackerData:
-            this.columns = this.columns.concat(trackerMessageColumns);
+            this.columns = trackerMessageColumns;
 
             break;
 
@@ -460,7 +457,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
               };
             });
 
-            this.columns = this.columns.concat(sensorColumns);
+            this.columns = [...dataMessageColumns, ...sensorColumns];
           }
         }
 
@@ -631,7 +628,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    * @param messages Messages.
    */
   #setMessagesDataSource(messages: Messages) {
-    let messagesDataSource: (TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource)[] | undefined;
+    let messagesDataSource: (TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource)[];
 
     switch (this.#options?.viewMessageType) {
       case MessageType.DataMessage:
@@ -704,6 +701,7 @@ export enum DataMessageParameter {
 }
 
 export enum MessageColumn {
+  Selection = 'selection',
   Position = 'position',
   Time = 'time',
   Registration = 'registration',
@@ -771,7 +769,14 @@ interface CommandMessageDataSource extends Pick<CommandMessage, 'id' | 'channel'
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
 
-const messageColumns: KeyValue<MessageColumn, string>[] = [
+const selectionColumn: KeyValue<MessageColumn, undefined>[] = [
+  {
+    key: MessageColumn.Selection,
+    value: undefined
+  }
+];
+
+const positionColumn: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Position,
     value: '#'
@@ -779,7 +784,7 @@ const messageColumns: KeyValue<MessageColumn, string>[] = [
 ];
 
 export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
-  ...messageColumns,
+  ...positionColumn,
   {
     key: MessageColumn.Time,
     value: 'Время устройства'
@@ -802,15 +807,18 @@ export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
   }
 ];
 
-export const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
+export const trackerMessageColumns: KeyValue<MessageColumn, string | undefined>[] = [
+  ...selectionColumn,
+  ...dataMessageColumns,
   {
     key: MessageColumn.Parameters,
     value: 'Параметры'
   }
 ];
 
-export const commandMessageColumns: KeyValue<MessageColumn, string>[] = [
-  ...messageColumns,
+export const commandMessageColumns: KeyValue<MessageColumn, string | undefined>[] = [
+  ...selectionColumn,
+  ...positionColumn,
   {
     key: MessageColumn.Time,
     value: 'Время'
