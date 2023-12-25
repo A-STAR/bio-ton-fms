@@ -22,6 +22,8 @@ import {
   defer,
   distinctUntilChanged,
   filter,
+  first,
+  forkJoin,
   map,
   skipWhile,
   startWith,
@@ -242,23 +244,19 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       periodEnd: endDate.toISOString()
     };
 
-    this.#messages$.next(messagesOptions);
-
-    let subscription = this.messageService
-      .getTrack(messageTrackOptions)
-      .subscribe(location => {
+    this.#subscription = forkJoin([
+      this.messageService.getTrack(messageTrackOptions),
+      this.messageService.getStatistics(messageStatisticsOptions),
+      this.#messagesSettled$.pipe(
+        first()
+      )
+    ])
+      .subscribe(([location, statistics]) => {
         this.#location$.next(location);
-      });
-
-    this.#subscription?.add(subscription);
-
-    subscription = this.messageService
-      .getStatistics(messageStatisticsOptions)
-      .subscribe(statistics => {
         this.#statistics$.next(statistics);
       });
 
-    this.#subscription?.add(subscription);
+    this.#messages$.next(messagesOptions);
   }
 
   /**
@@ -274,6 +272,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
+  #messagesSettled$ = new Subject();
   #location$ = new Subject<LocationAndTrackResponse>();
   #statistics$ = new Subject<MessageStatistics>();
   #subscription: Subscription | undefined;
@@ -475,6 +474,50 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Compute message row black box CSS class.
+   *
+   * @param timeDate Message time date.
+   * @param registrationDate Message server registration date.
+   *
+   * @returns Message CSS class.
+   */
+  #getBlackBoxClass(timeDate: DataMessage['trackerDateTime'], registrationDate: DataMessage['serverDateTime']) {
+    let cssClass: string | undefined;
+
+    if (timeDate) {
+      const time = new Date(timeDate)
+        .getTime();
+
+      const registration = new Date(registrationDate)
+        .getTime();
+
+      const period = registration - time;
+      const MINUTE = 60 * 1000;
+
+      switch (true) {
+        case period <= 2 * MINUTE:
+
+          break;
+
+        case period <= 10 * MINUTE:
+          cssClass = 'black-box';
+
+          break;
+
+        case period <= 30 * MINUTE:
+          cssClass = 'black-box-medium';
+
+          break;
+
+        default:
+          cssClass = 'black-box-long';
+      }
+    }
+
+    return cssClass;
+  }
+
+  /**
    * Map tracker messages data source.
    *
    * @param messages Messages with pagination.
@@ -503,7 +546,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         speed,
         location: { latitude, longitude, satellites },
         altitude,
-        parameters
+        parameters,
+        class: this.#getBlackBoxClass(time, registration)
       }));
   }
 
@@ -554,7 +598,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           speed,
           location: { latitude, longitude, satellites },
           altitude,
-          ...sensorMap
+          ...sensorMap,
+          class: this.#getBlackBoxClass(time, registration)
         };
       });
   }
@@ -614,7 +659,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Set messages, message type.
+   * Set messages, message columns.
    */
   #setMessages() {
     this.messages$ = this.#messages$.pipe(
@@ -623,6 +668,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       tap(messages => {
         this.#setColumns(messages);
         this.#setMessagesDataSource(messages);
+
+        this.#messagesSettled$.next(undefined);
       })
     );
   }
@@ -696,6 +743,7 @@ interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'a
     longitude: DataMessage['longitude'];
     satellites: DataMessage['satNumber'];
   };
+  class?: string;
 }
 
 interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Partial<{
@@ -709,6 +757,7 @@ interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'al
     longitude: DataMessage['longitude'];
     satellites: DataMessage['satNumber'];
   };
+  class?: string;
 }
 
 interface CommandMessageDataSource extends Pick<CommandMessage, 'channel'> {

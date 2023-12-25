@@ -225,15 +225,27 @@ const pagination: Pagination = {
 export const testTrackerMessages: Messages = {
   trackerDataMessages: [
     {
-      id: 1,
-      num: 178,
-      serverDateTime: '2023-12-08T21:52:00.273523+00:00',
+      id: 2,
+      num: 1,
       trackerDateTime: '2023-12-08T21:52:00.273523+00:00',
+      serverDateTime: '2023-12-08T22:22:01.273523+00:00',
       speed: 66.0,
-      latitude: 42.152,
-      longitude: 12.13,
+      latitude: 42.15232938729838,
+      longitude: 12.13893769872938,
       satNumber: 2,
       altitude: 23.1,
+      parameters: testParameters
+    },
+    {
+      id: 1,
+      num: 2,
+      trackerDateTime: '2023-12-08T21:53:00.273523+00:00',
+      serverDateTime: '2023-12-08T22:03:01.273523+00:00',
+      speed: 67.0,
+      latitude: 42.15928376293867,
+      longitude: 12.13293867298729,
+      satNumber: 2,
+      altitude: 23.2,
       parameters: testParameters
     }
   ],
@@ -243,15 +255,27 @@ export const testTrackerMessages: Messages = {
 export const testSensorMessages: Messages = {
   sensorDataMessages: [
     {
-      id: 1,
+      id: 2,
       num: 1,
-      serverDateTime: '2023-12-08T21:52:00.273523+00:00',
       trackerDateTime: '2023-12-08T21:52:00.273523+00:00',
+      serverDateTime: '2023-12-08T21:54:01.273523+00:00',
       speed: 66.0,
-      latitude: 42.152,
-      longitude: 12.13,
+      latitude: 42.15232938729838,
+      longitude: 12.13893769872938,
       satNumber: 2,
       altitude: 23.1,
+      sensors: testVehicleMonitoringInfo.trackerInfo.sensors!
+    },
+    {
+      id: 1,
+      num: 2,
+      trackerDateTime: '2023-12-08T21:53:00.273523+00:00',
+      serverDateTime: '2023-12-08T21:53:00.273523+00:00',
+      speed: 67.0,
+      latitude: 42.15928376293867,
+      longitude: 12.13293867298729,
+      satNumber: 2,
+      altitude: 23.2,
       sensors: testVehicleMonitoringInfo.trackerInfo.sensors!
     }
   ],

@@ -20,7 +20,7 @@ import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxo
 
 import { Observable, of } from 'rxjs';
 
-import { MessageService, MessageStatisticsOptions, MessageTrackOptions, Messages, MessagesOptions } from './message.service';
+import { DataMessage, MessageService, MessageStatisticsOptions, MessageTrackOptions, Messages, MessagesOptions } from './message.service';
 
 import MessagesComponent, {
   DataMessageParameter,
@@ -747,14 +747,14 @@ describe('MessagesComponent', () => {
       periodEnd: endDate.toISOString()
     };
 
-    spyOn(messageService, 'getMessages')
-      .and.callFake(() => of(testTrackerMessages));
-
     spyOn(messageService, 'getTrack')
       .and.callFake(() => of(testMessageLocationAndTrack));
 
     spyOn(messageService, 'getStatistics')
       .and.callFake(() => of(testMessageStatistics));
+
+    spyOn(messageService, 'getMessages')
+      .and.callFake(() => of(testTrackerMessages));
 
     const executeButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -767,14 +767,14 @@ describe('MessagesComponent', () => {
 
     await executeButton.click();
 
-    expect(messageService.getMessages)
-      .toHaveBeenCalledWith(testMessagesOptions);
-
     expect(messageService.getTrack)
       .toHaveBeenCalledWith(testTrackOptions);
 
     expect(messageService.getStatistics)
       .toHaveBeenCalledWith(testStatisticsOptions);
+
+    expect(messageService.getMessages)
+      .toHaveBeenCalledWith(testMessagesOptions);
 
     /* Coverage for updating messages data source */
 
@@ -1124,6 +1124,39 @@ describe('MessagesComponent', () => {
   it('should render data message table cells', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
+    const rowDes = fixture.debugElement.queryAll(
+      By.css('#messages mat-row')
+    );
+
+    rowDes.forEach((rowDe, index) => {
+      const {
+        trackerDateTime: time,
+        serverDateTime: registration
+      } = testTrackerMessages.trackerDataMessages![index];
+
+      const cssClass = getBlackBoxClass(time, registration);
+
+      if (cssClass) {
+        expect(rowDe.classes)
+          .withContext('has black box CSS class')
+          .toEqual(
+            jasmine.objectContaining({
+              [cssClass]: true
+            })
+          );
+      } else {
+        expect(rowDe.classes)
+          .withContext('has no black box CSS class')
+          .not.toEqual(
+            jasmine.objectContaining({
+              ['black-box']: true,
+              ['black-box-medium']: true,
+              ['black-box-long']: true
+            })
+          );
+      }
+    });
+
     const table = await loader.getHarness(MatTableHarness);
     const rows = await table.getRows();
 
@@ -1148,8 +1181,8 @@ describe('MessagesComponent', () => {
     cellTexts.forEach((rowCellTexts, index) => {
       const {
         num: position,
-        serverDateTime: time,
-        trackerDateTime: registration,
+        trackerDateTime: time,
+        serverDateTime: registration,
         speed,
         latitude,
         longitude,
@@ -1157,18 +1190,19 @@ describe('MessagesComponent', () => {
         altitude
       } = testTrackerMessages.trackerDataMessages![index];
 
-      const formattedTime = formatDate(time, dateFormat, 'ru-RU');
+      let formattedTime: string | undefined;
 
-      let formattedRegistration: string | undefined;
+      if (time) {
+        formattedTime = formatDate(time, dateFormat, 'ru-RU');
+      }
+
+      const formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
+
       let formattedSpeed: string | undefined;
       let formattedLatitude: string | undefined;
       let formattedLongitude: string | undefined;
       let location: string | undefined;
       let formattedAltitude: string | undefined;
-
-      if (registration) {
-        formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
-      }
 
       if (speed) {
         formattedSpeed = formatNumber(speed, 'en-US', '1.1-1');
@@ -1268,6 +1302,39 @@ describe('MessagesComponent', () => {
       parameter: DataMessageParameter.SensorData
     }, testSensorMessages);
 
+    const rowDes = fixture.debugElement.queryAll(
+      By.css('#messages mat-row')
+    );
+
+    rowDes.forEach((rowDe, index) => {
+      const {
+        trackerDateTime: time,
+        serverDateTime: registration
+      } = testSensorMessages.sensorDataMessages![index];
+
+      const cssClass = getBlackBoxClass(time, registration);
+
+      if (cssClass) {
+        expect(rowDe.classes)
+          .withContext('has black box CSS class')
+          .toEqual(
+            jasmine.objectContaining({
+              [cssClass]: true
+            })
+          );
+      } else {
+        expect(rowDe.classes)
+          .withContext('has no black box CSS class')
+          .not.toEqual(
+            jasmine.objectContaining({
+              ['black-box']: true,
+              ['black-box-medium']: true,
+              ['black-box-long']: true
+            })
+          );
+      }
+    });
+
     const table = await loader.getHarness(MatTableHarness);
     const rows = await table.getRows();
 
@@ -1290,8 +1357,8 @@ describe('MessagesComponent', () => {
     cellTexts.forEach((rowCellTexts, index) => {
       const {
         num: position,
-        serverDateTime: time,
-        trackerDateTime: registration,
+        trackerDateTime: time,
+        serverDateTime: registration,
         speed,
         latitude,
         longitude,
@@ -1300,18 +1367,19 @@ describe('MessagesComponent', () => {
         sensors
       } = testSensorMessages.sensorDataMessages![index];
 
-      const formattedTime = formatDate(time, dateFormat, 'ru-RU');
+      let formattedTime: string | undefined;
 
-      let formattedRegistration: string | undefined;
+      if (time) {
+        formattedTime = formatDate(time, dateFormat, 'ru-RU');
+      }
+
+      const formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
+
       let formattedSpeed: string | undefined;
       let formattedLatitude: string | undefined;
       let formattedLongitude: string | undefined;
       let location: string | undefined;
       let formattedAltitude: string | undefined;
-
-      if (registration) {
-        formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
-      }
 
       if (speed) {
         formattedSpeed = formatNumber(speed, 'en-US', '1.1-1');
@@ -1484,14 +1552,14 @@ async function mockTestMessages(
     });
   }
 
-  spyOn(messageService, 'getMessages')
-    .and.callFake(() => of(testMessages));
-
   spyOn(messageService, 'getTrack')
     .and.callFake(() => of(testMessageLocationAndTrack));
 
   spyOn(messageService, 'getStatistics')
     .and.callFake(() => of(testMessageStatistics));
+
+  spyOn(messageService, 'getMessages')
+    .and.callFake(() => of(testMessages));
 
   const executeButton = await loader.getHarness(
     MatButtonHarness.with({
@@ -1503,4 +1571,48 @@ async function mockTestMessages(
   );
 
   await executeButton.click();
+}
+
+/**
+ * Compute message row black box CSS class.
+ *
+ * @param timeDate Message time date.
+ * @param registrationDate Message server registration date.
+ *
+ * @returns Message CSS class.
+ */
+function getBlackBoxClass(timeDate: DataMessage['trackerDateTime'], registrationDate: DataMessage['serverDateTime']) {
+  let cssClass: string | undefined;
+
+  if (timeDate) {
+    const time = new Date(timeDate)
+      .getTime();
+
+    const registration = new Date(registrationDate)
+      .getTime();
+
+    const period = registration - time;
+    const MINUTE = 60 * 1000;
+
+    switch (true) {
+      case period <= 2 * MINUTE:
+
+        break;
+
+      case period <= 10 * MINUTE:
+        cssClass = 'black-box';
+
+        break;
+
+      case period <= 30 * MINUTE:
+        cssClass = 'black-box-medium';
+
+        break;
+
+      default:
+        cssClass = 'black-box-long';
+    }
+  }
+
+  return cssClass;
 }
