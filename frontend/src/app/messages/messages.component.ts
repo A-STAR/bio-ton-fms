@@ -615,13 +615,14 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     return Object
       .freeze(commandMessages!)
       .map(({
+        id,
         num: position,
         commandDateTime: time,
         commandText: command,
         executionTime: execution,
         channel,
         commandResponseText: response
-      }): CommandMessageDataSource => ({ position, time, channel, command, execution, response }));
+      }): CommandMessageDataSource => ({ id, position, time, channel, command, execution, response }));
   }
 
   /**
@@ -760,7 +761,7 @@ interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'al
   class?: string;
 }
 
-interface CommandMessageDataSource extends Pick<CommandMessage, 'channel'> {
+interface CommandMessageDataSource extends Pick<CommandMessage, 'id' | 'channel'> {
   position: CommandMessage['num'];
   time: CommandMessage['commandDateTime'];
   command: CommandMessage['commandText'];

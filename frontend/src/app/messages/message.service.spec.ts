@@ -285,6 +285,7 @@ export const testSensorMessages: Messages = {
 export const testCommandMessages: Messages = {
   commandMessages:[
     {
+      id: 2,
       num: 1,
       commandDateTime: '2023-12-17T03:09:22.9649951Z',
       commandText: 'text 1',
@@ -293,6 +294,7 @@ export const testCommandMessages: Messages = {
       commandResponseText: 'response 1'
     },
     {
+      id: 1,
       num: 2,
       commandDateTime: '2023-12-17T03:09:22.964995Z',
       commandText: 'text 2',

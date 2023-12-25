@@ -112,6 +112,7 @@ type SensorMessage = DataMessage & {
 };
 
 export type CommandMessage = {
+  id: number;
   num: number;
   commandDateTime: string;
   commandText?: TrackerCommand['commandText'];
