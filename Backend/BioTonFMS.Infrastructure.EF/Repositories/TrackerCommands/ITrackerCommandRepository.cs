@@ -18,4 +18,10 @@ public interface ITrackerCommandRepository : IRepository<TrackerCommand>
     /// ѕостранично возвращает массив событий с синформацией о командах отправленных на трекер дл€ зададанного трекера и временного диапазона
     /// </summary>
     PagedResult<CommandMessageDto> GetCommandMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
+
+    /// <summary>
+    /// ”дал€ет сообщени€ из списка
+    /// </summary>
+    /// <param name="messageIds">список идентификаторов дл€ удалени€</param>
+    void DeleteCommands(int[] commandIds);
 }

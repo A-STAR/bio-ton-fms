@@ -217,10 +217,10 @@ public class MessagesViewController : ValidationControllerBase
     }
 
     /// <summary>
-    /// Удаляет список сообщений по идентификаторам
+    /// Удаляет список сообщений трекеров по идентификаторам
     /// </summary>
-    /// <param name="messageIds">Список идентификаторов сообщений для удаления</param>
-    /// <response code="200">Список сообщенний успешно возвращён</response>
+    /// <param name="messageIds">Список идентификаторов сообщений предназначенных для удаления</param>
+    /// <response code="200">Сообщения успешно удалены</response>
     /// <response code="404">В списке есть идентификаторы несуществующих сообщений</response>
     [HttpDelete("delete-messages")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -230,6 +230,33 @@ public class MessagesViewController : ValidationControllerBase
         try
         {
             _messageRepository.DeleteMessages(messageIds);
+            return Ok();
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(new ServiceErrorResult(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении сообщений");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Удаляет список команд для трекеров по идентификаторам
+    /// </summary>
+    /// <param name="messageIds">Список идентификаторов команд для трекеров предназначенных для удаления</param>
+    /// <response code="200">Команды успешно удалены</response>
+    /// <response code="404">В списке есть идентификаторы несуществующих сообщений</response>
+    [HttpDelete("delete-command-messages")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
+    public IActionResult DeleteCommandMessages([FromBody] int[] messageIds)
+    {
+        try
+        {
+            _commandRepository.DeleteCommands(messageIds);
             return Ok();
         }
         catch (ArgumentException ex)

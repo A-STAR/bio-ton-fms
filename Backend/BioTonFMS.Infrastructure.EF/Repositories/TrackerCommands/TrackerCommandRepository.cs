@@ -48,7 +48,7 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
     }
 
     /// <summary>
-    /// ѕостранично возвращает массив событий с синформацией о командах отправленных на трекер дл€ зададанного трекера и временного диапазона
+    /// ѕостранично возвращает массив событий с информацией о командах отправленных на трекер дл€ зададанного трекера и временного диапазона
     /// </summary>
     public PagedResult<CommandMessageDto> GetCommandMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize)
     {
@@ -69,6 +69,7 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
         {
             Results = commands.Results.Select((cmd, idx) => new CommandMessageDto
             {
+                Id = cmd.Id,
                 Num = (commands.CurrentPage - 1) * commands.PageSize + idx + 1,
                 CommandDateTime = cmd.SentDateTime,
                 CommandText = cmd.CommandText,
@@ -80,5 +81,23 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
             TolalRowCount = commands.TolalRowCount,
             TotalPageCount = commands.TotalPageCount,
         };
+    }
+
+    /// <summary>
+    /// ”дал€ет команды из списка
+    /// </summary>
+    /// <param name="messageIds">список идентификаторов дл€ удалени€</param>
+    public void DeleteCommands(int[] commandIds)
+    {
+        var existingFromList = QueryableProvider.Linq().Where(cmd => commandIds.Contains(cmd.Id)).ToList();
+        if (commandIds.Length > existingFromList.Count())
+        {
+            throw new ArgumentException($"ƒл€ некоторых идентификаторов из списка не найдены сообщени€");
+        }
+
+        foreach (var message in existingFromList)
+        {
+            base.Remove(message);
+        }
     }
 }

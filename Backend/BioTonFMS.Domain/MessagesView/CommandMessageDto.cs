@@ -3,6 +3,11 @@ namespace BioTonFMS.Domain.MessagesView;
 public class CommandMessageDto
 {
     /// <summary>
+    /// Идентификатор сообщения
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Порядковый номер сообщения в выборке
     /// </summary>
     public int Num { get; set; }
