@@ -8,6 +8,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
@@ -66,6 +67,7 @@ import { TrackerParameter } from '../directory-tech/tracker.service';
     MatDatepickerModule,
     MatSelectModule,
     MatButtonModule,
+    MatIconModule,
     MatTableModule,
     MatCheckboxModule,
     MatChipsModule,

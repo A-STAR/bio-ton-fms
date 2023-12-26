@@ -1587,6 +1587,43 @@ describe('MessagesComponent', () => {
       .withContext('render all checkbox unchecked')
       .toBeResolvedTo(false);
   }));
+
+  it('should render delete messages button', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    let deleteButton: MatButtonHarness;
+
+    try {
+      deleteButton = await loader.getHarness(
+        MatButtonHarness.with({
+          ancestor: '#messages .controls',
+          text: 'delete',
+          variant: 'icon'
+        })
+      );
+    } catch { }
+
+    expect(deleteButton!)
+      .withContext('render no delete button')
+      .toBeUndefined();
+
+    const selectCheckbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-row',
+        selector: '[bioStopClickPropagation]'
+      })
+    );
+
+    selectCheckbox.check();
+
+    await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '#messages .controls',
+        text: 'delete',
+        variant: 'icon'
+      })
+    );
+  }));
 });
 
 /**
