@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
 
 import {
   BehaviorSubject,
@@ -47,6 +48,14 @@ import {
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
 import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-input.directive';
 import { StopClickPropagationDirective } from '../shared/stop-click-propagation/stop-click-propagation.directive';
+
+import {
+  ConfirmationDialogComponent,
+  confirmationDialogConfig,
+  confirmationDialogContentPartials,
+  getConfirmationDialogContent
+} from '../shared/confirmation-dialog/confirmation-dialog.component';
+
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
@@ -297,6 +306,25 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
       this.selection.select(...data);
     }
+  }
+
+  /**
+   * Delete messages in table.
+   */
+  protected onDeleteMessages() {
+    const entity = this.selection.selected.length.toString();
+
+    let { contentStart } = confirmationDialogContentPartials;
+
+    contentStart += 'сообщения (';
+    const contentEnd = ')?';
+
+    const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(entity, undefined, contentStart, contentEnd);
+
+    this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
+      ConfirmationDialogComponent,
+      { ...confirmationDialogConfig, data }
+    );
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
@@ -702,7 +730,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     );
   }
 
-  constructor(private fb: FormBuilder, private messageService: MessageService) {
+  constructor(private fb: FormBuilder, private dialog: MatDialog, private messageService: MessageService) {
     this.location$ = this.#location$.asObservable();
     this.statistics$ = this.#statistics$.asObservable();
   }

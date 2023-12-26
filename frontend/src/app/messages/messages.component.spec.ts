@@ -5,6 +5,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DATE_PIPE_DEFAULT_OPTIONS, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import localeRu from '@angular/common/locales/ru';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
@@ -17,6 +18,8 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatChipSetHarness } from '@angular/material/chips/testing';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
 import { Observable, of } from 'rxjs';
@@ -66,6 +69,7 @@ describe('MessagesComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatDialogModule,
           MessagesComponent
         ],
         providers: [
@@ -1588,7 +1592,10 @@ describe('MessagesComponent', () => {
       .toBeResolvedTo(false);
   }));
 
-  it('should render delete messages button', fakeAsync(async () => {
+  it('should delete messages', fakeAsync(async () => {
+    const overlayContainer = TestBed.inject(OverlayContainer);
+    const documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+
     await mockTestMessages(component, loader, messageService);
 
     let deleteButton: MatButtonHarness;
@@ -1607,22 +1614,31 @@ describe('MessagesComponent', () => {
       .withContext('render no delete button')
       .toBeUndefined();
 
-    const selectCheckbox = await loader.getHarness(
+    const selectAllCheckbox = await loader.getHarness(
       MatCheckboxHarness.with({
-        ancestor: '#messages mat-row',
-        selector: '[bioStopClickPropagation]'
+        ancestor: '#messages mat-header-row'
       })
     );
 
-    selectCheckbox.check();
+    selectAllCheckbox.check();
 
-    await loader.getHarness(
+    deleteButton = await loader.getHarness(
       MatButtonHarness.with({
         ancestor: '#messages .controls',
         text: 'delete',
         variant: 'icon'
       })
     );
+
+    await deleteButton.click();
+
+    const confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+
+    overlayContainer.ngOnDestroy();
   }));
 });
 

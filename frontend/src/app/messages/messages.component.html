@@ -196,7 +196,7 @@
   <ng-container *ngIf="messages$ | async as messages; else unselected">
     <ng-container *ngIf="(messages.trackerDataMessages || messages.sensorDataMessages || messages.commandMessages)?.length; else empty">
       <section class="controls">
-        <button mat-icon-button title="Удалить" color="warn" *ngIf="selection.hasValue()">
+        <button mat-icon-button title="Удалить" color="warn" *ngIf="selection.hasValue()" (click)="onDeleteMessages()">
           <mat-icon class="md-18">delete</mat-icon>
         </button>
       </section>
