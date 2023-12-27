@@ -159,7 +159,7 @@ export default class TrackerComponent implements OnInit, OnDestroy {
    *
    * @param sensorDataSource Sensor data source.
    */
-  protected async onDeleteSensor({ id, name }: SensorDataSource) {
+  protected onDeleteSensor({ id, name }: SensorDataSource) {
     const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(name);
 
     const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(

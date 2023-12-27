@@ -172,7 +172,7 @@ export default class TrackersComponent implements OnInit, OnDestroy {
    *
    * @param trackerDataSource Tracker data source.
    */
-  protected async onDeleteTracker({ id, name }: TrackerDataSource) {
+  protected onDeleteTracker({ id, name }: TrackerDataSource) {
     const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(name);
 
     const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(

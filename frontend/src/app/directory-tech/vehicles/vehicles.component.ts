@@ -190,7 +190,7 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
    *
    * @param vehicleDataSource Vehicle data source.
    */
-  protected async onDeleteVehicle({ id, name }: VehicleDataSource) {
+  protected onDeleteVehicle({ id, name }: VehicleDataSource) {
     const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(name);
 
     const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(

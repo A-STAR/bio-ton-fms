@@ -23,26 +23,34 @@ export const confirmationDialogConfig: MatDialogConfig<InnerHTML['innerHTML']> =
   width: '630px'
 };
 
-export const confirmationDialogContentPartials: [string, string] = ['Вы действительно хотите удалить ', '?'];
+export const confirmationDialogContentPartials: {
+  contentStart: string;
+  contentEnd: string;
+} = {
+  contentStart: 'Вы действительно хотите удалить ',
+  contentEnd: '?'
+};
 
 /**
  * Construct confirmation dialog content.
  *
- * @param name Entity name for action confirmation.
+ * @param entity Entity for action confirmation.
  * @param isTextContent HTML or plain text content flag.
- * @param contentPartials Text content start, end partials.
+ * @param contentStart Text content start partial.
+ * @param contentEnd Text content end partial.
  *
  * @returns Confirmation dialog content.
  */
 export function getConfirmationDialogContent<T extends boolean | undefined = undefined>(
-  name: string,
+  entity: string,
   isTextContent?: T,
-  [contentStart, contentEnd] = confirmationDialogContentPartials
+  contentStart = confirmationDialogContentPartials.contentStart,
+  contentEnd = confirmationDialogContentPartials.contentEnd
 ) {
   const paragraphEl = document.createElement('p');
   const strongEl = document.createElement('strong');
 
-  strongEl.append(name);
+  strongEl.append(entity);
   paragraphEl.append(contentStart, strongEl, contentEnd);
 
   return (

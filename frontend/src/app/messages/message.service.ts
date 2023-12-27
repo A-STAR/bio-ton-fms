@@ -47,6 +47,17 @@ export class MessageService {
   }
 
   /**
+   * Delete a data message.
+   *
+   * @param body Deleted messages ID.
+   *
+   * @returns An `Observable` of deleting message stream.
+   */
+  deleteMessages(body: DataMessage['id'][]) {
+    return this.httpClient.delete<null>('/api/telematica/messagesview/delete-messages', { body });
+  }
+
+  /**
    * Get messages location and track.
    *
    * @param fromObject Message track params options.
@@ -112,6 +123,7 @@ type SensorMessage = DataMessage & {
 };
 
 export type CommandMessage = {
+  id: number;
   num: number;
   commandDateTime: string;
   commandText?: TrackerCommand['commandText'];

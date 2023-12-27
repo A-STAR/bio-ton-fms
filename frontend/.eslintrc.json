@@ -282,6 +282,12 @@
           }
         ],
         "no-else-return": "warn",
+        "no-empty": [
+          "warn",
+          {
+            "allowEmptyCatch": true
+          }
+        ],
         "no-empty-function": [
           "warn",
           {

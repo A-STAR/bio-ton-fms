@@ -1,16 +1,19 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
-
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-
+import { SelectionModel } from '@angular/cdk/collections';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
   BehaviorSubject,
@@ -25,6 +28,7 @@ import {
   first,
   forkJoin,
   map,
+  mergeMap,
   skipWhile,
   startWith,
   switchMap,
@@ -45,6 +49,15 @@ import {
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
 import { TimeCharsInputDirective } from '../shared/time-chars-input/time-chars-input.directive';
+import { StopClickPropagationDirective } from '../shared/stop-click-propagation/stop-click-propagation.directive';
+
+import {
+  ConfirmationDialogComponent,
+  confirmationDialogConfig,
+  confirmationDialogContentPartials,
+  getConfirmationDialogContent
+} from '../shared/confirmation-dialog/confirmation-dialog.component';
+
 import { MapComponent } from '../shared/map/map.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
@@ -65,10 +78,13 @@ import { TrackerParameter } from '../directory-tech/tracker.service';
     MatDatepickerModule,
     MatSelectModule,
     MatButtonModule,
+    MatIconModule,
     MatTableModule,
+    MatCheckboxModule,
     MatChipsModule,
     DateCharsInputDirective,
     TimeCharsInputDirective,
+    StopClickPropagationDirective,
     MapComponent
   ],
   templateUrl: './messages.component.html',
@@ -81,7 +97,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    *
    * @returns Max start date.
    */
-  get maxStartDate() {
+  protected get maxStartDate() {
     return new Date();
   }
 
@@ -90,13 +106,22 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    *
    * @returns Max end date.
    */
-  get maxEndDate() {
+  protected get maxEndDate() {
     const date = new Date();
     const tomorrowDay = date.getDate() + 1;
 
     date.setDate(tomorrowDay);
 
     return date;
+  }
+
+  /**
+   * Whether the number of selected messages matches the total number of messages.
+   *
+   * @returns All messages selected value.
+   */
+  protected get isAllSelected() {
+    return this.selection.selected.length === this.messagesDataSource?.data.length;
   }
 
   /**
@@ -139,8 +164,9 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected statistics$?: Observable<MessageStatistics>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
-  protected columns?: KeyValue<MessageColumn | string, string>[];
+  protected columns?: KeyValue<MessageColumn | string, string | undefined>[];
   protected columnKeys?: string[];
+  protected selection = new SelectionModel<TrackerMessageDataSource | SensorMessageDataSource>(true);
   protected MessageColumn = MessageColumn;
 
   /**
@@ -269,6 +295,59 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    */
   protected parameterTrackBy(index: number, { paramName }: TrackerParameter) {
     return paramName;
+  }
+
+  /**
+   * Selects all messages if they are not all selected, otherwise clears selection.
+   */
+  protected toggleAllRows() {
+    if (this.isAllSelected) {
+      this.selection.clear();
+    } else {
+      const { data } = this.messagesDataSource as TableDataSource<TrackerMessageDataSource | SensorMessageDataSource>;
+
+      this.selection.select(...data);
+    }
+  }
+
+  /**
+   * Delete messages in table.
+   */
+  protected onDeleteMessages() {
+    const entity = this.selection.selected.length.toString();
+
+    let { contentStart } = confirmationDialogContentPartials;
+
+    contentStart += 'сообщения (';
+    const contentEnd = ')?';
+
+    const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(entity, undefined, contentStart, contentEnd);
+
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
+      ConfirmationDialogComponent,
+      { ...confirmationDialogConfig, data }
+    );
+
+    const messageIDs = this.selection.selected.map(({ id }) => id);
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        mergeMap(() => this.messageService.deleteMessages(messageIDs))
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open(MESSAGES_DELETED);
+
+          this.#updateMessages();
+        },
+        error: error => {
+          this.errorHandler.handleError(error);
+
+          this.#updateMessages();
+        }
+      });
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
@@ -437,11 +516,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   #setColumns({ sensorDataMessages }: Messages) {
     switch (this.#options?.viewMessageType) {
       case MessageType.DataMessage:
-        this.columns = dataMessageColumns;
 
         switch (this.#options.parameterType) {
           case DataMessageParameter.TrackerData:
-            this.columns = this.columns.concat(trackerMessageColumns);
+            this.columns = trackerMessageColumns;
 
             break;
 
@@ -460,7 +538,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
               };
             });
 
-            this.columns = this.columns.concat(sensorColumns);
+            this.columns = [...dataMessageColumns, ...sensorColumns];
           }
         }
 
@@ -615,13 +693,14 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     return Object
       .freeze(commandMessages!)
       .map(({
+        id,
         num: position,
         commandDateTime: time,
         commandText: command,
         executionTime: execution,
         channel,
         commandResponseText: response
-      }): CommandMessageDataSource => ({ position, time, channel, command, execution, response }));
+      }): CommandMessageDataSource => ({ id, position, time, channel, command, execution, response }));
   }
 
   /**
@@ -630,7 +709,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    * @param messages Messages.
    */
   #setMessagesDataSource(messages: Messages) {
-    let messagesDataSource: (TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource)[] | undefined;
+    let messagesDataSource: (TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource)[];
 
     switch (this.#options?.viewMessageType) {
       case MessageType.DataMessage:
@@ -659,7 +738,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Set messages, message columns.
+   * Set messages, message columns, clear selection.
    */
   #setMessages() {
     this.messages$ = this.#messages$.pipe(
@@ -669,12 +748,27 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         this.#setColumns(messages);
         this.#setMessagesDataSource(messages);
 
+        this.selection.clear();
+
         this.#messagesSettled$.next(undefined);
       })
     );
   }
 
-  constructor(private fb: FormBuilder, private messageService: MessageService) {
+  /**
+   * Emit messages update.
+   */
+  #updateMessages() {
+    this.#messages$.next(this.#options);
+  }
+
+  constructor(
+    private errorHandler: ErrorHandler,
+    private fb: FormBuilder,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private messageService: MessageService
+  ) {
     this.location$ = this.#location$.asObservable();
     this.statistics$ = this.#statistics$.asObservable();
   }
@@ -703,6 +797,7 @@ export enum DataMessageParameter {
 }
 
 export enum MessageColumn {
+  Selection = 'selection',
   Position = 'position',
   Time = 'time',
   Registration = 'registration',
@@ -760,7 +855,7 @@ interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'al
   class?: string;
 }
 
-interface CommandMessageDataSource extends Pick<CommandMessage, 'channel'> {
+interface CommandMessageDataSource extends Pick<CommandMessage, 'id' | 'channel'> {
   position: CommandMessage['num'];
   time: CommandMessage['commandDateTime'];
   command: CommandMessage['commandText'];
@@ -770,7 +865,14 @@ interface CommandMessageDataSource extends Pick<CommandMessage, 'channel'> {
 
 export const TIME_PATTERN = /^(0?[0-9]|1\d|2[0-3]):(0[0-9]|[1-5]\d)$/;
 
-const messageColumns: KeyValue<MessageColumn, string>[] = [
+const selectionColumn: KeyValue<MessageColumn, undefined>[] = [
+  {
+    key: MessageColumn.Selection,
+    value: undefined
+  }
+];
+
+const positionColumn: KeyValue<MessageColumn, string>[] = [
   {
     key: MessageColumn.Position,
     value: '#'
@@ -778,7 +880,7 @@ const messageColumns: KeyValue<MessageColumn, string>[] = [
 ];
 
 export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
-  ...messageColumns,
+  ...positionColumn,
   {
     key: MessageColumn.Time,
     value: 'Время устройства'
@@ -801,15 +903,18 @@ export const dataMessageColumns: KeyValue<MessageColumn, string>[] = [
   }
 ];
 
-export const trackerMessageColumns: KeyValue<MessageColumn, string>[] = [
+export const trackerMessageColumns: KeyValue<MessageColumn, string | undefined>[] = [
+  ...selectionColumn,
+  ...dataMessageColumns,
   {
     key: MessageColumn.Parameters,
     value: 'Параметры'
   }
 ];
 
-export const commandMessageColumns: KeyValue<MessageColumn, string>[] = [
-  ...messageColumns,
+export const commandMessageColumns: KeyValue<MessageColumn, string | undefined>[] = [
+  ...selectionColumn,
+  ...positionColumn,
   {
     key: MessageColumn.Time,
     value: 'Время'
@@ -831,6 +936,8 @@ export const commandMessageColumns: KeyValue<MessageColumn, string>[] = [
     value: 'Ответ на команду'
   }
 ];
+
+export const MESSAGES_DELETED = 'Сообщения удалены';
 
 /**
  * Parsing time from user input.
