@@ -12,7 +12,7 @@
         public int PageSize { get; set; }
 
         // Общее количество элементов в результате запроса
-        public int TolalRowCount { get; set; }
+        public int TotalRowCount { get; set; }
 
         public IList<T> Results { get; set; }
 

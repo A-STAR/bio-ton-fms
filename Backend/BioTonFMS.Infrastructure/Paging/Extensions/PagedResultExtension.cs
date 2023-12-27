@@ -7,10 +7,10 @@
             var result = new PagedResult<T>
             {
                 PageSize = pageSize,
-                TolalRowCount = query.Count()
+                TotalRowCount = query.Count()
             };
 
-            var pageCount = (double)result.TolalRowCount / pageSize;
+            var pageCount = (double)result.TotalRowCount / pageSize;
             result.TotalPageCount = (int)Math.Ceiling(pageCount);
             result.CurrentPage = result.TotalPageCount < page ? result.TotalPageCount : page;
 

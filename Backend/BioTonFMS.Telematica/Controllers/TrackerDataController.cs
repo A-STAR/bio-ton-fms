@@ -98,7 +98,8 @@ public class TrackerDataController : ValidationControllerBase
             Pagination = new Pagination
             {
                 PageIndex = history.CurrentPage,
-                Total = history.TotalPageCount
+                Total = history.TotalPageCount,
+                Records = history.TotalRowCount
             }
         };
 

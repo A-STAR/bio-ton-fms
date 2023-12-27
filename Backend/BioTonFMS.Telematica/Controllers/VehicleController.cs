@@ -87,7 +87,8 @@ public class VehicleController : ValidationControllerBase
             Pagination = new Pagination
             {
                 PageIndex = vehiclesPaging.CurrentPage,
-                Total = vehiclesPaging.TotalPageCount
+                Total = vehiclesPaging.TotalPageCount,
+                Records = vehiclesPaging.TotalRowCount
             }
         };
 

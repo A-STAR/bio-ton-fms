@@ -78,7 +78,7 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
             }).ToList(),
             PageSize = commands.PageSize,
             CurrentPage = commands.CurrentPage,
-            TolalRowCount = commands.TolalRowCount,
+            TotalRowCount = commands.TotalRowCount,
             TotalPageCount = commands.TotalPageCount,
         };
     }

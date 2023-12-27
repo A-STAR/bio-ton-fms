@@ -174,7 +174,8 @@ public class MessagesViewController : ValidationControllerBase
                 Pagination = new Pagination
                 {
                     PageIndex = pagedDataMessages.CurrentPage,
-                    Total = pagedDataMessages.TotalPageCount
+                    Total = pagedDataMessages.TotalPageCount,
+                    Records = pagedDataMessages.TotalRowCount
                 }
             });
         }
@@ -193,7 +194,8 @@ public class MessagesViewController : ValidationControllerBase
                 Pagination = new Pagination
                 {
                     PageIndex = pagedSensorMessages.CurrentPage,
-                    Total = pagedSensorMessages.TotalPageCount
+                    Total = pagedSensorMessages.TotalPageCount,
+                    Records = pagedSensorMessages.TotalRowCount
                 }
             });
         }
@@ -208,7 +210,8 @@ public class MessagesViewController : ValidationControllerBase
                 Pagination = new Pagination
                 {
                     PageIndex = pagedCommandMessages.CurrentPage,
-                    Total = pagedCommandMessages.TotalPageCount
+                    Total = pagedCommandMessages.TotalPageCount,
+                    Records = pagedCommandMessages.TotalRowCount
                 }
             });
         }

@@ -195,7 +195,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         {
             PageSize = page.PageSize,
             CurrentPage = page.CurrentPage,
-            TolalRowCount = page.TolalRowCount,
+            TotalRowCount = page.TotalRowCount,
             TotalPageCount = page.TotalPageCount,
             Results = page.Results.Select(x => new ParametersHistoryRecord
             {
@@ -375,7 +375,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             }).ToList(),
             CurrentPage = messages.CurrentPage,
             PageSize = messages.PageSize,
-            TolalRowCount = messages.TolalRowCount,
+            TotalRowCount = messages.TotalRowCount,
             TotalPageCount = messages.TotalPageCount
         };
     }
@@ -426,7 +426,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             }).ToList(),
             CurrentPage = messages.CurrentPage,
             PageSize = messages.PageSize,
-            TolalRowCount = messages.TolalRowCount,
+            TotalRowCount = messages.TotalRowCount,
             TotalPageCount = messages.TotalPageCount
         };
     }

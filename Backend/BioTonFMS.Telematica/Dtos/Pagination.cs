@@ -14,5 +14,10 @@
         /// Общее количество страниц для вывода всех данных
         /// </summary>
         public int Total { get; set; }
+
+        /// <summary>
+        /// Общее количество записей
+        /// </summary>
+        public int Records { get; set; }
     }
 }

@@ -75,7 +75,8 @@ public class TrackerController : ValidationControllerBase
             Pagination = new Pagination
             {
                 PageIndex = trackersPaging.CurrentPage,
-                Total = trackersPaging.TotalPageCount
+                Total = trackersPaging.TotalPageCount,
+                Records = trackersPaging.TotalRowCount
             }
         };
 
