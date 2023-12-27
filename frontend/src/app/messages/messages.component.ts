@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -13,6 +13,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
   BehaviorSubject,
@@ -27,6 +28,7 @@ import {
   first,
   forkJoin,
   map,
+  mergeMap,
   skipWhile,
   startWith,
   switchMap,
@@ -321,10 +323,31 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
     const data: InnerHTML['innerHTML'] = getConfirmationDialogContent(entity, undefined, contentStart, contentEnd);
 
-    this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
+    const dialogRef = this.dialog.open<ConfirmationDialogComponent, InnerHTML['innerHTML'], boolean | undefined>(
       ConfirmationDialogComponent,
       { ...confirmationDialogConfig, data }
     );
+
+    const messageIDs = this.selection.selected.map(({ id }) => id);
+
+    this.#subscription = dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        mergeMap(() => this.messageService.deleteMessages(messageIDs))
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open(MESSAGES_DELETED);
+
+          this.#updateMessages();
+        },
+        error: error => {
+          this.errorHandler.handleError(error);
+
+          this.#updateMessages();
+        }
+      });
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
@@ -715,7 +738,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Set messages, message columns.
+   * Set messages, message columns, clear selection.
    */
   #setMessages() {
     this.messages$ = this.#messages$.pipe(
@@ -725,12 +748,27 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         this.#setColumns(messages);
         this.#setMessagesDataSource(messages);
 
+        this.selection.clear();
+
         this.#messagesSettled$.next(undefined);
       })
     );
   }
 
-  constructor(private fb: FormBuilder, private dialog: MatDialog, private messageService: MessageService) {
+  /**
+   * Emit messages update.
+   */
+  #updateMessages() {
+    this.#messages$.next(this.#options);
+  }
+
+  constructor(
+    private errorHandler: ErrorHandler,
+    private fb: FormBuilder,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private messageService: MessageService
+  ) {
     this.location$ = this.#location$.asObservable();
     this.statistics$ = this.#statistics$.asObservable();
   }
@@ -898,6 +936,8 @@ export const commandMessageColumns: KeyValue<MessageColumn, string | undefined>[
     value: 'Ответ на команду'
   }
 ];
+
+export const MESSAGES_DELETED = 'Сообщения удалены';
 
 /**
  * Parsing time from user input.

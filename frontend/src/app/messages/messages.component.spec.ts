@@ -1,8 +1,9 @@
-import { LOCALE_ID } from '@angular/core';
+import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DATE_PIPE_DEFAULT_OPTIONS, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import localeRu from '@angular/common/locales/ru';
 import { OverlayContainer } from '@angular/cdk/overlay';
@@ -18,16 +19,19 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
 import { MatChipSetHarness } from '@angular/material/chips/testing';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxon-adapter';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { DataMessage, MessageService, MessageStatisticsOptions, MessageTrackOptions, Messages, MessagesOptions } from './message.service';
 
 import MessagesComponent, {
   DataMessageParameter,
+  MESSAGES_DELETED,
   MessageColumn,
   MessageType,
   commandMessageColumns,
@@ -37,9 +41,11 @@ import MessagesComponent, {
 } from './messages.component';
 
 import { MapComponent } from '../shared/map/map.component';
+import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
+import { environment } from '../../environments/environment';
 import { localeID } from '../tech/shared/relative-time.pipe';
 import { PAGE_NUM } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
@@ -58,6 +64,8 @@ import { dateFormat } from '../directory-tech/trackers/trackers.component.spec';
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
   let fixture: ComponentFixture<MessagesComponent>;
+  let overlayContainer: OverlayContainer;
+  let documentRootLoader: HarnessLoader;
   let loader: HarnessLoader;
   let messageService: MessageService;
 
@@ -69,6 +77,7 @@ describe('MessagesComponent', () => {
         imports: [
           NoopAnimationsModule,
           HttpClientTestingModule,
+          MatSnackBarModule,
           MatDialogModule,
           MessagesComponent
         ],
@@ -98,6 +107,8 @@ describe('MessagesComponent', () => {
     registerLocaleData(localeRu, localeID);
 
     fixture = TestBed.createComponent(MessagesComponent);
+    overlayContainer = TestBed.inject(OverlayContainer);
+    documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     loader = TestbedHarnessEnvironment.loader(fixture);
 
     messageService = TestBed.inject(MessageService);
@@ -1593,9 +1604,6 @@ describe('MessagesComponent', () => {
   }));
 
   it('should delete messages', fakeAsync(async () => {
-    const overlayContainer = TestBed.inject(OverlayContainer);
-    const documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
-
     await mockTestMessages(component, loader, messageService);
 
     let deleteButton: MatButtonHarness;
@@ -1637,6 +1645,112 @@ describe('MessagesComponent', () => {
     expect(confirmationDialog)
       .withContext('render a confirmation dialog')
       .not.toBeNull();
+
+    const deleteMessagesSpy = spyOn(messageService, 'deleteMessages')
+      .and.callFake(() => of(null));
+
+    /* Coverage for deleting, updating messages. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<ConfirmationDialogComponent, true | '' | undefined>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await deleteButton.click();
+
+    const testMessageIDs = testTrackerMessages.trackerDataMessages!.map(({ id }) => id);
+
+    expect(deleteMessagesSpy)
+      .toHaveBeenCalledWith(testMessageIDs);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(MESSAGES_DELETED);
+
+    expect(messageService.getMessages)
+      .toHaveBeenCalled();
+
+    confirmationDialog?.close();
+
+    overlayContainer.ngOnDestroy();
+  }));
+
+  it('should delete messages with error response', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const selectAllCheckbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-header-row'
+      })
+    );
+
+    selectAllCheckbox.check();
+
+    const deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '#messages .controls',
+        text: 'delete',
+        variant: 'icon'
+      })
+    );
+
+    await deleteButton.click();
+
+    const confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+
+    /* Handle an error although update messages anyway. */
+
+    const testURL = `${environment.api}/api/telematica/messagesview/delete-messages'`;
+
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        message: `Http failure response for ${testURL}: 500 Internal Server Error`
+      },
+      status: 500,
+      statusText: 'Internal Server Error',
+      url: testURL
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    spyOn(errorHandler, 'handleError');
+
+    const deleteMessagesSpy = spyOn(messageService, 'deleteMessages')
+      .and.callFake(() => throwError(() => testErrorResponse));
+
+    /* Coverage for updating messages. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<ConfirmationDialogComponent, true | '' | undefined>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await deleteButton.click();
+
+    const testMessageIDs = testTrackerMessages.trackerDataMessages!.map(({ id }) => id);
+
+    expect(deleteMessagesSpy)
+      .toHaveBeenCalledWith(testMessageIDs);
+
+    expect(errorHandler.handleError)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    expect(messageService.getMessages)
+      .toHaveBeenCalled();
+
+    confirmationDialog?.close();
 
     overlayContainer.ngOnDestroy();
   }));

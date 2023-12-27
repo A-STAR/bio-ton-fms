@@ -157,6 +157,27 @@ describe('MessageService', () => {
     service.getMessages(options);
   });
 
+  it('should delete messages', (done: DoneFn) => {
+    const messagesIDs = testTrackerMessages.trackerDataMessages!.map(({ id }) => id);
+
+    service
+      .deleteMessages(messagesIDs)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const deleteMessagesRequest = httpTestingController.expectOne({
+      method: 'DELETE',
+      url: '/api/telematica/messagesview/delete-messages'
+    }, 'delete messages request');
+
+    deleteMessagesRequest.flush(null);
+  });
+
   it('should get message statistics', (done: DoneFn) => {
     service
       .getStatistics(testMessageOptions)
