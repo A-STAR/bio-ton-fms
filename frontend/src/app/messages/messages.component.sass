@@ -153,6 +153,11 @@ bio-map
   figure
     overflow: auto
 
+    &:has(mat-table)
+      border: math.div(1px, 2) solid $light-gray
+      border-top-width: 1px
+      border-bottom-width: 1px
+
   mat-row
 
     &.black-box
@@ -214,6 +219,12 @@ bio-map
 
     &:not(.mat-column-selection, .mat-column-position, .mat-column-location, .mat-column-speed, .mat-column-altitude, .mat-column-parameters, [class*="mat-column-sensor"], .mat-column-channel)
       min-width: 175px
+
+  mat-header-cell
+    border-top: unset
+
+  mat-row:last-child mat-cell
+    border-bottom: unset
 
   p
     position: absolute
