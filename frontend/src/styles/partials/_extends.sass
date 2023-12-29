@@ -115,7 +115,7 @@
   mat-dialog-content .mdc-data-table__table,
   mat-header-cell,
   mat-cell,
-  :last-child .mdc-data-table__cell,
+  mat-row:last-child .mdc-data-table__cell,
   .actions
     border: math.div(1px, 2) solid $light-gray
 
@@ -132,6 +132,16 @@
 
       &:last-child
         border-right-color: transparent
+
+  mat-header-cell,
+  mat-cell,
+  mat-row:last-child .mdc-data-table__cell
+
+    &.mat-mdc-table-sticky-border-elem-left
+      border-right-width: 1px
+
+      & + *
+        border-left: unset
 
   .mat-mdc-table-sticky
 
