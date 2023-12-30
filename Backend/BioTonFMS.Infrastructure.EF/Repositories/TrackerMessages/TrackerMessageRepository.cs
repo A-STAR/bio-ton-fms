@@ -394,7 +394,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var endUtc = end.ToUniversalTime();
 
         PagedResult<TrackerMessage> messages = QueryableProvider
-            .Fetch(m => m.Tags.Where(x => x.SensorId == null))
+            .Fetch(m => m.Tags.Where(x => x.SensorId != null))
             .Linq()
             .Where(m => m.ExternalTrackerId == externalId &&
                         m.ServerDateTime >= startUtc &&
