@@ -47,6 +47,7 @@ public class TestDataController : ValidationControllerBase
     private readonly IVehicleGroupRepository _vehicleGroupRepository;
     private readonly IFuelTypeRepository _fuelTypeRepository;
     private readonly MoveTestTrackerMessagesService _moveTestTrackerMessagesService;
+    private readonly FillTestSensorDataService _fillTestSensorDataService;
     private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
 
@@ -60,6 +61,7 @@ public class TestDataController : ValidationControllerBase
         ITrackerTagRepository trackerTagRepository, IVehicleGroupRepository vehicleGroupRepository,
         ITrackerMessageRepository trackerMessageRepository, IFuelTypeRepository fuelTypeRepository,
         MoveTestTrackerMessagesService moveTestTrackerMessagesService,
+        FillTestSensorDataService fillTestSensorDataService,
         IMapper mapper)
     {
         _logger = logger;
@@ -75,6 +77,7 @@ public class TestDataController : ValidationControllerBase
         _vehicleGroupRepository = vehicleGroupRepository;
         _fuelTypeRepository = fuelTypeRepository;
         _moveTestTrackerMessagesService = moveTestTrackerMessagesService;
+        _fillTestSensorDataService = fillTestSensorDataService;
         _mapper = mapper;
     }
 
@@ -242,12 +245,12 @@ public class TestDataController : ValidationControllerBase
     }
 
     /// <summary>
-    /// Добавляет тестовые данные датчиков в сообщения
+    /// Добавляет тестовые слчайные данные датчиков в сообщения
     /// </summary>
     /// <remarks>Это чисто отладочный метод. Поэтому тут нет обработки ошибок. В случае неудачи всегда возвращается статус 500</remarks>
     /// <response code="200">Данные успешно добавлены в базу</response>
     /// <response code="500">Внутренняя ошибка сервиса</response>
-    [HttpPost("debug/add-sensors-info-to-messages")]
+    [HttpPost("debug/add-sensors-randon-info-to-messages")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult AddTestSenforsInfoToMessages()
@@ -256,6 +259,7 @@ public class TestDataController : ValidationControllerBase
         {
             return BadRequest("Test data service is not available!");
         }
+        _fillTestSensorDataService.FillRandomSensorData();
         return Ok();
     }
 

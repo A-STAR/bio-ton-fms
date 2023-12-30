@@ -4,6 +4,9 @@ using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 using Microsoft.Extensions.Logging;
 using BioTonFMS.Common.Extensions;
 using Bogus;
+using BioTonFMS.Domain;
+using BioTonFMS.Domain.TrackerMessages;
+using BioTonFMS.MessageProcessing;
 
 namespace BioTonFMS.Telematica.Services;
 public class FillTestSensorDataService
@@ -22,7 +25,7 @@ public class FillTestSensorDataService
         _trackerRepository = trackerRepository;
     }
 
-    public void FillTestSensorData()
+    public void FillRandomSensorData()
     {
         var testTrackersExternalIds = _trackerRepository.GetTrackers(new TrackersFilter() { PageSize = 100000 }, forUpdate: false)
             .Results.Where(t => t.Id <= 0).Select(t => t.ExternalId).ToArray();
@@ -36,7 +39,7 @@ public class FillTestSensorDataService
         foreach (var testMessage in testMessages)
         {
             // если у сообщения нет тегов датчика, то добавляем случайные 
-            if (testMessage.Tags.All(t => t.SensorId != null))
+            if (testMessage.Tags.All(t => t.SensorId == null))
             {
                 var tracker = testTrackersDict[testMessage.ExternalTrackerId];
                 if (tracker != null)
@@ -44,16 +47,43 @@ public class FillTestSensorDataService
                     var sensors = tracker.Sensors;
 
                     var facker = new Faker();
-                    for (int i = 0; i < facker.Random.Int(0, sensors.Count()); i++) 
+                    for (int i = 0; i < sensors.Count(); i++) 
                     { 
                         var sensor = sensors.ToArray()[i];
                         if (sensor != null)
                         {
-
+                            switch (sensor.DataType)
+                            {
+                                case SensorDataTypeEnum.Boolean:
+                                    var tagBool = new MessageTagBoolean()
+                                    {
+                                        TagType = TagDataTypeEnum.Boolean,
+                                        SensorId = sensor.Id,
+                                        TrackerTagId = null,
+                                        TrackerMessageId = testMessage.Id,
+                                        TrackerMessage = testMessage,
+                                        IsFallback = false,
+                                        Value = facker.Random.Bool()
+                                    };
+                                    testMessage.Tags.Add(tagBool);
+                                    break;
+                                case SensorDataTypeEnum.Number:
+                                    var tagNum = new MessageTagDouble()
+                                    {
+                                        TagType = TagDataTypeEnum.Double,
+                                        SensorId = sensor.Id,
+                                        TrackerTagId = null,
+                                        TrackerMessageId = testMessage.Id,
+                                        TrackerMessage = testMessage,
+                                        IsFallback = false,
+                                        Value = facker.Random.Double()
+                                    };
+                                    testMessage.Tags.Add(tagNum);
+                                    break;
+                                default: break;
+                            }
                         }
-
                     }
-
                 }
             }
 
