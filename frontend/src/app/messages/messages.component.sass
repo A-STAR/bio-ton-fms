@@ -138,18 +138,6 @@ bio-map
   p
     display: flex
 
-  $selection-column-width: 56px
-
-  .controls
-    $controls-padding: (horizontal: 10px, vertical: 6px)
-
-    min-height: 2 * map.get($controls-padding, vertical) + map.get($mat-icon-button, size)
-    padding: map.get($controls-padding, vertical) map.get($controls-padding, horizontal)
-
-    button[title="Удалить"]
-      margin: 0 math.div($selection-column-width - map.get($mat-icon-button, size), 2) - map.get($controls-padding, horizontal)
-      animation: map.get($fadein-animation, button)
-
   figure
     overflow: auto
 
@@ -185,6 +173,8 @@ bio-map
 
       mat-chip
         --mdc-chip-elevated-container-color: #{$light-green}
+
+  $selection-column-width: 56px
 
   mat-header-cell,
   mat-cell
@@ -225,6 +215,16 @@ bio-map
 
   mat-row:last-child mat-cell
     border-bottom: unset
+
+  .controls
+    $controls-padding: (horizontal: 10px, vertical: 6px)
+
+    min-height: 2 * map.get($controls-padding, vertical) + map.get($mat-icon-button, size)
+    padding: map.get($controls-padding, vertical) map.get($controls-padding, horizontal)
+
+    button[title="Удалить"]
+      margin: 0 math.div($selection-column-width - map.get($mat-icon-button, size), 2) - map.get($controls-padding, horizontal)
+      animation: map.get($fadein-animation, button)
 
   p
     position: absolute
