@@ -133,10 +133,6 @@ public class TestDataController : ValidationControllerBase
                 continue;
             _trackerRepository.Add(trackerData.Tracker);
         }
-        /*foreach (var message in trackerDatas.Where(t => t.Messages is not null).SelectMany(t => t.Messages!))
-        {
-            _trackerMessageRepository.Add(message);
-        }*/
 
         var vehicleGroupIds = _vehicleGroupRepository.GetVehicleGroups().Select(v => v.Id);
         var fuelTypeIds = _fuelTypeRepository.GetFuelTypes().Select(v => v.Id);
@@ -161,6 +157,10 @@ public class TestDataController : ValidationControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult AddTestTrackDataForToday(int limit = 10)
     {
+        if (!ServiceEnabled)
+        {
+            return BadRequest("Test data service is not available!");
+        }
         var dataFiles = new List<(string MessageFile, string TagsFile)>()
         {
             ("1734-messages.csv", "1734-message-tags.csv"),
@@ -241,6 +241,24 @@ public class TestDataController : ValidationControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Добавляет тестовые данные датчиков в сообщения
+    /// </summary>
+    /// <remarks>Это чисто отладочный метод. Поэтому тут нет обработки ошибок. В случае неудачи всегда возвращается статус 500</remarks>
+    /// <response code="200">Данные успешно добавлены в базу</response>
+    /// <response code="500">Внутренняя ошибка сервиса</response>
+    [HttpPost("debug/add-sensors-info-to-messages")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult AddTestSenforsInfoToMessages()
+    {
+        if (!ServiceEnabled)
+        {
+            return BadRequest("Test data service is not available!");
+        }
+        return Ok();
+    }
+
     private static void SetNullableOptions(CsvReader messageCsv)
     {
         messageCsv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().NullValues.Add("NULL");
@@ -262,6 +280,10 @@ public class TestDataController : ValidationControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult MoveTestMessagesToToday(DateTime fromDate)
     {
+        if (!ServiceEnabled)
+        {
+            return BadRequest("Test data service is not available!");
+        }
         _moveTestTrackerMessagesService.MoveTestTrackerMessagesForToday(DateOnly.FromDateTime(fromDate.Add(fromDate.TimeOfDay)));
 
         return Ok();
