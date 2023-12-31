@@ -2,7 +2,7 @@ import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { DATE_PIPE_DEFAULT_OPTIONS, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, DecimalPipe, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import localeRu from '@angular/common/locales/ru';
@@ -86,6 +86,7 @@ describe('MessagesComponent', () => {
             provide: LOCALE_ID,
             useValue: 'ru-RU'
           },
+          DecimalPipe,
           {
             provide: DATE_PIPE_DEFAULT_OPTIONS,
             useValue: {
@@ -1424,9 +1425,15 @@ describe('MessagesComponent', () => {
         formattedAltitude = formatNumber(altitude, 'en-US', '1.1-1');
       }
 
+      const decimalPipe = TestBed.inject(DecimalPipe);
+
       const sensorValues: string[] = [];
 
       sensors.forEach(({ value, unit }) => {
+        if (value !== undefined && !isNaN(parseFloat(value))) {
+          value = decimalPipe.transform(value, '1.1-6', 'en-US')!;
+        }
+
         const sensorValue = value ? `${value} ${unit}` : '';
 
         sensorValues.push(sensorValue);
