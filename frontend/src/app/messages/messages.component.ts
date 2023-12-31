@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule, KeyValue } from '@angular/common';
+import { CommonModule, DecimalPipe, KeyValue } from '@angular/common';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -87,6 +87,7 @@ import { TrackerParameter } from '../directory-tech/tracker.service';
     StopClickPropagationDirective,
     MapComponent
   ],
+  providers: [DecimalPipe],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -678,6 +679,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
               key += `-${index + 1}`;
             }
 
+            if (!isNaN(parseFloat(value))) {
+              value = this.decimalPipe.transform(value, '1.1-6', 'en-US')!;
+            }
+
             sensorMap[key] = `${value} ${unit}`;
           }
         });
@@ -778,6 +783,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
   constructor(
     private errorHandler: ErrorHandler,
+    private decimalPipe: DecimalPipe,
     private fb: FormBuilder,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
