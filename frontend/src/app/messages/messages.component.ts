@@ -481,14 +481,14 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       range: this.fb.group({
         start: this.fb.group({
           date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-          time: this.fb.nonNullable.control<string | undefined>('00:00', [
+          time: this.fb.nonNullable.control('00:00', [
             Validators.required,
             Validators.pattern(TIME_PATTERN)
           ])
         }),
         end: this.fb.group({
           date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-          time: this.fb.nonNullable.control<string | undefined>('00:00', [
+          time: this.fb.nonNullable.control('00:00', [
             Validators.required,
             Validators.pattern(TIME_PATTERN)
           ])
@@ -830,11 +830,11 @@ type MessageSelectionForm = FormGroup<{
   range: FormGroup<{
     start: FormGroup<{
       date: FormControl<string | undefined>;
-      time: FormControl<string | undefined>;
+      time: FormControl<string>;
     }>;
     end: FormGroup<{
       date: FormControl<string | undefined>;
-      time: FormControl<string | undefined>;
+      time: FormControl<string>;
     }>;
   }>;
   message: FormGroup<{
