@@ -21,8 +21,7 @@
         <label for="start">От</label>
 
         <mat-form-field>
-          <input id="start" matInput formControlName="date" placeholder="Дата начала" [matDatepicker]="startPicker"
-            [max]="selectionForm.controls.range.controls.end.controls.date.value ?? maxStartDate">
+          <input id="start" matInput formControlName="date" placeholder="Дата начала" [matDatepicker]="startPicker" [max]="maxStartDate">
 
           <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
 
