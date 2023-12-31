@@ -93,12 +93,26 @@ import { TrackerParameter } from '../directory-tech/tracker.service';
 })
 export default class MessagesComponent implements OnInit, OnDestroy {
   /**
-   * Get today's date.
+   * Get today's date or lesser end's date.
    *
    * @returns Max start date.
    */
   protected get maxStartDate() {
-    return new Date();
+    let maxStartDate = new Date();
+
+    const endDate = this.selectionForm.get('range.end.date')
+      ?.value;
+
+    if (endDate) {
+      const isEndDayMax = new Date(endDate)
+        .getDate() < maxStartDate.getDate();
+
+      if (isEndDayMax) {
+        maxStartDate = new Date(endDate);
+      }
+    }
+
+    return maxStartDate;
   }
 
   /**
@@ -467,14 +481,14 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       range: this.fb.group({
         start: this.fb.group({
           date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-          time: this.fb.nonNullable.control<string | undefined>('00:00', [
+          time: this.fb.nonNullable.control('00:00', [
             Validators.required,
             Validators.pattern(TIME_PATTERN)
           ])
         }),
         end: this.fb.group({
           date: this.fb.nonNullable.control<string | undefined>(undefined, Validators.required),
-          time: this.fb.nonNullable.control<string | undefined>('00:00', [
+          time: this.fb.nonNullable.control('00:00', [
             Validators.required,
             Validators.pattern(TIME_PATTERN)
           ])
@@ -816,11 +830,11 @@ type MessageSelectionForm = FormGroup<{
   range: FormGroup<{
     start: FormGroup<{
       date: FormControl<string | undefined>;
-      time: FormControl<string | undefined>;
+      time: FormControl<string>;
     }>;
     end: FormGroup<{
       date: FormControl<string | undefined>;
-      time: FormControl<string | undefined>;
+      time: FormControl<string>;
     }>;
   }>;
   message: FormGroup<{
