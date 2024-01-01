@@ -106,7 +106,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
     if (endDate) {
       const isEndDayMax = new Date(endDate)
-        .getDate() < maxStartDate.getDate();
+        .getTime() < maxStartDate.getTime();
 
       if (isEndDayMax) {
         maxStartDate = new Date(endDate);
