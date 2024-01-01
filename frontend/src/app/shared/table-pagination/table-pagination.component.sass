@@ -2,16 +2,16 @@
 @use 'variables' as *
 
 \:host
-  display: block
   min-height: 50px
+
+\:host,
+form
+  display: flex
+  align-items: center
 
 form,
 div:has(mat-form-field)
   column-gap: 10px
-
-form
-  display: flex
-  align-items: center
 
 $mat-form-field-width: 48px
 

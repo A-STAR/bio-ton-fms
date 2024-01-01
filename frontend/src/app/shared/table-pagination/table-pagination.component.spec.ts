@@ -4,6 +4,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatSelectHarness } from '@angular/material/select/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 
 import { TablePaginationComponent } from './table-pagination.component';
@@ -63,6 +64,24 @@ describe('TablePaginationComponent', () => {
       );
 
     await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Начало"]',
+        text: 'keyboard_double_arrow_left',
+        variant: 'icon'
+      })
+    );
+
+    await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Предыдущая"]',
+        text: 'keyboard_arrow_left',
+        variant: 'icon'
+      })
+    );
+
+    await loader.getHarness(
       MatInputHarness.with({
         ancestor: 'form#pagination-form',
         selector: '[bioNumberOnlyInput]',
@@ -81,6 +100,120 @@ describe('TablePaginationComponent', () => {
     expect(totalPageDe.nativeElement.textContent)
       .withContext('render total pages text')
       .toBe(`из ${pagination.pagination.total}`);
+
+    await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Следующая"]',
+        text: 'keyboard_arrow_right',
+        variant: 'icon'
+      })
+    );
+
+    await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Конец"]',
+        text: 'keyboard_double_arrow_right',
+        variant: 'icon'
+      })
+    );
+  });
+
+  it('should switch the page', async () => {
+    const pageInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#pagination-form'
+      })
+    );
+
+    let page = 5;
+
+    await pageInput.setValue(`${page}`);
+
+    const nextButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Следующая"]',
+        text: 'keyboard_arrow_right',
+        variant: 'icon'
+      })
+    );
+
+    await nextButton.click();
+
+    await expectAsync(
+      pageInput.getValue()
+    )
+      .withContext('set next page')
+      .toBeResolvedTo(`${++page}`);
+
+    await nextButton.click();
+
+    await expectAsync(
+      pageInput.getValue()
+    )
+      .withContext('set next page')
+      .toBeResolvedTo(`${++page}`);
+
+    const previousButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Предыдущая"]',
+        text: 'keyboard_arrow_left',
+        variant: 'icon'
+      })
+    );
+
+    await previousButton.click();
+
+    await expectAsync(
+      pageInput.getValue()
+    )
+      .withContext('set previous page')
+      .toBeResolvedTo(`${--page}`);
+
+    await previousButton.click();
+
+    await expectAsync(
+      pageInput.getValue()
+    )
+      .withContext('set previous page')
+      .toBeResolvedTo(`${--page}`);
+
+    const beginningButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Начало"]',
+        text: 'keyboard_double_arrow_left',
+        variant: 'icon'
+      })
+    );
+
+    await beginningButton.click();
+
+    await expectAsync(
+      pageInput.getValue()
+    )
+      .withContext('set the 1st page')
+      .toBeResolvedTo(`${1}`);
+
+    const endButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[title="Конец"]',
+        text: 'keyboard_double_arrow_right',
+        variant: 'icon'
+      })
+    );
+
+    await endButton.click();
+
+    await expectAsync(
+      pageInput.getValue()
+    )
+      .withContext('set the last page')
+      .toBeResolvedTo(`${pagination.pagination.total}`);
   });
 });
 

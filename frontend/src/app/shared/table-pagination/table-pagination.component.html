@@ -2,7 +2,7 @@
   <mat-form-field>
     <mat-label>Размер</mat-label>
 
-    <mat-select id="size" placeholder="Размер" formControlName="size">
+    <mat-select #size id="size" placeholder="Размер" formControlName="size">
       <mat-option [value]="20">20</mat-option>
 
       <mat-option [value]="50">50</mat-option>
@@ -13,13 +13,31 @@
     </mat-select>
   </mat-form-field>
 
+  <button type="button" title="Начало" mat-icon-button color="primary" (click)="onSwitchPage(1)">
+    <mat-icon>keyboard_double_arrow_left</mat-icon>
+  </button>
+
+  <button type="button" title="Предыдущая" mat-icon-button color="primary"
+    (click)="page.value && +page.value > 1 && onSwitchPage(+page.value -1)">
+    <mat-icon>keyboard_arrow_left</mat-icon>
+  </button>
+
   <div>
     <label for="page">Страница</label>
 
     <mat-form-field>
-      <input type="number" id="page" formnovalidate matInput bioNumberOnlyInput formControlName="page">
+      <input #page="matInput" type="number" id="page" formnovalidate matInput bioNumberOnlyInput formControlName="page">
     </mat-form-field>
 
     <span>из {{ pagination.total }}</span>
   </div>
+
+  <button type="button" title="Следующая" mat-icon-button color="primary"
+    (click)="page.value && +page.value < pagination.total && onSwitchPage(+page.value + 1)">
+    <mat-icon>keyboard_arrow_right</mat-icon>
+  </button>
+
+  <button type="button" title="Конец" mat-icon-button color="primary" (click)="onSwitchPage(pagination.total)">
+    <mat-icon>keyboard_double_arrow_right</mat-icon>
+  </button>
 </form>
