@@ -7,6 +7,7 @@ export type Pagination = {
   pagination: {
     pageIndex: number;
     total: number;
+    records: number;
   };
 };
 

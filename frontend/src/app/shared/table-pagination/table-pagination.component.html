@@ -1,0 +1,23 @@
+<form id="pagination-form" [formGroup]="paginationForm">
+  <mat-form-field>
+    <mat-label>Размер</mat-label>
+
+    <mat-select id="size" placeholder="Размер" formControlName="size">
+      <mat-option [value]="20">20</mat-option>
+
+      <mat-option [value]="50">50</mat-option>
+
+      <mat-option [value]="100">100</mat-option>
+
+      <mat-option [value]="200">200</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div>
+    <label for="page">Страница</label>
+
+    <mat-form-field>
+      <input type="number" id="page" formnovalidate matInput bioNumberOnlyInput formControlName="page">
+    </mat-form-field>
+  </div>
+</form>

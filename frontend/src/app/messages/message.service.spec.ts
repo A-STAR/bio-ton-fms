@@ -239,7 +239,8 @@ const testMessageOptions: MessagesOptions | MessageStatisticsOptions = {
 const pagination: Pagination = {
   pagination: {
     pageIndex: PAGE_NUM,
-    total: 10
+    total: 1,
+    records: 2
   }
 };
 

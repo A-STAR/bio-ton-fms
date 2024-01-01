@@ -270,7 +270,8 @@ describe('MessagesComponent', () => {
       trackerDataMessages: [],
       pagination: {
         pageIndex: PAGE_NUM,
-        total: 10
+        total: 1,
+        records: 0
       }
     });
 
