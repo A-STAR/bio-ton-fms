@@ -69,6 +69,18 @@ describe('TablePaginationComponent', () => {
         value: pagination.pagination.pageIndex.toString()
       })
     );
+
+    const totalPageDe = paginationFormDe.query(
+      By.css('label[for="page"] ~ span')
+    );
+
+    expect(totalPageDe)
+      .withContext('render total pages element')
+      .not.toBeNull();
+
+    expect(totalPageDe.nativeElement.textContent)
+      .withContext('render total pages text')
+      .toBe(`из ${pagination.pagination.total}`);
   });
 });
 

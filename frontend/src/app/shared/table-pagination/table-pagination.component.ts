@@ -25,6 +25,16 @@ import { PAGE_NUM as MIN_PAGE, PAGE_SIZE as INITIAL_SIZE, Pagination } from '../
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TablePaginationComponent implements OnInit {
+  /**
+   * Table pagination.
+   *
+   * @returns Pagination.
+   */
+  get pagination() {
+    return this.#pagination;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   @Input() set pagination(pagination: Pagination['pagination']) {
     this.#pagination = pagination;
 
