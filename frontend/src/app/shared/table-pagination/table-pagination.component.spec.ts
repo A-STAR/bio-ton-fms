@@ -216,6 +216,35 @@ describe('TablePaginationComponent', () => {
       .toBeResolvedTo(`${pagination.pagination.total}`);
   });
 
+  it('should reset page while changing pagination size', async () => {
+    const pageInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#pagination-form'
+      })
+    );
+
+    const page = 5;
+
+    await pageInput.setValue(`${page}`);
+
+    const sizeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#pagination-form',
+        selector: '[placeholder="Размер"]',
+      })
+    );
+
+    await sizeSelect.clickOptions({
+      text: '200'
+    });
+
+    await expectAsync(
+      pageInput.getValue()
+    )
+      .withContext('set the 1st page')
+      .toBeResolvedTo(`${1}`);
+  });
+
   it('should render messages summary', () => {
     const messagesSummaryDe = fixture.debugElement.query(
       By.css('output')
