@@ -215,6 +215,24 @@ describe('TablePaginationComponent', () => {
       .withContext('set the last page')
       .toBeResolvedTo(`${pagination.pagination.total}`);
   });
+
+  it('should render messages summary', () => {
+    const messagesSummaryDe = fixture.debugElement.query(
+      By.css('output')
+    );
+
+    expect(messagesSummaryDe)
+      .withContext('render messages summary element')
+      .not.toBeNull();
+
+    expect(messagesSummaryDe.nativeElement.textContent)
+      .withContext('render messages summary text')
+      .toBe(`Отображается с ${pagination.pagination.pageIndex * PAGE_SIZE - PAGE_SIZE + 1} по ${
+        pagination.pagination.pageIndex === pagination.pagination.total
+          ? pagination.pagination.records % PAGE_SIZE
+          : pagination.pagination.pageIndex * PAGE_SIZE
+      } из ${pagination.pagination.records} сообщений`);
+  });
 });
 
 const pagination: Pagination = {

@@ -41,3 +41,7 @@
     <mat-icon>keyboard_double_arrow_right</mat-icon>
   </button>
 </form>
+
+<output>Отображается с {{ pagination.pageIndex * size.value - size.value + 1 }} по {{ pagination.pageIndex === pagination.total
+  ? pagination.records % size.value
+  : pagination.pageIndex * size.value }} из {{ pagination.records }} сообщений</output>
