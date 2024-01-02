@@ -41,13 +41,14 @@ import MessagesComponent, {
 } from './messages.component';
 
 import { MapComponent } from '../shared/map/map.component';
+import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
 import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
 import { environment } from '../../environments/environment';
 import { localeID } from '../tech/shared/relative-time.pipe';
-import { PAGE_NUM } from '../directory-tech/shared/pagination';
+import { PAGE_NUM as INITIAL_PAGE } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
 
@@ -269,7 +270,7 @@ describe('MessagesComponent', () => {
     component['messages$'] = of({
       trackerDataMessages: [],
       pagination: {
-        pageIndex: PAGE_NUM,
+        pageIndex: INITIAL_PAGE,
         total: 1,
         records: 0
       }
@@ -752,12 +753,14 @@ describe('MessagesComponent', () => {
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString(),
       viewMessageType: MessageType.DataMessage,
-      parameterType: DataMessageParameter.TrackerData
+      parameterType: DataMessageParameter.TrackerData,
     };
 
     const testStatisticsOptions: MessageStatisticsOptions = {
       ...testMessagesOptions
     };
+
+    testMessagesOptions.pageNum = INITIAL_PAGE;
 
     const testTrackOptions: MessageTrackOptions = {
       vehicleId: testMonitoringVehicles[0].id,
@@ -1781,6 +1784,25 @@ describe('MessagesComponent', () => {
     confirmationDialog?.close();
 
     overlayContainer.ngOnDestroy();
+  }));
+
+  it('should handle pagination change', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const tablePaginationDe = fixture.debugElement.query(
+      By.directive(TablePaginationComponent)
+    );
+
+    expect(tablePaginationDe)
+      .withContext('render `bio-table-pagination` component')
+      .not.toBeNull();
+
+    /* Coverage for handling pagination. */
+
+    tablePaginationDe.triggerEventHandler('paginationChange', {
+      page: 2,
+      size: 100
+    });
   }));
 });
 

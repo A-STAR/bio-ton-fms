@@ -61,6 +61,7 @@ import {
 import { MapComponent } from '../shared/map/map.component';
 import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
 
+import { PAGE_NUM as INITIAL_PAGE, PaginationOptions } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 
 import { TableDataSource } from '../directory-tech/shared/table/table.data-source';
@@ -170,7 +171,14 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    * @returns `MessagesOptions` value.
    */
   get #options() {
-    return Object.freeze(this.#messages$.value);
+    return Object.freeze(this.#messages$.value!);
+  }
+
+  /**
+   * Set message options, update pagination.
+   */
+  set #options(options: MessagesOptions) {
+    this.#messages$.next({ ...this.#options, ...options });
   }
 
   protected selectionForm!: MessageSelectionForm;
@@ -281,6 +289,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
     const messageStatisticsOptions: MessageStatisticsOptions = { ...messagesOptions };
 
+    messagesOptions.pageNum = INITIAL_PAGE;
+
     const messageTrackOptions: MessageTrackOptions = {
       vehicleId: (tech as MonitoringTech).id,
       periodStart: startDate.toISOString(),
@@ -299,7 +309,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         this.#statistics$.next(statistics);
       });
 
-    this.#messages$.next(messagesOptions);
+    this.#options = messagesOptions;
   }
 
   /**
@@ -365,6 +375,15 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           this.#updateMessages();
         }
       });
+  }
+
+  /**
+   * Handle table pagination change event.
+   *
+   * @param pagination `PaginationOptions` options.
+   */
+  protected onPaginationChange(pagination: PaginationOptions) {
+    this.#options = { ...this.#options, ...pagination };
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);

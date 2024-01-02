@@ -265,7 +265,7 @@
           <mat-icon>delete</mat-icon>
         </button>
 
-        <bio-table-pagination [pagination]="messages.pagination"></bio-table-pagination>
+        <bio-table-pagination [pagination]="messages.pagination" (paginationChange)="onPaginationChange($event)"></bio-table-pagination>
       </section>
     </ng-container>
 
