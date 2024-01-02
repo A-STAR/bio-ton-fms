@@ -115,8 +115,11 @@ div.mat-mdc-form-field-error-wrapper
   padding-top: map.get($mat-mdc-form-field, subscript-wrapper, padding, vertical)
   padding-bottom: map.get($mat-mdc-form-field, subscript-wrapper, padding, vertical)
 
-.mat-mdc-form-field-subscript-wrapper:not(label ~ mat-form-field *):not(label + fieldset mat-form-field *)
-  display: none
+.mat-mdc-form-field-subscript-wrapper
+
+  mat-form-field:has([formnovalidate]) &,
+  &:not(label ~ mat-form-field *, label + fieldset mat-form-field *)
+    display: none
 
 div.mat-mdc-form-field-bottom-align::before
   display: block

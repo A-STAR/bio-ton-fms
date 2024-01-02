@@ -3,7 +3,7 @@ import { HttpClient, HttpParams, HttpParamsOptions } from '@angular/common/http'
 
 import { LocationAndTrackResponse, MonitoringSensor, MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
-import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from '../directory-tech/shared/pagination';
+import { PAGE_NUM, PAGE_SIZE, Pagination, PaginationOptions } from '../directory-tech/shared/pagination';
 import { TrackerCommand, TrackerCommandResponse, TrackerCommandTransport, TrackerParameter } from '../directory-tech/tracker.service';
 
 import { DataMessageParameter, MessageType } from './messages.component';
@@ -36,8 +36,17 @@ export class MessageService {
    */
   getMessages(fromObject: MessagesOptions) {
     if (!fromObject.pageNum || !fromObject.pageSize) {
-      fromObject = { pageNum, pageSize, ...fromObject };
+      fromObject = {
+        pageNum: PAGE_NUM,
+        pageSize: PAGE_SIZE,
+        ...fromObject
+      };
     }
+
+    const { pageNum, pageSize, vehicleId, periodStart, periodEnd, viewMessageType, parameterType } = fromObject;
+
+    // just to keep request url params order always the same
+    fromObject = { pageNum, pageSize, vehicleId, periodStart, periodEnd, viewMessageType, parameterType };
 
     const paramsOptions: HttpParamsOptions = { fromObject };
 

@@ -440,7 +440,8 @@ export const testSensors: Sensors = {
   ],
   pagination: {
     pageIndex: 1,
-    total: 1
+    total: 1,
+    records: 3
   }
 };
 

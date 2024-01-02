@@ -438,7 +438,8 @@ export const testTrackers: Trackers = {
   ],
   pagination: {
     pageIndex: 1,
-    total: 1
+    total: 1,
+    records: 3
   }
 };
 
@@ -530,6 +531,7 @@ export const testParametersHistory: TrackerParametersHistory = {
   ],
   pagination: {
     pageIndex: 1,
-    total: 1
+    total: 1,
+    records: 3
   }
 };

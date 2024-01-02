@@ -44,16 +44,16 @@ form
     &:nth-child(-n + 3)
       align-items: baseline
 
+      label
+        margin-bottom: unset
+        margin-right: auto
+
       mat-form-field
         $label-flex-basis: 41px
         $field-count: 2
 
         display: inline-block
         flex-basis: calc((100% - $label-flex-basis - 2 * $field-column-gap) / $field-count)
-
-      label
-        margin-bottom: unset
-        margin-right: auto
 
   > div mat-form-field
     flex: 1
@@ -217,14 +217,21 @@ bio-map
     border-bottom: unset
 
   .controls
-    $controls-padding: (horizontal: 10px, vertical: 6px)
+    $controls-padding-horizontal: 10px
 
-    min-height: 2 * map.get($controls-padding, vertical) + map.get($mat-icon-button, size)
-    padding: map.get($controls-padding, vertical) map.get($controls-padding, horizontal)
+    position: relative
+    column-gap: 10px
+    padding: 0 $controls-padding-horizontal
 
     button[title="Удалить"]
-      margin: 0 math.div($selection-column-width - map.get($mat-icon-button, size), 2) - map.get($controls-padding, horizontal)
+      position: absolute
+      top: 50%
+      margin: 0 math.div($selection-column-width - map.get($mat-icon-button, size), 2) - $controls-padding-horizontal
+      transform: translateY(-50%)
       animation: map.get($fadein-animation, button)
+
+    bio-table-pagination
+      margin-left: 46px
 
   p
     position: absolute

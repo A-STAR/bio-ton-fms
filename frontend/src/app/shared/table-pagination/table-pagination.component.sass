@@ -1,0 +1,49 @@
+@use 'sass:math'
+@use 'variables' as *
+
+\:host
+  min-height: 50px
+
+\:host,
+form
+  display: flex
+  align-items: center
+
+form,
+div:has(mat-form-field)
+  column-gap: 10px
+
+$mat-form-field-width: 48px
+
+mat-form-field
+
+  &:first-of-type
+    $mat-mdc-select-arrow-width: 10px
+    $select-icon-size: 24px
+
+    width: $mat-form-field-width + math.div($select-icon-size - $mat-mdc-select-arrow-width, 2) + $mat-mdc-select-arrow-width
+
+div:has(mat-form-field)
+  display: flex
+  align-items: baseline
+  margin-left: 10px
+
+  label
+    margin-bottom: unset
+
+  mat-form-field
+    width: $mat-form-field-width
+
+    input
+      text-align: center
+
+  span
+    color: $darker-gray
+    font-size: 12px
+    font-weight: 400
+
+output
+  flex: 1
+  color: $light-dark
+  font-size: 14px
+  text-align: center
