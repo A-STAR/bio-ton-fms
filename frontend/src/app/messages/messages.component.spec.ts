@@ -1510,6 +1510,24 @@ describe('MessagesComponent', () => {
     });
   }));
 
+  it('should render table pagination', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messageService);
+
+    const tablePaginationDe = fixture.debugElement.query(
+      By.css('#messages bio-table-pagination')
+    );
+
+    expect(tablePaginationDe)
+      .withContext('render `bio-table-pagination` component')
+      .not.toBeNull();
+
+    expect(
+      tablePaginationDe.nativeElement.getAttribute('ng-reflect-pagination')
+    )
+      .withContext('set pagination')
+      .toBeDefined();
+  }));
+
   it('should toggle all checkbox selecting messages', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
@@ -1614,19 +1632,20 @@ describe('MessagesComponent', () => {
   it('should delete messages', fakeAsync(async () => {
     await mockTestMessages(component, loader, messageService);
 
-    let deleteButton: MatButtonHarness;
+    let deleteButton: MatButtonHarness | undefined;
 
     try {
       deleteButton = await loader.getHarness(
         MatButtonHarness.with({
           ancestor: '#messages .controls',
+          selector: ':not([hidden])',
           text: 'delete',
           variant: 'icon'
         })
       );
     } catch { }
 
-    expect(deleteButton!)
+    expect(deleteButton)
       .withContext('render no delete button')
       .toBeUndefined();
 
@@ -1641,6 +1660,7 @@ describe('MessagesComponent', () => {
     deleteButton = await loader.getHarness(
       MatButtonHarness.with({
         ancestor: '#messages .controls',
+        selector: ':not([hidden])',
         text: 'delete',
         variant: 'icon'
       })

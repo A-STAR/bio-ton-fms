@@ -59,6 +59,7 @@ import {
 } from '../shared/confirmation-dialog/confirmation-dialog.component';
 
 import { MapComponent } from '../shared/map/map.component';
+import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
 
 import { DEBOUNCE_DUE_TIME, MonitoringTech, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 
@@ -85,7 +86,8 @@ import { TrackerParameter } from '../directory-tech/tracker.service';
     DateCharsInputDirective,
     TimeCharsInputDirective,
     StopClickPropagationDirective,
-    MapComponent
+    MapComponent,
+    TablePaginationComponent
   ],
   providers: [DecimalPipe],
   templateUrl: './messages.component.html',

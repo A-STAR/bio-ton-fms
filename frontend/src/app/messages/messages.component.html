@@ -261,9 +261,11 @@
       </figure>
 
       <section class="controls">
-        <button mat-icon-button title="Удалить" color="warn" *ngIf="selection.hasValue()" (click)="onDeleteMessages()">
+        <button mat-icon-button title="Удалить" color="warn" [hidden]="!selection.hasValue()" (click)="onDeleteMessages()">
           <mat-icon>delete</mat-icon>
         </button>
+
+        <bio-table-pagination [pagination]="messages.pagination"></bio-table-pagination>
       </section>
     </ng-container>
 
