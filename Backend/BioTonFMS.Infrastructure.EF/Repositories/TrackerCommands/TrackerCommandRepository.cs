@@ -83,6 +83,17 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
         };
     }
 
+    public IList<TrackerCommand> GetCommandsForDate(int[] trackerIds, DateOnly date, bool forUpdate)
+    {
+        var query = forUpdate ? QueryableProvider.Linq() : QueryableProvider.Linq().AsNoTracking();
+        query = query
+            .Where(cmd => trackerIds.Contains(cmd.TrackerId) &&
+                        DateOnly.FromDateTime(cmd.SentDateTime) == date)
+            .OrderBy(cmd => cmd.TrackerId)
+            .ThenBy(cmd => cmd.Id);
+        return query.ToList();
+    }
+
     /// <summary>
     /// Удаляет команды из списка
     /// </summary>

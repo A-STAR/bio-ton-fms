@@ -15,13 +15,20 @@ public interface ITrackerCommandRepository : IRepository<TrackerCommand>
     ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end);
 
     /// <summary>
-    /// ѕостранично возвращает массив событий с синформацией о командах отправленных на трекер дл€ зададанного трекера и временного диапазона
+    /// ѕостранично возвращает массив с синформацией о командах отправленных на трекер дл€ зададанного трекера и временного диапазона
     /// </summary>
     PagedResult<CommandMessageDto> GetCommandMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize);
+
+    /// <summary>
+    /// ѕостранично возвращает массив с синформацией о командах отправленных на трекер дл€ зададанного трекера и даты
+    /// </summary>
+    IList<TrackerCommand> GetCommandsForDate(int[] trackerIds, DateOnly date, bool forUpdate);
 
     /// <summary>
     /// ”дал€ет сообщени€ из списка
     /// </summary>
     /// <param name="messageIds">список идентификаторов дл€ удалени€</param>
     void DeleteCommands(int[] commandIds);
+
+    
 }
