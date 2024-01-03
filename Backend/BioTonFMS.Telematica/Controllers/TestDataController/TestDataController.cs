@@ -47,7 +47,8 @@ public class TestDataController : ValidationControllerBase
     private readonly IVehicleGroupRepository _vehicleGroupRepository;
     private readonly IFuelTypeRepository _fuelTypeRepository;
     private readonly MoveTestTrackerMessagesService _moveTestTrackerMessagesService;
-    private readonly FillTestSensorDataService _fillTestSensorDataService;
+    private readonly TestSensorDataService _testSensorDataService;
+    private readonly TestCommandsDataService _testCommandsDataService;
     private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
 
@@ -61,7 +62,8 @@ public class TestDataController : ValidationControllerBase
         ITrackerTagRepository trackerTagRepository, IVehicleGroupRepository vehicleGroupRepository,
         ITrackerMessageRepository trackerMessageRepository, IFuelTypeRepository fuelTypeRepository,
         MoveTestTrackerMessagesService moveTestTrackerMessagesService,
-        FillTestSensorDataService fillTestSensorDataService,
+        TestSensorDataService testSensorDataService,
+        TestCommandsDataService testCommandsDataService,
         IMapper mapper)
     {
         _logger = logger;
@@ -77,7 +79,8 @@ public class TestDataController : ValidationControllerBase
         _vehicleGroupRepository = vehicleGroupRepository;
         _fuelTypeRepository = fuelTypeRepository;
         _moveTestTrackerMessagesService = moveTestTrackerMessagesService;
-        _fillTestSensorDataService = fillTestSensorDataService;
+        _testSensorDataService = testSensorDataService;
+        _testCommandsDataService = testCommandsDataService;
         _mapper = mapper;
     }
 
@@ -244,8 +247,18 @@ public class TestDataController : ValidationControllerBase
         return Ok();
     }
 
+    private static void SetNullableOptions(CsvReader messageCsv)
+    {
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<double?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<int?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<CoordCorrectnessEnum?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<byte?>().NullValues.Add("NULL");
+        messageCsv.Context.TypeConverterOptionsCache.GetOptions<bool?>().NullValues.Add("NULL");
+    }
+
     /// <summary>
-    /// Добавляет тестовые слчайные данные датчиков в сообщения
+    /// Добавляет тестовые случайные данные датчиков в сообщения (в сообщения без данных датчиков) 
     /// </summary>
     /// <remarks>Это чисто отладочный метод. Поэтому тут нет обработки ошибок. В случае неудачи всегда возвращается статус 500</remarks>
     /// <response code="200">Данные успешно добавлены в базу</response>
@@ -259,18 +272,27 @@ public class TestDataController : ValidationControllerBase
         {
             return BadRequest("Test data service is not available!");
         }
-        _fillTestSensorDataService.FillRandomSensorData();
+        _testSensorDataService.FillRandomSensorData();
         return Ok();
     }
 
-    private static void SetNullableOptions(CsvReader messageCsv)
+    /// <summary>
+    /// Добавляет тестовые сообщения с командами для трекеров на сегодняшний день 
+    /// </summary>
+    /// <remarks>Это чисто отладочный метод. Поэтому тут нет обработки ошибок. В случае неудачи всегда возвращается статус 500</remarks>
+    /// <response code="200">Данные успешно добавлены в базу</response>
+    /// <response code="500">Внутренняя ошибка сервиса</response>
+    [HttpPost("debug/add-test-commands")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult AddTestCommandMessages()
     {
-        messageCsv.Context.TypeConverterOptionsCache.GetOptions<DateTime?>().NullValues.Add("NULL");
-        messageCsv.Context.TypeConverterOptionsCache.GetOptions<double?>().NullValues.Add("NULL");
-        messageCsv.Context.TypeConverterOptionsCache.GetOptions<int?>().NullValues.Add("NULL");
-        messageCsv.Context.TypeConverterOptionsCache.GetOptions<CoordCorrectnessEnum?>().NullValues.Add("NULL");
-        messageCsv.Context.TypeConverterOptionsCache.GetOptions<byte?>().NullValues.Add("NULL");
-        messageCsv.Context.TypeConverterOptionsCache.GetOptions<bool?>().NullValues.Add("NULL");
+        if (!ServiceEnabled)
+        {
+            return BadRequest("Test data service is not available!");
+        }
+        _testCommandsDataService.FillTestCommands();
+        return Ok();
     }
 
     /// <summary>
@@ -289,7 +311,7 @@ public class TestDataController : ValidationControllerBase
             return BadRequest("Test data service is not available!");
         }
         _moveTestTrackerMessagesService.MoveTestTrackerMessagesForToday(DateOnly.FromDateTime(fromDate.Add(fromDate.TimeOfDay)));
-
+        _testCommandsDataService.MoveTestCommandsForToday(DateOnly.FromDateTime(fromDate.Add(fromDate.TimeOfDay)));
         return Ok();
     }
 

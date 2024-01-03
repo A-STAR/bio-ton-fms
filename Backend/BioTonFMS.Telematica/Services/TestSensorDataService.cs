@@ -6,17 +6,16 @@ using BioTonFMS.Common.Extensions;
 using Bogus;
 using BioTonFMS.Domain;
 using BioTonFMS.Domain.TrackerMessages;
-using BioTonFMS.MessageProcessing;
 
 namespace BioTonFMS.Telematica.Services;
-public class FillTestSensorDataService
+public class TestSensorDataService
 {
-    private readonly ILogger<FillTestSensorDataService> _logger;
+    private readonly ILogger<TestSensorDataService> _logger;
     private readonly ITrackerMessageRepository _messageRepository;
     private readonly ITrackerRepository _trackerRepository;
 
-    public FillTestSensorDataService(
-        ILogger<FillTestSensorDataService> logger,
+    public TestSensorDataService(
+        ILogger<TestSensorDataService> logger,
         ITrackerMessageRepository messageRepository,
         ITrackerRepository trackerRepository)
     {
@@ -36,6 +35,7 @@ public class FillTestSensorDataService
         var testMessages = _messageRepository.GetMessagesForTrackers(testTrackersExternalIds, forUpdate: true);
 
         // Для каждого сообщения сгенерить теги для значений датчиков, если их ещё не было
+        var faker = new Faker();
         foreach (var testMessage in testMessages)
         {
             // если у сообщения нет тегов датчика, то добавляем случайные 
@@ -45,8 +45,6 @@ public class FillTestSensorDataService
                 if (tracker != null)
                 {
                     var sensors = tracker.Sensors;
-
-                    var facker = new Faker();
                     for (int i = 0; i < sensors.Count(); i++) 
                     { 
                         var sensor = sensors.ToArray()[i];
@@ -63,7 +61,7 @@ public class FillTestSensorDataService
                                         TrackerMessageId = testMessage.Id,
                                         TrackerMessage = testMessage,
                                         IsFallback = false,
-                                        Value = facker.Random.Bool()
+                                        Value = faker.Random.Bool()
                                     };
                                     testMessage.Tags.Add(tagBool);
                                     break;
@@ -76,7 +74,7 @@ public class FillTestSensorDataService
                                         TrackerMessageId = testMessage.Id,
                                         TrackerMessage = testMessage,
                                         IsFallback = false,
-                                        Value = facker.Random.Double()
+                                        Value = faker.Random.Double()
                                     };
                                     testMessage.Tags.Add(tagNum);
                                     break;

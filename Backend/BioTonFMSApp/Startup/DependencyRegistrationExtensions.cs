@@ -112,8 +112,9 @@ public static class DependencyRegistrationExtensions
 
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
-        services.AddTransient<MoveTestTrackerMessagesService, MoveTestTrackerMessagesService>();
-        services.AddTransient<FillTestSensorDataService, FillTestSensorDataService>();
+        services.AddTransient<MoveTestTrackerMessagesService>();
+        services.AddTransient<TestSensorDataService>();
+        services.AddTransient<TestCommandsDataService>();
 
         return services;
     }
