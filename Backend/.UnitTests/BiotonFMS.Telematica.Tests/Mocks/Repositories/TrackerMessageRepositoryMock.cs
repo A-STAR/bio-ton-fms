@@ -189,6 +189,7 @@ public class TrackerMessageRepositoryMock
             ExternalTrackerId = 128,
             Imei = "64128256",
             ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(10),
             Latitude = 39.4323,
             Longitude = 12.55861,
             SatNumber = 19,
