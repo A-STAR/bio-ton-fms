@@ -93,6 +93,7 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Stopped,
+                        LastMessageTime = TestUtcNow,
                         NumberOfSatellites = 19
                     }
                 }
@@ -114,6 +115,7 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Stopped,
+                        LastMessageTime = TestUtcNow,
                         NumberOfSatellites = 19
                     }
                 }
@@ -175,6 +177,7 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Stopped,
+                        LastMessageTime = TestUtcNow,
                         NumberOfSatellites = 19
                     },
                     new MonitoringVehicleDto
@@ -244,6 +247,7 @@ public class MonitoringControllerTests
                         },
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Stopped,
+                        LastMessageTime = TestUtcNow,
                         NumberOfSatellites = 19
                     },
                     new MonitoringVehicleDto

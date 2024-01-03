@@ -79,6 +79,7 @@ public class TrackerMessageRepositoryTests
             {
                 Id = 0,
                 ExternalTrackerId = 2552,
+                TrackerDateTime = SystemTime.UtcNow,
                 Imei = "123",
                 Tags = new List<MessageTag>
                 {
@@ -173,14 +174,16 @@ public class TrackerMessageRepositoryTests
                 Id = 0,
                 ExternalTrackerId = 2552,
                 Imei = "123",
-                ServerDateTime = DateTime.UtcNow
+                ServerDateTime = DateTime.UtcNow,
+                TrackerDateTime = DateTime.UtcNow
             },
             new()
             {
                 Id = 1,
                 ExternalTrackerId = 2552,
                 Imei = "123",
-                ServerDateTime = DateTime.UtcNow + TimeSpan.FromSeconds(2)
+                ServerDateTime = DateTime.UtcNow + TimeSpan.FromSeconds(2),
+                TrackerDateTime = DateTime.UtcNow + TimeSpan.FromSeconds(2)
             }
         };
         var repo = TrackerMessageRepositoryMock.GetStub(messages);
@@ -335,6 +338,7 @@ public class TrackerMessageRepositoryTests
             {
                 Id = 0,
                 ExternalTrackerId = 2552,
+                TrackerDateTime = SystemTime.UtcNow,
                 Imei = "123",
                 Tags = tags
             }
@@ -430,7 +434,8 @@ public class TrackerMessageRepositoryTests
                         TrackerExternalId = 128,
                         ConnectionStatus = ConnectionStatusEnum.Connected,
                         MovementStatus = MovementStatusEnum.Stopped,
-                        NumberOfSatellites = 19
+                        NumberOfSatellites = 19,
+                        LastMessageTime = DateTime.UtcNow
                     }}
                 }
             },

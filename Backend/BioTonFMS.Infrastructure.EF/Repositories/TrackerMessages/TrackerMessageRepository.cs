@@ -37,7 +37,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
     public override void Add(TrackerMessage entity)
     {
-        entity.ServerDateTime = SystemTime.UtcNow;
+        entity.TrackerDateTime = SystemTime.UtcNow;
         base.Add(entity);
     }
 
@@ -65,8 +65,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     {
         var query = forUpdate ? HydratedQuery : HydratedQuery.AsNoTracking();
         query = query
-            .Where(m => trackerExternalIds.Contains(m.ExternalTrackerId) &&
-                        DateOnly.FromDateTime(m.ServerDateTime) == date)
+            .Where(m => trackerExternalIds.Contains(m.ExternalTrackerId) && m.TrackerDateTime.HasValue &&  
+                        DateOnly.FromDateTime(m.TrackerDateTime!.Value) == date)
             .OrderBy(m => m.ExternalTrackerId)
             .ThenBy(m => m.Id);
         return query.ToList();
@@ -80,32 +80,32 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var stdParams = new TrackerStandardParameters();
 
         var last = QueryableProvider.Linq().AsNoTracking()
-            .Where(x => x.ExternalTrackerId == externalId)
-            .OrderByDescending(x => x.ServerDateTime)
+            .Where(x => x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue)
+            .OrderByDescending(x => x.TrackerDateTime)
             .FirstOrDefault();
 
         if (last is null) return stdParams;
 
-        stdParams.Time = last.ServerDateTime;
+        stdParams.Time = last.TrackerDateTime;
 
         stdParams.Long = last.Longitude ?? QueryableProvider.Linq()
-            .Where(x => x.Longitude != null && x.ExternalTrackerId == externalId)
-            .OrderByDescending(x => x.ServerDateTime)
+            .Where(x => x.Longitude != null && x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue)
+            .OrderByDescending(x => x.TrackerDateTime)
             .FirstOrDefault()?.Longitude;
 
         stdParams.Lat = last.Latitude ?? QueryableProvider.Linq()
-            .Where(x => x.Latitude != null && x.ExternalTrackerId == externalId)
-            .OrderByDescending(x => x.ServerDateTime)
+            .Where(x => x.Latitude != null && x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue)
+            .OrderByDescending(x => x.TrackerDateTime)
             .FirstOrDefault()?.Latitude;
 
         stdParams.Speed = last.Speed ?? QueryableProvider.Linq()
-            .Where(x => x.Speed != null && x.ExternalTrackerId == externalId)
-            .OrderByDescending(x => x.ServerDateTime)
+            .Where(x => x.Speed != null && x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue)
+            .OrderByDescending(x => x.TrackerDateTime)
             .FirstOrDefault()?.Speed;
 
         stdParams.Alt = last.Altitude ?? QueryableProvider.Linq()
-            .Where(x => x.Altitude != null && x.ExternalTrackerId == externalId)
-            .OrderByDescending(x => x.ServerDateTime)
+            .Where(x => x.Altitude != null && x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue)
+            .OrderByDescending(x => x.TrackerDateTime)
             .FirstOrDefault()?.Altitude;
 
         return stdParams;
@@ -122,8 +122,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .Fetch(m => m.Tags.Where(x => x.SensorId == null))
             .Linq()
             .AsNoTracking()
-            .Where(x => x.ExternalTrackerId == externalId)
-            .OrderByDescending(x => x.ServerDateTime)
+            .Where(x => x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue)
+            .OrderByDescending(x => x.TrackerDateTime)
             .FirstOrDefault()?.Tags;
 
         if (lastTags is null || !lastTags.Any())
@@ -187,8 +187,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .Fetch(m => m.Tags.Where(x => x.SensorId == null))
             .Linq()
             .AsNoTracking()
-            .Where(x => x.ExternalTrackerId == filter.ExternalId)
-            .OrderByDescending(x => x.ServerDateTime)
+            .Where(x => x.ExternalTrackerId == filter.ExternalId && x.TrackerDateTime.HasValue)
+            .OrderByDescending(x => x.TrackerDateTime)
             .GetPagedQueryable(filter.PageNum, filter.PageSize);
 
         return new PagedResult<ParametersHistoryRecord>
@@ -203,7 +203,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 Longitude = x.Longitude,
                 Altitude = x.Altitude,
                 Speed = x.Speed,
-                Time = x.ServerDateTime,
+                Time = x.TrackerDateTime!.Value,
                 Parameters = x.Tags.Aggregate("", (res, tag) =>
                     res + tagNames[tag.TrackerTagId!.Value] + '=' + tag.ValueString + ',')
             }).ToList()
@@ -216,14 +216,14 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var now = SystemTime.UtcNow;
 
         var foundResults = QueryableProvider.Linq()
-            .Where(x => externalIds.Contains(x.ExternalTrackerId))
+            .Where(x => externalIds.Contains(x.ExternalTrackerId) && x.TrackerDateTime.HasValue)
             .GroupBy(x => x.ExternalTrackerId,
                 (key, g) => g
-                    .OrderByDescending(x => x.ServerDateTime)
+                    .OrderByDescending(x => x.TrackerDateTime)
                     .Select(x => new VehicleStatus
                     {
                         TrackerExternalId = x.ExternalTrackerId,
-                        ConnectionStatus = (now - x.ServerDateTime).Minutes < trackerAddressValidMinutes
+                        ConnectionStatus = (now - x.TrackerDateTime!.Value).Minutes < trackerAddressValidMinutes
                             ? ConnectionStatusEnum.Connected
                             : ConnectionStatusEnum.NotConnected,
                         MovementStatus = x.Speed == null
@@ -261,8 +261,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var filteredMessages = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
                         x.Latitude != null && x.Longitude != null &&
-                        x.ServerDateTime >= trackStartTimeUtc &&
-                        x.ServerDateTime <= trackEndTimeUtc)
+                        x.TrackerDateTime >= trackStartTimeUtc &&
+                        x.TrackerDateTime <= trackEndTimeUtc)
             .OrderBy(x => x.TrackerDateTime);
 
         var result = filteredMessages
@@ -274,7 +274,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                     Longitude = x.Longitude!.Value,
                     NumberOfSatellites = x.SatNumber,
                     Speed = x.Speed,
-                    Time = x.ServerDateTime
+                    Time = x.TrackerDateTime!.Value
                 })
             .ToDictionary(x => x.Key, x => x.ToArray());
 
@@ -284,10 +284,10 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
     public IDictionary<int, (double Lat, double Long)> GetLocations(params int[] externalIds)
     {
         var result = QueryableProvider.Linq()
-            .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
+            .Where(x => externalIds.Contains(x.ExternalTrackerId) && x.TrackerDateTime.HasValue &&
                         x.Latitude != null && x.Longitude != null)
             .GroupBy(x => x.ExternalTrackerId,
-                (key, g) => g.OrderByDescending(x => x.ServerDateTime)
+                (key, g) => g.OrderByDescending(x => x.TrackerDateTime!.Value)
                     .Select(x => new { x.ExternalTrackerId, x.Longitude, x.Latitude })
                     .First())
             .ToDictionary(x => x.ExternalTrackerId, x => (x.Latitude!.Value, x.Longitude!.Value));
@@ -301,16 +301,16 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var endUtc = end.ToUniversalTime();
 
         var messages = HydratedQuery.AsNoTracking()
-            .Where(x => x.ExternalTrackerId == externalId &&
-                        x.ServerDateTime >= startUtc &&
-                        x.ServerDateTime <= endUtc);
+            .Where(x => x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue &&
+                        x.TrackerDateTime >= startUtc &&
+                        x.TrackerDateTime <= endUtc);
         //Пробег берем из тега can_b0 - значение нужно умножить на 5
-        var firstMileage = ((int?)messages.OrderBy(x => x.ServerDateTime)
+        var firstMileage = ((int?)messages.OrderBy(x => x.TrackerDateTime)
             .SelectMany(x => x.Tags)
             .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
             ?.GetValue() ?? 0) * 5;
         
-        var lastMileage = ((int?)messages.OrderByDescending(x => x.ServerDateTime)
+        var lastMileage = ((int?)messages.OrderByDescending(x => x.TrackerDateTime)
             .SelectMany(x => x.Tags)
             .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
             ?.GetValue() ?? 0) * 5;
@@ -328,8 +328,8 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 .Average(),
             Distance = (lastMileage - firstMileage),
             Mileage = lastMileage,
-            TotalTime = (messages.Select(x => x.ServerDateTime).DefaultIfEmpty().Max() -
-                         messages.Select(x => x.ServerDateTime).DefaultIfEmpty().Min()).Seconds
+            TotalTime = (messages.Select(x => x.TrackerDateTime!.Value).DefaultIfEmpty().Max() -
+                         messages.Select(x => x.TrackerDateTime!.Value).DefaultIfEmpty().Min()).Seconds
         };
     }
 
@@ -350,9 +350,10 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .Fetch(m => m.Tags.Where(x => x.SensorId == null))
             .Linq()
             .Where(m => m.ExternalTrackerId == externalId &&
-                        m.ServerDateTime >= startUtc &&
-                        m.ServerDateTime <= endUtc)
-            .OrderBy(x => x.ServerDateTime)
+                        m.TrackerDateTime.HasValue &&
+                        m.TrackerDateTime >= startUtc &&
+                        m.TrackerDateTime <= endUtc)
+            .OrderBy(x => x.TrackerDateTime)
             .AsNoTracking()
             .GetPagedQueryable(pageNum, pageSize);
 
@@ -397,9 +398,10 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .Fetch(m => m.Tags.Where(x => x.SensorId != null))
             .Linq()
             .Where(m => m.ExternalTrackerId == externalId &&
-                        m.ServerDateTime >= startUtc &&
-                        m.ServerDateTime <= endUtc)
-            .OrderBy(x => x.ServerDateTime)
+                        m.TrackerDateTime.HasValue &&
+                        m.TrackerDateTime >= startUtc &&
+                        m.TrackerDateTime <= endUtc)
+            .OrderBy(x => x.TrackerDateTime)
             .AsNoTracking()
             .GetPagedQueryable(pageNum, pageSize);
 
