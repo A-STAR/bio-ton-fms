@@ -46,7 +46,11 @@ export class MessageService {
     const { pageNum, pageSize, vehicleId, periodStart, periodEnd, viewMessageType, parameterType } = fromObject;
 
     // just to keep request url params order always the same
-    fromObject = { pageNum, pageSize, vehicleId, periodStart, periodEnd, viewMessageType, parameterType };
+    fromObject = { pageNum, pageSize, vehicleId, periodStart, periodEnd, viewMessageType };
+
+    if (parameterType) {
+      fromObject.parameterType = parameterType;
+    }
 
     const paramsOptions: HttpParamsOptions = { fromObject };
 
