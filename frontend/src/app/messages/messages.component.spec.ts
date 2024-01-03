@@ -2,7 +2,7 @@ import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { DATE_PIPE_DEFAULT_OPTIONS, DecimalPipe, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
+import { DecimalPipe, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import localeRu from '@angular/common/locales/ru';
@@ -60,8 +60,6 @@ import {
   testTrackerMessages
 } from './message.service.spec';
 
-import { dateFormat } from '../directory-tech/trackers/trackers.component.spec';
-
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
   let fixture: ComponentFixture<MessagesComponent>;
@@ -88,12 +86,6 @@ describe('MessagesComponent', () => {
             useValue: 'ru-RU'
           },
           DecimalPipe,
-          {
-            provide: DATE_PIPE_DEFAULT_OPTIONS,
-            useValue: {
-              dateFormat: 'd MMMM y, H:mm'
-            }
-          },
           {
             provide: DateAdapter,
             useClass: LuxonDateAdapter
@@ -1221,10 +1213,10 @@ describe('MessagesComponent', () => {
       let formattedTime: string | undefined;
 
       if (time) {
-        formattedTime = formatDate(time, dateFormat, 'ru-RU');
+        formattedTime = formatDate(time, DATE_FORMAT, 'ru-RU');
       }
 
-      const formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
+      const formattedRegistration = formatDate(registration, DATE_FORMAT, 'ru-RU');
 
       let formattedSpeed: string | undefined;
       let formattedLatitude: string | undefined;
@@ -1398,10 +1390,10 @@ describe('MessagesComponent', () => {
       let formattedTime: string | undefined;
 
       if (time) {
-        formattedTime = formatDate(time, dateFormat, 'ru-RU');
+        formattedTime = formatDate(time, DATE_FORMAT, 'ru-RU');
       }
 
-      const formattedRegistration = formatDate(registration, dateFormat, 'ru-RU');
+      const formattedRegistration = formatDate(registration, DATE_FORMAT, 'ru-RU');
 
       let formattedSpeed: string | undefined;
       let formattedLatitude: string | undefined;
@@ -1495,12 +1487,12 @@ describe('MessagesComponent', () => {
         commandResponseText: response
       } = testCommandMessages.commandMessages![index];
 
-      const formattedTime = formatDate(time, dateFormat, 'ru-RU');
+      const formattedTime = formatDate(time, DATE_FORMAT, 'ru-RU');
 
       let formattedExecution: string | undefined;
 
       if (execution) {
-        formattedExecution = formatDate(time, dateFormat, 'ru-RU');
+        formattedExecution = formatDate(time, DATE_FORMAT, 'ru-RU');
       }
 
       const messageTexts = [position, formattedTime, command, formattedExecution, channel, response].map(
@@ -1944,3 +1936,5 @@ function getBlackBoxClass(timeDate: DataMessage['trackerDateTime'], registration
 
   return cssClass;
 }
+
+const DATE_FORMAT = 'd MMMM y, H:mm:ss';

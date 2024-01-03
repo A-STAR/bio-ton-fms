@@ -248,7 +248,7 @@
 
               <ng-container *ngSwitchDefault>{{ element[column.key] }}</ng-container>
 
-              <ng-template #date>{{ element[column.key] | date }}</ng-template>
+              <ng-template #date>{{ element[column.key] | date: 'd MMMM y, H:mm:ss' }}</ng-template>
 
               <ng-template #telemetry>{{ element[column.key] | number: '1.1-1':'en-US' }}</ng-template>
             </mat-cell>
