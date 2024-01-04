@@ -468,9 +468,9 @@ describe('MessagesComponent', () => {
     discardPeriodicTasks();
   }));
 
-  it('should toggle parameters control visible/disabled state', fakeAsync(async () => {
-    // initially render `parameters` control hidden and disabled
-    let parametersSelect = await loader.getHarness(
+  it('should toggle parameter control visible/disabled state', fakeAsync(async () => {
+    // initially render `parameter` control hidden and disabled
+    let parameterSelect = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
         selector: '[placeholder="Параметры"]'
@@ -478,9 +478,9 @@ describe('MessagesComponent', () => {
     );
 
     await expectAsync(
-      parametersSelect.isDisabled()
+      parameterSelect.isDisabled()
     )
-      .withContext('render parameters control disabled')
+      .withContext('render parameter control disabled')
       .toBeResolvedTo(true);
 
     const typeSelect = await loader.getHarness(
@@ -490,12 +490,12 @@ describe('MessagesComponent', () => {
       })
     );
 
-    // render `parameters` control visible and enabled for `message` data `type`
+    // render `parameter` control visible and enabled for `message` data `type`
     typeSelect.clickOptions({
       text: 'Сообщения с данными'
     });
 
-    parametersSelect = await loader.getHarness(
+    parameterSelect = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#selection-form [formGroupName="message"] :not([hidden])',
         selector: '[placeholder="Параметры"]'
@@ -503,17 +503,17 @@ describe('MessagesComponent', () => {
     );
 
     await expectAsync(
-      parametersSelect.isDisabled()
+      parameterSelect.isDisabled()
     )
-      .withContext('render parameters control enabled')
+      .withContext('render parameter control enabled')
       .toBeResolvedTo(false);
 
-    // render `parameters` control hidden and enabled for `message` command `type`
+    // render `parameter` control hidden and enabled for `message` command `type`
     typeSelect.clickOptions({
       text: 'Отправленные команды'
     });
 
-    parametersSelect = await loader.getHarness(
+    parameterSelect = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#selection-form [formGroupName="message"] [hidden]',
         selector: '[placeholder="Параметры"]'
@@ -521,9 +521,9 @@ describe('MessagesComponent', () => {
     );
 
     await expectAsync(
-      parametersSelect.isDisabled()
+      parameterSelect.isDisabled()
     )
-      .withContext('render parameters control disabled')
+      .withContext('render parameter control disabled')
       .toBeResolvedTo(true);
 
     discardPeriodicTasks();
@@ -714,7 +714,7 @@ describe('MessagesComponent', () => {
     await startTimeInput.setValue(testStartTime);
     await endTimeInput.setValue(testEndTime);
 
-    const [typeSelect, parametersSelect] = await loader.getAllHarnesses(
+    const [typeSelect, parameterSelect] = await loader.getAllHarnesses(
       MatSelectHarness.with({
         ancestor: 'form#selection-form'
       })
@@ -724,7 +724,7 @@ describe('MessagesComponent', () => {
       text: 'Сообщения с данными'
     });
 
-    await parametersSelect.clickOptions({
+    await parameterSelect.clickOptions({
       text: 'Исходные данные'
     });
 

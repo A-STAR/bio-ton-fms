@@ -127,12 +127,12 @@
       </div>
 
       <div [hidden]="selectionForm.controls.message.controls.type.value !== MessageType.DataMessage">
-        <label for="parameters">Параметры</label>
+        <label for="parameter">Параметры</label>
 
         <mat-form-field>
           <mat-label>Параметры</mat-label>
 
-          <mat-select id="parameters" placeholder="Параметры" formControlName="parameters">
+          <mat-select id="parameter" placeholder="Параметры" formControlName="parameter">
             <mat-option [value]="DataMessageParameter.TrackerData">Исходные данные</mat-option>
 
             <mat-option [value]="DataMessageParameter.SensorData">Значения датчиков</mat-option>
