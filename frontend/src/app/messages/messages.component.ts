@@ -218,15 +218,15 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Toggle `message` `parameters` control disabled state
+   * Toggle `message` `parameter` control disabled state
    * on `message` `type` selection change conditionally.
    *
    * @param event `MatSelectionChange` event.
    */
   protected onMessageTypeSelectionChange({ value }: MatSelectChange) {
-    const parametersControl = this.selectionForm.get('message.parameters');
+    const parameterControl = this.selectionForm.get('message.parameter');
 
-    value === MessageType.DataMessage ? parametersControl?.enable() : parametersControl?.disable();
+    value === MessageType.DataMessage ? parameterControl?.enable() : parameterControl?.disable();
   }
 
   /**
@@ -261,7 +261,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     const { tech, range, message } = value;
 
     const { start, end } = range!;
-    const { type, parameters } = message!;
+    const { type, parameter } = message!;
 
     const startDate = new Date(start!.date!);
     const endDate = new Date(end!.date!);
@@ -280,11 +280,12 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       vehicleId: (tech as MonitoringTech).id,
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString(),
-      viewMessageType: type!
+      viewMessageType: type!,
+      parameterType: parameter
     };
 
-    if (parameters) {
-      messagesOptions.parameterType = parameters;
+    if (parameter) {
+      messagesOptions.parameterType = parameter;
     }
 
     const messageStatisticsOptions: MessageStatisticsOptions = { ...messagesOptions };
@@ -520,7 +521,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       }),
       message: this.fb.group({
         type: this.fb.nonNullable.control<MessageType | undefined>(undefined, Validators.required),
-        parameters: this.fb.nonNullable.control<DataMessageParameter | undefined>({
+        parameter: this.fb.nonNullable.control<DataMessageParameter | undefined>({
           value: undefined,
           disabled: true
         }, Validators.required)
@@ -866,7 +867,7 @@ type MessageSelectionForm = FormGroup<{
   }>;
   message: FormGroup<{
     type: FormControl<MessageType | undefined>;
-    parameters: FormControl<DataMessageParameter | undefined>;
+    parameter: FormControl<DataMessageParameter | undefined>;
   }>;
 }>;
 
