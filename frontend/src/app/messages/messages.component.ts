@@ -280,7 +280,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       vehicleId: (tech as MonitoringTech).id,
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString(),
-      viewMessageType: type!
+      viewMessageType: type!,
+      parameterType: parameter
     };
 
     if (parameter) {

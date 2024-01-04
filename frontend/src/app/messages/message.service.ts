@@ -48,7 +48,7 @@ export class MessageService {
     // just to keep request url params order always the same
     fromObject = { pageNum, pageSize, vehicleId, periodStart, periodEnd, viewMessageType };
 
-    if (parameterType) {
+    if (viewMessageType === MessageType.DataMessage) {
       fromObject.parameterType = parameterType;
     }
 
@@ -93,6 +93,15 @@ export class MessageService {
    * @returns An `Observable` of the `MessageStatistics` stream.
    */
   getStatistics(fromObject: MessageStatisticsOptions) {
+    const { vehicleId, periodStart, periodEnd, viewMessageType, parameterType } = fromObject;
+
+    // just to keep request url params order always the same
+    fromObject = { vehicleId, periodStart, periodEnd, viewMessageType };
+
+    if (parameterType) {
+      fromObject.parameterType = parameterType;
+    }
+
     const paramsOptions: HttpParamsOptions = { fromObject };
 
     const params = new HttpParams(paramsOptions);
