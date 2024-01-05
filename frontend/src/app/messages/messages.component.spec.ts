@@ -1283,7 +1283,7 @@ describe('MessagesComponent', () => {
         chip => chip.getText()
       ));
 
-      const parameters = testTrackerMessages.trackerDataMessages![index].parameters;
+      const parameters = testTrackerMessages.trackerDataMessages![index].parameters!;
 
       chipTexts.forEach((chipText, index) => {
         const {
