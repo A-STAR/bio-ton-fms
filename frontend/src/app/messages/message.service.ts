@@ -137,7 +137,7 @@ export type DataMessage = {
 };
 
 export type TrackerMessage = DataMessage & {
-  parameters: TrackerParameter[];
+  parameters?: TrackerParameter[];
 };
 
 type SensorMessage = DataMessage & {
