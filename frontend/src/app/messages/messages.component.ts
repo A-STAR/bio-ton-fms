@@ -561,7 +561,9 @@ export default class MessagesComponent implements OnInit, OnDestroy {
             break;
 
           case DataMessageParameter.SensorData: {
-            const sensorColumns: KeyValue<string, MonitoringSensor['name']>[] = sensorDataMessages![0].sensors.map(({ name }, index) => {
+            const sensorColumns: KeyValue<string, MonitoringSensor['name']>[] = [];
+
+            sensorDataMessages![0].sensors?.forEach(({ name }, index) => {
               let key = 'sensor';
 
               if (index) {
@@ -569,10 +571,12 @@ export default class MessagesComponent implements OnInit, OnDestroy {
                 key += `-${index + 1}`;
               }
 
-              return {
+              const column: KeyValue<string, MonitoringSensor['name']> = {
                 key,
                 value: name
               };
+
+              sensorColumns.push(column);
             });
 
             this.columns = [...dataMessageColumns, ...sensorColumns];
@@ -692,7 +696,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           [key: string]: string;
         } = {};
 
-        sensors.forEach(({ value, unit }, index) => {
+        sensors?.forEach(({ value, unit }, index) => {
           if (value) {
             let key = 'sensor';
 
