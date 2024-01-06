@@ -141,7 +141,7 @@ export type TrackerMessage = DataMessage & {
 };
 
 type SensorMessage = DataMessage & {
-  sensors: MonitoringSensor[];
+  sensors?: MonitoringSensor[];
 };
 
 export type CommandMessage = {
