@@ -48,7 +48,7 @@ import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.servi
 
 import { environment } from '../../environments/environment';
 import { localeID } from '../tech/shared/relative-time.pipe';
-import { PAGE_NUM as INITIAL_PAGE } from '../directory-tech/shared/pagination';
+import { PAGE_NUM as INITIAL_PAGE, PAGE_SIZE } from '../directory-tech/shared/pagination';
 import { DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from '../tech/tech.component';
 import { mockTestFoundMonitoringVehicles, testFindCriterion, testMonitoringVehicles } from '../tech/tech.service.spec';
 
@@ -1776,6 +1776,106 @@ describe('MessagesComponent', () => {
     confirmationDialog?.close();
 
     overlayContainer.ngOnDestroy();
+  }));
+
+  it('should keep on streaming messages after error', fakeAsync(async () => {
+    /* Autocomplete doesn't properly set an actual control `object` value in tests
+       rather than its display value. */
+    component['selectionForm'].controls.tech.setValue(testMonitoringVehicles[0]);
+
+    const [startDateInput, endDateInput] = await loader.getAllHarnesses(
+      MatDatepickerInputHarness.with({
+        ancestor: 'form#selection-form [formGroupName="range"]'
+      })
+    );
+
+    const testStartDate = '17.11.2023';
+    const testEndDate = '18.11.2023';
+
+    await startDateInput.setValue(testStartDate);
+    await endDateInput.setValue(testEndDate);
+
+    const typeSelect = await loader.getHarness(
+      MatSelectHarness.with({
+        ancestor: 'form#selection-form'
+      })
+    );
+
+    await typeSelect.clickOptions({
+      text: 'Отправленные команды'
+    });
+
+    spyOn(messageService, 'getTrack')
+      .and.callFake(() => of(testMessageLocationAndTrack));
+
+    spyOn(messageService, 'getStatistics')
+      .and.callFake(() => of(testMessageStatistics));
+
+    const [startDay, startMonth, startYear] = testStartDate
+      .split('.')
+      .map(Number);
+
+    const [endDay, endMonth, endYear] = testStartDate
+      .split('.')
+      .map(Number);
+
+    const startMonthIndex = startMonth - 1;
+    const endMonthIndex = endMonth - 1;
+
+    const startDate = new Date(startYear, startMonthIndex, startDay);
+    const endDate = new Date(endYear, endMonthIndex, endDay);
+
+    const testURL = `${environment.api}/api/telematica/messagesview/list?pageNum=${INITIAL_PAGE}&pageSize=${PAGE_SIZE}&vehicleId=${
+      testMonitoringVehicles[0].id
+    }&periodStart=${startDate.toISOString()}&periodEnd=${endDate.toISOString()}&viewMessageType=${MessageType.CommandMessage}`;
+
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        message: `Http failure response for ${testURL}: 500 Internal Server Error`
+      },
+      status: 500,
+      statusText: 'Internal Server Error',
+      url: testURL
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    const messagesSpy = spyOn(messageService, 'getMessages')
+      .and.callFake(() => throwError(() => testErrorResponse));
+
+    spyOn(console, 'error');
+
+    const handleErrorSpy = spyOn(errorHandler, 'handleError');
+
+    const executeButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: 'form#selection-form',
+        selector: '[type="submit"]',
+        text: 'Выполнить',
+        variant: 'flat'
+      })
+    );
+
+    await executeButton.click();
+
+    expect(messagesSpy)
+      .toHaveBeenCalled();
+
+    expect(handleErrorSpy)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    handleErrorSpy.calls.reset();
+
+    messagesSpy.and.callFake(() => of(testCommandMessages));
+    handleErrorSpy.and.callThrough();
+
+    await executeButton.click();
+
+    expect(messagesSpy)
+      .toHaveBeenCalledTimes(2);
+
+    expect(handleErrorSpy)
+      .not.toHaveBeenCalled();
   }));
 
   it('should handle pagination change', fakeAsync(async () => {

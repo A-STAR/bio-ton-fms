@@ -17,10 +17,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
   BehaviorSubject,
+  NEVER,
   Observable,
   Subject,
   Subscription,
   asapScheduler,
+  catchError,
   debounceTime,
   defer,
   distinctUntilChanged,
@@ -788,15 +790,24 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   #setMessages() {
     this.messages$ = this.#messages$.pipe(
       filter((value): value is MessagesOptions => value !== undefined),
-      switchMap(messagesOptions => this.messageService.getMessages(messagesOptions)),
-      tap(messages => {
-        this.#setColumns(messages);
-        this.#setMessagesDataSource(messages);
+      switchMap(messagesOptions => this.messageService
+        .getMessages(messagesOptions)
+        .pipe(
+          tap(messages => {
+            this.#setColumns(messages);
+            this.#setMessagesDataSource(messages);
 
-        this.selection.clear();
+            this.selection.clear();
 
-        this.#messagesSettled$.next(undefined);
-      })
+            this.#messagesSettled$.next(undefined);
+          }),
+          catchError(error => {
+            this.errorHandler.handleError(error);
+
+            return NEVER;
+          })
+        )
+      )
     );
   }
 
