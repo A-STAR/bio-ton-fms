@@ -38,5 +38,10 @@ public class RabbitMQOptions
     /// <summary>
     /// Максимальное число необработанных сообщения от трекеров в очереди, после которого сообщения перестают приниматься
     /// </summary>
-    public int? TrackerQueueMaxLength { get; set; } = null; 
+    public int? TrackerQueueMaxLength { get; set; } = null;
+
+    /// <summary>
+    /// Название очереди для сообщений трекера
+    /// </summary>
+    public string RawMessageQueueName { get; set; } = "RawTrackerMessages-primary";
 }

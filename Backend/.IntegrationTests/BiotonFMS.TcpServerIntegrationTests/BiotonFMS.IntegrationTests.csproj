@@ -11,9 +11,57 @@
     <None Remove="configs\appsettings.trackertcpserver.ci-external.json" />
     <None Remove="configs\appsettings.trackertcpserver.container.json" />
     <None Remove="configs\appsettings.trackertcpserver.external.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.ci-container.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.ci-external.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.container.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.external.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.ci-container.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.ci-external.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.container.json" />
+    <None Remove="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.external.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.ci-external.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.external.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.ci-container.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.ci-external.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.container.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.messagehandler.external.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.ci-container.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="configs\MessageHandlerRetranslationTests\appsettings.trackertcpserver.container.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="configs\TrackerTcpServerTests\appsettings.trackertcpserver.ci-container.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

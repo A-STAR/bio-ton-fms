@@ -67,13 +67,13 @@ IMessageBus GetRawTrackerMessageBus(IServiceProvider serviceProvider, RabbitMQOp
 {
     var timeouts = serviceProvider.GetRequiredService<IOptions<RetryOptions>>()
         .Value.TimeoutsInMs.Select(x => TimeSpan.FromSeconds(x));
-    var rabbitMQOptions = serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>();
+    var rabbitMqOptions = serviceProvider.GetRequiredService<IOptions<RabbitMQOptions>>();
     var primaryBus = new RabbitMQMessageBus(
         serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
         serviceProvider,
-        rabbitMQOptions,
+        rabbitMqOptions,
         isDurable: true,
-        "RawTrackerMessages-primary", 
+        rabbitMqOptions.Value.RawMessageQueueName, 
         needDeadMessageQueue: true,
         deliveryLimit: rabbitOptions.DeliveryLimit,
         queueMaxLength: rabbitOptions.TrackerQueueMaxLength);
@@ -84,7 +84,7 @@ IMessageBus GetRawTrackerMessageBus(IServiceProvider serviceProvider, RabbitMQOp
         secondary = new RabbitMQMessageBus(
             serviceProvider.GetRequiredService<ILogger<RabbitMQMessageBus>>(),
             serviceProvider,
-            rabbitMQOptions,
+            rabbitMqOptions,
             isDurable: true,
             "RawTrackerMessages-secondary",
             needDeadMessageQueue: true,
