@@ -28,7 +28,7 @@ public sealed class TrackerMessageHandlerTests : IAsyncLifetime
 {
     private readonly IContainer _container;
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly RabbitMQMessageBus _messageBus;
+    private readonly RabbitMQMessageBus _rawMessageBus;
     private string _externalConfigName;
     private List<byte[]> receivedMessages = new List<byte[]>();
 
@@ -52,9 +52,11 @@ public sealed class TrackerMessageHandlerTests : IAsyncLifetime
         var logger = new TestOutputHelperLoggerMock<RabbitMQMessageBus>(_testOutputHelper);
         var serviceProvider = new Mock<IServiceProvider>();
         var rabbitMqOptions = Options.Create(rabbitMqSettings);
-        _messageBus = new RabbitMQMessageBus(logger, serviceProvider.Object, rabbitMqOptions, isDurable: true, "RawTrackerMessages-primary",
+
+        // Шина данных для сообщений трекера
+        _rawMessageBus = new RabbitMQMessageBus(logger, serviceProvider.Object, rabbitMqOptions, isDurable: true, rabbitMqOptions.Value.RawMessageQueueName,
             needDeadMessageQueue: true, deliveryLimit: rabbitMqSettings.DeliveryLimit, queueMaxLength: rabbitMqSettings.TrackerQueueMaxLength);
-        serviceProvider.Setup(s => s.GetService(typeof(TestTrackerMessageHandlerMessageHandler))).Returns(new TestTrackerMessageHandlerMessageHandler(_messageBus, receivedMessages));
+        serviceProvider.Setup(s => s.GetService(typeof(TestTrackerMessageHandlerMessageHandler))).Returns(new TestTrackerMessageHandlerMessageHandler(_rawMessageBus, receivedMessages));
 
         string? imageTag = Environment.GetEnvironmentVariable("DOCKER_TAG");
         if (imageTag is null)
@@ -65,14 +67,16 @@ public sealed class TrackerMessageHandlerTests : IAsyncLifetime
 
         byte[] appSettings = GetAppsettingsFile(containerConfigName);
 
-        _container = new ContainerBuilder()
+        var builder = new ContainerBuilder()
                     .WithImage($"fms-tracker-message:{imageTag}")
                     .WithResourceMapping(appSettings, "/app/config/appsettings.json")
-                    .WithPortBinding(6000, true)
-                    //.WithWaitStrategy(Wait.ForUnixContainer().UntilMessageIsLogged("Application started. Press Ctrl+C to shut down"))
-                    // Build the _container configuration.
-                    .Build();
-
+                    .WithPortBinding(6000, true);
+        if (ciEnvironment is null)
+        {
+            builder = builder.WithNetwork("integration-tests");
+        }
+        // Build the _trackerMessageHandlerContainer configuration.
+        _container = builder.Build();
     }
 
     private MessagesDBContext CreateMsgContext(string externalConfigName)
@@ -87,7 +91,20 @@ public sealed class TrackerMessageHandlerTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _container.StartAsync();
+        try
+        {
+            await _container.StartAsync();
+        }
+        catch
+        {
+            var logs = await _container.GetLogsAsync();
+            _testOutputHelper.WriteLine("Container failed to start - stdout:");
+            _testOutputHelper.WriteLine(logs.Stdout);
+
+            _testOutputHelper.WriteLine("Container failed to start - stderr:");
+            _testOutputHelper.WriteLine(logs.Stderr);
+            throw;
+        }
     }
 
     public Task DisposeAsync()
@@ -98,10 +115,14 @@ public sealed class TrackerMessageHandlerTests : IAsyncLifetime
     [Fact]
     public async void TrackerMessageHandler_ShouldProcessMessageAndCreateMessageInDB()
     {
+        // Задержка для того, чтобы контейнеры успели инициализироваться
         CancellationToken stoppingToken = new CancellationToken();
         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
-        _messageBus.PurgeQueue();
 
+        // очистим очереди, принимающие участие в тесте
+        _rawMessageBus.PurgeQueue();
+
+        // подготовим сообщение для отправки в MessageHandler
         var rawMessage = TestUtils.ReadMessageFromFile("TestData/11-package.txt");
         var testIp = IPAddress.Parse("111.222.111.222");
         int testPort = 12345;
@@ -114,10 +135,16 @@ public sealed class TrackerMessageHandlerTests : IAsyncLifetime
             IpAddress = testIp.ToString(),
             Port = testPort
         };
-        var publishNumber = _messageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(rawTrackerMessage)));
+        // Опубликуем сообщение. 
+        var publishNumber = _rawMessageBus.Publish(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(rawTrackerMessage)));
         _testOutputHelper.LogInformation("Сообщение отправлено. SeqNum = {0} Len = {1} PackageUID = {2}", publishNumber, rawMessage.Length, rawTrackerMessage.PackageUID);
 
+        // MessageHandler должен принять опубликованное сообщение, разобрать и положить в БД
+
+        // дадим гарантированный запас времени на обработку    
         await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
+        // Выведем логи контейнеров, учавствовавших в тесте
         var logs = await _container.GetLogsAsync();
         _testOutputHelper.WriteLine("Container stdout:");
         _testOutputHelper.WriteLine(logs.Stdout);
@@ -125,14 +152,14 @@ public sealed class TrackerMessageHandlerTests : IAsyncLifetime
         _testOutputHelper.WriteLine("Container stderr:");
         _testOutputHelper.WriteLine(logs.Stderr);
 
-        using var msgDbContext = CreateMsgContext(_externalConfigName);
+        // Проверим, что тест отработал корректно
 
+        // Отправленное сообщение обработано и положено в БД
+        using var msgDbContext = CreateMsgContext(_externalConfigName);
         msgDbContext.TrackerMessages.Where(m => m.PackageUID == rawTrackerMessage.PackageUID).Count().Should().Be(1);
         var messageTags = msgDbContext.TrackerMessages.Where(m => m.PackageUID == rawTrackerMessage.PackageUID)
             .SelectMany(m => m.Tags).ToArray();
         messageTags.Where(t => t.ValueString == "862057047832826").ToList().Should().HaveCount(1);
-
-
     }
 
     private byte[] GetAppsettingsFile(string settingsFileName)

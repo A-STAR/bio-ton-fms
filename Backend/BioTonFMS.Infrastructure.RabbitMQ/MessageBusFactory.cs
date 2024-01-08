@@ -27,7 +27,7 @@ public class MessageBusFactory
                     isDurable: true, "Retranslation", needDeadMessageQueue: true, deliveryLimit: rabbitOptions.Value.DeliveryLimit),
                 MessgingBusType.Consuming => new RabbitMQMessageBus(
                     rabbitLogger, serviceProvider, rabbitOptions,
-                    isDurable: true, "RawTrackerMessages-primary", needDeadMessageQueue: true,
+                    isDurable: true, rabbitOptions.Value.RawMessageQueueName, needDeadMessageQueue: true,
                     deliveryLimit: rabbitOptions.Value.DeliveryLimit, queueMaxLength: rabbitOptions.Value.TrackerQueueMaxLength),
                 MessgingBusType.TrackerCommandsReceive => new RabbitMQMessageBus(
                     rabbitLogger, serviceProvider, rabbitOptions,

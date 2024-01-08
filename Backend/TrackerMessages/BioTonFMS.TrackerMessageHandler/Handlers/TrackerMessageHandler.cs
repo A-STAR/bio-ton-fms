@@ -113,6 +113,9 @@ public class TrackerMessageHandler : IBusMessageHandler
                 AddMessageToRepository(rawMessage, trackerMessage);
             }
 
+            _logger.LogTrace("Retranslation {IsEnabled}", _retranslatorOptions.Enabled);
+            _logger.LogTrace("Retranslation {AllowedExtIds}", _retranslatorOptions.AllowedExtIds);
+
             if (_retranslatorOptions.Enabled &&
                 (_retranslatorOptions.AllowedExtIds is null ||
                  (messages.Length > 0 && _retranslatorOptions.AllowedExtIds.Contains(messages[0].ExternalTrackerId.ToString()))))
