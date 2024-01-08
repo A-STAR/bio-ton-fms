@@ -185,6 +185,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
+  protected searchForm!: MessageSearchForm;
   protected messages$?: Observable<Messages>;
   protected messagesDataSource?: TableDataSource<TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource>;
   protected location$?: Observable<LocationAndTrackResponse>;
@@ -532,6 +533,15 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Initialize Search form.
+   */
+  #initSearchForm() {
+    this.searchForm = this.fb.group({
+      search: this.fb.nonNullable.control<string | undefined>(undefined)
+    });
+  }
+
+  /**
    * Set tech.
    */
   #setTech() {
@@ -834,6 +844,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.#initSelectionForm();
     this.#setTech();
+    this.#initSearchForm();
     this.#setMessages();
   }
 
@@ -884,6 +895,10 @@ type MessageSelectionForm = FormGroup<{
     type: FormControl<MessageType | undefined>;
     parameter: FormControl<DataMessageParameter | undefined>;
   }>;
+}>;
+
+type MessageSearchForm = FormGroup<{
+  search: FormControl<string | undefined>;
 }>;
 
 interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Pick<TrackerMessage, 'parameters'> {

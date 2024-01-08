@@ -16,11 +16,11 @@ aside
   > :last-child
     margin-bottom: 20px
 
-form,
+form#selection-form,
 dl:not(:last-of-type)
   margin-bottom: 40px
 
-form
+form#selection-form
   display: flex
   flex-wrap: wrap
   justify-content: center
@@ -138,6 +138,20 @@ bio-map
   p
     display: flex
 
+  $controls-padding-horizontal: 10px
+
+  header,
+  footer
+    padding: 0 $controls-padding-horizontal
+
+  header
+    display: flex
+    align-items: center
+    min-height: 60px
+
+    form
+      flex-basis: 80%
+
   figure
     overflow: auto
 
@@ -216,12 +230,9 @@ bio-map
   mat-row:last-child mat-cell
     border-bottom: unset
 
-  .controls
-    $controls-padding-horizontal: 10px
-
+  footer
     position: relative
     column-gap: 10px
-    padding: 0 $controls-padding-horizontal
 
     button[title="Удалить"]
       position: absolute
