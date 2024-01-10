@@ -1597,6 +1597,29 @@ describe('MessagesComponent', () => {
       .toBeDefined();
   }));
 
+  it('should search messages', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarnessOrNull(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    expect(searchInput)
+      .withContext('render search form element')
+      .not.toBeNull();
+
+    await searchInput!.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    await searchInput!.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+  }));
+
   it('should toggle all checkbox selecting messages', fakeAsync(async () => {
     await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 

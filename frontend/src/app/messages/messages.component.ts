@@ -29,8 +29,10 @@ import {
   filter,
   first,
   forkJoin,
+  iif,
   map,
   mergeMap,
+  of,
   skipWhile,
   startWith,
   switchMap,
@@ -145,7 +147,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get search stream.
+   * Get tech search stream.
    *
    * @returns An `Observable` of search stream.
    */
@@ -164,6 +166,29 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         skipWhile(searchValue => searchValue ? searchValue.length < SEARCH_MIN_LENGTH : true),
         map(searchValue => searchValue !== undefined && searchValue.length < SEARCH_MIN_LENGTH ? undefined : searchValue),
         distinctUntilChanged()
+      );
+  }
+
+  /**
+   * Get messages search stream.
+   *
+   * @returns An `Observable` of search stream.
+   */
+  get #filter$() {
+    return this.searchForm
+      .get('search')!
+      .valueChanges.pipe(
+        debounceTime(DEBOUNCE_DUE_TIME),
+        map(searchValue => searchValue
+          ?.trim()
+          ?.toLocaleLowerCase()
+        ),
+        map(searchValue => searchValue || undefined),
+        distinctUntilChanged(),
+        startWith(
+          this.searchForm.get('search')
+            ?.value ?? undefined
+        )
       );
   }
 
@@ -798,6 +823,8 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    * Set messages, message columns, clear selection.
    */
   #setMessages() {
+    const filter$ = defer(() => this.#filter$);
+
     this.messages$ = this.#messages$.pipe(
       filter((value): value is MessagesOptions => value !== undefined),
       switchMap(messagesOptions => this.messageService
@@ -811,6 +838,11 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
             this.#messagesSettled$.next(undefined);
           }),
+          switchMap(messages => iif(() => messagesOptions.parameterType === DataMessageParameter.SensorData, of(undefined), filter$)
+            .pipe(
+              map(() => messages)
+            )
+          ),
           catchError(error => {
             this.errorHandler.handleError(error);
 
