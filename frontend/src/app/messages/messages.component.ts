@@ -338,6 +338,13 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         this.#statistics$.next(statistics);
       });
 
+    if (this.#options && (this.#options.viewMessageType !== type || this.#options.parameterType !== parameter)) {
+      // reset form when message type changes
+      this.searchForm.reset(undefined, {
+        emitEvent: false
+      });
+    }
+
     this.#options = messagesOptions;
   }
 

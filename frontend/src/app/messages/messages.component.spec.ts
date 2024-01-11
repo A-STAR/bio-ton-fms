@@ -1620,6 +1620,32 @@ describe('MessagesComponent', () => {
     tick(DEBOUNCE_DUE_TIME);
   }));
 
+  it('should reset search form on message type change', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    await searchInput.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.DataMessage,
+      parameter: DataMessageParameter.SensorData
+    }, testSensorMessages);
+
+    await expectAsync(
+      searchInput?.getValue()
+    )
+      .withContext('reset search form input')
+      .toBeResolvedTo('');
+  }));
+
   it('should toggle all checkbox selecting messages', fakeAsync(async () => {
     await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
