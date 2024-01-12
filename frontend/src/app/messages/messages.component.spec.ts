@@ -1620,6 +1620,65 @@ describe('MessagesComponent', () => {
     tick(DEBOUNCE_DUE_TIME);
   }));
 
+  it('should filter out tracker, command message table rows', fakeAsync(async () => {
+    // filter out tracker messages
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    await searchInput!.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render no tracker message table rows')
+      .toBe(0);
+
+    await searchInput!.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render tracker message table rows')
+      .toBe(testTrackerMessages.trackerDataMessages!.length);
+
+    // filter out command messages
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    await searchInput!.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render no command message table rows')
+      .toBe(0);
+
+    await searchInput!.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render command message table rows')
+      .toBe(testCommandMessages.commandMessages!.length);
+  }));
+
   it('should reset search form on message type change', fakeAsync(async () => {
     await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 

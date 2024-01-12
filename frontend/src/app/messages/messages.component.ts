@@ -423,6 +423,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
+  #messagesDataSource?: (TrackerMessageDataSource | CommandMessageDataSource)[];
   #messagesSettled$ = new Subject();
   #location$ = new Subject<LocationAndTrackResponse>();
   #statistics$ = new Subject<MessageStatistics>();
@@ -807,16 +808,22 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           case DataMessageParameter.TrackerData:
             messagesDataSource = this.#mapTrackerMessagesDataSource(messages);
 
+            this.#messagesDataSource = messagesDataSource as TrackerMessageDataSource[];
+
             break;
 
           case DataMessageParameter.SensorData:
             messagesDataSource = this.#mapSensorMessagesDataSource(messages);
+
+            this.#messagesDataSource = undefined;
         }
 
         break;
 
       case MessageType.CommandMessage:
         messagesDataSource = this.#mapCommandMessagesDataSource(messages);
+
+        this.#messagesDataSource = messagesDataSource as CommandMessageDataSource[];
     }
 
     if (this.messagesDataSource) {
@@ -827,10 +834,31 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Filter `TableDataSource` and set messages data source.
+   *
+   * @param searchQuery Search query.
+   */
+  #filterMessagesDataSource(searchQuery?: string) {
+    let messagesDataSource: (TrackerMessageDataSource | CommandMessageDataSource)[];
+
+    if (searchQuery === undefined) {
+      messagesDataSource = this.#messagesDataSource!;
+    } else {
+      messagesDataSource = [];
+    }
+
+    this.messagesDataSource!.setDataSource(messagesDataSource);
+  }
+
+  /**
    * Set messages, message columns, clear selection.
    */
   #setMessages() {
-    const filter$ = defer(() => this.#filter$);
+    const filter$ = defer(() => this.#filter$.pipe(
+      tap(searchQuery => {
+        this.#filterMessagesDataSource(searchQuery);
+      })
+    ));
 
     this.messages$ = this.#messages$.pipe(
       filter((value): value is MessagesOptions => value !== undefined),
