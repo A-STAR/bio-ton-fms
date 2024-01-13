@@ -154,6 +154,7 @@ bio-map
 
   figure
     overflow: auto
+    margin-bottom: auto
 
     &:has(mat-table)
       border: math.div(1px, 2) solid $light-gray
@@ -230,6 +231,15 @@ bio-map
   mat-row:last-child mat-cell
     border-bottom: unset
 
+  tr
+    display: flex
+    justify-content: center
+    align-items: center
+
+  tr,
+  p
+    font-size: 14px
+
   footer
     position: relative
     column-gap: 10px
@@ -253,5 +263,4 @@ bio-map
     height: 100%
     background-color: $light
     color: $green
-    font-size: 14px
     text-align: center

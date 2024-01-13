@@ -1640,8 +1640,16 @@ describe('MessagesComponent', () => {
     let rows = await table.getRows();
 
     expect(rows.length)
-      .withContext('render no tracker message table rows')
-      .toBe(0);
+      .withContext('render tracker message table no data row')
+      .toBe(1);
+
+    let [cell] = await rows[0].getCells();
+
+    await expectAsync(
+      cell.getText()
+    )
+      .withContext('render tracker message table no data row text')
+      .toBeResolvedTo('Нет данных');
 
     await searchInput!.setValue('');
 
@@ -1665,8 +1673,16 @@ describe('MessagesComponent', () => {
     rows = await table.getRows();
 
     expect(rows.length)
-      .withContext('render no command message table rows')
-      .toBe(0);
+      .withContext('render command message table no data row')
+      .toBe(1);
+
+    [cell] = await rows[0].getCells();
+
+    await expectAsync(
+      cell.getText()
+    )
+      .withContext('render command message table no data row text')
+      .toBeResolvedTo('Нет данных');
 
     await searchInput!.setValue('');
 
