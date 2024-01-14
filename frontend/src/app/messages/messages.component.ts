@@ -565,7 +565,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           case DataMessageParameter.SensorData: {
             const sensorColumns: KeyValue<string, MonitoringSensor['name']>[] = [];
 
-            sensorDataMessages![0].sensors?.forEach(({ name }, index) => {
+            sensorDataMessages?.[0]?.sensors?.forEach(({ name }, index) => {
               let key = 'sensor';
 
               if (index) {
