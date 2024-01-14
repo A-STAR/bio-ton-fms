@@ -1,14 +1,7 @@
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using BioTonFMS.Domain;
-using BioTonFMS.Infrastructure.EF;
-using BioTonFMS.Infrastructure;
-using BioTonFMS.Infrastructure.EF.Repositories.Models.Filters;
 using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
-using BioTonFMS.Infrastructure.Paging;
-using BioTonFMS.Infrastructure.Persistence.Providers;
 using Moq;
-using BioTonFMS.Infrastructure.EF.Repositories.Vehicles;
-using BioTonFMS.Telematica.Controllers;
 using Microsoft.Extensions.Logging;
 
 namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;

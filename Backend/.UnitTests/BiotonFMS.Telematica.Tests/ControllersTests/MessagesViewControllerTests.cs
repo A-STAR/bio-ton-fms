@@ -18,6 +18,8 @@ using Microsoft.IdentityModel.Tokens;
 using Moq;
 using Xunit.Abstractions;
 using BioTonFMS.Telematica.Validation;
+using BioTonFMS.Telematica.Dtos;
+using System.Collections;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
@@ -27,6 +29,8 @@ namespace BiotonFMS.Telematica.Tests.ControllersTests;
 public class MessagesViewControllerTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
+
+    private static DateTime _systemNow = DateTime.UtcNow;
 
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -38,7 +42,7 @@ public class MessagesViewControllerTests
         _testOutputHelper = testOutputHelper;
     }
 
-    public static IEnumerable<object[]> CriterionData =>
+    public static IEnumerable<object[]> FindVehicleCriterionData =>
         new List<object[]>
         {
             // поиск по вхождению в начале названия машины, должна быть найдена одна машина
@@ -134,7 +138,7 @@ public class MessagesViewControllerTests
             }
         };
 
-    [Theory, MemberData(nameof(CriterionData))]
+    [Theory, MemberData(nameof(FindVehicleCriterionData))]
     public void FindVehicles(string? criterion, MessagesViewVehicleDto[] expected)
     {
         _testOutputHelper.WriteLine("Criterion = \"" + criterion + "\"");
@@ -348,7 +352,7 @@ public class MessagesViewControllerTests
                 },
                 new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
             },
-            //Машина без трекера
+            // Машина без трекера
             new object[]
             {
                 new MessagesViewTrackRequest
@@ -402,17 +406,855 @@ public class MessagesViewControllerTests
         }
     }
 
+    public static IEnumerable<object[]> ViewMessagesTrackerParamsData =>
+    new List<object[]>
+    {
+        // Несуществующая машина
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = -13432,
+                PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                PeriodEnd = SystemTime.UtcNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.TrackerData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+        },
+        // Машина без трекера
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 5,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.TrackerData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+        },
+        //Машина с трекером без сообщений
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 2,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.TrackerData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                TrackerDataMessages = new TrackerDataMessageDto[]{}, 
+                Pagination = new Pagination
+                {
+                     Records = 0,
+                     Total = 0,
+                     PageIndex = 0
+                } 
+            })
+        },
+       // Машина с сообщениями в заданном диапазоне
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 1,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.TrackerData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                TrackerDataMessages = new TrackerDataMessageDto[]{
+                    new TrackerDataMessageDto
+                    { 
+                        Altitude = 97.0,
+                        Id = 1,
+                        Latitude = 49.432023,
+                        Longitude = 52.556861,
+                        Num = 1,
+                        SatNumber = 12,
+                        ServerDateTime = _systemNow - TimeSpan.FromSeconds(40),
+                        TrackerDateTime = _systemNow - TimeSpan.FromSeconds(40),
+                        Parameters = new TrackerParameter[] {
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 1234.0,
+                                ParamName = "rec_sn"
+                            },
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 6.0,
+                                ParamName = "hdop"
+                            },
+                            new TrackerParameter
+                            {
+                                LastValueString = "11101011",
+                                ParamName = "out"
+                            }
+                        }
+                    },
+                    new TrackerDataMessageDto
+                    {
+                        Altitude = 97.0,
+                        Id = 2,
+                        Latitude = 42.432023,
+                        Longitude = 54.556861,
+                        Num = 2,
+                        SatNumber = 14,
+                        Speed = 12.1,
+                        ServerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        TrackerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        Parameters = new TrackerParameter[] {
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 12345,
+                                ParamName = "rec_sn"
+                            },
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 6.0,
+                                ParamName = "hdop"
+                            },
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 2134.0,
+                                ParamName = "rs485_1"
+                            }
+                        }
+                    },
+                },
+                Pagination = new Pagination
+                {
+                     Records = 2,
+                     Total = 1,
+                     PageIndex = 1
+                }
+            })
+        },
+       // Машина с сообщениями в заданном диапазоне, размер страницы - 1, вернуть вторую страницу
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 1,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.TrackerData,
+                PageNum = 2,
+                PageSize = 1
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                TrackerDataMessages = new TrackerDataMessageDto[]{
+                    new TrackerDataMessageDto
+                    {
+                        Altitude = 97.0,
+                        Id = 2,
+                        Latitude = 42.432023,
+                        Longitude = 54.556861,
+                        Num = 2,
+                        SatNumber = 14,
+                        Speed = 12.1,
+                        ServerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        TrackerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        Parameters = new TrackerParameter[] {
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 12345,
+                                ParamName = "rec_sn"
+                            },
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 6.0,
+                                ParamName = "hdop"
+                            },
+                            new TrackerParameter
+                            {
+                                LastValueDecimal = 2134.0,
+                                ParamName = "rs485_1"
+                            }
+                        }
+                    },
+                },
+                Pagination = new Pagination
+                {
+                     Records = 2,
+                     Total = 2,
+                     PageIndex = 2
+                }
+            })
+        }
+    };
+
+    [Theory, MemberData(nameof(ViewMessagesTrackerParamsData))]
+    public void GetMessagesViewMessages_ShouldReturnDataMessagesWithTrackerParamsData(MessagesViewMessagesRequest request, ObjectResult expected)
+    {
+        _testOutputHelper.WriteLine($"id: {request.VehicleId}; dates: {request.PeriodStart} - {request.PeriodEnd}");
+        SystemTime.Set(_systemNow);
+
+        var result = GetController().GetMessagesViewMessages(request);
+
+        expected.StatusCode.Should().Be(result.As<ObjectResult>().StatusCode);
+
+        if (expected.StatusCode == 200)
+        {
+            var actual = result.As<OkObjectResult>().Value.As<ViewMessageMessagesDto>();
+            actual.Should().BeEquivalentTo(expected.Value);
+        }
+        else
+        {
+            expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
+        }
+    }
+
+    public static IEnumerable<object[]> ViewMessagesTrackerSensorData =>
+    new List<object[]>
+    {
+        // в набор датчиков для теста входит один датчик с признаком IsVisible = false, он не должен попадать в результат
+        // один из датчиков в тесте не имеет значения в сообщениях
+        // Несуществующая машина
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = -13432,
+                PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                PeriodEnd = SystemTime.UtcNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.SensorData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+        },
+        // Машина без трекера
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 5,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.SensorData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+        },
+        //Машина с трекером без сообщений
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 2,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.SensorData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                SensorDataMessages = new SensorDataMessageDto[]{},
+                Pagination = new Pagination
+                {
+                     Records = 0,
+                     Total = 0,
+                     PageIndex = 0
+                }
+            })
+        },
+       // Машина с сообщениями в заданном диапазоне
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 1,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.SensorData,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                SensorDataMessages = new SensorDataMessageDto[]{
+                    new SensorDataMessageDto
+                    {
+                        Altitude = 97.0,
+                        Id = 1,
+                        Latitude = 49.432023,
+                        Longitude = 52.556861,
+                        Num = 1,
+                        SatNumber = 12,
+                        ServerDateTime = _systemNow - TimeSpan.FromSeconds(40),
+                        TrackerDateTime = _systemNow - TimeSpan.FromSeconds(40),
+                        Sensors = new TrackerSensorDto[] {
+                            new TrackerSensorDto
+                            {
+                                Name = "a",
+                                Value = "1234",
+                                Unit = "м"
+                            },
+                            new TrackerSensorDto
+                            {
+                                Name = "b",
+                                Value = "1234.12",
+                                Unit = "м"
+                            },
+                            new TrackerSensorDto
+                            {
+                                Name = "e",
+                                Unit = "м"
+                            }
+                        }
+                    },
+                    new SensorDataMessageDto
+                    {
+                        Altitude = 97.0,
+                        Id = 2,
+                        Latitude = 42.432023,
+                        Longitude = 54.556861,
+                        Num = 2,
+                        SatNumber = 14,
+                        Speed = 12.1,
+                        ServerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        TrackerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        Sensors = new TrackerSensorDto[] {
+                            new TrackerSensorDto
+                            {
+                                Name = "a",
+                                Value = "1234",
+                                Unit = "м"
+                            },
+                            new TrackerSensorDto
+                            {
+                                Name = "b",
+                                Value = "1234.12",
+                                Unit = "м"
+                            },
+                            new TrackerSensorDto
+                            {
+                                Name = "e",
+                                Unit = "м"
+                            }
+                        }
+                    },
+                },
+                Pagination = new Pagination
+                {
+                     Records = 2,
+                     Total = 1,
+                     PageIndex = 1
+                }
+            })
+        },
+        // Машина с сообщениями в заданном диапазоне, размер страницы - 1, вернуть вторую страницу
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 1,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.DataMessage,
+                ParameterType = ParameterTypeEnum.SensorData,
+                PageNum = 2,
+                PageSize = 1
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                SensorDataMessages = new SensorDataMessageDto[]{
+                    new SensorDataMessageDto
+                    {
+                        Altitude = 97.0,
+                        Id = 2,
+                        Latitude = 42.432023,
+                        Longitude = 54.556861,
+                        Num = 2,
+                        SatNumber = 14,
+                        Speed = 12.1,
+                        ServerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        TrackerDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        Sensors = new TrackerSensorDto[] {
+                            new TrackerSensorDto
+                            {
+                                Name = "a",
+                                Value = "1234",
+                                Unit = "м"
+                            },
+                            new TrackerSensorDto
+                            {
+                                Name = "b",
+                                Value = "1234.12",
+                                Unit = "м"
+                            },
+                            new TrackerSensorDto
+                            {
+                                Name = "e",
+                                Unit = "м"
+                            }
+                        }
+                    },
+                },
+                Pagination = new Pagination
+                {
+                     Records = 2,
+                     Total = 2,
+                     PageIndex = 2
+                }
+            })
+        }
+    };
+
+    [Theory, MemberData(nameof(ViewMessagesTrackerSensorData))]
+    public void GetMessagesViewMessages_ShouldReturnDataMessagesWithTrackerSensorData(MessagesViewMessagesRequest request, ObjectResult expected)
+    {
+        _testOutputHelper.WriteLine($"id: {request.VehicleId}; dates: {request.PeriodStart} - {request.PeriodEnd}");
+        SystemTime.Set(_systemNow);
+
+        var result = GetController(GetTrackersForSensorData(), null, MessagesForSensorData).GetMessagesViewMessages(request);
+
+        expected.StatusCode.Should().Be(result.As<ObjectResult>().StatusCode);
+
+        if (expected.StatusCode == 200)
+        {
+            var actual = result.As<OkObjectResult>().Value.As<ViewMessageMessagesDto>();
+            actual.Should().BeEquivalentTo(expected.Value);
+        }
+        else
+        {
+            expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
+        }
+    }
+
+    public static IEnumerable<object[]> ViewMessagesCommandData =>
+    new List<object[]>
+    {
+        // Несуществующая машина
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = -13432,
+                PeriodStart = SystemTime.UtcNow.AddHours(-100),
+                PeriodEnd = SystemTime.UtcNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.CommandMessage,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+        },
+        // Машина без трекера
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 5,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.CommandMessage,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new NotFoundObjectResult("Машина с таким id не существует, либо к ней не привязан трекер")
+        },
+        //Машина с трекером без команд
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 2,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.CommandMessage,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                CommandMessages = new CommandMessageDto[]{},
+                Pagination = new Pagination
+                {
+                     Records = 0,
+                     Total = 0,
+                     PageIndex = 0
+                }
+            })
+        },
+       // Машина с командами в заданном диапазоне
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 1,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.CommandMessage,
+                PageNum = 1,
+                PageSize = 10
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                CommandMessages = new CommandMessageDto[]{
+                    new CommandMessageDto
+                    {
+                        Id = 1,
+                        Num = 1,
+                        CommandDateTime = _systemNow - TimeSpan.FromSeconds(40),
+                        CommandText = "IMEI",
+                        CommandResponseText = ""
+                    },
+                    new CommandMessageDto
+                    {
+                        Id = 2,
+                        Num = 2,
+                        CommandDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        CommandText = "TEST",
+                        CommandResponseText = "TEST RESPONSE",
+                        ExecutionTime = _systemNow - TimeSpan.FromSeconds(25)
+                    },
+                },
+                Pagination = new Pagination
+                {
+                     Records = 2,
+                     Total = 1,
+                     PageIndex = 1
+                }
+            })
+        },
+        // Машина с командами в заданном диапазоне, размер страницы - 1, вернуть вторую страницу
+        new object[]
+        {
+            new MessagesViewMessagesRequest
+            {
+                VehicleId = 1,
+                PeriodStart = _systemNow.AddHours(-100),
+                PeriodEnd = _systemNow.AddHours(100),
+                ViewMessageType = ViewMessageTypeEnum.CommandMessage,
+                PageNum = 2,
+                PageSize = 1
+            },
+            new OkObjectResult(new ViewMessageMessagesDto
+            {
+                CommandMessages = new CommandMessageDto[]{
+                    new CommandMessageDto
+                    {
+                        Id = 2,
+                        Num = 2,
+                        CommandDateTime = _systemNow - TimeSpan.FromSeconds(30),
+                        CommandText = "TEST",
+                        CommandResponseText = "TEST RESPONSE",
+                        ExecutionTime = _systemNow - TimeSpan.FromSeconds(25)
+                    },
+                },
+                Pagination = new Pagination
+                {
+                     Records = 2,
+                     Total = 2,
+                     PageIndex = 2
+                }
+            })
+        },
+    };
+
+    [Theory, MemberData(nameof(ViewMessagesCommandData))]
+    public void GetMessagesViewMessages_ShouldReturnComandMessages(MessagesViewMessagesRequest request, ObjectResult expected)
+    {
+        _testOutputHelper.WriteLine($"id: {request.VehicleId}; dates: {request.PeriodStart} - {request.PeriodEnd}");
+        SystemTime.Set(_systemNow);
+
+        var result = GetController(GetTrackersForSensorData(), null, MessagesForSensorData, Commands).GetMessagesViewMessages(request);
+
+        expected.StatusCode.Should().Be(result.As<ObjectResult>().StatusCode);
+
+        if (expected.StatusCode == 200)
+        {
+            var actual = result.As<OkObjectResult>().Value.As<ViewMessageMessagesDto>();
+            actual.Should().BeEquivalentTo(expected.Value);
+        }
+        else
+        {
+            expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
+        }
+    }
+
+
     private static MessagesViewController GetController(
+        ICollection<Tracker>? trackers = null,
         ICollection<Vehicle>? vehicles = null,
-        ICollection<TrackerMessage>? messages = null)
+        ICollection<TrackerMessage>? messages = null,
+        ICollection<TrackerCommand>? commands = null)
     {
         var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MessagesViewMappingProfile())));
         var logger = new Mock<ILogger<MessagesViewController>>().Object;
+        var trackerRepository = TrackerRepositoryMock.GetStub(trackers);
         var vehicleRepository = VehicleRepositoryMock.GetStub(vehicles);
-        var commandRepository = TrackerCommandRepositoryMock.GetStub();
-        var messageRepository = TrackerMessageRepositoryMock.GetStub(messages);
+        var commandRepository = TrackerCommandRepositoryMock.GetStub(commands);
+        var messageRepository = TrackerMessageRepositoryMock.GetStub(messages, trackerRepository);
         var messagesViewMessagesRequestValidator = new MessagesViewMessagesRequestValidator();
 
         return new MessagesViewController(logger, mapper, messagesViewMessagesRequestValidator, vehicleRepository, commandRepository, messageRepository);
     }
+
+    private static ICollection<Tracker> GetTrackersForSensorData()
+    {
+        var sensors = GetSensorsForSensorData().ToList();
+        return new List<Tracker>
+        {
+            new()
+            {
+                Id = 1,
+                Name = "трекер GalileoSky",
+                Description = "Описание 1",
+                Imei = "12341",
+                ExternalId = 2552,
+                StartDate = DateTime.MinValue,
+                TrackerType = TrackerTypeEnum.GalileoSkyV50,
+                SimNumber = "905518101010",
+                Sensors = sensors.Where(s => s.TrackerId == 1).ToList()
+            },
+            new()
+            {
+                Id = 2,
+                Name = "трекер Retranslator",
+                Description = "Описание 2",
+                Imei = "12342",
+                ExternalId = 15,
+                StartDate = DateTime.UnixEpoch,
+                TrackerType = TrackerTypeEnum.Retranslator,
+                SimNumber = "905518101020",
+                Sensors = sensors.Where(s => s.TrackerId == 2).ToList()
+            },
+            new()
+            {
+                Id = 3,
+                Name = "трекер WialonIPS",
+                Description = "Описание 3",
+                Imei = "12343",
+                ExternalId = 333,
+                StartDate = DateTime.MaxValue,
+                TrackerType = TrackerTypeEnum.WialonIPS,
+                SimNumber = "905518101030",
+                Sensors = sensors.Where(s => s.TrackerId == 3).ToList()
+            },
+            new()
+            {
+                Id = 121,
+                Name = "трекер WialonIPS",
+                Description = "Описание 121",
+                Imei = "123435",
+                ExternalId = 444,
+                StartDate = DateTime.MaxValue,
+                TrackerType = TrackerTypeEnum.WialonIPS,
+                SimNumber = "905518101030",
+                Sensors = sensors.Where(s => s.TrackerId == 3).ToList()
+            }
+        };
+    }
+
+    public static IEnumerable<Sensor> GetSensorsForSensorData() => new List<Sensor>
+    {
+        new()
+        {
+            Id = 1, TrackerId = 1, Name = "a", Formula = "b", IsVisible = true, Unit = new Unit(1, "м", "м")
+        },
+        new()
+        {
+            Id = 2, TrackerId = 1, Name = "b", Formula = "const1", IsVisible = true, Unit = new Unit(1, "м", "м")
+        },
+        new()
+        {
+            Id = 3, TrackerId = 1, Name = "c", Formula = "const2", IsVisible = false, Unit = new Unit(1, "м", "м")
+        },
+        new()
+        {
+            Id = 4, TrackerId = 1, Name = "e", Formula = "const3", IsVisible = true, Unit = new Unit(1, "м", "м")
+        }
+    };
+
+    public static TrackerMessage[] MessagesForSensorData => new TrackerMessage[]
+    {
+        new()
+        {
+            Id = 1,
+            ExternalTrackerId = 2552,
+            Imei = "123",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            Latitude = 49.432023,
+            Longitude = 52.556861,
+            SatNumber = 12,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 97.0,
+            Direction = 2.8,
+            FuelLevel = 100,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("F28AC4A2-5DD0-49DC-B8B5-3B161C39546A"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 1234,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagBits
+                {
+                    Value = new BitArray(new byte[] { 215 }),
+                    TrackerTagId = 15,
+                    TagType = TagDataTypeEnum.Bits
+                },
+                new MessageTagInteger
+                {
+                    SensorId = 1,
+                    Value = 1234,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagDouble
+                {
+                    SensorId = 2,
+                    Value = 1234.12,
+                    TagType = TagDataTypeEnum.Double
+                }
+            }
+        },
+        new()
+        {
+            Id = 2,
+            ExternalTrackerId = 2552,
+            Imei = "123",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            Latitude = 42.432023,
+            Longitude = 54.556861,
+            SatNumber = 14,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 97.0,
+            Speed = 12.1,
+            Direction = 2.8,
+            FuelLevel = 100,
+            CoolantTemperature = 45,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("829C3996-DB42-4777-A4D5-BB6D8A9E3B79"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 12345,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagInteger
+                {
+                    Value = 2134,
+                    TrackerTagId = 24,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagInteger
+                {
+                    SensorId = 1,
+                    Value = 1234,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagDouble
+                {
+                    SensorId = 2,
+                    Value = 1234.12,
+                    TagType = TagDataTypeEnum.Double
+                }
+            }
+        },
+        new()
+        {
+            Id = 3,
+            ExternalTrackerId = 1024,
+            Imei = "512128256",
+            ServerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            TrackerDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(20),
+            Latitude = 39.4323,
+            Longitude = 12.55861,
+            SatNumber = 1,
+            CoordCorrectness = CoordCorrectnessEnum.CorrectGps,
+            Altitude = 92.0,
+            Speed = null,
+            Direction = 2.1,
+            FuelLevel = 90,
+            CoolantTemperature = 40,
+            EngineSpeed = 901,
+            PackageUID = Guid.Parse("719C3996-DB32-4777-A4F5-BC0D8A9E3B96"),
+            Tags = new List<MessageTag>
+            {
+                new MessageTagInteger
+                {
+                    Value = 12345,
+                    TrackerTagId = 5,
+                    TagType = TagDataTypeEnum.Integer
+                },
+                new MessageTagByte
+                {
+                    Value = 6,
+                    TrackerTagId = 10,
+                    TagType = TagDataTypeEnum.Byte
+                },
+                new MessageTagInteger
+                {
+                    Value = 2134,
+                    TrackerTagId = 24,
+                    TagType = TagDataTypeEnum.Integer
+                }
+            }
+        }
+    };
+
+    public static List<TrackerCommand> Commands => new()
+    {
+        new TrackerCommand
+        {
+            Id = 1,
+            Tracker = new Tracker{ExternalId = 2552},
+            SentDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(40),
+            CommandText = "IMEI"
+        },
+        new TrackerCommand
+        {
+            Id = 2,
+            Tracker = new Tracker{ExternalId = 2552},
+            SentDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(30),
+            CommandText = "TEST",
+            ResponseText = "TEST RESPONSE",
+            ResponseDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(25),
+        },
+    };
 }
