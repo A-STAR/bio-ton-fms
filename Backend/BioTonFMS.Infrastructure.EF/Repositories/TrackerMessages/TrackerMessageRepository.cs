@@ -37,7 +37,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
 
     public override void Add(TrackerMessage entity)
     {
-        entity.TrackerDateTime = SystemTime.UtcNow;
+        entity.ServerDateTime = SystemTime.UtcNow;
         base.Add(entity);
     }
 
