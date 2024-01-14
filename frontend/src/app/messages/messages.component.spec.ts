@@ -1092,9 +1092,11 @@ describe('MessagesComponent', () => {
 
     expect(headerCells.length)
       .withContext('render header cells')
-      .toBe(dataMessageColumns.length + testSensorMessages.sensorDataMessages![0].sensors!.length);
+      .toBe(
+        dataMessageColumns.length + (testSensorMessages.sensorDataMessages?.['0']?.sensors?.length ?? 0)
+      );
 
-    const sensorNames = testSensorMessages.sensorDataMessages![0].sensors!.map(({ name }) => name);
+    const sensorNames = testSensorMessages.sensorDataMessages?.[0]?.sensors?.map(({ name }) => name) ?? [];
 
     const headerCellTexts = await parallel(
       () => headerCells.map(cell => cell.getText())
@@ -1365,7 +1367,9 @@ describe('MessagesComponent', () => {
     cells.forEach(({ length }) => {
       expect(length)
         .withContext('render cells')
-        .toBe(dataMessageColumns.length + testSensorMessages.sensorDataMessages![0].sensors!.length);
+        .toBe(
+          dataMessageColumns.length + (testSensorMessages.sensorDataMessages?.['0']?.sensors?.length ?? 0)
+        );
     });
 
     const cellTexts = await parallel(() => cells.map(
