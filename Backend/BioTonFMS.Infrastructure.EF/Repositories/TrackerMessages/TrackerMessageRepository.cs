@@ -261,6 +261,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var filteredMessages = QueryableProvider.Linq()
             .Where(x => externalIds.Contains(x.ExternalTrackerId) &&
                         x.Latitude != null && x.Longitude != null &&
+                        !(x.Latitude == 0 && x.Longitude == 0) && // обе координаты одновременно равны нулю - гарантированно неверные данные
                         x.TrackerDateTime >= trackStartTimeUtc &&
                         x.TrackerDateTime <= trackEndTimeUtc)
             .OrderBy(x => x.TrackerDateTime);
