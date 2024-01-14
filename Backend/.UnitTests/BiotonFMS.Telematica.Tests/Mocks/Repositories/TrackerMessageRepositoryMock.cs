@@ -5,19 +5,24 @@ using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
 using BiotonFMS.Telematica.Tests.Mocks.Infrastructure;
 using BioTonFMS.Common.Testable;
 using BioTonFMS.Infrastructure.EF.Repositories.TrackerTags;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
 
 namespace BiotonFMS.Telematica.Tests.Mocks.Repositories;
 
 public class TrackerMessageRepositoryMock
 {
-    public static ITrackerMessageRepository GetStub(ICollection<TrackerMessage>? messages = null)
+    public static ITrackerMessageRepository GetStub(ICollection<TrackerMessage>? messages = null, ITrackerRepository trackerRepository = null)
     {
         messages ??= Messages;
         
         var kvp = new KeyValueProviderMock<TrackerMessage, int>(messages);
         var qp = new QueryableProviderMock<TrackerMessage>(messages);
         var uow = new MessagesDBContextUnitOfWorkFactoryMock();
-        var repo = new TrackerMessageRepository(kvp, qp, uow, TrackerTagRepositoryMock.GetStub(), TrackerRepositoryMock.GetStub());
+        if (trackerRepository == null)
+        {
+            trackerRepository = TrackerRepositoryMock.GetStub();
+        }
+        var repo = new TrackerMessageRepository(kvp, qp, uow, TrackerTagRepositoryMock.GetStub(), trackerRepository);
         
         return repo;
     }
