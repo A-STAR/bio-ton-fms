@@ -834,6 +834,68 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Filter `TrackerMessageDataSource` by parameters.
+   *
+   * @param searchQuery Search query.
+   *
+   * @returns Filtered `TrackerMessageDataSource[]`.
+   */
+  #filterTrackerMessagesDataSource(searchQuery: string) {
+    return (this.#messagesDataSource as TrackerMessageDataSource[])
+      .filter(({ parameters }) => parameters?.length && searchQuery
+        .replaceAll(QUERY_FORBIDDEN_CHARACTERS_PATTERN, '')
+        .replaceAll(/\s/g, '')
+        .replaceAll('?', '.+')
+        .replaceAll('*', '.*')
+        .split(',')
+        .filter(query => query !== '')
+        .map(query => query
+          .match(PARAMETER_QUERY_PATTERN)!
+          .groups!
+        )
+        .some(({ query, comparison, value }) => parameters
+          .some(({ paramName, lastValueString, lastValueDecimal, lastValueDateTime }) => {
+            const queryPattern = new RegExp(`^${query}$`, 'i');
+
+            let hasMatch = queryPattern.test(paramName);
+
+            if (hasMatch && comparison && value !== undefined) {
+              const valuePattern = new RegExp(`^${value}$`, 'i');
+
+              switch (true) {
+                case (lastValueString !== undefined):
+                  hasMatch &&= ['=', '<>'].includes(comparison);
+
+                  if (hasMatch) {
+                    const hasValue = valuePattern.test(lastValueString!);
+
+                    hasMatch &&= comparison === '=' ? hasValue : !hasValue;
+                  }
+
+                  break;
+
+                case (lastValueDateTime !== undefined):
+                  hasMatch &&= ['=', '<>'].includes(comparison);
+
+                  if (hasMatch) {
+                    const hasValue = valuePattern.test(lastValueDateTime!);
+
+                    hasMatch &&= comparison === '=' ? hasValue : !hasValue;
+                  }
+              }
+            } else {
+              const value = lastValueString ?? lastValueDecimal?.toString() ?? lastValueDateTime;
+
+              hasMatch ||= queryPattern.test(value!);
+            }
+
+            return hasMatch;
+          })
+        )
+      );
+  }
+
+  /**
    * Filter `TableDataSource` and set messages data source.
    *
    * @param searchQuery Search query.
@@ -844,7 +906,15 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     if (searchQuery === undefined) {
       messagesDataSource = this.#messagesDataSource!;
     } else {
-      messagesDataSource = [];
+      switch (this.#options?.viewMessageType) {
+        case MessageType.DataMessage:
+          messagesDataSource = this.#filterTrackerMessagesDataSource(searchQuery);
+
+          break;
+
+        case MessageType.CommandMessage:
+          messagesDataSource = [];
+      }
     }
 
     this.messagesDataSource!.setDataSource(messagesDataSource);
@@ -1077,6 +1147,9 @@ export const commandMessageColumns: KeyValue<MessageColumn, string | undefined>[
 ];
 
 export const MESSAGES_DELETED = 'Сообщения удалены';
+
+const QUERY_FORBIDDEN_CHARACTERS_PATTERN = /[^\w\d\s-.,:<>=*?]/g;
+const PARAMETER_QUERY_PATTERN = /(?<query>[^<=>]+)(?<comparison>[<(<=)=(<>)(>=)>]*)?(?<value>.*)?/;
 
 /**
  * Parsing time from user input.

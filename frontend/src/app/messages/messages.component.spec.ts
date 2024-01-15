@@ -1695,6 +1695,113 @@ describe('MessagesComponent', () => {
       .toBe(testCommandMessages.commandMessages!.length);
   }));
 
+  it('should filter tracker message table parameter string value rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    // test parameter string value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![1].paramName}=${
+      testTrackerMessages.trackerDataMessages![0].parameters![1].lastValueString
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter string value rows')
+      .toBe(2);
+
+    await searchInput.setValue(`alarm_code?<>${
+      testTrackerMessages.trackerDataMessages![0].parameters![1].lastValueString
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render other than parameter string value rows')
+      .toBe(1);
+
+    // test multiple parameter string value query
+    await searchInput.setValue(`alarm*=${testTrackerMessages.trackerDataMessages![0].parameters![1].lastValueString}, ${
+      testTrackerMessages.trackerDataMessages![1].parameters![1].paramName
+    }=${testTrackerMessages.trackerDataMessages![1].parameters![1].lastValueString}`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter string value rows')
+      .toBe(2);
+
+    // test parameter date time value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![5].paramName}=2023-03-16T09:14:36.422?`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter date time value rows')
+      .toBe(2);
+
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![5].paramName}<>2023-03-16T09:14:36.42*`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render other than parameter date time value rows')
+      .toBe(1);
+
+    // test multiple parameter date time value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![5].paramName}=2023-03-16?09:*:36.422Z, ${
+      testTrackerMessages.trackerDataMessages![1].parameters![5].paramName
+    }=2023-03-16*`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter date time value rows')
+      .toBe(2);
+
+    // test parameter decimal value query
+    await searchInput.setValue('*humidity?');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter decimal value rows')
+      .toBe(2);
+
+    // test multiple parameter single decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal}, 35.1*`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter decimal value rows')
+      .toBe(2);
+  }));
+
   it('should reset search form on message type change', fakeAsync(async () => {
     await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
