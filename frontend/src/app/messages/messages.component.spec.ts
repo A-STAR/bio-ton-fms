@@ -1802,6 +1802,114 @@ describe('MessagesComponent', () => {
       .toBe(2);
   }));
 
+  it('should filter tracker message table parameter decimal value rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    // test parameter lesser decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}<${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter lesser decimal value rows')
+      .toBe(1);
+
+    // test parameter lesser or equal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}<=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter lesser or equal decimal value rows')
+      .toBe(2);
+
+    // test parameter equal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter equal decimal value rows')
+      .toBe(2);
+
+    // test parameter unequal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}<>${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter unequal decimal value rows')
+      .toBe(1);
+
+    // test parameter greater or equal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}>=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter greater or equal decimal value rows')
+      .toBe(2);
+
+    // test parameter greater decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}>${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter greater decimal value rows')
+      .toBe(1);
+
+    // test multiple parameter decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![0].paramName}>${
+      testTrackerMessages.trackerDataMessages![0].parameters![0].lastValueDecimal
+    }, ${testTrackerMessages.trackerDataMessages![0].parameters![2].paramName}<=${
+      testTrackerMessages.trackerDataMessages![0].parameters![2].lastValueDecimal
+    }, ${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter decimal value rows')
+      .toBe(2);
+  }));
+
   it('should reset search form on message type change', fakeAsync(async () => {
     await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 

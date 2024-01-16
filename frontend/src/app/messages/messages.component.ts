@@ -874,6 +874,39 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
                   break;
 
+                case (lastValueDecimal !== undefined):
+                  switch (comparison) {
+                    case '<':
+                      hasMatch &&= lastValueDecimal! < Number(value);
+
+                      break;
+
+                    case '<=':
+                      hasMatch &&= lastValueDecimal! <= Number(value);
+
+                      break;
+
+                    case '=':
+                      hasMatch &&= lastValueDecimal! === Number(value);
+
+                      break;
+
+                    case '<>':
+                      hasMatch &&= lastValueDecimal! !== Number(value);
+
+                      break;
+
+                    case '>=':
+                      hasMatch &&= lastValueDecimal! >= Number(value);
+
+                      break;
+
+                    case '>':
+                      hasMatch &&= lastValueDecimal! > Number(value);
+                  }
+
+                  break;
+
                 case (lastValueDateTime !== undefined):
                   hasMatch &&= ['=', '<>'].includes(comparison);
 
