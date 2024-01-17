@@ -1910,6 +1910,54 @@ describe('MessagesComponent', () => {
       .toBe(2);
   }));
 
+  it('should filter command message table response rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    // test a single response query
+    await searchInput.setValue(testCommandMessages.commandMessages![0].commandResponseText!);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render response rows')
+      .toBe(1);
+
+    // test shared response query
+    await searchInput.setValue('respon?e *');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple response rows')
+      .toBe(2);
+
+    // test multiple response query
+    await searchInput.setValue(`${testCommandMessages.commandMessages![0].commandResponseText!}, resp*}`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple response rows')
+      .toBe(2);
+  }));
+
   it('should reset search form on message type change', fakeAsync(async () => {
     await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 

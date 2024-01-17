@@ -929,6 +929,32 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Filter `CommandMessageDataSource` by response.
+   *
+   * @param searchQuery Search query.
+   *
+   * @returns Filtered `CommandMessageDataSource[]`.
+   */
+  #filterCommandMessagesDataSource(searchQuery: string) {
+    return (this.#messagesDataSource as CommandMessageDataSource[])
+      .filter(({ response }) => response !== undefined && searchQuery
+        .replaceAll(QUERY_FORBIDDEN_CHARACTERS_PATTERN, '')
+        .replaceAll('?', '.+')
+        .replaceAll('*', '.*')
+        .split(',')
+        .map(query => query.trim())
+        .filter(query => query !== '')
+        .some(query => {
+          const queryPattern = new RegExp(query, 'i');
+
+          const isValid = queryPattern.test(response);
+
+          return isValid;
+        })
+      );
+  }
+
+  /**
    * Filter `TableDataSource` and set messages data source.
    *
    * @param searchQuery Search query.
@@ -946,7 +972,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           break;
 
         case MessageType.CommandMessage:
-          messagesDataSource = [];
+          messagesDataSource = this.#filterCommandMessagesDataSource(searchQuery);
       }
     }
 
