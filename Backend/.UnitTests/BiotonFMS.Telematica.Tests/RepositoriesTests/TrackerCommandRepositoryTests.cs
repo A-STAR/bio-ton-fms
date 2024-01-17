@@ -20,6 +20,7 @@ public class TrackerCommandRepositoryTests
     public static IEnumerable<object[]> StatisticsData =>
         new List<object[]>
         {
+            // Трекер существует, есть сообщения в периоде
             new object[]
             {
                 2552,
@@ -31,6 +32,7 @@ public class TrackerCommandRepositoryTests
                     TotalTime = 20
                 }
             },
+            // Трекер существует, нет сообщений в периоде
             new object[]
             {
                 1555,
@@ -41,6 +43,7 @@ public class TrackerCommandRepositoryTests
                     NumberOfMessages = 0
                 }
             },
+            // Трекер не существует
             new object[]
             {
                 -12938,

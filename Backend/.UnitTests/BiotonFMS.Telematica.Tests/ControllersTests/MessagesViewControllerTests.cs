@@ -76,6 +76,7 @@ public class MessagesViewControllerTests
                     }
                 }
             },
+            // поиск по IMEI трекера, должна быть найдена одна машина
             new object[]
             {
                 "64128256",
@@ -88,11 +89,13 @@ public class MessagesViewControllerTests
                     }
                 }
             },
+            // поиск по несуществующему IMEI, машин не должно быть
             new object[]
             {
                 "6412",
                 Array.Empty<MessagesViewVehicleDto>()
             },
+            // поиск по внешнему id трекера, должна быть найдена одна машина
             new object[]
             {
                 "15",
@@ -105,6 +108,7 @@ public class MessagesViewControllerTests
                     }
                 }
             },
+            // фильтр поиска - пустая строка, должны быть найдены все машины с трекером
             new object[]
             {
                 "",
@@ -118,11 +122,13 @@ public class MessagesViewControllerTests
                     new MessagesViewVehicleDto { Id = 7, Name = "Фиолетовый трактор 2" }
                 }
             },
+            // фильтр поиска не совпадает с названиями, машин не должно быть
             new object[]
             {
                 "такой строки нет",
                 Array.Empty<MessagesViewVehicleDto>()
             },
+            // фильтр поиска - mull, должны быть найдены все машины с трекером
             new object[]
             {
                 null!,
