@@ -47,8 +47,7 @@ import {
   MessageStatisticsOptions,
   MessageTrackOptions,
   Messages,
-  MessagesOptions,
-  TrackerMessage
+  MessagesOptions
 } from './message.service';
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
@@ -841,91 +840,129 @@ export default class MessagesComponent implements OnInit, OnDestroy {
    * @returns Filtered `TrackerMessageDataSource[]`.
    */
   #filterTrackerMessagesDataSource(searchQuery: string) {
-    return (this.#messagesDataSource as TrackerMessageDataSource[])
-      .filter(({ parameters }) => parameters?.length && searchQuery
-        .replaceAll(QUERY_FORBIDDEN_CHARACTERS_PATTERN, '')
-        .replaceAll(/\s/g, '')
-        .replaceAll('?', '.+')
-        .replaceAll('*', '.*')
-        .split(',')
-        .filter(query => query !== '')
-        .map(query => query
-          .match(PARAMETER_QUERY_PATTERN)!
-          .groups!
-        )
-        .some(({ query, comparison, value }) => parameters
-          .some(({ paramName, lastValueString, lastValueDecimal, lastValueDateTime }) => {
-            const queryPattern = new RegExp(`^${query}$`, 'i');
+    const lookupParameter = (
+      { query, comparison, value }: NonNullable<RegExpMatchArray['groups']>,
+      { paramName, lastValueString, lastValueDecimal, lastValueDateTime }: TrackerParameter
+    ) => {
+      const queryPattern = new RegExp(`^${query}$`, 'i');
 
-            let hasMatch = queryPattern.test(paramName);
+      let hasMatch = queryPattern.test(paramName);
 
-            if (hasMatch && comparison && value !== undefined) {
-              const valuePattern = new RegExp(`^${value}$`, 'i');
+      if (hasMatch && comparison && value !== undefined) {
+        const valuePattern = new RegExp(`^${value}$`, 'i');
 
-              switch (true) {
-                case (lastValueString !== undefined):
-                  hasMatch &&= ['=', '<>'].includes(comparison);
+        switch (true) {
+          case (lastValueString !== undefined):
+            hasMatch &&= ['=', '<>'].includes(comparison);
 
-                  if (hasMatch) {
-                    const hasValue = valuePattern.test(lastValueString!);
+            if (hasMatch) {
+              const hasValue = valuePattern.test(lastValueString!);
 
-                    hasMatch &&= comparison === '=' ? hasValue : !hasValue;
-                  }
-
-                  break;
-
-                case (lastValueDecimal !== undefined):
-                  switch (comparison) {
-                    case '<':
-                      hasMatch &&= lastValueDecimal! < Number(value);
-
-                      break;
-
-                    case '<=':
-                      hasMatch &&= lastValueDecimal! <= Number(value);
-
-                      break;
-
-                    case '=':
-                      hasMatch &&= lastValueDecimal! === Number(value);
-
-                      break;
-
-                    case '<>':
-                      hasMatch &&= lastValueDecimal! !== Number(value);
-
-                      break;
-
-                    case '>=':
-                      hasMatch &&= lastValueDecimal! >= Number(value);
-
-                      break;
-
-                    case '>':
-                      hasMatch &&= lastValueDecimal! > Number(value);
-                  }
-
-                  break;
-
-                case (lastValueDateTime !== undefined):
-                  hasMatch &&= ['=', '<>'].includes(comparison);
-
-                  if (hasMatch) {
-                    const hasValue = valuePattern.test(lastValueDateTime!);
-
-                    hasMatch &&= comparison === '=' ? hasValue : !hasValue;
-                  }
-              }
-            } else {
-              const value = lastValueString ?? lastValueDecimal?.toString() ?? lastValueDateTime;
-
-              hasMatch ||= queryPattern.test(value!);
+              hasMatch &&= comparison === '=' ? hasValue : !hasValue;
             }
 
-            return hasMatch;
-          })
-        )
+            break;
+
+          case (lastValueDecimal !== undefined):
+            switch (comparison) {
+              case '<':
+                hasMatch &&= lastValueDecimal! < Number(value);
+
+                break;
+
+              case '<=':
+                hasMatch &&= lastValueDecimal! <= Number(value);
+
+                break;
+
+              case '=':
+                hasMatch &&= lastValueDecimal! === Number(value);
+
+                break;
+
+              case '<>':
+                hasMatch &&= lastValueDecimal! !== Number(value);
+
+                break;
+
+              case '>=':
+                hasMatch &&= lastValueDecimal! >= Number(value);
+
+                break;
+
+              case '>':
+                hasMatch &&= lastValueDecimal! > Number(value);
+            }
+
+            break;
+
+          case (lastValueDateTime !== undefined):
+            hasMatch &&= ['=', '<>'].includes(comparison);
+
+            if (hasMatch) {
+              const hasValue = valuePattern.test(lastValueDateTime!);
+
+              hasMatch &&= comparison === '=' ? hasValue : !hasValue;
+            }
+        }
+      } else {
+        const value = lastValueString ?? lastValueDecimal?.toString() ?? lastValueDateTime;
+
+        hasMatch ||= queryPattern.test(value!);
+      }
+
+      return hasMatch;
+    };
+
+    const queryGroups = searchQuery
+      .replaceAll(QUERY_FORBIDDEN_CHARACTERS_PATTERN, '')
+      .replaceAll(/\s/g, '')
+      .replaceAll('?', '.+')
+      .replaceAll('*', '.*')
+      .split(',')
+      .filter(query => query !== '')
+      .map(query => query
+        .match(PARAMETER_QUERY_PATTERN)!
+        .groups!
       );
+
+    const firstMatchedParameterIndices: number[] = [];
+
+    return (this.#messagesDataSource as TrackerMessageDataSource[])
+      .filter(({ parameters }) => parameters?.length && queryGroups.some(groups => parameters.some((parameter, index) => {
+        const hasParameter = lookupParameter(groups, parameter);
+
+        if (hasParameter) {
+          firstMatchedParameterIndices.push(index);
+        }
+
+        return hasParameter;
+      })))
+      .map((message, index) => {
+        message = structuredClone(message);
+
+        queryGroups.forEach(group => {
+          for (let i = 0; i < message.parameters!.length; i++) {
+            const parameter = message.parameters![i];
+
+            if (parameter.hasHighlight) {
+              continue;
+            }
+
+            // set highlight for matched parameter index, do lookup for others
+            const hasHighlight = firstMatchedParameterIndices[index] === i || lookupParameter(group, parameter);
+
+            if (hasHighlight) {
+              parameter.hasHighlight = hasHighlight;
+
+              // colors applied based on queries
+              parameter.backgroundColor = parameterColors[i % parameterColors.length];
+            }
+          }
+        });
+
+        return message;
+      });
   }
 
   /**
@@ -1097,7 +1134,7 @@ type MessageSearchForm = FormGroup<{
   search: FormControl<string | undefined>;
 }>;
 
-interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Pick<TrackerMessage, 'parameters'> {
+interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'> {
   position: DataMessage['num'];
   time?: DataMessage['trackerDateTime'];
   registration: DataMessage['serverDateTime'];
@@ -1106,6 +1143,10 @@ interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'a
     longitude: DataMessage['longitude'];
     satellites: DataMessage['satNumber'];
   };
+  parameters?: (TrackerParameter & {
+    hasHighlight?: boolean;
+    backgroundColor?: string;
+  })[];
   class?: string;
 }
 
@@ -1209,6 +1250,8 @@ export const MESSAGES_DELETED = 'Сообщения удалены';
 
 const QUERY_FORBIDDEN_CHARACTERS_PATTERN = /[^\w\d\s-.,:<>=*?]/g;
 const PARAMETER_QUERY_PATTERN = /(?<query>[^<=>]+)(?<comparison>[<(<=)=(<>)(>=)>]*)?(?<value>.*)?/;
+
+const parameterColors = ['250, 213, 101', '187, 249, 101', '101, 200, 249', '249, 101, 212', '249, 101, 113'];
 
 /**
  * Parsing time from user input.
