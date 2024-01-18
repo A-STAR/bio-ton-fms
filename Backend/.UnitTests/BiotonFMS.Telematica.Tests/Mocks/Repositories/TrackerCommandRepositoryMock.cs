@@ -30,16 +30,19 @@ public static class TrackerCommandRepositoryMock
     {
         new TrackerCommand
         {
+            Id = 1,
             Tracker = new Tracker{ExternalId = 2552},
             SentDateTime = Now
         },
         new TrackerCommand
         {
+            Id = 2,
             Tracker = new Tracker{ExternalId = 2552},
             SentDateTime = Now.AddSeconds(-10)
         },
         new TrackerCommand
         {
+            Id = 3,
             Tracker = new Tracker{ExternalId = 2552},
             SentDateTime = Now.AddSeconds(-20)
         }

@@ -230,6 +230,10 @@ public class MessagesViewController : ValidationControllerBase
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult DeleteMessages([FromBody] long[] messageIds)
     {
+        if (messageIds.Length == 0)
+        {
+            return NotFound("Пустой список идентификаторов для удаления");
+        }
         try
         {
             _messageRepository.DeleteMessages(messageIds);
@@ -257,6 +261,10 @@ public class MessagesViewController : ValidationControllerBase
     [ProducesResponseType(typeof(ServiceErrorResult), StatusCodes.Status404NotFound)]
     public IActionResult DeleteCommandMessages([FromBody] int[] messageIds)
     {
+        if (messageIds.Length == 0)
+        {
+            return NotFound("Пустой список идентификаторов для удаления");
+        }
         try
         {
             _commandRepository.DeleteCommands(messageIds);

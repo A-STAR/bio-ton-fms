@@ -443,7 +443,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var existingFromList = QueryableProvider.Linq().Where(m => messageIds.Contains(m.Id)).ToList();
         if (messageIds.Length > existingFromList.Count())
         {
-            throw new ArgumentException($"Для некоторых идентификаторов из списка не найдены сообщения");
+            throw new ArgumentException("Для некоторых идентификаторов из списка не найдены сообщения");
         }
 
         foreach (var message in existingFromList)

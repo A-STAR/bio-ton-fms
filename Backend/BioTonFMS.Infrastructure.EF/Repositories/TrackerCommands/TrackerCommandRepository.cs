@@ -1,4 +1,4 @@
-using BioTonFMS.Domain;
+п»їusing BioTonFMS.Domain;
 using BioTonFMS.Domain.MessagesView;
 using BioTonFMS.Domain.TrackerMessages;
 using BioTonFMS.Infrastructure.Paging;
@@ -26,7 +26,7 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
     }
 
     /// <summary>
-    /// Возвращает статистику по командам трекера для просмотра сообщений для зададанного трекера и временного диапазона
+    /// Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃС‚Р°С‚РёСЃС‚РёРєСѓ РїРѕ РєРѕРјР°РЅРґР°Рј С‚СЂРµРєРµСЂР° РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃРѕРѕР±С‰РµРЅРёР№ РґР»СЏ Р·Р°РґР°РґР°РЅРЅРѕРіРѕ С‚СЂРµРєРµСЂР° Рё РІСЂРµРјРµРЅРЅРѕРіРѕ РґРёР°РїР°Р·РѕРЅР°
     /// </summary>
     public ViewMessageStatisticsDto GetStatistics(int externalId, DateTime start, DateTime end)
     {
@@ -48,7 +48,7 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
     }
 
     /// <summary>
-    /// Постранично возвращает массив событий с информацией о командах отправленных на трекер для зададанного трекера и временного диапазона
+    /// РџРѕСЃС‚СЂР°РЅРёС‡РЅРѕ РІРѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ СЃРѕР±С‹С‚РёР№ СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ Рѕ РєРѕРјР°РЅРґР°С… РѕС‚РїСЂР°РІР»РµРЅРЅС‹С… РЅР° С‚СЂРµРєРµСЂ РґР»СЏ Р·Р°РґР°РґР°РЅРЅРѕРіРѕ С‚СЂРµРєРµСЂР° Рё РІСЂРµРјРµРЅРЅРѕРіРѕ РґРёР°РїР°Р·РѕРЅР°
     /// </summary>
     public PagedResult<CommandMessageDto> GetCommandMessages(int externalId, DateTime start, DateTime end, int pageNum, int pageSize)
     {
@@ -95,15 +95,15 @@ public class TrackerCommandRepository : Repository<TrackerCommand, BioTonDBConte
     }
 
     /// <summary>
-    /// Удаляет команды из списка
+    /// РЈРґР°Р»СЏРµС‚ РєРѕРјР°РЅРґС‹ РёР· СЃРїРёСЃРєР°
     /// </summary>
-    /// <param name="messageIds">список идентификаторов для удаления</param>
+    /// <param name="messageIds">СЃРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ</param>
     public void DeleteCommands(int[] commandIds)
     {
         var existingFromList = QueryableProvider.Linq().Where(cmd => commandIds.Contains(cmd.Id)).ToList();
         if (commandIds.Length > existingFromList.Count())
         {
-            throw new ArgumentException($"Для некоторых идентификаторов из списка не найдены сообщения");
+            throw new ArgumentException("Р”Р»СЏ РЅРµРєРѕС‚РѕСЂС‹С… РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РёР· СЃРїРёСЃРєР° РЅРµ РЅР°Р№РґРµРЅС‹ СЃРѕРѕР±С‰РµРЅРёСЏ");
         }
 
         foreach (var message in existingFromList)
