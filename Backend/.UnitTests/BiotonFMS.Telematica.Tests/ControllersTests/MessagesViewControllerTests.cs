@@ -20,6 +20,10 @@ using Xunit.Abstractions;
 using BioTonFMS.Telematica.Validation;
 using BioTonFMS.Telematica.Dtos;
 using System.Collections;
+using BioTonFMS.Infrastructure.Services;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerMessages;
+using BioTonFMS.Infrastructure.EF.Repositories.Trackers;
+using BioTonFMS.Infrastructure.EF.Repositories.TrackerCommands;
 
 namespace BiotonFMS.Telematica.Tests.ControllersTests;
 
@@ -42,6 +46,7 @@ public class MessagesViewControllerTests
         _testOutputHelper = testOutputHelper;
     }
 
+    #region FindVehicles
     public static IEnumerable<object[]> FindVehicleCriterionData =>
         new List<object[]>
         {
@@ -160,6 +165,9 @@ public class MessagesViewControllerTests
         }
     }
 
+    #endregion FindVehicles
+
+    #region Statistics
     public static IEnumerable<object[]> StatisticsData =>
         new List<object[]>
         {
@@ -287,6 +295,9 @@ public class MessagesViewControllerTests
         expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
     }
 
+    #endregion Statistics
+
+    #region Tracks
     public static IEnumerable<object[]> TrackData =>
         new List<object[]>
         {
@@ -406,6 +417,9 @@ public class MessagesViewControllerTests
         }
     }
 
+    #endregion Tracks
+
+    #region ParamsData
     public static IEnumerable<object[]> ViewMessagesTrackerParamsData =>
     new List<object[]>
     {
@@ -622,6 +636,9 @@ public class MessagesViewControllerTests
         }
     }
 
+    #endregion ParamsData
+
+    #region SensorData
     public static IEnumerable<object[]> ViewMessagesTrackerSensorData =>
     new List<object[]>
     {
@@ -845,7 +862,9 @@ public class MessagesViewControllerTests
             expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
         }
     }
+    #endregion SensorData
 
+    #region CommandData
     public static IEnumerable<object[]> ViewMessagesCommandData =>
     new List<object[]>
     {
@@ -996,8 +1015,116 @@ public class MessagesViewControllerTests
             expected.Value.Should().BeEquivalentTo(result.As<ObjectResult>().Value);
         }
     }
+    #endregion CommandData
 
+    #region DeleteMessages
+    [Fact]
+    public void DeleteMessages_ShouldReturnNotFound_IfIdListIsEmpty()
+    {
+        long[] messageIds = new long[] { };
 
+        var result = GetController().DeleteMessages(messageIds);
+
+        result.As<ObjectResult>().StatusCode.Should().Be(404);
+        result.As<ObjectResult>().Value.Should().Be("Пустой список идентификаторов для удаления");
+    }
+
+    [Fact]
+    public void DeleteMessages_ShouldReturnNotFound_IfOneIdFromListNotExists()
+    {
+        long[] messageIds = new long[] { 1, 2, -100 };
+
+        var result = GetController().DeleteMessages(messageIds);
+
+        result.As<ObjectResult>().StatusCode.Should().Be(404);
+        result.As<ObjectResult>().Value.Should().BeEquivalentTo(new ServiceErrorResult("Для некоторых идентификаторов из списка не найдены сообщения"));
+    }
+
+    [Fact]
+    public void DeleteMessages_ShouldDeleteMessage_IfOneCorrectIdInList()
+    {
+        long[] messageIds = new long[] { 1 };
+
+        var messageRepository = TrackerMessageRepositoryMock.GetStub();
+        messageRepository[1].Should().NotBeNull();
+        var result = GetController(messageRepository).DeleteMessages(messageIds);
+
+        result.As<OkResult>().StatusCode.Should().Be(200);
+        messageRepository[1].Should().BeNull();
+        messageRepository[2].Should().NotBeNull();
+    }
+
+    [Fact]
+    public void DeleteMessages_ShouldDeleteMessages_IfTwoCorrectIdInList()
+    {
+        long[] messageIds = new long[] { 1, 2 };
+
+        var messageRepository = TrackerMessageRepositoryMock.GetStub();
+        messageRepository[1].Should().NotBeNull();
+        messageRepository[2].Should().NotBeNull();
+        var result = GetController(messageRepository).DeleteMessages(messageIds);
+
+        result.As<OkResult>().StatusCode.Should().Be(200);
+        messageRepository[1].Should().BeNull();
+        messageRepository[2].Should().BeNull();
+    }
+    #endregion DeleteMessages
+
+    #region DeleteCommandMessages
+    [Fact]
+    public void DeleteCommandMessages_ShouldReturnNotFound_IfIdListIsEmpty()
+    {
+        int[] messageIds = new int[] { };
+
+        var result = GetController().DeleteCommandMessages(messageIds);
+
+        result.As<ObjectResult>().StatusCode.Should().Be(404);
+        result.As<ObjectResult>().Value.Should().Be("Пустой список идентификаторов для удаления");
+    }
+
+    [Fact]
+    public void DeleteCommandMessages_ShouldReturnNotFound_IfOneIdFromListNotExists()
+    {
+        int[] messageIds = new int[] { 1, 2, -100 };
+
+        var result = GetController().DeleteCommandMessages(messageIds);
+
+        result.As<ObjectResult>().StatusCode.Should().Be(404);
+        result.As<ObjectResult>().Value.Should().BeEquivalentTo(new ServiceErrorResult("Для некоторых идентификаторов из списка не найдены сообщения"));
+    }
+
+    [Fact]
+    public void DeleteCommandMessages_ShouldDeleteMessage_IfOneCorrectIdInList()
+    {
+        int[] messageIds = new int[] { 1 };
+
+        var commandRepository = TrackerCommandRepositoryMock.GetStub();
+        commandRepository[1].Should().NotBeNull();
+        var result = GetController(commandRepository).DeleteCommandMessages(messageIds);
+
+        result.As<OkResult>().StatusCode.Should().Be(200);
+        commandRepository[1].Should().BeNull();
+        commandRepository[2].Should().NotBeNull();
+    }
+
+    [Fact]
+    public void DeleteCommandMessages_ShouldDeleteMessages_IfTwoCorrectIdInList()
+    {
+        int[] messageIds = new int[] { 1, 2 };
+
+        var commandRepository = TrackerCommandRepositoryMock.GetStub();
+
+        commandRepository[1].Should().NotBeNull();
+        commandRepository[2].Should().NotBeNull();
+        var result = GetController(commandRepository).DeleteCommandMessages(messageIds);
+
+        result.As<OkResult>().StatusCode.Should().Be(200);
+        commandRepository[1].Should().BeNull();
+        commandRepository[2].Should().BeNull();
+    }
+    #endregion DeleteCommandMessages
+
+    #region Controller & Repository data
     private static MessagesViewController GetController(
         ICollection<Tracker>? trackers = null,
         ICollection<Vehicle>? vehicles = null,
@@ -1008,8 +1135,32 @@ public class MessagesViewControllerTests
         var logger = new Mock<ILogger<MessagesViewController>>().Object;
         var trackerRepository = TrackerRepositoryMock.GetStub(trackers);
         var vehicleRepository = VehicleRepositoryMock.GetStub(vehicles);
-        var commandRepository = TrackerCommandRepositoryMock.GetStub(commands);
+        ITrackerCommandRepository commandRepository = TrackerCommandRepositoryMock.GetStub(commands);
         var messageRepository = TrackerMessageRepositoryMock.GetStub(messages, trackerRepository);
+        var messagesViewMessagesRequestValidator = new MessagesViewMessagesRequestValidator();
+
+        return new MessagesViewController(logger, mapper, messagesViewMessagesRequestValidator, vehicleRepository, commandRepository, messageRepository);
+    }
+
+    private static MessagesViewController GetController(ITrackerMessageRepository messageRepository)
+    {
+        var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MessagesViewMappingProfile())));
+        var logger = new Mock<ILogger<MessagesViewController>>().Object;
+        var trackerRepository = TrackerRepositoryMock.GetStub();
+        var vehicleRepository = VehicleRepositoryMock.GetStub();
+        var commandRepository = TrackerCommandRepositoryMock.GetStub();
+        var messagesViewMessagesRequestValidator = new MessagesViewMessagesRequestValidator();
+
+        return new MessagesViewController(logger, mapper, messagesViewMessagesRequestValidator, vehicleRepository, commandRepository, messageRepository);
+    }
+
+    private static MessagesViewController GetController(ITrackerCommandRepository commandRepository)
+    {
+        var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MessagesViewMappingProfile())));
+        var logger = new Mock<ILogger<MessagesViewController>>().Object;
+        var trackerRepository = TrackerRepositoryMock.GetStub();
+        var vehicleRepository = VehicleRepositoryMock.GetStub();
+        var messageRepository = TrackerMessageRepositoryMock.GetStub(null, trackerRepository);
         var messagesViewMessagesRequestValidator = new MessagesViewMessagesRequestValidator();
 
         return new MessagesViewController(logger, mapper, messagesViewMessagesRequestValidator, vehicleRepository, commandRepository, messageRepository);
@@ -1257,4 +1408,6 @@ public class MessagesViewControllerTests
             ResponseDateTime = SystemTime.UtcNow - TimeSpan.FromSeconds(25),
         },
     };
+
+    #endregion Controller & Repository data
 }

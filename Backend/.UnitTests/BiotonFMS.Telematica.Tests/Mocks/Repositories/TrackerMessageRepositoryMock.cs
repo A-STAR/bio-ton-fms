@@ -27,7 +27,7 @@ public class TrackerMessageRepositoryMock
         return repo;
     }
     
-    public static TrackerMessage[] Messages => new TrackerMessage[]
+    public static List<TrackerMessage> Messages => new List<TrackerMessage>
     {
         new()
         {
