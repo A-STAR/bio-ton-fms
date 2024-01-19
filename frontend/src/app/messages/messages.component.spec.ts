@@ -44,6 +44,7 @@ import MessagesComponent, {
   MessageType,
   commandMessageColumns,
   dataMessageColumns,
+  parameterColors,
   parseTime,
   trackerMessageColumns
 } from './messages.component';
@@ -1956,6 +1957,57 @@ describe('MessagesComponent', () => {
     expect(rows.length)
       .withContext('render multiple response rows')
       .toBe(2);
+  }));
+
+  it('should render tracker message table parameters highlight', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    const parameterIndices = [1, 2, 4];
+
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[0]].paramName}, ${
+      testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[1]].paramName
+    }, ${testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[2]].paramName}`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells({
+        columnName: MessageColumn.Parameters
+      })
+    ));
+
+    const parametersChipSets = await parallel(() => cells.map(
+      ([parametersCell]) => parametersCell.getHarness(MatChipSetHarness))
+    );
+
+    parametersChipSets.forEach(async parametersChipSet => {
+      const chips = await parametersChipSet.getChips();
+
+      const chipHosts = await parallel(() => chips.map(
+        chip => chip.host()
+      ));
+
+      const chipBackgroundColorValues = await parallel(() => chipHosts.map(
+        host => host.getCssValue('background-color')
+      ));
+
+      parameterIndices.forEach(index => {
+        expect(chipBackgroundColorValues[index])
+          .withContext('render highlight `background-color` value')
+          .toContain(parameterColors[index % parameterColors.length]);
+      });
+    });
   }));
 
   it('should reset search form on message type change', fakeAsync(async () => {

@@ -1251,7 +1251,7 @@ export const MESSAGES_DELETED = 'Сообщения удалены';
 const QUERY_FORBIDDEN_CHARACTERS_PATTERN = /[^\w\d\s-.,:<>=*?]/g;
 const PARAMETER_QUERY_PATTERN = /(?<query>[^<=>]+)(?<comparison>[<(<=)=(<>)(>=)>]*)?(?<value>.*)?/;
 
-const parameterColors = ['250, 213, 101', '187, 249, 101', '101, 200, 249', '249, 101, 212', '249, 101, 113'];
+export const parameterColors = ['250, 213, 101', '187, 249, 101', '101, 200, 249', '249, 101, 212', '249, 101, 113'];
 
 /**
  * Parsing time from user input.

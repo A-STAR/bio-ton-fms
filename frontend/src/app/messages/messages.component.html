@@ -253,7 +253,9 @@
 
               <ng-container *ngSwitchCase="MessageColumn.Parameters">
                 <mat-chip-set>
-                  <mat-chip disableRipple *ngFor="let parameter of element[column.key]; trackBy: parameterTrackBy">
+                  <mat-chip disableRipple [class.highlight]="parameter.hasHighlight"
+                    [style.--background-color]="parameter.backgroundColor"
+                    *ngFor="let parameter of element[column.key]; trackBy: parameterTrackBy">
                     {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
                   </mat-chip>
                 </mat-chip-set>

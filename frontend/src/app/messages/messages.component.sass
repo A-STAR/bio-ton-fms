@@ -163,8 +163,17 @@ bio-map
 
   mat-row
 
+    &:hover
+      background-color: inherit
+
+    mat-chip.highlight
+      --mdc-chip-elevated-container-color: #{rgba(var(--background-color), 35%)}
+
     &.black-box
       background-color: $lighter-green
+
+      mat-chip.highlight
+        --mdc-chip-elevated-container-color: #{rgba(var(--background-color), 55%)}
 
     &.black-box-medium,
     &.black-box-long
@@ -172,7 +181,7 @@ bio-map
       mat-cell
         color: $white
 
-      mat-chip
+      mat-chip:not(.highlight)
         --mdc-chip-label-text-color: #{$white}
 
         border-color: $light-gray
@@ -183,11 +192,17 @@ bio-map
       mat-chip
         --mdc-chip-elevated-container-color: #{$brighter-green}
 
+        &.highlight
+          --mdc-chip-elevated-container-color: #{rgba(var(--background-color), 80%)}
+
     &.black-box-long
       background-color: $brighter-green
 
       mat-chip
         --mdc-chip-elevated-container-color: #{$light-green}
+
+        &.highlight
+          --mdc-chip-elevated-container-color: #{rgba(var(--background-color), 90%)}
 
   $selection-column-width: 56px
 
