@@ -198,6 +198,76 @@ public class VehicleRepositoryTests
 
     #endregion
 
+    public static IEnumerable<object[]> ExternalIdsData =>
+        new List<object[]>
+        {
+            // Машина с трекером
+            new object[]
+            {
+                new[] { 2 }, new Dictionary<int, int> { [2] = 15 }
+            },
+            // Машина без трекера
+            new object[]
+            {
+                new[] { 5 }, new Dictionary<int, int>()
+            },
+            // Несуществующая машина
+            new object[]
+            {
+                new[] { 13456 }, new Dictionary<int, int>()
+            },
+            // Несколько машин, среди которых есть машина без трекера
+            new object[]
+            {
+                new[] { 2, 3, 5 }, new Dictionary<int, int> { [2] = 15, [3] = 128 }
+            }
+        };
+    
+    [Theory, MemberData(nameof(ExternalIdsData))]
+    public void GetExternalIds_ShouldReturnRightIds(int[] vehicleIds, Dictionary<int, int> result)
+    {
+        var repo = VehicleRepositoryMock.GetStub();
+        var externalIds = repo.GetExternalIds(vehicleIds);
+
+        externalIds.Should().BeEquivalentTo(result);
+    }
+    
+    public static IEnumerable<object[]> NamesData =>
+        new List<object[]>
+        {
+            // Машина с трекером
+            new object[]
+            {
+                new[] { 3 }, new Dictionary<int, string> { [3] = "Желтая машина" }
+            },
+            // Машина без трекера
+            new object[]
+            {
+                new[] { 5 }, new Dictionary<int, string>()
+            },
+            // Несуществующая машина
+            new object[]
+            {
+                new[] { 13456 }, new Dictionary<int, string>()
+            },
+            // Несколько машин, среди которых есть машина без трекера
+            new object[]
+            {
+                new[] { 2, 3, 5 }, new Dictionary<int, string> { [2] = "Синяя машина", [3] = "Желтая машина" }
+            }
+        };
+
+    [Theory, MemberData(nameof(NamesData))]
+    public void GetNamesWhereTrackerNotEmpty_ShouldReturnRightNames(int[] vehicleIds, Dictionary<int, string> result)
+    {
+        var repo = VehicleRepositoryMock.GetStub();
+        var names = repo.GetNamesWhereTrackerNotEmpty(vehicleIds);
+
+        names.Should().BeEquivalentTo(result);
+    }
+    
+    
+
     [Fact]
     public void AddVehicle_VehicleWithSuchNameExists_ShouldThrowException()
     {
@@ -398,7 +468,7 @@ public class VehicleRepositoryTests
     public static IEnumerable<object[]> VehicleGetTrackerData =>
         new List<object[]>
         {
-            // Машина с сообщениями и без настроенных датчиков
+            // Машина с трекером
             new object[]
             {
                 1,
@@ -409,6 +479,7 @@ public class VehicleRepositoryTests
                     ExternalId = 2552
                 }
             },
+            // Машина без трекера
             new object[]
             {
                 2,
@@ -421,10 +492,7 @@ public class VehicleRepositoryTests
     {
         var repository = VehicleRepositoryMock.GetStub(VehiclesForGetTracker);
         var tracker = repository.GetTracker(vehicleId);
-        if (expected != null)
-        {
-            tracker.Should().BeEquivalentTo(expected);
-        }
+        tracker.Should().BeEquivalentTo(expected);
     }
 
     public static IList<Vehicle> VehiclesForGetTracker => new List<Vehicle>
@@ -466,14 +534,7 @@ public class VehicleRepositoryTests
             Model = "Focus",
             ManufacturingYear = 2015,
             RegistrationNumber = "В167АР 172",
-            InventoryNumber = "1235",
-            TrackerId = 2,
-            Tracker = new Tracker
-            {
-                Id = 2,
-                Imei = "128128",
-                ExternalId = 15
-            }
+            InventoryNumber = "1235"
         }
     };
 }
