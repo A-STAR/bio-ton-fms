@@ -194,6 +194,19 @@
 <section id="messages">
   <ng-container *ngIf="messages$ | async as messages; else unselected">
     <ng-container *ngIf="(messages.trackerDataMessages || messages.sensorDataMessages || messages.commandMessages)?.length; else empty">
+      <ng-container *ngIf="!messages.sensorDataMessages">
+        <header>
+          <form id="search-form" [formGroup]="searchForm">
+            <mat-form-field>
+              <input matInput id="search" placeholder="Поиск" formControlName="search">
+              <span matPrefix>
+                <mat-icon color="primary">search</mat-icon>
+              </span>
+            </mat-form-field>
+          </form>
+        </header>
+      </ng-container>
+
       <figure role="region" aria-labelledby="legend">
         <mat-table [dataSource]="messagesDataSource!">
           <ng-container sticky [matColumnDef]="column.key" *ngFor="let column of columns | slice:0:messages.sensorDataMessages ? 1 : 2">
@@ -240,7 +253,9 @@
 
               <ng-container *ngSwitchCase="MessageColumn.Parameters">
                 <mat-chip-set>
-                  <mat-chip disableRipple *ngFor="let parameter of element[column.key]; trackBy: parameterTrackBy">
+                  <mat-chip disableRipple [class.highlight]="parameter.hasHighlight"
+                    [style.--background-color]="parameter.backgroundColor"
+                    *ngFor="let parameter of element[column.key]; trackBy: parameterTrackBy">
                     {{ parameter.paramName }}={{ parameter.lastValueString ?? parameter.lastValueDecimal ?? parameter.lastValueDateTime }}
                   </mat-chip>
                 </mat-chip-set>
@@ -257,16 +272,20 @@
           <mat-header-row *matHeaderRowDef="columnKeys; sticky: true"></mat-header-row>
 
           <mat-row [class]="row.class" *matRowDef="let row; columns: columnKeys"></mat-row>
+
+          <tr class="mat-mdc-row mdc-data-table__row" *matNoDataRow>
+            <td class="mat-mdc-cell mdc-data-table__cell">Нет данных</td>
+          </tr>
         </mat-table>
       </figure>
 
-      <section class="controls">
+      <footer>
         <button mat-icon-button title="Удалить" color="warn" [hidden]="!selection.hasValue()" (click)="onDeleteMessages()">
           <mat-icon>delete</mat-icon>
         </button>
 
         <bio-table-pagination [pagination]="messages.pagination" (paginationChange)="onPaginationChange($event)"></bio-table-pagination>
-      </section>
+      </footer>
     </ng-container>
 
     <ng-template #empty>

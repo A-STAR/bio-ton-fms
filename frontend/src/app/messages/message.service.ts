@@ -136,7 +136,7 @@ export type DataMessage = {
   altitude?: number;
 };
 
-export type TrackerMessage = DataMessage & {
+type TrackerMessage = DataMessage & {
   parameters?: TrackerParameter[];
 };
 

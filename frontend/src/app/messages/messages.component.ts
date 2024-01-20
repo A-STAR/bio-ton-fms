@@ -29,8 +29,10 @@ import {
   filter,
   first,
   forkJoin,
+  iif,
   map,
   mergeMap,
+  of,
   skipWhile,
   startWith,
   switchMap,
@@ -45,8 +47,7 @@ import {
   MessageStatisticsOptions,
   MessageTrackOptions,
   Messages,
-  MessagesOptions,
-  TrackerMessage
+  MessagesOptions
 } from './message.service';
 
 import { DateCharsInputDirective } from '../shared/date-chars-input/date-chars-input.directive';
@@ -145,7 +146,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get search stream.
+   * Get tech search stream.
    *
    * @returns An `Observable` of search stream.
    */
@@ -168,6 +169,29 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Get messages search stream.
+   *
+   * @returns An `Observable` of search stream.
+   */
+  get #filter$() {
+    return this.searchForm
+      .get('search')!
+      .valueChanges.pipe(
+        debounceTime(DEBOUNCE_DUE_TIME),
+        map(searchValue => searchValue
+          ?.trim()
+          ?.toLocaleLowerCase()
+        ),
+        map(searchValue => searchValue || undefined),
+        distinctUntilChanged(),
+        startWith(
+          this.searchForm.get('search')
+            ?.value ?? undefined
+        )
+      );
+  }
+
+  /**
    * Get message options.
    *
    * @returns `MessagesOptions` value.
@@ -185,6 +209,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
+  protected searchForm!: MessageSearchForm;
   protected messages$?: Observable<Messages>;
   protected messagesDataSource?: TableDataSource<TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource>;
   protected location$?: Observable<LocationAndTrackResponse>;
@@ -312,6 +337,13 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         this.#statistics$.next(statistics);
       });
 
+    if (this.#options && (this.#options.viewMessageType !== type || this.#options.parameterType !== parameter)) {
+      // reset form when message type changes
+      this.searchForm.reset(undefined, {
+        emitEvent: false
+      });
+    }
+
     this.#options = messagesOptions;
   }
 
@@ -390,6 +422,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   #messages$ = new BehaviorSubject<MessagesOptions | undefined>(undefined);
+  #messagesDataSource?: (TrackerMessageDataSource | CommandMessageDataSource)[];
   #messagesSettled$ = new Subject();
   #location$ = new Subject<LocationAndTrackResponse>();
   #statistics$ = new Subject<MessageStatistics>();
@@ -528,6 +561,15 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           disabled: true
         }, Validators.required)
       })
+    });
+  }
+
+  /**
+   * Initialize Search form.
+   */
+  #initSearchForm() {
+    this.searchForm = this.fb.group({
+      search: this.fb.nonNullable.control<string | undefined>(undefined)
     });
   }
 
@@ -765,16 +807,22 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           case DataMessageParameter.TrackerData:
             messagesDataSource = this.#mapTrackerMessagesDataSource(messages);
 
+            this.#messagesDataSource = messagesDataSource as TrackerMessageDataSource[];
+
             break;
 
           case DataMessageParameter.SensorData:
             messagesDataSource = this.#mapSensorMessagesDataSource(messages);
+
+            this.#messagesDataSource = undefined;
         }
 
         break;
 
       case MessageType.CommandMessage:
         messagesDataSource = this.#mapCommandMessagesDataSource(messages);
+
+        this.#messagesDataSource = messagesDataSource as CommandMessageDataSource[];
     }
 
     if (this.messagesDataSource) {
@@ -785,9 +833,199 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Filter `TrackerMessageDataSource` by parameters.
+   *
+   * @param searchQuery Search query.
+   *
+   * @returns Filtered `TrackerMessageDataSource[]`.
+   */
+  #filterTrackerMessagesDataSource(searchQuery: string) {
+    const lookupParameter = (
+      { query, comparison, value }: NonNullable<RegExpMatchArray['groups']>,
+      { paramName, lastValueString, lastValueDecimal, lastValueDateTime }: TrackerParameter
+    ) => {
+      const queryPattern = new RegExp(`^${query}$`, 'i');
+
+      let hasMatch = queryPattern.test(paramName);
+
+      if (hasMatch && comparison && value !== undefined) {
+        const valuePattern = new RegExp(`^${value}$`, 'i');
+
+        switch (true) {
+          case (lastValueString !== undefined):
+            hasMatch &&= ['=', '<>'].includes(comparison);
+
+            if (hasMatch) {
+              const hasValue = valuePattern.test(lastValueString!);
+
+              hasMatch &&= comparison === '=' ? hasValue : !hasValue;
+            }
+
+            break;
+
+          case (lastValueDecimal !== undefined):
+            switch (comparison) {
+              case '<':
+                hasMatch &&= lastValueDecimal! < Number(value);
+
+                break;
+
+              case '<=':
+                hasMatch &&= lastValueDecimal! <= Number(value);
+
+                break;
+
+              case '=':
+                hasMatch &&= lastValueDecimal! === Number(value);
+
+                break;
+
+              case '<>':
+                hasMatch &&= lastValueDecimal! !== Number(value);
+
+                break;
+
+              case '>=':
+                hasMatch &&= lastValueDecimal! >= Number(value);
+
+                break;
+
+              case '>':
+                hasMatch &&= lastValueDecimal! > Number(value);
+            }
+
+            break;
+
+          case (lastValueDateTime !== undefined):
+            hasMatch &&= ['=', '<>'].includes(comparison);
+
+            if (hasMatch) {
+              const hasValue = valuePattern.test(lastValueDateTime!);
+
+              hasMatch &&= comparison === '=' ? hasValue : !hasValue;
+            }
+        }
+      } else {
+        const value = lastValueString ?? lastValueDecimal?.toString() ?? lastValueDateTime;
+
+        hasMatch ||= queryPattern.test(value!);
+      }
+
+      return hasMatch;
+    };
+
+    const queryGroups = searchQuery
+      .replaceAll(QUERY_FORBIDDEN_CHARACTERS_PATTERN, '')
+      .replaceAll(/\s/g, '')
+      .replaceAll('?', '.+')
+      .replaceAll('*', '.*')
+      .split(',')
+      .filter(query => query !== '')
+      .map(query => query
+        .match(PARAMETER_QUERY_PATTERN)!
+        .groups!
+      );
+
+    const firstMatchedParameterIndices: number[] = [];
+
+    return (this.#messagesDataSource as TrackerMessageDataSource[])
+      .filter(({ parameters }) => parameters?.length && queryGroups.some(groups => parameters.some((parameter, index) => {
+        const hasParameter = lookupParameter(groups, parameter);
+
+        if (hasParameter) {
+          firstMatchedParameterIndices.push(index);
+        }
+
+        return hasParameter;
+      })))
+      .map((message, index) => {
+        message = structuredClone(message);
+
+        queryGroups.forEach(group => {
+          for (let i = 0; i < message.parameters!.length; i++) {
+            const parameter = message.parameters![i];
+
+            if (parameter.hasHighlight) {
+              continue;
+            }
+
+            // set highlight for matched parameter index, do lookup for others
+            const hasHighlight = firstMatchedParameterIndices[index] === i || lookupParameter(group, parameter);
+
+            if (hasHighlight) {
+              parameter.hasHighlight = hasHighlight;
+
+              // colors applied based on queries
+              parameter.backgroundColor = parameterColors[i % parameterColors.length];
+            }
+          }
+        });
+
+        return message;
+      });
+  }
+
+  /**
+   * Filter `CommandMessageDataSource` by response.
+   *
+   * @param searchQuery Search query.
+   *
+   * @returns Filtered `CommandMessageDataSource[]`.
+   */
+  #filterCommandMessagesDataSource(searchQuery: string) {
+    return (this.#messagesDataSource as CommandMessageDataSource[])
+      .filter(({ response }) => response !== undefined && searchQuery
+        .replaceAll(QUERY_FORBIDDEN_CHARACTERS_PATTERN, '')
+        .replaceAll('?', '.+')
+        .replaceAll('*', '.*')
+        .split(',')
+        .map(query => query.trim())
+        .filter(query => query !== '')
+        .some(query => {
+          const queryPattern = new RegExp(query, 'i');
+
+          const isValid = queryPattern.test(response);
+
+          return isValid;
+        })
+      );
+  }
+
+  /**
+   * Filter `TableDataSource` and set messages data source.
+   *
+   * @param searchQuery Search query.
+   */
+  #filterMessagesDataSource(searchQuery?: string) {
+    let messagesDataSource: (TrackerMessageDataSource | CommandMessageDataSource)[];
+
+    if (searchQuery === undefined) {
+      messagesDataSource = this.#messagesDataSource!;
+    } else {
+      switch (this.#options?.viewMessageType) {
+        case MessageType.DataMessage:
+          messagesDataSource = this.#filterTrackerMessagesDataSource(searchQuery);
+
+          break;
+
+        case MessageType.CommandMessage:
+          messagesDataSource = this.#filterCommandMessagesDataSource(searchQuery);
+      }
+    }
+
+    this.messagesDataSource!.setDataSource(messagesDataSource);
+  }
+
+  /**
    * Set messages, message columns, clear selection.
    */
   #setMessages() {
+    const filter$ = defer(() => this.#filter$.pipe(
+      tap(searchQuery => {
+        this.#filterMessagesDataSource(searchQuery);
+      })
+    ));
+
     this.messages$ = this.#messages$.pipe(
       filter((value): value is MessagesOptions => value !== undefined),
       switchMap(messagesOptions => this.messageService
@@ -801,6 +1039,11 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
             this.#messagesSettled$.next(undefined);
           }),
+          switchMap(messages => iif(() => messagesOptions.parameterType === DataMessageParameter.SensorData, of(undefined), filter$)
+            .pipe(
+              map(() => messages)
+            )
+          ),
           catchError(error => {
             this.errorHandler.handleError(error);
 
@@ -834,6 +1077,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.#initSelectionForm();
     this.#setTech();
+    this.#initSearchForm();
     this.#setMessages();
   }
 
@@ -886,7 +1130,11 @@ type MessageSelectionForm = FormGroup<{
   }>;
 }>;
 
-interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Pick<TrackerMessage, 'parameters'> {
+type MessageSearchForm = FormGroup<{
+  search: FormControl<string | undefined>;
+}>;
+
+interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'> {
   position: DataMessage['num'];
   time?: DataMessage['trackerDateTime'];
   registration: DataMessage['serverDateTime'];
@@ -895,6 +1143,10 @@ interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'a
     longitude: DataMessage['longitude'];
     satellites: DataMessage['satNumber'];
   };
+  parameters?: (TrackerParameter & {
+    hasHighlight?: boolean;
+    backgroundColor?: string;
+  })[];
   class?: string;
 }
 
@@ -995,6 +1247,11 @@ export const commandMessageColumns: KeyValue<MessageColumn, string | undefined>[
 ];
 
 export const MESSAGES_DELETED = 'Сообщения удалены';
+
+const QUERY_FORBIDDEN_CHARACTERS_PATTERN = /[^\w\d\s-.,:<>=*?]/g;
+const PARAMETER_QUERY_PATTERN = /(?<query>[^<=>]+)(?<comparison>[<(<=)=(<>)(>=)>]*)?(?<value>.*)?/;
+
+export const parameterColors = ['250, 213, 101', '187, 249, 101', '101, 200, 249', '249, 101, 212', '249, 101, 113'];
 
 /**
  * Parsing time from user input.

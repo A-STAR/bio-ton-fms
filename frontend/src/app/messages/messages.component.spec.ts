@@ -27,7 +27,15 @@ import { LuxonDateAdapter, MAT_LUXON_DATE_FORMATS } from '@angular/material-luxo
 
 import { Observable, of, throwError } from 'rxjs';
 
-import { DataMessage, MessageService, MessageStatisticsOptions, MessageTrackOptions, Messages, MessagesOptions } from './message.service';
+import {
+  DataMessage,
+  MessageService,
+  MessageStatistics,
+  MessageStatisticsOptions,
+  MessageTrackOptions,
+  Messages,
+  MessagesOptions
+} from './message.service';
 
 import MessagesComponent, {
   DataMessageParameter,
@@ -36,6 +44,7 @@ import MessagesComponent, {
   MessageType,
   commandMessageColumns,
   dataMessageColumns,
+  parameterColors,
   parseTime,
   trackerMessageColumns
 } from './messages.component';
@@ -44,7 +53,7 @@ import { MapComponent } from '../shared/map/map.component';
 import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
 import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confirmation-dialog.component';
 
-import { MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
+import { LocationAndTrackResponse, MonitoringVehicle, MonitoringVehiclesOptions } from '../tech/tech.service';
 
 import { environment } from '../../environments/environment';
 import { localeID } from '../tech/shared/relative-time.pipe';
@@ -69,6 +78,9 @@ describe('MessagesComponent', () => {
   let messageService: MessageService;
 
   let vehiclesSpy: jasmine.Spy<(options?: MonitoringVehiclesOptions) => Observable<MonitoringVehicle[]>>;
+  let messagesSpy: jasmine.Spy<(options: MessagesOptions) => Observable<Messages>>;
+  let trackSpy: jasmine.Spy<(options: MessageTrackOptions) => Observable<LocationAndTrackResponse>>;
+  let statisticsSpy: jasmine.Spy<(options: MessageStatisticsOptions) => Observable<MessageStatistics>>;
 
   beforeEach(async () => {
     await TestBed
@@ -114,7 +126,18 @@ describe('MessagesComponent', () => {
     vehiclesSpy = spyOn(messageService, 'getVehicles')
       .and.returnValue(vehicles$);
 
+    messagesSpy = spyOn(messageService, 'getMessages');
+    trackSpy = spyOn(messageService, 'getTrack');
+    statisticsSpy = spyOn(messageService, 'getStatistics');
+
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    vehiclesSpy.calls.reset();
+    messagesSpy.calls.reset();
+    trackSpy.calls.reset();
+    statisticsSpy.calls.reset();
   });
 
   it('should create', () => {
@@ -662,8 +685,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should submit invalid selection form', fakeAsync(async () => {
-    spyOn(messageService, 'getStatistics')
-      .and.callThrough();
+    statisticsSpy.and.callThrough();
 
     const executeButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -676,7 +698,7 @@ describe('MessagesComponent', () => {
 
     await executeButton.click();
 
-    expect(messageService.getStatistics)
+    expect(statisticsSpy)
       .not.toHaveBeenCalled();
   }));
 
@@ -760,14 +782,9 @@ describe('MessagesComponent', () => {
       periodEnd: endDate.toISOString()
     };
 
-    spyOn(messageService, 'getTrack')
-      .and.callFake(() => of(testMessageLocationAndTrack));
-
-    spyOn(messageService, 'getStatistics')
-      .and.callFake(() => of(testMessageStatistics));
-
-    spyOn(messageService, 'getMessages')
-      .and.callFake(() => of(testTrackerMessages));
+    trackSpy.and.callFake(() => of(testMessageLocationAndTrack));
+    statisticsSpy.and.callFake(() => of(testMessageStatistics));
+    messagesSpy.and.callFake(() => of(testTrackerMessages));
 
     const executeButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -780,13 +797,13 @@ describe('MessagesComponent', () => {
 
     await executeButton.click();
 
-    expect(messageService.getTrack)
+    expect(trackSpy)
       .toHaveBeenCalledWith(testTrackOptions);
 
-    expect(messageService.getStatistics)
+    expect(statisticsSpy)
       .toHaveBeenCalledWith(testStatisticsOptions);
 
-    expect(messageService.getMessages)
+    expect(messagesSpy)
       .toHaveBeenCalledWith(testMessagesOptions);
 
     /* Coverage for updating messages data source */
@@ -812,7 +829,7 @@ describe('MessagesComponent', () => {
       .toBeNull();
 
     // set data message statistics
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     fixture.detectChanges();
 
@@ -900,7 +917,7 @@ describe('MessagesComponent', () => {
       .toBeNull();
 
     // set message statistics
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     fixture.detectChanges();
 
@@ -954,8 +971,62 @@ describe('MessagesComponent', () => {
     });
   }));
 
+  it('should render message table search form', fakeAsync(async () => {
+    // render tracker messages table search form
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    let searchFormDe = fixture.debugElement.query(
+      By.css('#messages header form#search-form')
+    );
+
+    expect(searchFormDe)
+      .withContext('render search form element')
+      .not.toBeNull();
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    // render no sensor message table search form
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.DataMessage,
+      parameter: DataMessageParameter.SensorData
+    }, testSensorMessages);
+
+    searchFormDe = fixture.debugElement.query(
+      By.css('#messages header form#search-form')
+    );
+
+    expect(searchFormDe)
+      .withContext('render no search form element')
+      .toBeNull();
+
+    // render command message table search form
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    searchFormDe = fixture.debugElement.query(
+      By.css('#messages header form#search-form')
+    );
+
+    expect(searchFormDe)
+      .withContext('render search form element')
+      .not.toBeNull();
+
+    await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+  }));
+
   it('should render tracker message table', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const tables = await loader.getHarnessOrNull(MatTableHarness);
 
@@ -965,7 +1036,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render sensor message table', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.DataMessage,
       parameter: DataMessageParameter.SensorData
     }, testSensorMessages);
@@ -978,7 +1049,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render command message table', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.CommandMessage
     }, testCommandMessages);
 
@@ -990,7 +1061,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render tracker message table rows', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     fixture.detectChanges();
 
@@ -1008,7 +1079,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render sensor message table rows', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.DataMessage,
       parameter: DataMessageParameter.SensorData
     }, testSensorMessages);
@@ -1029,7 +1100,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render command message table rows', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.CommandMessage
     }, testCommandMessages);
 
@@ -1049,7 +1120,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render tracker message table header cells', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const table = await loader.getHarness(MatTableHarness);
     const headerRows = await table.getHeaderRows();
@@ -1078,7 +1149,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render sensor message table header cells', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.DataMessage,
       parameter: DataMessageParameter.SensorData
     }, testSensorMessages);
@@ -1113,7 +1184,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render command message table header cells', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.CommandMessage
     }, testCommandMessages);
 
@@ -1144,7 +1215,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render tracker message table cells', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const rowDes = fixture.debugElement.queryAll(
       By.css('#messages mat-row')
@@ -1257,7 +1328,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render tracker message table parameters cells chips', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const table = await loader.getHarness(MatTableHarness);
     const rows = await table.getRows();
@@ -1319,7 +1390,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render sensor message table cells', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.DataMessage,
       parameter: DataMessageParameter.SensorData
     }, testSensorMessages);
@@ -1456,7 +1527,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render command message table cells', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService, {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
       type: MessageType.CommandMessage
     }, testCommandMessages);
 
@@ -1510,7 +1581,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should render table pagination', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const tablePaginationDe = fixture.debugElement.query(
       By.css('#messages bio-table-pagination')
@@ -1527,8 +1598,446 @@ describe('MessagesComponent', () => {
       .toBeDefined();
   }));
 
+  it('should search messages', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarnessOrNull(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    expect(searchInput)
+      .withContext('render search form element')
+      .not.toBeNull();
+
+    await searchInput!.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    await searchInput!.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+  }));
+
+  it('should filter out tracker, command message table rows', fakeAsync(async () => {
+    // filter out tracker messages
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    await searchInput!.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render tracker message table no data row')
+      .toBe(1);
+
+    let [cell] = await rows[0].getCells();
+
+    await expectAsync(
+      cell.getText()
+    )
+      .withContext('render tracker message table no data row text')
+      .toBeResolvedTo('Нет данных');
+
+    await searchInput!.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render tracker message table rows')
+      .toBe(testTrackerMessages.trackerDataMessages!.length);
+
+    // filter out command messages
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    await searchInput!.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render command message table no data row')
+      .toBe(1);
+
+    [cell] = await rows[0].getCells();
+
+    await expectAsync(
+      cell.getText()
+    )
+      .withContext('render command message table no data row text')
+      .toBeResolvedTo('Нет данных');
+
+    await searchInput!.setValue('');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render command message table rows')
+      .toBe(testCommandMessages.commandMessages!.length);
+  }));
+
+  it('should filter tracker message table parameter string value rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    // test parameter string value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![1].paramName}=${
+      testTrackerMessages.trackerDataMessages![0].parameters![1].lastValueString
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter string value rows')
+      .toBe(2);
+
+    await searchInput.setValue(`alarm_code?<>${
+      testTrackerMessages.trackerDataMessages![0].parameters![1].lastValueString
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render other than parameter string value rows')
+      .toBe(1);
+
+    // test multiple parameter string value query
+    await searchInput.setValue(`alarm*=${testTrackerMessages.trackerDataMessages![0].parameters![1].lastValueString}, ${
+      testTrackerMessages.trackerDataMessages![1].parameters![1].paramName
+    }=${testTrackerMessages.trackerDataMessages![1].parameters![1].lastValueString}`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter string value rows')
+      .toBe(2);
+
+    // test parameter date time value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![5].paramName}=2023-03-16T09:14:36.422?`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter date time value rows')
+      .toBe(2);
+
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![5].paramName}<>2023-03-16T09:14:36.42*`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render other than parameter date time value rows')
+      .toBe(1);
+
+    // test multiple parameter date time value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![5].paramName}=2023-03-16?09:*:36.422Z, ${
+      testTrackerMessages.trackerDataMessages![1].parameters![5].paramName
+    }=2023-03-16*`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter date time value rows')
+      .toBe(2);
+
+    // test parameter decimal value query
+    await searchInput.setValue('*humidity?');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter decimal value rows')
+      .toBe(2);
+
+    // test multiple parameter single decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal}, 35.1*`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter decimal value rows')
+      .toBe(2);
+  }));
+
+  it('should filter tracker message table parameter decimal value rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    // test parameter lesser decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}<${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter lesser decimal value rows')
+      .toBe(1);
+
+    // test parameter lesser or equal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}<=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter lesser or equal decimal value rows')
+      .toBe(2);
+
+    // test parameter equal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter equal decimal value rows')
+      .toBe(2);
+
+    // test parameter unequal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}<>${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter unequal decimal value rows')
+      .toBe(1);
+
+    // test parameter greater or equal decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}>=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter greater or equal decimal value rows')
+      .toBe(2);
+
+    // test parameter greater decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}>${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render parameter greater decimal value rows')
+      .toBe(1);
+
+    // test multiple parameter decimal value query
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![0].paramName}>${
+      testTrackerMessages.trackerDataMessages![0].parameters![0].lastValueDecimal
+    }, ${testTrackerMessages.trackerDataMessages![0].parameters![2].paramName}<=${
+      testTrackerMessages.trackerDataMessages![0].parameters![2].lastValueDecimal
+    }, ${testTrackerMessages.trackerDataMessages![0].parameters![3].paramName}=${
+      testTrackerMessages.trackerDataMessages![0].parameters![3].lastValueDecimal
+    }`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple parameter decimal value rows')
+      .toBe(2);
+  }));
+
+  it('should filter command message table response rows', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    // test a single response query
+    await searchInput.setValue(testCommandMessages.commandMessages![0].commandResponseText!);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    let rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render response rows')
+      .toBe(1);
+
+    // test shared response query
+    await searchInput.setValue('respon?e *');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple response rows')
+      .toBe(2);
+
+    // test multiple response query
+    await searchInput.setValue(`${testCommandMessages.commandMessages![0].commandResponseText!}, resp*}`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    rows = await table.getRows();
+
+    expect(rows.length)
+      .withContext('render multiple response rows')
+      .toBe(2);
+  }));
+
+  it('should render tracker message table parameters highlight', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    const table = await loader.getHarness(MatTableHarness);
+
+    const parameterIndices = [1, 2, 4];
+
+    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[0]].paramName}, ${
+      testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[1]].paramName
+    }, ${testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[2]].paramName}`);
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    const rows = await table.getRows();
+
+    const cells = await parallel(() => rows.map(
+      row => row.getCells({
+        columnName: MessageColumn.Parameters
+      })
+    ));
+
+    const parametersChipSets = await parallel(() => cells.map(
+      ([parametersCell]) => parametersCell.getHarness(MatChipSetHarness))
+    );
+
+    parametersChipSets.forEach(async parametersChipSet => {
+      const chips = await parametersChipSet.getChips();
+
+      const chipHosts = await parallel(() => chips.map(
+        chip => chip.host()
+      ));
+
+      const chipBackgroundColorValues = await parallel(() => chipHosts.map(
+        host => host.getCssValue('background-color')
+      ));
+
+      parameterIndices.forEach(index => {
+        expect(chipBackgroundColorValues[index])
+          .withContext('render highlight `background-color` value')
+          .toContain(parameterColors[index % parameterColors.length]);
+      });
+    });
+  }));
+
+  it('should reset search form on message type change', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
+
+    const searchInput = await loader.getHarness(
+      MatInputHarness.with({
+        ancestor: 'form#search-form',
+        placeholder: 'Поиск'
+      })
+    );
+
+    await searchInput.setValue('123');
+
+    tick(DEBOUNCE_DUE_TIME);
+
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.DataMessage,
+      parameter: DataMessageParameter.SensorData
+    }, testSensorMessages);
+
+    await expectAsync(
+      searchInput?.getValue()
+    )
+      .withContext('reset search form input')
+      .toBeResolvedTo('');
+  }));
+
   it('should toggle all checkbox selecting messages', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const selectAllCheckbox = await loader.getHarness(
       MatCheckboxHarness.with({
@@ -1574,7 +2083,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should select messages toggling all checkbox', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const selectAllCheckbox = await loader.getHarness(
       MatCheckboxHarness.with({
@@ -1629,14 +2138,14 @@ describe('MessagesComponent', () => {
   }));
 
   it('should delete messages', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     let deleteButton: MatButtonHarness | undefined;
 
     try {
       deleteButton = await loader.getHarness(
         MatButtonHarness.with({
-          ancestor: '#messages .controls',
+          ancestor: '#messages footer',
           selector: ':not([hidden])',
           text: 'delete',
           variant: 'icon'
@@ -1658,7 +2167,7 @@ describe('MessagesComponent', () => {
 
     deleteButton = await loader.getHarness(
       MatButtonHarness.with({
-        ancestor: '#messages .controls',
+        ancestor: '#messages footer',
         selector: ':not([hidden])',
         text: 'delete',
         variant: 'icon'
@@ -1699,7 +2208,7 @@ describe('MessagesComponent', () => {
     )
       .toBeResolvedTo(MESSAGES_DELETED);
 
-    expect(messageService.getMessages)
+    expect(messagesSpy)
       .toHaveBeenCalled();
 
     confirmationDialog?.close();
@@ -1708,7 +2217,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should delete messages with error response', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const selectAllCheckbox = await loader.getHarness(
       MatCheckboxHarness.with({
@@ -1720,7 +2229,7 @@ describe('MessagesComponent', () => {
 
     const deleteButton = await loader.getHarness(
       MatButtonHarness.with({
-        ancestor: '#messages .controls',
+        ancestor: '#messages footer',
         text: 'delete',
         variant: 'icon'
       })
@@ -1774,7 +2283,7 @@ describe('MessagesComponent', () => {
     expect(errorHandler.handleError)
       .toHaveBeenCalledWith(testErrorResponse);
 
-    expect(messageService.getMessages)
+    expect(messagesSpy)
       .toHaveBeenCalled();
 
     confirmationDialog?.close();
@@ -1809,11 +2318,8 @@ describe('MessagesComponent', () => {
       text: 'Отправленные команды'
     });
 
-    spyOn(messageService, 'getTrack')
-      .and.callFake(() => of(testMessageLocationAndTrack));
-
-    spyOn(messageService, 'getStatistics')
-      .and.callFake(() => of(testMessageStatistics));
+    trackSpy.and.callFake(() => of(testMessageLocationAndTrack));
+    statisticsSpy.and.callFake(() => of(testMessageStatistics));
 
     const [startDay, startMonth, startYear] = testStartDate
       .split('.')
@@ -1844,8 +2350,7 @@ describe('MessagesComponent', () => {
 
     const errorHandler = TestBed.inject(ErrorHandler);
 
-    const messagesSpy = spyOn(messageService, 'getMessages')
-      .and.callFake(() => throwError(() => testErrorResponse));
+    messagesSpy.and.callFake(() => throwError(() => testErrorResponse));
 
     spyOn(console, 'error');
 
@@ -1883,7 +2388,7 @@ describe('MessagesComponent', () => {
   }));
 
   it('should handle pagination change', fakeAsync(async () => {
-    await mockTestMessages(component, loader, messageService);
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy);
 
     const tablePaginationDe = fixture.debugElement.query(
       By.directive(TablePaginationComponent)
@@ -1907,14 +2412,18 @@ describe('MessagesComponent', () => {
  *
  * @param component `MessagesComponent` test component.
  * @param loader `HarnessLoader` instance.
- * @param messageService `MessageService` instance.
+ * @param messagesSpy Messages spy.
+ * @param trackSpy Track spy.
+ * @param statisticsSpy Statistics spy.
  * @param options Message type options.
  * @param testMessages Test `Messages`.
  */
 async function mockTestMessages(
   component: MessagesComponent,
   loader: HarnessLoader,
-  messageService: MessageService,
+  messagesSpy: jasmine.Spy<(options: MessagesOptions) => Observable<Messages>>,
+  trackSpy: jasmine.Spy<(options: MessageTrackOptions) => Observable<LocationAndTrackResponse>>,
+  statisticsSpy: jasmine.Spy<(options: MessageStatisticsOptions) => Observable<MessageStatistics>>,
   { type, parameter }: {
     type: MessageType;
     parameter?: DataMessageParameter;
@@ -1976,14 +2485,9 @@ async function mockTestMessages(
     });
   }
 
-  spyOn(messageService, 'getTrack')
-    .and.callFake(() => of(testMessageLocationAndTrack));
-
-  spyOn(messageService, 'getStatistics')
-    .and.callFake(() => of(testMessageStatistics));
-
-  spyOn(messageService, 'getMessages')
-    .and.callFake(() => of(testMessages));
+  trackSpy.and.callFake(() => of(testMessageLocationAndTrack));
+  statisticsSpy.and.callFake(() => of(testMessageStatistics));
+  messagesSpy.and.callFake(() => of(testMessages));
 
   const executeButton = await loader.getHarness(
     MatButtonHarness.with({
