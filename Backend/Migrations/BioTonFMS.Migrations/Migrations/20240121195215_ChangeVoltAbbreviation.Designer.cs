@@ -3,6 +3,7 @@ using System;
 using BioTonFMS.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BioTonFMS.Migrations.Migrations
 {
     [DbContext(typeof(BioTonDBContext))]
-    partial class BioTonDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240121195215_ChangeVoltAbbreviation")]
+    partial class ChangeVoltAbbreviation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

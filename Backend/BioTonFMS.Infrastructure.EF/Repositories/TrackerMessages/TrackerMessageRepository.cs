@@ -503,7 +503,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
                 x => new TrackerSensorDto
                 {
                     Name = x.Name,
-                    Unit = x.Unit.Name
+                    Unit = x.Unit.Abbreviated
                 });
 
         var trackerSensorDtos = new List<TrackerSensorDto>();

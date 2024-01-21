@@ -25,7 +25,13 @@ public class MessagesDBContext : DbContext
             .HasValue<MessageTagBoolean>(TagDataTypeEnum.Boolean)
             .HasValue<MessageTagString>(TagDataTypeEnum.String)
             .HasValue<MessageTagDateTime>(TagDataTypeEnum.DateTime);
-        
+
+        modelBuilder.Entity<TrackerMessage>()
+            .HasIndex("TrackerDateTime");
+
+        modelBuilder.Entity<TrackerMessage>()
+            .HasIndex("ExternalTrackerId");
+
         base.OnModelCreating(modelBuilder);
     }
 }

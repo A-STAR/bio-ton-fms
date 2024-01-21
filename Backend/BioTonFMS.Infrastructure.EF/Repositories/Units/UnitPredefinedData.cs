@@ -8,7 +8,7 @@ public static class UnitPredefinedData
     {
         new Unit(1, "Безразмерная величина", ""),
         new Unit(2, "Километры", "км"),
-        new Unit(3, "Вольты", "V"),
+        new Unit(3, "Вольты", "В"),
         new Unit(4, "Тонны", "т"),
         new Unit(5, "g", "g"),
         new Unit(6, "Градусы цельсия", "C°"),
