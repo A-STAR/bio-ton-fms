@@ -259,10 +259,11 @@ public class MonitoringController : ValidationControllerBase
             }
 
             // вычисление пробега и моточасов
+            // Никита Станин из Биотон подтвердил, что значение can_b0 нужно брать как есть
             switch (tag.TrackerTagId)
             {
                 case TagsSeed.CanB0Id:
-                    generalInfo.Mileage = ((MessageTagInteger)tag).Value * 5;
+                    generalInfo.Mileage = ((MessageTagInteger)tag).Value;
                     break;
                 case TagsSeed.Can32BitR0Id:
                     generalInfo.EngineHours = ((MessageTagInteger)tag).Value / 100;

@@ -305,16 +305,17 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
             .Where(x => x.ExternalTrackerId == externalId && x.TrackerDateTime.HasValue &&
                         x.TrackerDateTime >= startUtc &&
                         x.TrackerDateTime <= endUtc);
-        //Пробег берем из тега can_b0 - значение нужно умножить на 5
+        //Пробег берем из тега can_b0 - значение нужно умножить на 5 
+        // Никита Станин из Биотон подтвердил, что значение can_b0 нужно брать как есть
         var firstMileage = ((int?)messages.OrderBy(x => x.TrackerDateTime)
             .SelectMany(x => x.Tags)
             .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
-            ?.GetValue() ?? 0) * 5;
+            ?.GetValue() ?? 0);
         
         var lastMileage = ((int?)messages.OrderByDescending(x => x.TrackerDateTime)
             .SelectMany(x => x.Tags)
             .FirstOrDefault(x => x.TrackerTagId == TagsSeed.CanB0Id)
-            ?.GetValue() ?? 0) * 5;
+            ?.GetValue() ?? 0);
 
         return new ViewMessageStatisticsDto
         {

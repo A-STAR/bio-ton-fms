@@ -281,8 +281,8 @@ public class MessagesViewControllerTests
                     TotalTime = 10,
                     AverageSpeed = 50.1,
                     MaxSpeed = 50.1,
-                    Distance = 5,
-                    Mileage = 74905
+                    Distance = 1,
+                    Mileage = 14981
                 })
             }
         };
