@@ -943,7 +943,7 @@ describe('MessagesComponent', () => {
 
     const DESCRIPTION_TEXTS = [
       {
-        color: '#699575',
+        color: '#CAD8CE',
         details: 'Сообщения из «черного ящика» (от 2 до 10 минут)'
       },
       {
@@ -951,7 +951,7 @@ describe('MessagesComponent', () => {
         details: 'Сообщения из «черного ящика» (от 10 до 30 минут)'
       },
       {
-        color: '#CAD8CE',
+        color: '#699575',
         details: 'Сообщения из «черного ящика» (позже 30 минут)'
       }
     ];
