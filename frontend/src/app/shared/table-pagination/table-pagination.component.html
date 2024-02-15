@@ -26,7 +26,8 @@
     <label for="page">Страница</label>
 
     <mat-form-field>
-      <input #page="matInput" type="number" id="page" formnovalidate matInput bioNumberOnlyInput formControlName="page">
+      <input #page="matInput" formnovalidate matInput bioNumberOnlyInput id="page" type="number" min="1" formControlName="page"
+        [max]="pagination.total">
     </mat-form-field>
 
     <span>из {{ pagination.total }}</span>
