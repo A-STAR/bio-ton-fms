@@ -44,5 +44,5 @@
 </form>
 
 <output>Отображается с {{ pagination.pageIndex * size.value - size.value + 1 }} по {{ pagination.pageIndex === pagination.total
-  ? pagination.records % size.value
+  ? pagination.records
   : pagination.pageIndex * size.value }} из {{ pagination.records }} сообщений</output>

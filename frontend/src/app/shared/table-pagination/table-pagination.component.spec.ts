@@ -245,7 +245,7 @@ describe('TablePaginationComponent', () => {
       .toBeResolvedTo(`${1}`);
   });
 
-  it('should render messages summary', () => {
+  it('should render messages summary', async () => {
     const messagesSummaryDe = fixture.debugElement.query(
       By.css('output')
     );
