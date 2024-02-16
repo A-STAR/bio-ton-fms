@@ -26,7 +26,8 @@
     <label for="page">Страница</label>
 
     <mat-form-field>
-      <input #page="matInput" type="number" id="page" formnovalidate matInput bioNumberOnlyInput formControlName="page">
+      <input #page="matInput" formnovalidate matInput bioNumberOnlyInput id="page" type="number" min="1" formControlName="page"
+        [max]="pagination.total">
     </mat-form-field>
 
     <span>из {{ pagination.total }}</span>
@@ -43,5 +44,5 @@
 </form>
 
 <output>Отображается с {{ pagination.pageIndex * size.value - size.value + 1 }} по {{ pagination.pageIndex === pagination.total
-  ? pagination.records % size.value
+  ? pagination.records
   : pagination.pageIndex * size.value }} из {{ pagination.records }} сообщений</output>

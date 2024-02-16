@@ -79,6 +79,7 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
       size: this.fb.nonNullable.control(INITIAL_SIZE),
       page: this.fb.nonNullable.control(this.#pagination.pageIndex, {
         validators: [
+          Validators.required,
           Validators.min(MIN_PAGE),
           Validators.max(this.pagination.total)
         ],
@@ -102,7 +103,7 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
         filter((value): value is {
           page: number;
           size: number;
-        } => value.page !== undefined),
+        } => this.paginationForm.valid),
         debounceTime(DEBOUNCE_DUE_TIME)
       )
       .subscribe(({ page, size }) => {
