@@ -186,7 +186,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         distinctUntilChanged(),
         startWith(
           this.searchForm.get('search')
-            ?.value ?? undefined
+            ?.value || undefined
         )
       );
   }
