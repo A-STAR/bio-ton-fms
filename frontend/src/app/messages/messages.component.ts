@@ -392,11 +392,15 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
     const messageIDs = this.selection.selected.map(({ id }) => id);
 
+    const deleteMessages$ = this.#options.viewMessageType === MessageType.DataMessage
+      ? this.messageService.deleteMessages(messageIDs)
+      : this.messageService.deleteCommandMessages(messageIDs);
+
     this.#subscription = dialogRef
       .afterClosed()
       .pipe(
         filter(Boolean),
-        mergeMap(() => this.messageService.deleteMessages(messageIDs))
+        mergeMap(() => deleteMessages$)
       )
       .subscribe({
         next: () => {
