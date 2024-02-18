@@ -2291,6 +2291,164 @@ describe('MessagesComponent', () => {
     overlayContainer.ngOnDestroy();
   }));
 
+  it('should delete command messages', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    let deleteButton: MatButtonHarness | undefined;
+
+    try {
+      deleteButton = await loader.getHarness(
+        MatButtonHarness.with({
+          ancestor: '#messages footer',
+          selector: ':not([hidden])',
+          text: 'delete',
+          variant: 'icon'
+        })
+      );
+    } catch { }
+
+    expect(deleteButton)
+      .withContext('render no delete button')
+      .toBeUndefined();
+
+    const selectAllCheckbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-header-row'
+      })
+    );
+
+    selectAllCheckbox.check();
+
+    deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '#messages footer',
+        selector: ':not([hidden])',
+        text: 'delete',
+        variant: 'icon'
+      })
+    );
+
+    await deleteButton.click();
+
+    const confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+
+    const deleteCommandMessagesSpy = spyOn(messageService, 'deleteCommandMessages')
+      .and.callFake(() => of(null));
+
+    /* Coverage for deleting, updating messages. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<ConfirmationDialogComponent, true | '' | undefined>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await deleteButton.click();
+
+    const testMessageIDs = testCommandMessages.commandMessages!.map(({ id }) => id);
+
+    expect(deleteCommandMessagesSpy)
+      .toHaveBeenCalledWith(testMessageIDs);
+
+    const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+
+    await expectAsync(
+      snackBar.getMessage()
+    )
+      .toBeResolvedTo(MESSAGES_DELETED);
+
+    expect(messagesSpy)
+      .toHaveBeenCalled();
+
+    confirmationDialog?.close();
+
+    overlayContainer.ngOnDestroy();
+  }));
+
+  it('should delete command messages with error response', fakeAsync(async () => {
+    await mockTestMessages(component, loader, messagesSpy, trackSpy, statisticsSpy, {
+      type: MessageType.CommandMessage
+    }, testCommandMessages);
+
+    const selectAllCheckbox = await loader.getHarness(
+      MatCheckboxHarness.with({
+        ancestor: '#messages mat-header-row'
+      })
+    );
+
+    selectAllCheckbox.check();
+
+    const deleteButton = await loader.getHarness(
+      MatButtonHarness.with({
+        ancestor: '#messages footer',
+        text: 'delete',
+        variant: 'icon'
+      })
+    );
+
+    await deleteButton.click();
+
+    const confirmationDialog = await documentRootLoader.getHarnessOrNull(MatDialogHarness);
+
+    expect(confirmationDialog)
+      .withContext('render a confirmation dialog')
+      .not.toBeNull();
+
+    /* Handle an error although update messages anyway. */
+
+    const testURL = `${environment.api}/api/telematica/messagesview/delete-command-messages'`;
+
+    const testErrorResponse = new HttpErrorResponse({
+      error: {
+        message: `Http failure response for ${testURL}: 500 Internal Server Error`
+      },
+      status: 500,
+      statusText: 'Internal Server Error',
+      url: testURL
+    });
+
+    const errorHandler = TestBed.inject(ErrorHandler);
+
+    spyOn(console, 'error');
+    spyOn(errorHandler, 'handleError');
+
+    const deleteCommandMessagesSpy = spyOn(messageService, 'deleteCommandMessages')
+      .and.callFake(() => throwError(() => testErrorResponse));
+
+    /* Coverage for updating messages. */
+
+    const dialogRef = {
+      afterClosed: () => of(true)
+    } as MatDialogRef<ConfirmationDialogComponent, true | '' | undefined>;
+
+    spyOn(component['dialog'], 'open')
+      .and.returnValue(dialogRef);
+
+    await deleteButton.click();
+
+    const testMessageIDs = testCommandMessages.commandMessages!.map(({ id }) => id);
+
+    expect(deleteCommandMessagesSpy)
+      .toHaveBeenCalledWith(testMessageIDs);
+
+    expect(errorHandler.handleError)
+      .toHaveBeenCalledWith(testErrorResponse);
+
+    expect(messagesSpy)
+      .toHaveBeenCalled();
+
+    confirmationDialog?.close();
+
+    overlayContainer.ngOnDestroy();
+  }));
+
   it('should keep on streaming messages after error', fakeAsync(async () => {
     /* Autocomplete doesn't properly set an actual control `object` value in tests
        rather than its display value. */

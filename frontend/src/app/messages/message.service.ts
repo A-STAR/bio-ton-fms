@@ -60,14 +60,25 @@ export class MessageService {
   }
 
   /**
-   * Delete a data message.
+   * Delete a data messages.
    *
    * @param body Deleted messages ID.
    *
-   * @returns An `Observable` of deleting message stream.
+   * @returns An `Observable` of deleting messages stream.
    */
   deleteMessages(body: DataMessage['id'][]) {
     return this.httpClient.delete<null>('/api/telematica/messagesview/delete-messages', { body });
+  }
+
+  /**
+   * Delete a command messages.
+   *
+   * @param body Deleted command messages ID.
+   *
+   * @returns An `Observable` of deleting command messages stream.
+   */
+  deleteCommandMessages(body: CommandMessage['id'][]) {
+    return this.httpClient.delete<null>('/api/telematica/messagesview/delete-command-messages', { body });
   }
 
   /**

@@ -178,6 +178,27 @@ describe('MessageService', () => {
     deleteMessagesRequest.flush(null);
   });
 
+  it('should delete command messages', (done: DoneFn) => {
+    const messagesIDs = testCommandMessages.commandMessages!.map(({ id }) => id);
+
+    service
+      .deleteCommandMessages(messagesIDs)
+      .subscribe(response => {
+        expect(response)
+          .withContext('emit response')
+          .toBeNull();
+
+        done();
+      });
+
+    const deleteCommandMessagesRequest = httpTestingController.expectOne({
+      method: 'DELETE',
+      url: '/api/telematica/messagesview/delete-command-messages'
+    }, 'delete command messages request');
+
+    deleteCommandMessagesRequest.flush(null);
+  });
+
   it('should get message statistics', (done: DoneFn) => {
     service
       .getStatistics(testMessageOptions)
