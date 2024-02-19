@@ -1971,11 +1971,13 @@ describe('MessagesComponent', () => {
 
     const table = await loader.getHarness(MatTableHarness);
 
-    const parameterIndices = [1, 2, 4];
+    const testParameterIndices = [1, 2, 4];
 
-    await searchInput.setValue(`${testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[0]].paramName}, ${
-      testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[1]].paramName
-    }, ${testTrackerMessages.trackerDataMessages![0].parameters![parameterIndices[2]].paramName}`);
+    const query = testParameterIndices
+      .map(value => testTrackerMessages.trackerDataMessages![0].parameters![value].paramName)
+      .join(',');
+
+    await searchInput.setValue(query);
 
     tick(DEBOUNCE_DUE_TIME);
 
@@ -2002,8 +2004,8 @@ describe('MessagesComponent', () => {
         host => host.getCssValue('background-color')
       ));
 
-      parameterIndices.forEach(index => {
-        expect(chipBackgroundColorValues[index])
+      testParameterIndices.forEach((value, index) => {
+        expect(chipBackgroundColorValues[value])
           .withContext('render highlight `background-color` value')
           .toContain(parameterColors[index % parameterColors.length]);
       });

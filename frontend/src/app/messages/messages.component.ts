@@ -918,7 +918,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
       return hasMatch;
     };
 
-    const queryGroups = searchQuery
+    const queries = searchQuery
       .replaceAll(QUERY_FORBIDDEN_CHARACTERS_PATTERN, '')
       .replaceAll(/\s/g, '')
       .replaceAll('?', '.+')
@@ -933,7 +933,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     const firstMatchedParameterIndices: number[] = [];
 
     return (this.#messagesDataSource as TrackerMessageDataSource[])
-      .filter(({ parameters }) => parameters?.length && queryGroups.some(groups => parameters.some((parameter, index) => {
+      .filter(({ parameters }) => parameters?.length && queries.some(groups => parameters.some((parameter, index) => {
         const hasParameter = lookupParameter(groups, parameter);
 
         if (hasParameter) {
@@ -942,10 +942,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
         return hasParameter;
       })))
-      .map((message, index) => {
+      .map((message, messageIndex) => {
         message = structuredClone(message);
 
-        queryGroups.forEach(group => {
+        queries.forEach((groups, index) => {
           for (let i = 0; i < message.parameters!.length; i++) {
             const parameter = message.parameters![i];
 
@@ -954,13 +954,13 @@ export default class MessagesComponent implements OnInit, OnDestroy {
             }
 
             // set highlight for matched parameter index, do lookup for others
-            const hasHighlight = firstMatchedParameterIndices[index] === i || lookupParameter(group, parameter);
+            const hasHighlight = firstMatchedParameterIndices[messageIndex] === i || lookupParameter(groups, parameter);
 
             if (hasHighlight) {
               parameter.hasHighlight = hasHighlight;
 
               // colors applied based on queries
-              parameter.backgroundColor = parameterColors[i % parameterColors.length];
+              parameter.backgroundColor = parameterColors[index % parameterColors.length];
             }
           }
         });
