@@ -83,7 +83,7 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
           Validators.min(MIN_PAGE),
           Validators.max(this.pagination.total)
         ],
-        updateOn: 'blur'
+        updateOn: 'submit'
       })
     });
 
