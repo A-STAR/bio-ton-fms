@@ -243,6 +243,12 @@ describe('TablePaginationComponent', () => {
     )
       .withContext('set the 1st page')
       .toBeResolvedTo(`${1}`);
+
+    /* Coverage for `distinctUntilChanged` pagination `size`. */
+
+    await sizeSelect.clickOptions({
+      text: PAGE_SIZE.toString()
+    });
   });
 
   it('should render messages summary', async () => {
