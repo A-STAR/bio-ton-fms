@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 
-import { Subscription, debounceTime, filter } from 'rxjs';
+import { Subscription, debounceTime, distinctUntilChanged, filter } from 'rxjs';
 
 import { NumberOnlyInputDirective } from '../number-only-input/number-only-input.directive';
 
@@ -104,7 +104,8 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
           page: number;
           size: number;
         } => this.paginationForm.valid),
-        debounceTime(DEBOUNCE_DUE_TIME)
+        debounceTime(DEBOUNCE_DUE_TIME),
+        distinctUntilChanged((previous, current) => current.page === previous.page && current.size === previous.size)
       )
       .subscribe(({ page, size }) => {
         this.paginationChange.emit({
