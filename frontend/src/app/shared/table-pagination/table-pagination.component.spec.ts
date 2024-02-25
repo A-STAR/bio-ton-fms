@@ -227,6 +227,10 @@ describe('TablePaginationComponent', () => {
 
     await pageInput.setValue(`${page}`);
 
+    /* Coverage for updating page and its validation. */
+
+    component.pagination = pagination.pagination;
+
     const sizeSelect = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#pagination-form',

@@ -44,13 +44,26 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   @Input() set pagination(pagination: Pagination['pagination']) {
-    this.#pagination = pagination;
+    if (this.#pagination) {
+      const pageControl = this.paginationForm?.get('page');
 
-    this.paginationForm
-      ?.get('page')
-      ?.setValue(pagination.pageIndex, {
+      const options = {
         emitEvent: false
-      });
+      };
+
+      pageControl?.setValue(pagination.pageIndex, options);
+
+      const validators = [
+        Validators.required,
+        Validators.min(MIN_PAGE),
+        Validators.max(pagination.total)
+      ];
+
+      pageControl?.setValidators(validators);
+      pageControl?.updateValueAndValidity(options);
+    }
+
+    this.#pagination = pagination;
   }
 
   protected paginationForm!: PaginationForm;
