@@ -218,7 +218,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected DataMessageParameter = DataMessageParameter;
   protected columns?: KeyValue<MessageColumn | string, string | undefined>[];
   protected columnKeys?: string[];
-  protected selection = new SelectionModel<TrackerMessageDataSource | SensorMessageDataSource>(true);
+  protected selection = new SelectionModel<TrackerMessageDataSource | CommandMessageDataSource>(true);
   protected MessageColumn = MessageColumn;
 
   /**
@@ -366,7 +366,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     if (this.isAllSelected) {
       this.selection.clear();
     } else {
-      const { data } = this.messagesDataSource as TableDataSource<TrackerMessageDataSource | SensorMessageDataSource>;
+      const { data } = this.messagesDataSource as TableDataSource<TrackerMessageDataSource | CommandMessageDataSource>;
 
       this.selection.select(...data);
     }
