@@ -1,5 +1,6 @@
 ﻿using BioTonFMS.Common.Settings;
 using BioTonFMS.Infrastructure.MessageBus;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
