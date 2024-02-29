@@ -18,6 +18,10 @@ export const routes: Routes = [
         loadComponent: () => import('./sign-in/sign-in.component')
       },
       {
+        path: 'agro',
+        loadComponent: () => import('./agro/agro.component')
+      },
+      {
         path: 'tech',
         loadComponent: () => import('./tech/tech.component')
       },
