@@ -13,3 +13,4 @@ export type Pagination = {
 
 export const PAGE_NUM = 1;
 export const PAGE_SIZE = 50;
+export const PAGE_SIZE_1000 = 1000;
