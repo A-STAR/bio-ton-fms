@@ -348,7 +348,7 @@ export class MapComponent implements OnInit {
         data: icons,
         paint: getIcon({
           svg: TECH_SVG,
-          color: '#8FAB93',
+          color: '#D3007C',
           stroke: TECH_SVG_STROKE,
           size: TECH_SVG_SIZE
         })
