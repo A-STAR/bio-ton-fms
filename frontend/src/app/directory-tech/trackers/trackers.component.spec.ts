@@ -140,7 +140,7 @@ describe('TrackersComponent', () => {
     const table = await loader.getHarness(MatTableHarness);
 
     const rows = await table.getRows({
-      selector: '.link'
+      selector: '[role="link"]'
     });
 
     rows.forEach(async (row, index) => {
