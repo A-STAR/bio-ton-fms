@@ -17,6 +17,7 @@ public class GalileoskyMessageParser : ITrackerMessageParser
     private const int CoordsStructCode = 0x30;
     private const int VelocityStructCode = 0x33;
     private const int AltitudeStructCode = 0x34;
+    private const int HDOPCode = 0x35;
     private const int CanLogStructCode = 0xC1;
 
     private readonly IProtocolTagRepository _protocolTagRepository;
@@ -101,6 +102,24 @@ public class GalileoskyMessageParser : ITrackerMessageParser
                     break;
                 case AltitudeStructCode:
                     message.Altitude = AddMessageTag<MessageTagInteger>(tag, binaryPackage, i, message).Value;
+                    break;
+                case HDOPCode:
+                    if (tag.Tag is not null)
+                    {
+                        var messageTag = CreateMessageTag(tag.Tag, binaryPackage[i..(i + tag.Size)]) as MessageTagByte;
+                        if (messageTag != null)
+                        {
+                            if (message.CoordCorrectness == CoordCorrectnessEnum.CorrectGps)
+                            {
+                                messageTag.Value /= 10;
+                            }
+                            else
+                            {
+                                messageTag.Value *= 10;
+                            }
+                            message.Tags.Add(messageTag);
+                        }
+                    }
                     break;
                 case CanLogStructCode:
                     var data = binaryPackage[i..(i + tag.Size)].ParseCanLog();

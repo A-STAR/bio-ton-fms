@@ -70,7 +70,7 @@ public class GalileoskyMessageParserTests
                 new object[]
                 {
                     "Расшифровка_пакет_а_JD_с_CAN_данными.docx",
-                    "01 B8 83 04 F8 09 10 05 47 20 48 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 06 40 00 3A 41 5C 34 42 16 0E 43 08 53 00 00 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 04 F8 09 10 04 47 20 3C 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 06 40 00 3A 41 93 38 42 16 0E 43 08 53 5B 38 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 F1 68",
+                    "01 B8 83 04 F8 09 10 05 47 20 48 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 0A 40 00 3A 41 5C 34 42 16 0E 43 08 53 00 00 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 04 F8 09 10 04 47 20 3C 50 A1 63 30 0C 3D F4 21 03 D7 45 F2 02 33 00 00 1C 00 34 61 00 35 0A 40 00 3A 41 93 38 42 16 0E 43 08 53 5B 38 60 00 00 61 00 00 C0 9E 03 0F 00 C1 FA 55 2C 1C C4 00 DB BA 71 15 00 F1 68",
                     new TrackerMessage[]
                     {
                         new()
@@ -97,7 +97,7 @@ public class GalileoskyMessageParserTests
                                 new MessageTagByte
                                 {
                                     TrackerTagId = TagsSeed.HdopId,
-                                    Value = 6
+                                    Value = 1
                                 },
                                 new MessageTagInteger
                                 {
@@ -235,7 +235,7 @@ public class GalileoskyMessageParserTests
                                 new MessageTagByte
                                 {
                                     TrackerTagId = TagsSeed.HdopId,
-                                    Value = 6
+                                    Value = 1
                                 },
                                 new MessageTagInteger
                                 {
