@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { AgroComponent } from './agro.component';
+import AgroComponent from './agro.component';
+import { MapComponent } from '../shared/map/map.component';
 
 describe('AgroComponent', () => {
   let component: AgroComponent;
@@ -9,7 +12,10 @@ describe('AgroComponent', () => {
   beforeEach(async () => {
     await TestBed
       .configureTestingModule({
-        imports: [AgroComponent]
+        imports: [
+          HttpClientTestingModule,
+          AgroComponent
+        ]
       })
       .compileComponents();
 
@@ -23,5 +29,15 @@ describe('AgroComponent', () => {
   it('should create', () => {
     expect(component)
       .toBeTruthy();
+  });
+
+  it('should render map', () => {
+    const mapDe = fixture.debugElement.query(
+      By.directive(MapComponent)
+    );
+
+    expect(mapDe)
+      .withContext('render `bio-map` component')
+      .not.toBeNull();
   });
 });
