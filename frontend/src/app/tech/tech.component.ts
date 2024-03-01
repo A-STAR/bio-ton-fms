@@ -426,7 +426,7 @@ type ViewOptions = {
 
 export type TechMonitoringInfo = VehicleMonitoringInfo;
 
-export const POLL_INTERVAL_PERIOD = 5000;
+export const POLL_INTERVAL_PERIOD = 12000;
 
 export const SEARCH_MIN_LENGTH = 3;
 
