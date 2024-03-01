@@ -51,6 +51,22 @@ export const routes: Routes = [
         loadComponent: () => import('./messages/messages.component')
       },
       {
+        path: 'reports',
+        loadComponent: () => import('./shared/mock/mock.component'),
+        data: {
+          title: 'Отчёты',
+          mock: 'assets/images/reports.png'
+        }
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./shared/mock/mock.component'),
+        data: {
+          title: 'Пользователи',
+          mock: 'assets/images/users.png'
+        }
+      },
+      {
         path: 'directory',
         loadChildren: () => import('./directory.routes')
       }
