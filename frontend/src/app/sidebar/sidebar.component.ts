@@ -124,18 +124,19 @@ export const NAVIGATION: NavigationItem[][][] = [
   ],
   [
     [
-      {
-        title: 'Аккаунт',
-        link: '/account',
-        icon: 'account',
-        alt: 'Аккаунт'
-      },
-      {
-        title: 'Настройки',
-        link: '/settings',
-        icon: 'settings',
-        alt: 'Настройки'
-      },
+      // TODO: uncomment Account, Settings when pages are available.
+      // {
+      //   title: 'Аккаунт',
+      //   link: '/account',
+      //   icon: 'account',
+      //   alt: 'Аккаунт'
+      // },
+      // {
+      //   title: 'Настройки',
+      //   link: '/settings',
+      //   icon: 'settings',
+      //   alt: 'Настройки'
+      // },
       {
         title: 'Выход',
         icon: 'exit',
