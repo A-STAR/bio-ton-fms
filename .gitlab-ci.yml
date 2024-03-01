@@ -303,6 +303,8 @@ Deploy-backend-stage.bioton-fms.ru:
     - ssh user@stage.bioton-fms.ru docker pull git.bioton-fms.ru:5050/bioton/fms/tracker-message
     - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-message || true
     - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-message --network bioton -v /var/log/fms/tracker-message:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
+    - ssh user@stage.bioton-fms.ru docker rm -f fms-tracker-message2 || true
+    - ssh user@stage.bioton-fms.ru docker run --name fms-tracker-message2 --network bioton -v /var/log/fms/tracker-message2:/app/logs -v /etc/fms/tracker-message:/app/config --restart always  -d git.bioton-fms.ru:5050/bioton/fms/tracker-message:$DOCKER_TAG
   rules:    
     - when: manual        
   allow_failure: true
