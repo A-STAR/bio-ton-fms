@@ -19,6 +19,7 @@ public class GalileoskyMessageParser : ITrackerMessageParser
     private const int AltitudeStructCode = 0x34;
     private const int HDOPCode = 0x35;
     private const int CanLogStructCode = 0xC1;
+    private const int ExtendedTagsCode = 0xFE;
 
     private readonly IProtocolTagRepository _protocolTagRepository;
     private readonly ILogger<GalileoskyMessageParser> _logger;
@@ -46,10 +47,18 @@ public class GalileoskyMessageParser : ITrackerMessageParser
 
         while (i < binaryPackage.Length - Galileosky.CheckSumLength)
         {
-            if (!tags.TryGetValue(binaryPackage[i], out ProtocolTag? tag))
+            ProtocolTag? tag;
+            if (binaryPackage[i] == ExtendedTagsCode)
+            // расширенные теги идут в конце сообщения, их не рассматриваем
+            {
+                yield return message;
+                yield break;
+            }
+            else if (!tags.TryGetValue(binaryPackage[i], out tag))
             {
                 _logger.LogError("GalileoskyMessageParser Тег с кодом {Code} не найден, позиция в сообщении {Position}, сообщение {Message}, пакет {PackageUID}",
                     binaryPackage[i], i, string.Join(' ', binaryPackage.Select(x => x.ToString("X"))), packageUid);
+                yield return message;
                 yield break;
             }
 
