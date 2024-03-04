@@ -59,7 +59,7 @@
               <mat-form-field class="full-width">
                 <input matInput id="formula" placeholder="Формула" formControlName="formula">
 
-                <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">Обязательное поле</mat-error>
+                <mat-error *ngIf="sensorForm.controls.basic.controls.formula.errors?.['required']">Обязательное поле</mat-error>
 
                 <mat-error *ngIf="sensorForm.controls.basic.controls.formula.errors?.['serverErrors'] as error">
                   {{ error.messages }}
@@ -93,7 +93,7 @@
                 <mat-option [value]="validator.id" *ngFor="let validator of this.data.sensors">{{ validator.name }}</mat-option>
               </mat-select>
 
-              <mat-error *ngIf="sensorForm.controls.basic.controls.name.errors?.['required']">Обязательное поле</mat-error>
+              <mat-error *ngIf="sensorForm.controls.basic.controls.validator.errors?.['required']">Обязательное поле</mat-error>
 
               <mat-error *ngIf="sensorForm.controls.basic.controls.validator.errors?.['serverErrors'] as error">
                 {{ error.messages }}
