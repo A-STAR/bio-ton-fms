@@ -210,10 +210,10 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   protected selectionForm!: MessageSelectionForm;
   protected tech$!: Observable<MonitoringTech[]>;
   protected searchForm!: MessageSearchForm;
-  protected messages$?: Observable<Messages>;
+  protected messages$?: Observable<Messages | undefined>;
   protected messagesDataSource?: TableDataSource<TrackerMessageDataSource | SensorMessageDataSource | CommandMessageDataSource>;
   protected location$?: Observable<LocationAndTrackResponse>;
-  protected statistics$?: Observable<MessageStatistics>;
+  protected statistics$?: Observable<MessageStatistics | undefined>;
   protected MessageType = MessageType;
   protected DataMessageParameter = DataMessageParameter;
   protected columns?: KeyValue<MessageColumn | string, string | undefined>[];
@@ -269,6 +269,9 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         .get('range.end.time')
         ?.setValue('00:00');
     }, 1);
+
+    this.#messages$.next(undefined);
+    this.#statistics$.next(undefined);
   }
 
   /**
@@ -429,7 +432,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   #messagesDataSource?: (TrackerMessageDataSource | CommandMessageDataSource)[];
   #messagesSettled$ = new Subject();
   #location$ = new Subject<LocationAndTrackResponse>();
-  #statistics$ = new Subject<MessageStatistics>();
+  #statistics$ = new Subject<MessageStatistics | undefined>();
   #subscription: Subscription | undefined;
 
   /**
@@ -1031,29 +1034,30 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     ));
 
     this.messages$ = this.#messages$.pipe(
-      filter((value): value is MessagesOptions => value !== undefined),
-      switchMap(messagesOptions => this.messageService
-        .getMessages(messagesOptions)
-        .pipe(
-          tap(messages => {
-            this.#setColumns(messages);
-            this.#setMessagesDataSource(messages);
+      switchMap(messagesOptions => messagesOptions
+        ? this.messageService
+          .getMessages(messagesOptions)
+          .pipe(
+            tap(messages => {
+              this.#setColumns(messages);
+              this.#setMessagesDataSource(messages);
 
-            this.selection.clear();
+              this.selection.clear();
 
-            this.#messagesSettled$.next(undefined);
-          }),
-          switchMap(messages => iif(() => messagesOptions.parameterType === DataMessageParameter.SensorData, of(undefined), filter$)
-            .pipe(
-              map(() => messages)
-            )
-          ),
-          catchError(error => {
-            this.errorHandler.handleError(error);
+              this.#messagesSettled$.next(undefined);
+            }),
+            switchMap(messages => iif(() => messagesOptions.parameterType === DataMessageParameter.SensorData, of(undefined), filter$)
+              .pipe(
+                map(() => messages)
+              )
+            ),
+            catchError(error => {
+              this.errorHandler.handleError(error);
 
-            return NEVER;
-          })
-        )
+              return NEVER;
+            })
+          )
+        : of(undefined)
       )
     );
   }
