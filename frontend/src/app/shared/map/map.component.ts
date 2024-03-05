@@ -552,7 +552,7 @@ const CONTROL_POSITION = 'top-right';
 const AUTH_LOGIN = 'a.zubkova@bioton-agro.ru';
 const AUTH_PASSWORD = 'asdfghjkl13';
 
-const FIELD_RESOURCE_DEFINITION: ResourceDefinition = 109;
+const FIELD_RESOURCE_DEFINITION: ResourceDefinition = 23;
 const FIELD_LAYER_DEFINITION = 'field';
 
 const TRACK_LAYER_DEFINITION = 'track';
