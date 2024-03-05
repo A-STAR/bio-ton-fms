@@ -257,7 +257,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Reset selection form default values.
+   * Reset selection form default values, messages, location, statistics.
    */
   protected onResetSelectionForm() {
     asapScheduler.schedule(() => {
@@ -271,6 +271,12 @@ export default class MessagesComponent implements OnInit, OnDestroy {
     }, 1);
 
     this.#messages$.next(undefined);
+
+    const unselectedLocation: LocationAndTrackResponse = {
+      tracks: []
+    };
+
+    this.#location$.next(unselectedLocation);
     this.#statistics$.next(undefined);
   }
 
