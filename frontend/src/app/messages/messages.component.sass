@@ -1,5 +1,6 @@
 @use 'sass:map'
 @use 'sass:math'
+@use 'sass:color'
 @use 'extends'
 @use 'variables' as *
 
@@ -163,14 +164,14 @@ bio-map
 
   mat-row
 
-    &:hover
-      background-color: inherit
-
     mat-chip.highlight
       --mdc-chip-elevated-container-color: #{rgba(var(--background-color), 35%)}
 
     &.black-box
       background-color: $lighter-green
+
+      &:hover
+        background-color: color.scale($lighter-green, $lightness: -5%)
 
       mat-chip.highlight
         --mdc-chip-elevated-container-color: #{rgba(var(--background-color), 55%)}
@@ -189,6 +190,9 @@ bio-map
     &.black-box-medium
       background-color: $light-green
 
+      &:hover
+        background-color: color.scale($light-green, $lightness: -5%)
+
       mat-chip
         --mdc-chip-elevated-container-color: #{$brighter-green}
 
@@ -197,6 +201,9 @@ bio-map
 
     &.black-box-long
       background-color: $brighter-green
+
+      &:hover
+        background-color: color.scale($brighter-green, $lightness: -5%)
 
       mat-chip
         --mdc-chip-elevated-container-color: #{$light-green}
