@@ -271,7 +271,7 @@
 
           <mat-header-row *matHeaderRowDef="columnKeys; sticky: true"></mat-header-row>
 
-          <mat-row [class]="row.class" *matRowDef="let row; columns: columnKeys"></mat-row>
+          <mat-row [class]="row.className" *matRowDef="let row; columns: columnKeys"></mat-row>
 
           <tr class="mat-mdc-row mdc-data-table__row" *matNoDataRow>
             <td class="mat-mdc-cell mdc-data-table__cell">Нет данных</td>
