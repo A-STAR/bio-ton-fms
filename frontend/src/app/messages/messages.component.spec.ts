@@ -1227,14 +1227,14 @@ describe('MessagesComponent', () => {
         serverDateTime: registration
       } = testTrackerMessages.trackerDataMessages![index];
 
-      const cssClass = getBlackBoxClass(time, registration);
+      const className = getBlackBoxClass(time, registration);
 
-      if (cssClass) {
+      if (className) {
         expect(rowDe.classes)
           .withContext('has black box CSS class')
           .toEqual(
             jasmine.objectContaining({
-              [cssClass]: true
+              [className]: true
             })
           );
       } else {
@@ -1405,14 +1405,14 @@ describe('MessagesComponent', () => {
         serverDateTime: registration
       } = testSensorMessages.sensorDataMessages![index];
 
-      const cssClass = getBlackBoxClass(time, registration);
+      const className = getBlackBoxClass(time, registration);
 
-      if (cssClass) {
+      if (className) {
         expect(rowDe.classes)
           .withContext('has black box CSS class')
           .toEqual(
             jasmine.objectContaining({
-              [cssClass]: true
+              [className]: true
             })
           );
       } else {

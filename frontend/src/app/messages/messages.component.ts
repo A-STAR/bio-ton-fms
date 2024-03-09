@@ -723,7 +723,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         location: { latitude, longitude, satellites },
         altitude,
         parameters,
-        class: this.#getBlackBoxClass(time, registration)
+        className: this.#getBlackBoxClass(time, registration)
       }));
   }
 
@@ -779,7 +779,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
           location: { latitude, longitude, satellites },
           altitude,
           ...sensorMap,
-          class: this.#getBlackBoxClass(time, registration)
+          className: this.#getBlackBoxClass(time, registration)
         };
       });
   }
@@ -1161,7 +1161,7 @@ interface TrackerMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'a
     hasHighlight?: boolean;
     backgroundColor?: string;
   })[];
-  class?: string;
+  className?: string;
 }
 
 interface SensorMessageDataSource extends Pick<DataMessage, 'id' | 'speed' | 'altitude'>, Partial<{
