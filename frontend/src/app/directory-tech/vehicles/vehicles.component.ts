@@ -253,9 +253,9 @@ export default class VehiclesComponent implements OnInit, OnDestroy {
         serialNumber: serial,
         description,
         tracker
-      }): VehicleDataSource => {
-        return { id, name, make, model, type, subtype, group, year, fuel, registration, inventory, serial, tracker, description };
-      });
+      }): VehicleDataSource => (
+        { id, name, make, model, type, subtype, group, year, fuel, registration, inventory, serial, tracker, description }
+      ));
   }
 
   /**
