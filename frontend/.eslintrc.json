@@ -179,6 +179,10 @@
           }
         ],
         "@typescript-eslint/semi": "error",
+        "arrow-body-style": [
+          "warn",
+          "as-needed"
+        ],
         "camelcase": "warn",
         "curly": "warn",
         "default-case-last": "warn",
