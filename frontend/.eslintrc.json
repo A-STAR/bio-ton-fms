@@ -301,6 +301,7 @@
           }
         ],
         "no-empty-static-block": "warn",
+        "no-eq-null": "warn",
         "no-eval": "warn",
         "no-extend-native": "warn",
         "no-extra-boolean-cast": "warn",
