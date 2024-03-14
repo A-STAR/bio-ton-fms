@@ -319,6 +319,7 @@
             "skipTemplates": true
           }
         ],
+        "no-lone-blocks": "warn",
         "no-lonely-if": "warn",
         "no-restricted-imports": [
           "error",
