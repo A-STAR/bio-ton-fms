@@ -321,6 +321,7 @@
         ],
         "no-lone-blocks": "warn",
         "no-lonely-if": "warn",
+        "no-multi-str": "warn",
         "no-restricted-imports": [
           "error",
           {
