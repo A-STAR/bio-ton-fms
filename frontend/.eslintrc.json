@@ -338,6 +338,7 @@
         "no-self-compare": "warn",
         "no-template-curly-in-string": "warn",
         "no-undef-init": "error",
+        "no-unexpected-multiline": "warn",
         "no-unmodified-loop-condition": "error",
         "no-unreachable-loop": "error",
         "no-unused-private-class-members": "warn",
