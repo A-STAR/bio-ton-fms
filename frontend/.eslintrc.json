@@ -340,6 +340,7 @@
         "no-undef-init": "error",
         "no-unexpected-multiline": "warn",
         "no-unmodified-loop-condition": "error",
+        "no-unneeded-ternary": "warn",
         "no-unreachable-loop": "error",
         "no-unused-private-class-members": "warn",
         "no-void": "error",
