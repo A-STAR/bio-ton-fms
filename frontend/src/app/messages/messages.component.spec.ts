@@ -1242,9 +1242,9 @@ describe('MessagesComponent', () => {
           .withContext('has no black box CSS class')
           .not.toEqual(
             jasmine.objectContaining({
-              ['black-box']: true,
-              ['black-box-medium']: true,
-              ['black-box-long']: true
+              'black-box': true,
+              'black-box-medium': true,
+              'black-box-long': true
             })
           );
       }
@@ -1420,9 +1420,9 @@ describe('MessagesComponent', () => {
           .withContext('has no black box CSS class')
           .not.toEqual(
             jasmine.objectContaining({
-              ['black-box']: true,
-              ['black-box-medium']: true,
-              ['black-box-long']: true
+              'black-box': true,
+              'black-box-medium': true,
+              'black-box-long': true
             })
           );
       }
