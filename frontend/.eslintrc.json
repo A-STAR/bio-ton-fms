@@ -344,6 +344,7 @@
         "no-unreachable": "warn",
         "no-unreachable-loop": "error",
         "no-unused-private-class-members": "warn",
+        "no-useless-computed-key": "warn",
         "no-void": "error",
         "no-whitespace-before-property": "error",
         "object-property-newline": [
