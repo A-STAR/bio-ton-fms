@@ -32,6 +32,9 @@ public class MessagesDBContext : DbContext
         modelBuilder.Entity<TrackerMessage>()
             .HasIndex("ExternalTrackerId");
 
+        modelBuilder.Entity<TrackerMessage>()
+            .HasIndex("PackageUID");
+
         base.OnModelCreating(modelBuilder);
     }
 }
