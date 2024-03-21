@@ -353,6 +353,7 @@
             "allowAllPropertiesOnSameLine": true
           }
         ],
+        "object-shorthand": "warn",
         "padded-blocks": [
           "warn",
           "never"
