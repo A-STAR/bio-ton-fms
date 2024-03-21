@@ -17,7 +17,7 @@ import {
 
 import { SortDirection } from './shared/sort';
 
-import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
+import { PAGE_NUM, PAGE_SIZE_1000 } from './shared/pagination';
 
 describe('VehicleService', () => {
   let httpTestingController: HttpTestingController;
@@ -53,7 +53,7 @@ describe('VehicleService', () => {
       });
 
     let vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
+      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}`,
       'vehicles request'
     );
 
@@ -74,7 +74,7 @@ describe('VehicleService', () => {
       });
 
     vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
+      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}`,
       'vehicles request'
     );
 
@@ -96,7 +96,7 @@ describe('VehicleService', () => {
     const URL = '/api/telematica/vehicles';
 
     let vehiclesRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${VehiclesSortBy.Name}&sortDirection=${SortDirection.Ascending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}&sortBy=${VehiclesSortBy.Name}&sortDirection=${SortDirection.Ascending}`,
       'sorted by name vehicles request'
     );
 
@@ -116,7 +116,7 @@ describe('VehicleService', () => {
       });
 
     vehiclesRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${VehiclesSortBy.Fuel}&sortDirection=${SortDirection.Descending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}&sortBy=${VehiclesSortBy.Fuel}&sortDirection=${SortDirection.Descending}`,
       'sorted in descending order by fuel vehicles request'
     );
 
@@ -137,7 +137,7 @@ describe('VehicleService', () => {
       });
 
     vehiclesRequest = httpTestingController.expectOne(
-      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
+      `/api/telematica/vehicles?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}`,
       'unsorted vehicles request'
     );
 

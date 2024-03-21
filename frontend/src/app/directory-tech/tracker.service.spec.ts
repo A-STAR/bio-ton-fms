@@ -23,7 +23,7 @@ import {
 
 import { SortDirection } from './shared/sort';
 
-import { PAGE_NUM, PAGE_SIZE } from './shared/pagination';
+import { PAGE_NUM, PAGE_SIZE_1000 } from './shared/pagination';
 import { testVehicles } from './vehicle.service.spec';
 
 describe('TrackerService', () => {
@@ -60,7 +60,7 @@ describe('TrackerService', () => {
       });
 
     let trackersRequest = httpTestingController.expectOne(
-      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
+      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}`,
       'trackers request'
     );
 
@@ -81,7 +81,7 @@ describe('TrackerService', () => {
       });
 
     trackersRequest = httpTestingController.expectOne(
-      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
+      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}`,
       'trackers request'
     );
 
@@ -103,7 +103,7 @@ describe('TrackerService', () => {
     const URL = '/api/telematica/trackers';
 
     let trackersRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${TrackersSortBy.Name}&sortDirection=${SortDirection.Ascending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}&sortBy=${TrackersSortBy.Name}&sortDirection=${SortDirection.Ascending}`,
       'sorted by name trackers request'
     );
 
@@ -123,7 +123,7 @@ describe('TrackerService', () => {
       });
 
     trackersRequest = httpTestingController.expectOne(
-      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}&sortBy=${TrackersSortBy.Start}&sortDirection=${SortDirection.Descending}`,
+      `${URL}?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}&sortBy=${TrackersSortBy.Start}&sortDirection=${SortDirection.Descending}`,
       'sorted in descending order by start date trackers request'
     );
 
@@ -144,7 +144,7 @@ describe('TrackerService', () => {
       });
 
     trackersRequest = httpTestingController.expectOne(
-      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE}`,
+      `/api/telematica/trackers?pageNum=${PAGE_NUM}&pageSize=${PAGE_SIZE_1000}`,
       'unsorted trackers request'
     );
 
