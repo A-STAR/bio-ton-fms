@@ -355,6 +355,7 @@
           }
         ],
         "object-shorthand": "warn",
+        "operator-assignment": "warn",
         "padded-blocks": [
           "warn",
           "never"
