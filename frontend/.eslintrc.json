@@ -360,6 +360,7 @@
           "warn",
           "never"
         ],
+        "prefer-arrow-callback": "warn",
         "prefer-const": [
           "warn",
           {
