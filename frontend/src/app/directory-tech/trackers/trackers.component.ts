@@ -8,9 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, filter, mergeMap, switchMap, tap } from 'rxjs';
 
-import { TrackersSortBy, Tracker, Trackers, TrackersOptions, TrackerService, NewTracker } from '../tracker.service';
+import { NewTracker, Tracker, TrackerService, Trackers, TrackersOptions, TrackersSortBy } from '../tracker.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { StopClickPropagationDirective } from '../../../app/shared/stop-click-propagation/stop-click-propagation.directive';

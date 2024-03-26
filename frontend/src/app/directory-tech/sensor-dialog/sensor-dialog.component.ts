@@ -12,7 +12,7 @@ import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansi
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { forkJoin, map, Observable, share, Subscription, tap } from 'rxjs';
+import { Observable, Subscription, forkJoin, map, share, tap } from 'rxjs';
 
 import { NewSensor, Sensor, SensorGroup, SensorService, Unit } from '../sensor.service';
 

@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import {
-  MessagesOptions,
   MessageService,
   MessageStatistics,
   MessageStatisticsOptions,
   MessageTrackOptions,
-  Messages
+  Messages,
+  MessagesOptions
 } from './message.service';
 
 import { DataMessageParameter, MessageType } from './messages.component';

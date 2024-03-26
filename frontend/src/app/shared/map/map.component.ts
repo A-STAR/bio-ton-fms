@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit } from '@angular/core';
 import { CommonModule, formatDate, formatNumber } from '@angular/common';
 
-import { CreatePopupContentProps, createWebMap, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap } from '@nextgis/webmap';
+import { CreatePopupContentProps, FeatureLayerAdapter, FitOptions, MainLayerAdapter, WebMap, createWebMap } from '@nextgis/webmap';
 import MapAdapter from '@nextgis/mapboxgl-map-adapter';
 import maplibregl from 'maplibre-gl';
 import { FeatureProperties, LngLatArray, LngLatBoundsArray } from '@nextgis/utils';
 import { createQmsAdapter } from '@nextgis/qms-kit';
-import { createNgwLayerAdapter, NgwLayerAdapterType, NgwLayerOptions } from '@nextgis/ngw-kit';
+import { NgwLayerAdapterType, NgwLayerOptions, createNgwLayerAdapter } from '@nextgis/ngw-kit';
 import NgwConnector, { ResourceDefinition } from '@nextgis/ngw-connector';
 import { Feature, FeatureCollection, LineString, Point, Position } from 'geojson';
 import { getIcon } from '@nextgis/icons';
@@ -14,7 +14,7 @@ import { getIcon } from '@nextgis/icons';
 import { firstValueFrom, map, tap } from 'rxjs';
 
 import { LocationAndTrackResponse, TechService } from '../../tech/tech.service';
-import { localeID, RelativeTimePipe } from '../../tech/shared/relative-time.pipe';
+import { RelativeTimePipe, localeID } from '../../tech/shared/relative-time.pipe';
 
 import { MonitoringTech } from '../../tech/tech.component';
 

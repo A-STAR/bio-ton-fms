@@ -9,7 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, filter, map, mergeMap, Observable, shareReplay, Subscription, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, filter, map, mergeMap, shareReplay, switchMap, tap } from 'rxjs';
 
 import { Tracker, TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
 import { Sensor, SensorService } from '../sensor.service';

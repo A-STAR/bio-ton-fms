@@ -5,7 +5,7 @@ import { KeyValue } from '@angular/common';
 import { SortOptions } from './shared/sort';
 import { VehicleDataSource } from './vehicles/vehicles.component';
 
-import { PAGE_NUM as pageNum, PAGE_SIZE_1000 as pageSize, Pagination, PaginationOptions } from './shared/pagination';
+import { Pagination, PaginationOptions, PAGE_NUM as pageNum, PAGE_SIZE_1000 as pageSize } from './shared/pagination';
 
 @Injectable({
   providedIn: 'root'

@@ -1,7 +1,7 @@
 import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, KeyValue, formatDate, registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -20,9 +20,9 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of, throwError } from 'rxjs';
 
-import { Trackers, TrackerService } from '../tracker.service';
+import { TrackerService, Trackers } from '../tracker.service';
 
-import TrackersComponent, { TrackerColumn, trackerColumns, TRACKER_DELETED } from './trackers.component';
+import TrackersComponent, { TRACKER_DELETED, TrackerColumn, trackerColumns } from './trackers.component';
 import { TrackerDialogComponent } from '../tracker-dialog/tracker-dialog.component';
 
 import { environment } from '../../../environments/environment';

@@ -5,7 +5,7 @@ import { KeyValue } from '@angular/common';
 import { Tracker } from './tracker.service';
 import { SensorDataSource } from './tracker/tracker.component';
 
-import { PAGE_NUM as pageNum, PAGE_SIZE as pageSize, Pagination, PaginationOptions } from './shared/pagination';
+import { Pagination, PaginationOptions, PAGE_NUM as pageNum, PAGE_SIZE as pageSize } from './shared/pagination';
 
 @Injectable({
   providedIn: 'root'

@@ -19,9 +19,9 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 
 import { Observable, of, throwError } from 'rxjs';
 
-import { Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
+import { VehicleService, Vehicles, VehiclesOptions } from '../vehicle.service';
 
-import VehiclesComponent, { vehicleColumns, VehicleColumn, VEHICLE_DELETED } from './vehicles.component';
+import VehiclesComponent, { VEHICLE_DELETED, VehicleColumn, vehicleColumns } from './vehicles.component';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';
 
 import { environment } from '../../../environments/environment';

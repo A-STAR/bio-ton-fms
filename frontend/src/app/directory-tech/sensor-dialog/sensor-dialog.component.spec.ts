@@ -21,7 +21,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { NewSensor, Sensor, SensorGroup, SensorService, Unit } from '../sensor.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
-import { SensorDialogComponent, SensorDialogData, SENSOR_CREATED, SENSOR_UPDATED } from './sensor-dialog.component';
+import { SENSOR_CREATED, SENSOR_UPDATED, SensorDialogComponent, SensorDialogData } from './sensor-dialog.component';
 
 import { TEST_TRACKER_ID } from '../tracker.service.spec';
 import {

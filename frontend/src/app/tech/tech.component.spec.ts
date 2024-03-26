@@ -23,16 +23,16 @@ import {
   VehicleMonitoringInfo
 } from './tech.service';
 
-import TechComponent, { POLL_INTERVAL_PERIOD, DEBOUNCE_DUE_TIME, SEARCH_MIN_LENGTH } from './tech.component';
+import TechComponent, { DEBOUNCE_DUE_TIME, POLL_INTERVAL_PERIOD, SEARCH_MIN_LENGTH } from './tech.component';
 import { TechMonitoringStateComponent } from './shared/tech-monitoring-state/tech-monitoring-state.component';
 import { MapComponent } from '../shared/map/map.component';
 
 import {
   mockTestFoundMonitoringVehicles,
   testFindCriterion,
-  testVehicleMonitoringInfo,
+  testLocationAndTrackResponse,
   testMonitoringVehicles,
-  testLocationAndTrackResponse
+  testVehicleMonitoringInfo
 } from './tech.service.spec';
 
 describe('TechComponent', () => {

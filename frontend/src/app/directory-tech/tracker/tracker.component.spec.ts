@@ -2,11 +2,11 @@ import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { DATE_PIPE_DEFAULT_OPTIONS, formatDate, formatNumber, KeyValue, registerLocaleData } from '@angular/common';
+import { DATE_PIPE_DEFAULT_OPTIONS, KeyValue, formatDate, formatNumber, registerLocaleData } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute, convertToParamMap, Params } from '@angular/router';
+import { ActivatedRoute, Params, convertToParamMap } from '@angular/router';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -24,7 +24,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 import { Observable, of, throwError } from 'rxjs';
 
 import { TrackerParameter, TrackerParameterName, TrackerService, TrackerStandardParameter } from '../tracker.service';
-import { Sensor, Sensors, SensorService } from '../sensor.service';
+import { Sensor, SensorService, Sensors } from '../sensor.service';
 
 import TrackerComponent, { SENSOR_DELETED, SensorColumn, sensorColumns, trackerParameterColumns } from './tracker.component';
 import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component';
@@ -32,7 +32,7 @@ import { SensorDialogComponent } from '../sensor-dialog/sensor-dialog.component'
 import { environment } from '../../../environments/environment';
 import { localeID } from '../../tech/shared/relative-time.pipe';
 import { dateFormat } from '../trackers/trackers.component.spec';
-import { testParameters, testStandardParameters, TEST_TRACKER_ID } from '../tracker.service.spec';
+import { TEST_TRACKER_ID, testParameters, testStandardParameters } from '../tracker.service.spec';
 import { testSensor, testSensors } from '../sensor.service.spec';
 
 describe('TrackerComponent', () => {
