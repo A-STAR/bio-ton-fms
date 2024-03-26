@@ -369,6 +369,7 @@
           }
         ],
         "prefer-destructuring": "warn",
+        "prefer-template": "warn",
         "quotes": [
           "error",
           "single",
