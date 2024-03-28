@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
-import { catchError, mergeMap, Observable, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, mergeMap, of, tap, throwError } from 'rxjs';
 
 import { TokenService } from './token.service';
 import { AuthService } from './auth.service';

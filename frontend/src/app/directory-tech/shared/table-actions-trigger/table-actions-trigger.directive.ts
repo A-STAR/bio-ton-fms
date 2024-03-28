@@ -1,6 +1,6 @@
 import { Directive, HostListener, OnDestroy } from '@angular/core';
 
-import { delay, of, Subscription } from 'rxjs';
+import { Subscription, delay, of } from 'rxjs';
 
 @Directive({
   selector: '[bioTableActionsTrigger]',

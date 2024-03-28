@@ -6,7 +6,7 @@ import localeRu from '@angular/common/locales/ru';
 import { HttpClientModule } from '@angular/common/http';
 import { HarnessLoader, parallel } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatDialogTitle, MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose, MatDialogTitle } from '@angular/material/dialog';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { MatChipSetHarness } from '@angular/material/chips/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
@@ -17,13 +17,13 @@ import { TrackerParametersHistory, TrackerService } from '../tracker.service';
 
 import {
   ParameterHistoryColumn,
-  trackerParameterHistoryColumns,
-  TrackerParametersHistoryDialogComponent
+  TrackerParametersHistoryDialogComponent,
+  trackerParameterHistoryColumns
 } from './tracker-parameters-history-dialog.component';
 
 import { localeID } from '../../tech/shared/relative-time.pipe';
 import { dateFormat } from '../trackers/trackers.component.spec';
-import { testParametersHistory, TEST_TRACKER_ID } from '../tracker.service.spec';
+import { TEST_TRACKER_ID, testParametersHistory } from '../tracker.service.spec';
 
 describe('TrackerParametersHistoryDialogComponent', () => {
   let component: TrackerParametersHistoryDialogComponent;

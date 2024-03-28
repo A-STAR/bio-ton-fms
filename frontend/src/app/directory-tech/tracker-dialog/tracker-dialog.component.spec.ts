@@ -2,13 +2,13 @@ import { ErrorHandler, LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { formatDate, KeyValue, registerLocaleData } from '@angular/common';
+import { KeyValue, formatDate, registerLocaleData } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import localeRu from '@angular/common/locales/ru';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatDialogRef, MatDialogTitle, MAT_DIALOG_DATA, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
@@ -21,7 +21,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { NewTracker, Tracker, TrackerService, TrackerTypeEnum } from '../tracker.service';
 
 import { NumberOnlyInputDirective } from '../../shared/number-only-input/number-only-input.directive';
-import { inputDateFormat, TrackerDialogComponent, TRACKER_CREATED, TRACKER_UPDATED } from './tracker-dialog.component';
+import { TRACKER_CREATED, TRACKER_UPDATED, TrackerDialogComponent, inputDateFormat } from './tracker-dialog.component';
 
 import { environment } from '../../../environments/environment';
 import { localeID } from '../../tech/shared/relative-time.pipe';

@@ -8,9 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { BehaviorSubject, switchMap, Observable, tap, Subscription, filter, mergeMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, filter, mergeMap, switchMap, tap } from 'rxjs';
 
-import { NewVehicle, VehiclesSortBy, Vehicle, Vehicles, VehicleService, VehiclesOptions } from '../vehicle.service';
+import { NewVehicle, Vehicle, VehicleService, Vehicles, VehiclesOptions, VehiclesSortBy } from '../vehicle.service';
 
 import { TableActionsTriggerDirective } from '../shared/table-actions-trigger/table-actions-trigger.directive';
 import { VehicleDialogComponent } from '../vehicle-dialog/vehicle-dialog.component';

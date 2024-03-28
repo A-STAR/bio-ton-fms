@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { DEFAULT_ERROR_MESSAGE, ErrorHandler as ErrorHandlerClass, ERROR_ACTION, snackBarConfig } from './error.handler';
+import { DEFAULT_ERROR_MESSAGE, ERROR_ACTION, ErrorHandler as ErrorHandlerClass, snackBarConfig } from './error.handler';
 
 describe('ErrorHandler', () => {
   let handler: ErrorHandler;

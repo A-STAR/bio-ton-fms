@@ -377,6 +377,12 @@
             "allowTemplateLiterals": true
           }
         ],
+        "sort-imports": [
+          "warn",
+          {
+            "ignoreDeclarationSort": true
+          }
+        ],
         "space-before-blocks": "warn",
         "space-before-function-paren": [
           "error",
