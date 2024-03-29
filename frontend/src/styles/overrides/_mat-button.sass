@@ -103,11 +103,14 @@
   &.mat-warn
     color: $green
 
-  &.mat-unthemed[aria-pressed="true"]
-    color: $light-green
+  &[aria-pressed="true"]
 
-  &.mat-primary[aria-pressed="true"]
-    color: $green
+    &.mat-unthemed,
+    &.mat-accent
+      color: $light-green
+
+    &.mat-primary
+      color: $green
 
   &:hover,
   &:active
