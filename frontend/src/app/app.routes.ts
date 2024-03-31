@@ -10,7 +10,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'messages',
+        redirectTo: 'tech',
         pathMatch: 'full'
       },
       {
