@@ -328,6 +328,7 @@
             "allowForLoopAfterthoughts": true
           }
         ],
+        "no-regex-spaces": "warn",
         "no-restricted-imports": [
           "error",
           {
