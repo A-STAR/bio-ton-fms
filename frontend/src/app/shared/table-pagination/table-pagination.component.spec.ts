@@ -129,7 +129,9 @@ describe('TablePaginationComponent', () => {
 
     let page = 5;
 
-    await pageInput.setValue(`${page}`);
+    await pageInput.setValue(
+      page.toString()
+    );
 
     const nextButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -142,19 +144,23 @@ describe('TablePaginationComponent', () => {
 
     await nextButton.click();
 
+    page += 1;
+
     await expectAsync(
       pageInput.getValue()
     )
       .withContext('set next page')
-      .toBeResolvedTo(`${++page}`);
+      .toBeResolvedTo(`${page}`);
 
     await nextButton.click();
 
+    page += 1;
+
     await expectAsync(
       pageInput.getValue()
     )
       .withContext('set next page')
-      .toBeResolvedTo(`${++page}`);
+      .toBeResolvedTo(`${page}`);
 
     const previousButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -167,19 +173,23 @@ describe('TablePaginationComponent', () => {
 
     await previousButton.click();
 
+    page -= 1;
+
     await expectAsync(
       pageInput.getValue()
     )
       .withContext('set previous page')
-      .toBeResolvedTo(`${--page}`);
+      .toBeResolvedTo(`${page}`);
 
     await previousButton.click();
 
+    page -= 1;
+
     await expectAsync(
       pageInput.getValue()
     )
       .withContext('set previous page')
-      .toBeResolvedTo(`${--page}`);
+      .toBeResolvedTo(`${page}`);
 
     const beginningButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -196,7 +206,7 @@ describe('TablePaginationComponent', () => {
       pageInput.getValue()
     )
       .withContext('set the 1st page')
-      .toBeResolvedTo(`${1}`);
+      .toBeResolvedTo('1');
 
     const endButton = await loader.getHarness(
       MatButtonHarness.with({

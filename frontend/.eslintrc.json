@@ -322,6 +322,12 @@
         "no-lone-blocks": "warn",
         "no-lonely-if": "warn",
         "no-multi-str": "warn",
+        "no-plusplus": [
+          "warn",
+          {
+            "allowForLoopAfterthoughts": true
+          }
+        ],
         "no-restricted-imports": [
           "error",
           {
