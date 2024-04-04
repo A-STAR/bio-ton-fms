@@ -344,6 +344,7 @@
         ],
         "no-self-compare": "warn",
         "no-template-curly-in-string": "warn",
+        "no-throw-literal": "error",
         "no-undef-init": "error",
         "no-unexpected-multiline": "warn",
         "no-unmodified-loop-condition": "error",
