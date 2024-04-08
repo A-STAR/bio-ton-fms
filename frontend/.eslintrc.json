@@ -179,6 +179,7 @@
           }
         ],
         "@typescript-eslint/semi": "error",
+        "array-bracket-spacing": "warn",
         "arrow-body-style": [
           "warn",
           "as-needed"
