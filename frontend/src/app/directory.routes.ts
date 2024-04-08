@@ -4,7 +4,7 @@ const routes: Routes = [
   {
     path: '',
     redirectTo: 'tech',
-    pathMatch: 'full',
+    pathMatch: 'full'
   },
   {
     path: 'tech',

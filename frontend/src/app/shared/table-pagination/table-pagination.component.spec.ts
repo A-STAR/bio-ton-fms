@@ -52,7 +52,7 @@ describe('TablePaginationComponent', () => {
     const sizeSelect = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#pagination-form',
-        selector: '[placeholder="Размер"]',
+        selector: '[placeholder="Размер"]'
       })
     );
 
@@ -244,7 +244,7 @@ describe('TablePaginationComponent', () => {
     const sizeSelect = await loader.getHarness(
       MatSelectHarness.with({
         ancestor: 'form#pagination-form',
-        selector: '[placeholder="Размер"]',
+        selector: '[placeholder="Размер"]'
       })
     );
 

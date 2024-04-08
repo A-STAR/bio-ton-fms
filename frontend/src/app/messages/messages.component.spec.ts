@@ -767,7 +767,7 @@ describe('MessagesComponent', () => {
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString(),
       viewMessageType: MessageType.DataMessage,
-      parameterType: DataMessageParameter.TrackerData,
+      parameterType: DataMessageParameter.TrackerData
     };
 
     const testStatisticsOptions: MessageStatisticsOptions = {
