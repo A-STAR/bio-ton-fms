@@ -161,7 +161,7 @@ describe('SensorDialogComponent', () => {
     const tabGroup = await loader.getHarnessOrNull(
       MatTabGroupHarness.with({
         ancestor: 'form#sensor-form',
-        selectedTabLabel: 'Основные сведения',
+        selectedTabLabel: 'Основные сведения'
       })
     );
 

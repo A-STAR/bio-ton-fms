@@ -292,7 +292,7 @@ export class SensorDialogComponent implements OnInit {
       tracker: this.data.sensor!.tracker,
       sensorType: {
         id: sensorTypeId,
-        value: type.name,
+        value: type.name
       },
       unit: {
         id: unitId,

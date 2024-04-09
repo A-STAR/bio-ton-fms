@@ -469,7 +469,7 @@ describe('TechComponent', () => {
     index = 1;
 
     await list.deselectItems({
-      title: testMonitoringVehicles[index].name,
+      title: testMonitoringVehicles[index].name
     });
 
     tick(DEBOUNCE_DUE_TIME);

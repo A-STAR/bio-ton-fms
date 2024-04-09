@@ -185,6 +185,7 @@
           "as-needed"
         ],
         "camelcase": "warn",
+        "comma-dangle": "warn",
         "curly": "warn",
         "default-case-last": "warn",
         "default-param-last": "warn",
