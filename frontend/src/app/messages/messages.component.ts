@@ -865,7 +865,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
         const valuePattern = new RegExp(`^${value}$`, 'i');
 
         switch (true) {
-          case (lastValueString !== undefined):
+          case lastValueString !== undefined:
             hasMatch &&= ['=', '<>'].includes(comparison);
 
             if (hasMatch) {
@@ -876,7 +876,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
             break;
 
-          case (lastValueDecimal !== undefined):
+          case lastValueDecimal !== undefined:
             switch (comparison) {
               case '<':
                 hasMatch &&= lastValueDecimal! < Number(value);
@@ -909,7 +909,7 @@ export default class MessagesComponent implements OnInit, OnDestroy {
 
             break;
 
-          case (lastValueDateTime !== undefined):
+          case lastValueDateTime !== undefined:
             hasMatch &&= ['=', '<>'].includes(comparison);
 
             if (hasMatch) {
