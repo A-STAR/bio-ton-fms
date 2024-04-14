@@ -390,6 +390,10 @@
         ],
         "prefer-destructuring": "warn",
         "prefer-template": "warn",
+        "quote-props": [
+          "warn",
+          "as-needed"
+        ],
         "quotes": [
           "error",
           "single",
