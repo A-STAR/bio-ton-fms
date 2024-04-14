@@ -401,6 +401,7 @@
             "allowTemplateLiterals": true
           }
         ],
+        "semi-spacing": "warn",
         "sort-imports": [
           "warn",
           {
