@@ -416,6 +416,7 @@
             "named": "never"
           }
         ],
+        "space-unary-ops": "warn",
         "spaced-comment": "warn"
       }
     },
