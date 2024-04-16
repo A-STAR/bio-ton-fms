@@ -195,6 +195,7 @@
           "warn",
           "as-needed"
         ],
+        "arrow-spacing": "warn",
         "camelcase": "warn",
         "comma-dangle": "warn",
         "curly": "warn",
