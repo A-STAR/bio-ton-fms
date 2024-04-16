@@ -191,6 +191,10 @@
           "warn",
           "as-needed"
         ],
+        "arrow-parens": [
+          "warn",
+          "as-needed"
+        ],
         "camelcase": "warn",
         "comma-dangle": "warn",
         "curly": "warn",
@@ -367,7 +371,10 @@
         "no-useless-rename": "warn",
         "no-void": "error",
         "no-whitespace-before-property": "error",
-        "object-curly-spacing": ["warn", "always"],
+        "object-curly-spacing": [
+          "warn",
+          "always"
+        ],
         "object-property-newline": [
           "warn",
           {
