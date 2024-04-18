@@ -196,6 +196,7 @@
           "as-needed"
         ],
         "arrow-spacing": "warn",
+        "block-spacing": "warn",
         "camelcase": "warn",
         "comma-dangle": "warn",
         "curly": "warn",
