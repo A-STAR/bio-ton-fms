@@ -200,6 +200,13 @@
         "brace-style": "warn",
         "camelcase": "warn",
         "comma-dangle": "warn",
+        "comma-spacing": [
+          "error",
+          {
+            "before": false,
+            "after": true
+          }
+        ],
         "curly": "warn",
         "default-case-last": "warn",
         "default-param-last": "warn",
