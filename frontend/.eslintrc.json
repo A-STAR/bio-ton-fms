@@ -207,6 +207,7 @@
             "after": true
           }
         ],
+        "computed-property-spacing": "warn",
         "curly": "warn",
         "default-case-last": "warn",
         "default-param-last": "warn",
