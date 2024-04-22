@@ -226,10 +226,9 @@ describe('TrackerComponent', () => {
     });
 
     const cellTexts = await parallel(() => cells.map(
-      rowCells =>
-        parallel(
-          () => rowCells.map(cell => cell.getText())
-        )
+      rowCells => parallel(
+        () => rowCells.map(cell => cell.getText())
+      )
     ));
 
     cellTexts.forEach((rowCellTexts, index) => {
@@ -407,10 +406,9 @@ describe('TrackerComponent', () => {
     });
 
     const cellTexts = await parallel(() => cells.map(
-      rowCells =>
-        parallel(
-          () => rowCells.map(cell => cell.getText())
-        )
+      rowCells => parallel(
+        () => rowCells.map(cell => cell.getText())
+      )
     ));
 
     cellTexts.forEach((rowCellTexts, index) => {
@@ -679,12 +677,11 @@ describe('TrackerComponent', () => {
     });
 
     const cellTexts = await parallel(() => cells.map(
-      rowCells =>
-        parallel(
-          () => rowCells
-            .slice(1, -1)
-            .map(cell => cell.getText())
-        )
+      rowCells => parallel(
+        () => rowCells
+          .slice(1, -1)
+          .map(cell => cell.getText())
+      )
     ));
 
     cellTexts.forEach((rowCellTexts, index) => {
