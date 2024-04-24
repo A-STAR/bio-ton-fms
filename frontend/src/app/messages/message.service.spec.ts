@@ -326,7 +326,7 @@ export const testSensorMessages: Messages = {
 };
 
 export const testCommandMessages: Messages = {
-  commandMessages:[
+  commandMessages: [
     {
       id: 2,
       num: 1,
