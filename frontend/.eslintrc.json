@@ -277,6 +277,7 @@
             "SwitchCase": 1
           }
         ],
+        "key-spacing": "warn",
         "keyword-spacing": "warn",
         "lines-between-class-members": [
           "warn",
