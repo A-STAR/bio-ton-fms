@@ -224,6 +224,7 @@
           "warn",
           "getBeforeSet"
         ],
+        "implicit-arrow-linebreak": "warn",
         "jsdoc/check-line-alignment": "warn",
         "jsdoc/check-param-names": [
           "error",
