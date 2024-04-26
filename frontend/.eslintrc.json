@@ -279,6 +279,13 @@
         ],
         "key-spacing": "warn",
         "keyword-spacing": "warn",
+        "lines-around-comment": [
+          "error",
+          {
+            "allowBlockStart": true,
+            "allowClassStart": true
+          }
+        ],
         "lines-between-class-members": [
           "warn",
           "always",
