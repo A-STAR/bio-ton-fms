@@ -216,7 +216,7 @@ public class TrackerMessageRepository : Repository<TrackerMessage, MessagesDBCon
         var now = SystemTime.UtcNow;
 
         var foundResults = QueryableProvider.Linq()
-            .Where(x => externalIds.Contains(x.ExternalTrackerId) && x.TrackerDateTime.HasValue)
+            .Where(x => externalIds.Contains(x.ExternalTrackerId) && x.TrackerDateTime.HasValue && x.TrackerDateTime >= now.AddDays(-7)) // смотрим сообщения только за последнюю неделю
             .GroupBy(x => x.ExternalTrackerId,
                 (key, g) => g
                     .OrderByDescending(x => x.TrackerDateTime)
