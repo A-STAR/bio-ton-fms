@@ -411,6 +411,42 @@
           "warn",
           "never"
         ],
+        "padding-line-between-statements": [
+          "warn",
+          {
+            "blankLine": "always",
+            "prev": "*",
+            "next": "*"
+          },
+          {
+            "blankLine": "any",
+            "prev": [
+              "import",
+              "export",
+              "expression",
+              "const",
+              "let",
+              "case"
+            ],
+            "next": [
+              "import",
+              "export",
+              "expression",
+              "const",
+              "let",
+              "case",
+              "default"
+            ]
+          },
+          {
+            "blankLine": "always",
+            "prev": "multiline-block-like",
+            "next": [
+              "case",
+              "default"
+            ]
+          }
+        ],
         "prefer-arrow-callback": "warn",
         "prefer-const": [
           "warn",
