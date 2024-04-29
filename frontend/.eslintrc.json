@@ -468,6 +468,7 @@
             "allowTemplateLiterals": true
           }
         ],
+        "rest-spread-spacing": "warn",
         "semi-spacing": "warn",
         "sort-imports": [
           "warn",
