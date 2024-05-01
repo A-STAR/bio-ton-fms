@@ -485,6 +485,7 @@
             "named": "never"
           }
         ],
+        "space-in-parens": "warn",
         "space-unary-ops": "warn",
         "spaced-comment": "warn"
       }
