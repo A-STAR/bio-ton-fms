@@ -391,6 +391,12 @@
         "no-useless-rename": "warn",
         "no-void": "error",
         "no-whitespace-before-property": "error",
+        "object-curly-newline": [
+          "warn",
+          {
+            "consistent": true
+          }
+        ],
         "object-curly-spacing": [
           "warn",
           "always"
