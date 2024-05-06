@@ -201,7 +201,7 @@
         "camelcase": "warn",
         "comma-dangle": "warn",
         "comma-spacing": [
-          "error",
+          "warn",
           {
             "before": false,
             "after": true
@@ -215,7 +215,7 @@
           "error",
           "smart"
         ],
-        "func-call-spacing": "error",
+        "func-call-spacing": "warn",
         "func-names": [
           "warn",
           "as-needed"
@@ -280,7 +280,7 @@
         "key-spacing": "warn",
         "keyword-spacing": "warn",
         "lines-around-comment": [
-          "error",
+          "warn",
           {
             "allowBlockStart": true,
             "allowClassStart": true
@@ -390,7 +390,7 @@
         "no-useless-escape": "warn",
         "no-useless-rename": "warn",
         "no-void": "error",
-        "no-whitespace-before-property": "error",
+        "no-whitespace-before-property": "warn",
         "object-curly-newline": [
           "warn",
           {
@@ -485,7 +485,7 @@
         ],
         "space-before-blocks": "warn",
         "space-before-function-paren": [
-          "error",
+          "warn",
           {
             "anonymous": "never",
             "named": "never"
