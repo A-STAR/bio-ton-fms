@@ -118,7 +118,9 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
           size: number;
         } => this.paginationForm.valid),
         debounceTime(DEBOUNCE_DUE_TIME),
-        distinctUntilChanged((previous, current) => current.page === previous.page && current.size === previous.size)
+        // also compare `#pagination.pageIndex` for update coming from outside
+        distinctUntilChanged((previous, current) => (current.page === previous.page && this.#pagination.pageIndex === previous.page)
+          && current.size === previous.size)
       )
       .subscribe(({ page, size }) => {
         this.paginationChange.emit({
